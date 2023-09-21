@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingExampleInstances" data-bs-toggle="collapse" data-bs-target="#collapseExampleInstances" aria-expanded="true" aria-controls="collapseExampleInstances">
+        <h5 class="mb-0">
+            Example Instances
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapseExampleInstances" class="card-body collapse show" aria-labelledby="headingExampleInstances">
+        {% if data['Example Instances'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <ol>
+                {% for example in data['Example Instances'] %}
+                    <li>{{ example | safe }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+</div>

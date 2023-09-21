@@ -1,0 +1,92 @@
+.table-dataframe{
+    width: 100% !important;
+    /* border-collapse: separate !important; */
+}
+.table-dataframe tbody th, th{
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    font-weight: bold;
+    min-width: 110px !important;
+}
+.table-dataframe tbody td, td{
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    word-wrap: break-word;
+    vertical-align: top;
+    white-space: pre-line;
+}
+.table-dataframe tbody th {
+    text-align: center;
+    vertical-align: middle;
+}
+.table-dataframe .filter-input{
+    &::placeholder{
+        animation: floatText 5s infinite linear;
+    }
+    &:focus::placeholder{
+        animation: finalText 0.2s linear;
+    }
+}
+@-webkit-keyframes floatText {
+    0% {text-indent:100%;}
+    100% {text-indent:-100%;}
+}
+@-webkit-keyframes finalText {
+    from{text-indent:50%;}
+    to{text-indent:0%;}
+}
+
+/* .btn-check + .btn{
+    color: black;
+    background-color: transparent;
+    border-color: rgb(0, 169, 124) !important;
+}
+.btn-check:focus + .btn, .btn-check:active + .btn, .btn-check:hover + .btn, .btn-check:checked + .btn{
+    background-color: rgb(0, 128, 94) !important;
+    border-color: rgb(0, 169, 124) !important;
+} */
+
+.badge-Meta{
+    background-color: #0009b4 !important;
+}
+.badge-Standard{
+    background-color: #2830b8 !important;
+}
+.badge-Detailed{
+    background-color: #5156b0 !important;
+}
+.badge-domains{
+    background-color: #07a081 !important;
+}
+.badge-High{
+    background-color: #a01407 !important;
+}
+.badge-Medium{
+    background-color: #a05b07 !important;
+}
+.badge-Low{
+    background-color: #93a007 !important;
+}
+
+.accordion-options{
+    width: 100%;
+    margin: 15px auto;
+    clear: both;
+    float: left;
+}
+
+.accordion-options .btn{
+    float: right;
+}
+
+.card-header[data-bs-toggle="collapse"] {
+    cursor: pointer !important;
+}
+
+.card-header.collapsed .fa-chevron-down {
+    transform: rotate(-90deg);
+}
+
+.fa-chevron-down{
+    transition: all 0.3s ease-in-out;
+}

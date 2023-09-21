@@ -1,0 +1,34 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingExternalRef" data-bs-toggle="collapse" data-bs-target="#collapseExternalRef" aria-expanded="true" aria-controls="collapseExternalRef">
+        <h5 class="mb-0">
+            External References
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapseExternalRef" class=" card-body collapse show" aria-labelledby="headingExternalRef">
+        {% if data['External References'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <table class="table table-hover table-striped table-responsive">
+                <thead>
+                    <tr>
+                        <th scope="col">External ID</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Link</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ref in data['External References'] %}
+                    <tr>
+                        <th scope="row">{{ ref.external_id }}</th>
+                        <td>{{ ref.source_name }}</td>
+                        <td><a href="{{ ref.url }}">{{ ref.url }}</a></td>
+                        <td>{{ ref.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<h3>
+    <span class="badge badge-{{data['Abstraction']}}">{{data['Abstraction']}}</span>
+    {% for domain in data['Domains'] %}
+        <span class="badge badge-domains">
+            {{ domain }}
+        </span>
+    {% endfor %}
+    {% if data['Likelihood Of Attack'] is not none %}
+        <span class="badge badge-{{data['Likelihood Of Attack']}}">Likelihood: {{data['Likelihood Of Attack']}}</span>
+    {% endif %}
+    {% if data['Typical Severity'] is not none %}
+        <span class="badge badge-{{data['Typical Severity']}}">Typical Severity: {{data['Typical Severity']}}</span>
+    {% endif %}
+</h3>
+
+{% if data['Capec Parents ID'] is not none %}
+<h4>
+    Parents:
+    {% for parent in data['Capec Parents ID'] | sort %}
+        <!-- <span class="badge badge-primary">
+            <a href="/capec-detail?id={{ parent }}">{{ parent }}</a>
+        </span> -->
+        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#CapecModal{{ parent }}">
+            {{ parent }}
+        </button>
+    {% endfor %}
+</h4>
+{% endif %}
+
+{% if data['Capec Childs ID'] is not none %}
+<h4>
+    Childs:
+    {% for child in data['Capec Childs ID'] | sort %}
+        <span class="badge badge-primary">
+            <a href="/capec-detail?id={{ child }}">{{ child }}</a>
+        </span>
+    {% endfor %}
+</h4>
+{% endif %}

@@ -1,0 +1,100 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Capec-{{ data.name }} {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h3 class="m-b-10">
+                                            Capec-<span class="badge badge-primary">{{ data.name }}</span> Detail: 
+                                            <span class="text-primary">
+                                                {{ data['Name'] }}
+                                            </span>
+                                        </h3>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                        <li class="breadcrumb-item"><a href="/capec">Capec</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Capec-{{ data.name }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="col-xl-12">
+                                <!-- Badges start -->
+                                {% include 'home/capec-detail/badges.html' %}
+                                <!-- Badges end -->
+
+                                <div class="accordion-options">
+                                    <input type="checkbox" class="btn-check" id="ExpandToggle" checked autocomplete="off">
+                                    <label class="btn btn-primary" for="ExpandToggle" aria-expanded="false" aria-controls="">Expand All</label>
+                                </div>
+                                
+                                <!-- [ Cards ] start -->
+                                <div class="row">
+                                    <div class="col">
+                                        
+                                        <!-- Description -->
+                                        {% include 'home/capec-detail/description.html' %}
+                                        
+                                        <div class="accordion" id="accordionOne">
+                                            <!-- External References -->
+                                            {% include 'home/capec-detail/external-references.html' %}
+
+                                            <!-- Execution Flow -->
+                                            {% include 'home/capec-detail/execution-flow.html' %}
+                                            
+                                            <!-- Prerequisites -->
+                                            {% include 'home/capec-detail/prerequisites.html' %}
+                                            
+                                            <!-- Resources Required -->
+                                            {% include 'home/capec-detail/resource-required.html' %}
+                                            
+                                            <!-- Skills Required -->
+                                            {% include 'home/capec-detail/skills-required.html' %}
+                                            
+                                            <!-- Consequences -->
+                                            {% include 'home/capec-detail/consequences.html' %}
+                                            
+                                            <!-- Example Instances -->
+                                            {% include 'home/capec-detail/example-instances.html' %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Cards ] end -->
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->            
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/capec-detail.js"></script>
+{% endblock javascripts %}

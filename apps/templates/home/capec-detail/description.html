@@ -1,0 +1,26 @@
+<div class="card">
+    <div class="card-header">
+        <h5>Description</h5>
+    </div>
+    <div class="card-body">
+        <p class="m-b-14">{{ data['Description'] | safe}}</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header {{'collapsed' if data['Extended Description'] is none }}" id="headingExtendedDescription" data-bs-toggle="collapse" data-bs-target="#collapseExtendedDescription" aria-expanded="true" aria-controls="collapseExtendedDescription">
+        <h5 class="mb-0">
+            Extended Description
+            <i class="fas fa-chevron-down mr-auto"></i>
+        </h5>
+    </div>
+    <div id="collapseExtendedDescription" class="card-body collapse show" aria-labelledby="headingExtendedDescription">
+        {% if data['Extended Description'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <div>
+                {{ data['Extended Description'] | safe}}
+            </div>
+        {% endif %}
+    </div>
+</div>

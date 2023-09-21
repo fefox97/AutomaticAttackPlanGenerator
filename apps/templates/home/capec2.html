@@ -1,0 +1,89 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Attack Patterns {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Capec</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Capec</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="col-xl-12">
+                                <div class="card">
+                                        <div class="card-header">
+                                            <h5>Capec Attack Patterns</h5>
+                                        </div>
+                                        <div class="card-block table-border-style">
+
+                                            <label for="SearchID">Search by ID</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="SearchID" aria-describedby="SearchIDHelp" placeholder="Enter ID">
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-primary" title="Submit" data-toggle="tooltip" id="SearchIDButton">Search</button>
+                                                    <button type="reset" class="btn btn-secondary" title="Reset entry" data-toggle="tooltip" id="ResetIDButton">Reset</button>
+                                                    <input type="checkbox" class="btn-check" id="ShowTreeToggle" checked autocomplete="off">
+                                                    <label class="btn btn-primary" for="ShowTreeToggle">Show Tree</label>
+                                                </div>
+                                            </div>
+                                            <small id="SearchIDHelp" class="form-text text-muted">Enter one or multiple IDs.</small>
+                                            
+                                            <!-- TODO: Non completo -->
+                                            <div class="input-group">
+                                                <input id="TagsInput" type="text" value="Amsterdam,Washington,Sydney,Beijing,Cairo" data-role="tagsinput" class="form-control"/>
+                                                <div class="input-group-append">
+                                                    <button type="reset" class="btn btn-secondary" title="Reset entry" data-toggle="tooltip" id="ResetTagButton">Reset</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-block">
+                                            <!-- [ stiped-table ] start -->
+                                            {% if table is not none %}
+                                                {{ table|safe }}
+                                            {% else %}
+                                                <p class="text-danger mb-1 display-4">No data available</p>
+                                            {% endif %}
+                                            <!-- [ stiped-table ] end -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->            
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/capec.js"></script>
+{% endblock javascripts %}

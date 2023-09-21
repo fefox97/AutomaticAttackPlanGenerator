@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingPrerequisites" data-bs-toggle="collapse" data-bs-target="#collapsePrerequisites" aria-expanded="true" aria-controls="collapsePrerequisites">
+        <h5 class="mb-0">
+            Prerequisites
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapsePrerequisites" class=" card-body collapse show" aria-labelledby="headingPrerequisites">
+        {% if data['Prerequisites'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <ol>
+                {% for example in data['Prerequisites'] %}
+                    <li>{{ example | safe }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+</div>

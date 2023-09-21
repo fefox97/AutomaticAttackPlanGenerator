@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingResourceRequired" data-bs-toggle="collapse" data-bs-target="#collapseResourceRequired" aria-expanded="true" aria-controls="collapseResourceRequired">
+        <h5 class="mb-0">
+            Resource Required
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapseResourceRequired" class=" card-body collapse show" aria-labelledby="headingResourceRequired">
+        {% if data['Resources Required'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <ol>
+                {% for example in data['Resources Required'] %}
+                    <li>{{ example | safe }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+</div>

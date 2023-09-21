@@ -1,0 +1,32 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingSkillsRequired" data-bs-toggle="collapse" data-bs-target="#collapseSkillsRequired" aria-expanded="true" aria-controls="collapseSkillsRequired">
+        <h5 class="mb-0">
+            Skills Required
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapseSkillsRequired" class=" card-body collapse show" aria-labelledby="headingSkillsRequired">
+        {% if data['Skills Required'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+
+            <table class="table table-hover table-striped table-responsive">
+                <thead>
+                    <tr>
+                        {% for key, value in data['Skills Required'].items() %}
+                        <th scope="col">{{ key.replace('_', ' ') }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for key, value in data['Skills Required'].items() %}
+                    <tr>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>

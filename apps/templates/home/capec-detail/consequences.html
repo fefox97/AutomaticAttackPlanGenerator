@@ -1,0 +1,38 @@
+<div class="card">
+    <div class="card-header collapsed" id="headingConsequences" data-bs-toggle="collapse" data-bs-target="#collapseConsequences" aria-expanded="true" aria-controls="collapseConsequences">
+        <h5 class="mb-0">
+            Consequences
+            <i class="fas fa-chevron-down"></i>
+        </h5>
+    </div>
+    <div id="collapseConsequences" class="card-body collapse show" aria-labelledby="headingConsequences">
+        {% if data['Consequences'] is none %}
+            <p class="text-warning mb-1">Not present</p>
+        {% else %}
+            <!-- get maximum lenght of data['Consequences'].values() -->
+            {% set max_len = [] %}
+            {% for key, value in data['Consequences'].items() %}
+                {% set tmp =  max_len.append(value|length) %}
+            {% endfor %}
+
+            <table class="table table-hover table-striped table-responsive">
+                <thead>
+                    <tr>
+                        {% for key, value in data['Consequences'].items() %}
+                        <th scope="col">{{ key.replace('_', ' ') }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(max_len|max) %}
+                    <tr>
+                        {% for key, value in data['Consequences'].items() %}
+                        <td>{{ value[i] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
