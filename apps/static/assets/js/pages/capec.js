@@ -104,9 +104,9 @@ function replaceIDWithButton(table) {
         });
         cell.style = 'cursor: pointer;';
         
-        let new_content = document.createElement('button');
+        let new_content = document.createElement('span');
         new_content.innerHTML = id;
-        new_content.className = 'btn btn-primary btn-sm';
+        new_content.className = 'badge bg-primary';
         parent.replaceChildren(new_content);
     });
 
@@ -119,9 +119,9 @@ function replaceIDWithButton(table) {
                 cell.replaceChildren(parent);
                 let badges = [];
                 for(const element of data) {
-                    let badge = document.createElement('button');
+                    let badge = document.createElement('span');
                     badge.innerHTML = element;
-                    badge.className = 'btn btn-primary btn-sm';
+                    badge.className = 'badge bg-primary';
                     badge.style = 'margin-right: 5px; cursor: pointer;';
                     badge.addEventListener('click', () => {
                         window.location.href = '/capec-detail?id=' + element;

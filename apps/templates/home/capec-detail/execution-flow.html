@@ -1,16 +1,16 @@
-<div class="card">
-    <div class="card-header collapsed" id="headingExecutionFlow" data-bs-toggle="collapse" data-bs-target="#collapseExecutionFlow" aria-expanded="true" aria-controls="collapseExecutionFlow">
-        <h5 class="mb-0">
+<div class="card border-0 shadow mb-2">
+    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingExecutionFlow" data-bs-toggle="collapse" data-bs-target="#collapseExecutionFlow" aria-expanded="true" aria-controls="collapseExecutionFlow">
+        <h2 class="h5 mb-0">
             Execution Flow
             <i class="fas fa-chevron-down"></i>
-        </h5>
+        </h2>
     </div>
-    <div id="collapseExecutionFlow" class=" card-body collapse show" aria-labelledby="headingExecutionFlow">
+    <div id="collapseExecutionFlow" class="card-body collapse show" aria-labelledby="headingExecutionFlow">
         {% if data['Execution Flow'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <div class="table-striped">
-                {{ data['Execution Flow'] | replace('<table>', '<table class="table table-hover table-responsive table-striped">') | safe }}
+                {{ data['Execution Flow'] | replace('<table>', '<table class="table table-hover table-responsive table-striped">') | replace('h3', 'h5') | safe }}
             </div>
         {% endif %}
     </div>

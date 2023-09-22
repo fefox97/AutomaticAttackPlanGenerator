@@ -1,15 +1,15 @@
 <h3>
-    <span class="badge badge-{{data['Abstraction']}}">{{data['Abstraction']}}</span>
+    <span class="badge bg-{{data['Abstraction']}}">{{data['Abstraction']}}</span>
     {% for domain in data['Domains'] %}
-        <span class="badge badge-domains">
+        <span class="badge bg-domains">
             {{ domain }}
         </span>
     {% endfor %}
     {% if data['Likelihood Of Attack'] is not none %}
-        <span class="badge badge-{{data['Likelihood Of Attack']}}">Likelihood: {{data['Likelihood Of Attack']}}</span>
+        <span class="badge bg-{{data['Likelihood Of Attack']}}">Likelihood: {{data['Likelihood Of Attack']}}</span>
     {% endif %}
     {% if data['Typical Severity'] is not none %}
-        <span class="badge badge-{{data['Typical Severity']}}">Typical Severity: {{data['Typical Severity']}}</span>
+        <span class="badge bg-{{data['Typical Severity'] | replace(' ', '') }}">Typical Severity: {{data['Typical Severity']}}</span>
     {% endif %}
 </h3>
 
@@ -17,12 +17,9 @@
 <h4>
     Parents:
     {% for parent in data['Capec Parents ID'] | sort %}
-        <!-- <span class="badge badge-primary">
+        <span class="badge bg-primary">
             <a href="/capec-detail?id={{ parent }}">{{ parent }}</a>
-        </span> -->
-        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#CapecModal{{ parent }}">
-            {{ parent }}
-        </button>
+        </span>
     {% endfor %}
 </h4>
 {% endif %}
@@ -31,7 +28,7 @@
 <h4>
     Childs:
     {% for child in data['Capec Childs ID'] | sort %}
-        <span class="badge badge-primary">
+        <span class="badge bg-primary">
             <a href="/capec-detail?id={{ child }}">{{ child }}</a>
         </span>
     {% endfor %}

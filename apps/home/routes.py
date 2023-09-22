@@ -10,7 +10,6 @@ from jinja2 import TemplateNotFound
 from flask import current_app as app
 from flask import jsonify
 from apps.my_modules import converter, attack_pattern, threat_catalog
-from flask_modals import render_template_modal
 
 
 @blueprint.route('/index')
@@ -18,8 +17,8 @@ from flask_modals import render_template_modal
 def index():
 
     return render_template('home/dashboard.html', 
-                            segment='dashboard', 
-                            user_id=current_user.id)
+                           segment='dashboard', 
+                           user_id=current_user.id)
 
 @blueprint.route('/<template>', methods=['GET', 'POST'])
 @login_required
@@ -53,8 +52,7 @@ def route_template(template):
             selected_id = request.args.get('id')
             df = attack_pattern.attack_pattern_df
             selected_attack_pattern = df.loc[int(selected_id)]
-            # return render_template("home/" + template, segment=segment, data=selected_attack_pattern)
-            return render_template_modal("home/capec-detail-modal.html", segment=segment, data=selected_attack_pattern)
+            return render_template("home/" + template, segment=segment, data=selected_attack_pattern)
         
         elif template == 'threat-catalog.html':
             df = threat_catalog.threat_catalog_df
