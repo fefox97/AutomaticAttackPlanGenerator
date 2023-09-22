@@ -34,5 +34,7 @@ glob2
 
 Flask-Modals
 Flask-Modals-markupsafe
+
+neo4j
 # flask_mysqldb
 # psycopg2-binary

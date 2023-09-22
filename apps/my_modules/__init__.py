@@ -8,3 +8,4 @@ from .Utils import *
 threat_catalog = ThreatCatalog()
 converter = Converter()
 attack_pattern = AttackPattern()
+macm = Macm()

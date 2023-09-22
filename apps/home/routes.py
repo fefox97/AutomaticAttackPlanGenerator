@@ -9,7 +9,9 @@ from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
 from flask import jsonify
-from apps.my_modules import converter, attack_pattern, threat_catalog
+from apps.my_modules import converter, attack_pattern, threat_catalog, macm
+from werkzeug.utils import secure_filename
+from apps import utils
 
 
 @blueprint.route('/index')
@@ -17,8 +19,8 @@ from apps.my_modules import converter, attack_pattern, threat_catalog
 def index():
 
     return render_template('home/dashboard.html', 
-                           segment='dashboard', 
-                           user_id=current_user.id)
+                            segment='dashboard', 
+                            user_id=current_user.id)
 
 @blueprint.route('/<template>', methods=['GET', 'POST'])
 @login_required
@@ -59,6 +61,23 @@ def route_template(template):
             if df is not None:
                 df_html = converter.threat_catalog_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='threat_catalog_table', escape=False)
             return render_template("home/" + template, segment=segment, table=df_html)
+        
+        elif template == 'macm.html':
+            if request.method == 'POST':
+                if 'macmFile' in request.files:
+                    file = request.files['macmFile']
+                    if not utils.allowed_file(file.filename, 'txt'):
+                        return jsonify({'success': False, 'message': 'File type not allowed'})
+                    query_str = file.read().decode('utf-8')
+                elif 'macmCypher' in request.form:
+                    query_str = request.form.get('macmCypher')
+                else:
+                    return jsonify({'success': False, 'message': 'No file or Cypher query provided'})
+                macm.upload_macm(query_str)
+            df = macm.read_macm()
+            if df is not None:
+                df_html = converter.macm_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='macm_table', escape=False)
+            return render_template("home/" + template, segment=segment, table=df_html)
 
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template("home/" + template, segment=segment)
@@ -67,6 +86,7 @@ def route_template(template):
         return render_template('home/page-404.html'), 404
 
     except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         return render_template('home/page-500.html'), 500
 
 

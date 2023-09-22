@@ -6,6 +6,7 @@ from neo4j import Result
 from functools import reduce
 import re
 from apps.my_modules.Converter import Converter
+from neo4j import GraphDatabase
 
 class AttackPattern:
     
@@ -101,15 +102,7 @@ class ThreatCatalog:
     converter = Converter()
 
     def __init__(self):
-        # neo4j setup
-        #URI_NEO4J = "neo4j://192.168.1.6:7687"
-        self.URI_NEO4J = "neo4j://192.168.40.4:7787"
-        self.USER_NEO4J = "neo4j"
-        self.PASS_NEO4J = "neo4j#1234"
         self.base_path = "/Users/fefox/Desktop/Web2/apps/static/assets/dbs"
-        
-        self.macm_file = "MACM-OEM.txt"
-    
         self.threat_catalog_df = self.load_threat_catalog(f"{self.base_path}/ThreatCatalogComplete.xlsx")
 
     def load_threat_catalog(self, filename):
@@ -124,8 +117,40 @@ class ThreatCatalog:
         df['Asset'] = df['Asset'].apply(lambda x: x.replace('.', '_'))
         return df
 
-    def read_macm(self, driver):
-        macm_df = driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_='macm', result_transformer_=Result.to_df)
+class Macm:
+
+    def __init__(self):
+        # neo4j setup
+        #URI_NEO4J = "neo4j://192.168.1.6:7687"
+        self.URI_NEO4J = "neo4j://192.168.40.4:7787"
+        self.USER_NEO4J = "neo4j"
+        self.PASS_NEO4J = "neo4j#1234"
+        self.base_path = "/Users/fefox/Desktop/Web2/apps/static/assets/dbs"
+        
+        self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
+        self.driver.verify_connectivity()
+
+    def clear_database(self, database):
+        self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
+
+    def read_macm(self, database='macm'):
+        macm_df = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
         macm_df.columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID']
         return macm_df
-        
+
+    def upload_macm(self, query, database='macm'):
+        self.clear_database(database)
+        self.driver.execute_query(query, database_=database)
+
+class Utils:
+
+    def __init__(self):
+        self.allowed_extensions = None
+
+    def init_app(self, app):
+        self.allowed_extensions = app.config['ALLOWED_EXTENSIONS']
+
+    def allowed_file(self, filename, allowed_extensions=None):
+        if allowed_extensions is None:
+            allowed_extensions = self.allowed_extensions
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions

@@ -137,4 +137,14 @@ class Converter:
         if footer:
             df_html = self.add_footer_to_html(df, df_html)
         return df_html
+    
+    def macm_to_html(self, df: pd.DataFrame, classes=None, table_id=None, escape=True, footer=True):
+        df = df.copy()
+        df.set_index('Component ID', inplace=True)
+        df = df.replace('\n', '<br>', regex=True)
+        df = self.replace_index_with_column(df)
+        df_html = df.to_html(classes=classes, table_id=table_id, escape=escape)
+        if footer:
+            df_html = self.add_footer_to_html(df, df_html)
+        return df_html
 

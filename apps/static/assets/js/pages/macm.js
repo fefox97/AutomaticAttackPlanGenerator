@@ -1,17 +1,17 @@
-var threat_catalog = undefined;
+var macm = undefined;
 var default_shown_columns = undefined;
 
 $(window).on('load', function() {
 
     // Set default shown columns
-    if (localStorage.getItem('threat_catalog_columns') === null) {    
-        default_shown_columns = ['TID', 'Asset', 'Threat', 'Description', 'CapecMeta', 'CapecStandard', 'CapecDetailed'];
-        localStorage.setItem('threat_catalog_columns', JSON.stringify(default_shown_columns));
+    if (localStorage.getItem('macm_columns') === null) {    
+        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID'];
+        localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     } else {
-        default_shown_columns = JSON.parse(localStorage.getItem('threat_catalog_columns'));
+        default_shown_columns = JSON.parse(localStorage.getItem('macm_columns'));
     }
     
-    threat_catalog = $('#threat_catalog_table').DataTable({
+    macm = $('#macm_table').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],
@@ -30,22 +30,15 @@ $(window).on('load', function() {
                 targets: 0,
                 className: 'noVis',
                 width: '120px',
-                render: function (data, type, row) {
-                    if ( type === 'sort' || type === 'type' ){
-                        var data = data.replace('T', '');
-                        data = parseInt(data);
-                    }
-                    return data;
-                },
             },
             {
-                targets: [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                targets: [0, 1, 4],
                 searchPanes: {
                     show: false,
                 },
             },
             {
-                targets: [1, 2, 4],
+                targets: [2, 3],
                 searchPanes: {
                     show: true,
                 },
@@ -93,25 +86,25 @@ $(window).on('load', function() {
     });
 
     // Set column names for search
-    threat_catalog.settings()[0].aoColumns.forEach(function(column) {
+    macm.settings()[0].aoColumns.forEach(function(column) {
         column.sName = column.sTitle;
     });
     
     // Replace Capec IDs with buttons
-    replaceIDWithButton(threat_catalog);
+    // replaceIDWithButton(macm);
 
-    threat_catalog.on('column-reorder', function (e, settings, details) {
-        replaceIDWithButton(threat_catalog);
+    macm.on('column-reorder', function (e, settings, details) {
+        // replaceIDWithButton(macm);
     });
 
     // Save column visibility state
-    threat_catalog.on('column-visibility.dt', function (e, settings, column, state) {
+    macm.on('column-visibility.dt', function (e, settings, column, state) {
         if (state) {
             default_shown_columns.push(settings.aoColumns[column].sTitle);
         } else {
             default_shown_columns = default_shown_columns.filter(function(value, index, arr){ return value != settings.aoColumns[column].sTitle;});
         }
-        localStorage.setItem('threat_catalog_columns', JSON.stringify(default_shown_columns));
+        localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     });
 });
 
@@ -140,31 +133,3 @@ function replaceIDWithButton(table) {
     });
 }
 
-$(document).ready(function() {
-
-    function searchQuery ( ) {
-        console.log("Searching for " + $('#SearchID').val());
-        if ($('#SearchID').val() === '') {
-            threat_catalog.search('').columns().search('').draw();
-            return;
-        }
-        $.ajax({
-            url: '/capec',
-            type: 'POST',
-            data: {
-                'SearchID': $('#SearchID').val(),
-                'ShowTree': $('#ShowTreeToggle').is(':checked')
-            },
-            success: function(response) {
-                ids = response.childs.toString().split(',');
-                ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
-                threat_catalog.column(0).search(ids, true, false).draw();
-
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    };
-    
-});
