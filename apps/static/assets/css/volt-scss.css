@@ -14386,6 +14386,9 @@ label {
   .badge.super-badge {
     vertical-align: super; }
 
+.bg-primary a:hover {
+  color: #d4dce7; }
+
 .badge-pill {
   padding-right: 0.875em;
   padding-left: 0.875em; }

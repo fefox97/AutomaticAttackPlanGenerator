@@ -30,6 +30,7 @@ types-bleach
 
 Flask-Assets
 libsass
+glob2
 
 Flask-Modals
 Flask-Modals-markupsafe

@@ -16,19 +16,8 @@ $(window).on('load', function() {
         "ordering": true,
         "order": [[ 0, "asc" ]],
         "colReorder": true,
-        dom: 'PBfrtip',
+        dom: 'Bfrtip',
         searchPane: true,
-        searchPanes:{
-            panes: [{
-                header: 'custom',
-                options: [{
-                    label: 'Accountants in Tokyo',
-                    value: function(rowData, rowIdx){
-                        return rowData[2] === 'Accountant' && rowData[3] === 'Tokyo';
-                    }
-                }]
-            }]
-        },
         "scrollX": true,
         "scrollY": "50vh",
         "scrollCollapse": true,
@@ -49,6 +38,18 @@ $(window).on('load', function() {
                     return data;
                 },
             },
+            {
+                targets: [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                searchPanes: {
+                    show: false,
+                },
+            },
+            {
+                targets: [1, 2, 4],
+                searchPanes: {
+                    show: true,
+                },
+            },
         ],
         lengthMenu: [
             [ 10, 25, 50, -1 ],
@@ -60,6 +61,7 @@ $(window).on('load', function() {
                 columns: ':not(.noVis)'
             },
             'pageLength',
+            'searchPanes',
         ],
         initComplete: function () {
             // Add search bar for each column

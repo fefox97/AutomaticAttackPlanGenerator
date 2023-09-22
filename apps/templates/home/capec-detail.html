@@ -1,12 +1,11 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Capec {% endblock %} 
+{% block title %} Capec-{{ data.name }}  {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div class="d-block mb-4 mb-md-0">
@@ -22,7 +21,7 @@
                 </ol>
             </nav>
             <h2 class="h4">Capec-<span class="badge bg-primary">{{ data.name }}</span> Detail</h2>
-            <p class="text-info mb-0 h5">{{ data['Name'] }}</p>
+            <p class="text-info mb-0 h3">{{ data['Name'] }}</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
@@ -43,8 +42,7 @@
         <!-- Badges end -->
 
         <div class="accordion-options">
-            <input type="checkbox" class="btn-check" id="ExpandToggle" checked autocomplete="off">
-            <label class="btn btn-primary" for="ExpandToggle" aria-expanded="false" aria-controls="">Expand All</label>
+            <button type="button" class="btn btn-outline-tertiary" data-bs-toggle="button" id="ExpandToggle" aria-pressed="false">Expand All</button>
         </div>
 
             <!-- [ Cards ] start -->

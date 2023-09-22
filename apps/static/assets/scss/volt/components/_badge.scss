@@ -13,6 +13,11 @@
     &.super-badge{
         vertical-align: super;
     }
+
+}
+
+.bg-primary a:hover {
+    color: $link-hover-light-color;
 }
 
 // Variations
