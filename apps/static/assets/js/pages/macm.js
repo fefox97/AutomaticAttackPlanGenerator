@@ -1,7 +1,14 @@
 var macm = undefined;
 var default_shown_columns = undefined;
+let neoViz;
 
 $(window).on('load', function() {
+
+    // Draw Neo4j
+    drawNeo4j();
+    neoViz.registerOnEvent('completed', function () {
+        neoViz.stabilize();
+    });
 
     // Set default shown columns
     if (localStorage.getItem('macm_columns') === null) {    
@@ -133,3 +140,40 @@ function replaceIDWithButton(table) {
     });
 }
 
+function drawNeo4j() {
+    const config = {
+        containerId: "viz",
+        serverDatabase: "macm",
+        neo4j: {
+            serverUrl: "bolt://192.168.40.4:7787",
+            serverUser: "neo4j",
+            serverPassword: "neo4j#1234",
+        },
+        visConfig: {
+            nodes: {
+            },
+            edges: {
+                arrows: {
+                    to: {enabled: true}
+                }
+            },
+        },
+        labels: {
+            "Asset": {
+                caption: true,
+                label: "name",
+            }
+        },
+        relationships: {
+            "relationship": {
+                caption: true,
+                label: "name",
+            }
+        },
+        initialCypher: "MATCH p=(:Asset)-[b]->(:Asset) RETURN p"
+    };
+
+    neoViz = new NeoVis.default(config);
+    neoViz.render();
+    console.log(neoViz);
+}
