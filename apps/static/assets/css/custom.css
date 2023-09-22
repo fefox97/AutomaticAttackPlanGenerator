@@ -46,25 +46,28 @@
     border-color: rgb(0, 169, 124) !important;
 } */
 
-.badge-Meta{
+.bg-Meta{
     background-color: #0009b4 !important;
 }
-.badge-Standard{
+.bg-Standard{
     background-color: #2830b8 !important;
 }
-.badge-Detailed{
+.bg-Detailed{
     background-color: #5156b0 !important;
 }
-.badge-domains{
+.bg-domains{
     background-color: #07a081 !important;
 }
-.badge-High{
+.bg-High{
     background-color: #a01407 !important;
 }
-.badge-Medium{
+.bg-VeryHigh{
+    background-color: #7b1107 !important;
+}
+.bg-Medium{
     background-color: #a05b07 !important;
 }
-.badge-Low{
+.bg-Low{
     background-color: #93a007 !important;
 }
 

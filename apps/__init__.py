@@ -10,6 +10,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from flask_modals import Modal
+from flask_assets import Environment, Bundle
 
 
 db = SQLAlchemy()
@@ -21,6 +22,19 @@ def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
     modal.init_app(app)
+
+
+def register_assets(app):
+    assets = Environment(app)
+    assets.debug = app.debug
+    app.config['ASSETS_DEBUG'] = True
+    assets.url = app.static_url_path
+    scss = Bundle('assets/scss/volt.scss', filters='libsass', output='assets/css/volt-scss.css', depends='assets/scss/**/*.scss')
+    bundles = {
+        'css_all': scss
+    }
+    assets.register(bundles)
+    scss.build()
 
 
 def register_blueprints(app):
@@ -57,6 +71,7 @@ def create_app(config):
     app.config.from_object(config)
     register_extensions(app)
     register_blueprints(app)
+    register_assets(app)
 
     app.register_blueprint(github_blueprint, url_prefix="/login") 
     

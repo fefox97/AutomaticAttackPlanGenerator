@@ -33,3 +33,4 @@ apps/static/assets/.temp
 
 migrations
 
+apps/static/.webassets-cache/
