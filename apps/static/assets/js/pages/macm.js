@@ -7,23 +7,25 @@ $(window).on('load', function() {
     // Draw Neo4j with NeoVis
     drawNeo4j();
 
-    // Draw Neo4j with Popoto
-    const driver = new neo4j.driver(
-        "neo4j://192.168.40.4:7787",
-        neo4j.auth.basic("neo4j", "neo4j#1234"),
-    );
-
-    popoto.runner.DRIVER = driver;
-    popoto.runner.createSession = function () {
-        return popoto.runner.DRIVER.session({database: "macm"});
-    };
-
-    popoto.provider.node.Provider = {}
-
-    driver.verifyConnectivity().then(function () {
-        popoto.start("Network");
-    }).catch(function (error) {
-        console.error(error);
+    neoViz.registerOnEvent("completed", () => {
+        $("#saveImage").prop("disabled", false);
+        $("#centerNetwork").prop("disabled", false);
+    });
+    
+    $("#saveImage").click(() => {
+        console.log(neoViz.network.canvas.getContext("2d"));
+        const link = document.createElement("a");
+        const data = neoViz.network.canvas.getContext("2d").canvas.toDataURL("image/png");
+        link.href = data;
+        link.download = "macm.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+    
+    $("#centerNetwork").click(() => {
+        neoViz.stabilize();
+        neoViz.network.fit();
     });
 
     // Set default shown columns
@@ -171,13 +173,38 @@ function drawNeo4j() {
             edges: {
                 arrows: {
                     to: {enabled: true}
-                }
+                },
+            },
+            physics: {
+                enabled: true,
+                barnesHut: {
+                    gravitationalConstant: -2000,
+                    centralGravity: 0.3,
+                    springLength: 95,
+                    springConstant: 0.04,
+                    damping: 0.09,
+                    avoidOverlap: 0.4
+                },
+                
+                solver: 'barnesHut',
+                adaptiveTimestep: true,
             },
         },
         labels: {
+            "Network": {
+                caption: true,
+                label: "name",
+                group: "type",
+            },
+            "Service.MQTTClient": {
+                caption: true,
+                label: "type",
+                group: "type",
+            },
             [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
                 caption: true,
                 label: "name",
+                group: "type",
                 [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
                     cypher: {
                         value: "MATCH (n) WHERE id(n) = $id RETURN n"
@@ -186,20 +213,16 @@ function drawNeo4j() {
                         title: NeoVis.objectToTitleHtml,
                     },
                 }
-            }
+            },
         },
         relationships: {
             [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
-                caption: true,
-                label: "name",
                 [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
-                    cypher: {
-                        value: "MATCH (a)-[b]->(c) WHERE id(b) = $id RETURN TYPE(b)"
-                    },
                     function: {
-                        title: NeoVis.objectToTitleHtml,
+                        label: rel => rel.type,
+                        title: (props) => NeoVis.objectToTitleHtml(props),
                     },
-                }
+                },
             }
         },
         initialCypher: "MATCH (a)-[b]->(c) RETURN a,b,c"
@@ -207,5 +230,4 @@ function drawNeo4j() {
 
     neoViz = new NeoVis.default(config);
     neoViz.render();
-    console.log(neoViz);
 }
