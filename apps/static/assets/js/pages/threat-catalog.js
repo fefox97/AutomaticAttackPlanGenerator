@@ -127,7 +127,7 @@ function replaceIDWithButton(table) {
                 for(let i = 0; i < data.length; i++) {
                     let badge = document.createElement('span');
                     badge.innerHTML = data[i];
-                    badge.className = 'badge badge-primary';
+                    badge.className = 'badge bg-primary';
                     badge.style = 'margin-right: 5px; cursor: pointer;';
                     badge.addEventListener('click', () => {
                         window.location.href = '/capec-detail?id=' + data[i];
