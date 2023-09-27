@@ -14,25 +14,26 @@
             {% for key, value in data['Consequences'].items() %}
                 {% set tmp =  max_len.append(value|length) %}
             {% endfor %}
-
-            <table class="table table-hover table-striped table-responsive">
-                <thead>
-                    <tr>
-                        {% for key, value in data['Consequences'].items() %}
-                        <th scope="col">{{ key.replace('_', ' ') }}</th>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            {% for key, value in data['Consequences'].items() %}
+                            <th scope="col">{{ key.replace('_', ' ') }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(max_len|max) %}
+                        <tr>
+                            {% for key, value in data['Consequences'].items() %}
+                            <td>{{ value[i] }}</td>
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in range(max_len|max) %}
-                    <tr>
-                        {% for key, value in data['Consequences'].items() %}
-                        <td>{{ value[i] }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
     </div>
 </div>
