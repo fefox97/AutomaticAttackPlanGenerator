@@ -62,7 +62,6 @@
 <link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
 <link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/notyf/notyf.min.css" rel="stylesheet">
 
-<!-- <link type="text/css" href="{{ config.ASSETS_ROOT }}/css/volt.css" rel="stylesheet"> -->
 <!-- Custom Volt SCSS -->
 {% assets "css_all" %}
   <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -74,11 +73,9 @@
 <!-- Datatables -->
 <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.6/b-2.4.2/b-colvis-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/kt-2.10.0/sc-2.2.0/sb-1.5.0/sp-2.2.0/sl-1.7.0/datatables.min.css" rel="stylesheet">
 
-<!-- Custom CSS -->
-<link type="text/css" href="{{ config.ASSETS_ROOT }}/css/custom.css" rel="stylesheet">
+<!-- Popoto -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/popoto/dist/popoto.min.css">
 
-
-{{ modals() }}
 
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}
