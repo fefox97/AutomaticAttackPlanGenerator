@@ -4,10 +4,26 @@ let neoViz;
 
 $(window).on('load', function() {
 
-    // Draw Neo4j
+    // Draw Neo4j with NeoVis
     drawNeo4j();
-    neoViz.registerOnEvent('completed', function () {
-        neoViz.stabilize();
+
+    // Draw Neo4j with Popoto
+    const driver = new neo4j.driver(
+        "neo4j://192.168.40.4:7787",
+        neo4j.auth.basic("neo4j", "neo4j#1234"),
+    );
+
+    popoto.runner.DRIVER = driver;
+    popoto.runner.createSession = function () {
+        return popoto.runner.DRIVER.session({database: "macm"});
+    };
+
+    popoto.provider.node.Provider = {}
+
+    driver.verifyConnectivity().then(function () {
+        popoto.start("Network");
+    }).catch(function (error) {
+        console.error(error);
     });
 
     // Set default shown columns
@@ -159,18 +175,34 @@ function drawNeo4j() {
             },
         },
         labels: {
-            "Asset": {
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
                 caption: true,
                 label: "name",
+                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
+                    cypher: {
+                        value: "MATCH (n) WHERE id(n) = $id RETURN n"
+                    },
+                    function: {
+                        title: NeoVis.objectToTitleHtml,
+                    },
+                }
             }
         },
         relationships: {
-            "relationship": {
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
                 caption: true,
                 label: "name",
+                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
+                    cypher: {
+                        value: "MATCH (a)-[b]->(c) WHERE id(b) = $id RETURN TYPE(b)"
+                    },
+                    function: {
+                        title: NeoVis.objectToTitleHtml,
+                    },
+                }
             }
         },
-        initialCypher: "MATCH p=(:Asset)-[b]->(:Asset) RETURN p"
+        initialCypher: "MATCH (a)-[b]->(c) RETURN a,b,c"
     };
 
     neoViz = new NeoVis.default(config);
