@@ -2,6 +2,7 @@ import Tags from "/static/assets/node_modules/bootstrap5-tags/tags.js";
 
 var capec_table = undefined;
 var default_shown_columns = undefined;
+var tags = undefined;
 
 $(window).on('load', function() {
 
@@ -110,6 +111,12 @@ $(window).on('load', function() {
 
     // Add tags
     Tags.init("#tags-input");
+
+    tags = Tags.getInstance(document.querySelector("#tags-input"));
+    console.log(tags);
+    tags.setConfig("onCreateItem", function (item) {
+        console.log(item.innerHTML);
+    });
 });
 
 function replaceIDWithButton(table) {
@@ -155,7 +162,7 @@ function replaceIDWithButton(table) {
 
 $(document).ready(function() {
 
-    function searchQuery ( ) {
+    function searchIDQuery ( ) {
         console.log("Searching for " + $('#SearchID').val());
         if ($('#SearchID').val() === '') {
             capec_table.search('').columns().search('').draw();
@@ -180,9 +187,9 @@ $(document).ready(function() {
         });
     };
     
-    $('#SearchIDButton').on('click', searchQuery);
+    $('#SearchIDButton').on('click', searchIDQuery);
 
-    $("#ShowTreeToggle").on('click', searchQuery);
+    $("#ShowTreeToggle").on('click', searchIDQuery);
 
     $('#ResetIDButton').on('click', function() {
         console.log("Resetting filters");
@@ -191,12 +198,12 @@ $(document).ready(function() {
     });
     
     $('#SearchID').on('keyup', function(e) {
-        searchQuery();
+        searchIDQuery();
     });
     
     $('#ResetTagButton').on('click', function() {
         console.log("Resetting tags");
-        $('#TagsInput').tagsinput('removeAll');
+        tags.removeAll();
     });
 
 });
