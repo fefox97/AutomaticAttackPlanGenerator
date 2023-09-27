@@ -1,3 +1,89 @@
 .neovis{
     height: 50vh;
 }
+
+.table-dataframe{
+    width: 100% !important;
+    /* border-collapse: separate !important; */
+}
+.table-dataframe tbody th, th{
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    font-weight: bold;
+    min-width: 110px !important;
+}
+.table-dataframe tbody td, td{
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    word-wrap: break-word;
+    vertical-align: top;
+    white-space: pre-line;
+}
+.table-dataframe tbody th {
+    text-align: center;
+    vertical-align: middle;
+}
+.table-dataframe .filter-input{
+    &::placeholder{
+        animation: floatText 5s infinite linear;
+    }
+    &:focus::placeholder{
+        animation: finalText 0.2s linear;
+    }
+}
+@-webkit-keyframes floatText {
+    0% {text-indent:100%;}
+    100% {text-indent:-100%;}
+}
+@-webkit-keyframes finalText {
+    from{text-indent:50%;}
+    to{text-indent:0%;}
+}
+
+.bg-Meta{
+    background-color: #0009b4 !important;
+}
+.bg-Standard{
+    background-color: #2830b8 !important;
+}
+.bg-Detailed{
+    background-color: #5156b0 !important;
+}
+.bg-domains{
+    background-color: #07a081 !important;
+}
+.bg-High{
+    background-color: #a01407 !important;
+}
+.bg-VeryHigh{
+    background-color: #7b1107 !important;
+}
+.bg-Medium{
+    background-color: #a05b07 !important;
+}
+.bg-Low{
+    background-color: #93a007 !important;
+}
+
+.accordion-options{
+    width: 100%;
+    margin: 15px auto;
+    clear: both;
+    float: left;
+}
+
+.accordion-options .btn{
+    float: right;
+}
+
+.card-header[data-bs-toggle="collapse"] {
+    cursor: pointer !important;
+}
+
+.card-header.collapsed .fa-chevron-down {
+    transform: rotate(-90deg);
+}
+
+.fa-chevron-down{
+    transition: all 0.3s ease-in-out;
+}

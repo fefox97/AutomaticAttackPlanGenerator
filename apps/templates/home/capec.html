@@ -55,9 +55,17 @@
                 
                 <div class="d-block align-items-center pt-3">
                     <!-- TODO: Non completo -->
-                    <div class="input-group">
-                        <input id="TagsInput" type="text" value="Amsterdam,Washington,Sydney,Beijing,Cairo" data-role="tagsinput" class="form-control"/>
-                        <button type="reset" class="btn btn-secondary" title="Reset entry" data-toggle="tooltip" id="ResetTagButton">Reset</button>
+                    <div class="row">
+                        <label for="tags-input" class="form-label">Tags</label>
+                        <div class="col">
+                            <select class="form-select" id="tags-input" name="tags_separator[]" multiple data-allow-new="true" data-separator=" |,|  " data-allow-clear="1">
+                                <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
+                            </select>
+                            <div class="invalid-feedback">Please select a valid tag.</div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="reset" class="btn btn-secondary" data-bs-toggle="tooltip" id="ResetTagButton">Reset</button>
+                        </div>
                     </div>
                 </div>
 
@@ -78,5 +86,5 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/capec.js"></script>
+    <script type="module" src="{{ config.ASSETS_ROOT }}/js/pages/capec.js"></script>
 {% endblock javascripts %}

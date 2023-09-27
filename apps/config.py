@@ -10,7 +10,7 @@ class Config(object):
     basedir = os.path.abspath(os.path.dirname(__file__))
 
     # Assets Management
-    ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')  
+    ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'apps/static/uploads')
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
     
@@ -27,7 +27,7 @@ class Config(object):
 
     # Enable/Disable Github Social Login    
     if GITHUB_ID and GITHUB_SECRET:
-         SOCIAL_AUTH_GITHUB  = True        
+        SOCIAL_AUTH_GITHUB  = True        
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

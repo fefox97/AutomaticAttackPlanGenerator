@@ -1,3 +1,5 @@
+import Tags from "/static/assets/node_modules/bootstrap5-tags/tags.js";
+
 var capec_table = undefined;
 var default_shown_columns = undefined;
 
@@ -21,6 +23,7 @@ $(window).on('load', function() {
         "scrollX": true,
         "scrollY": "50vh",
         "scrollCollapse": true,
+        searchPane: true,
         fixedColumns: {
             left: 1
         },
@@ -28,7 +31,19 @@ $(window).on('load', function() {
             {
                 targets: 0,
                 className: 'noVis'
-            }
+            },
+            {
+                targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 19, 20, 21, 22, 23, 25, 26, 27],
+                searchPanes: {
+                    show: false,
+                },
+            },
+            {
+                targets: [9, 14, 18, 24],
+                searchPanes: {
+                    show: true,
+                },
+            },
         ],
         lengthMenu: [
             [ 10, 25, 50, -1 ],
@@ -40,6 +55,7 @@ $(window).on('load', function() {
                 columns: ':not(.noVis)'
             },
             'pageLength',
+            'searchPanes',
         ],
         initComplete: function () {
             // Add search bar for each column
@@ -91,6 +107,9 @@ $(window).on('load', function() {
         }
         localStorage.setItem('capec_table_columns', JSON.stringify(default_shown_columns));
     });
+
+    // Add tags
+    Tags.init("#tags-input");
 });
 
 function replaceIDWithButton(table) {
@@ -179,5 +198,5 @@ $(document).ready(function() {
         console.log("Resetting tags");
         $('#TagsInput').tagsinput('removeAll');
     });
-    
+
 });
