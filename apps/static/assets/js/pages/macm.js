@@ -12,17 +12,20 @@ $(window).on('load', function() {
         $("#centerNetwork").prop("disabled", false);
     });
     
-    $("#saveImage").click(() => {
-        console.log(neoViz.network.canvas.getContext("2d"));
-        const link = document.createElement("a");
-        const data = neoViz.network.canvas.getContext("2d").canvas.toDataURL("image/png");
-        link.href = data;
-        link.download = "macm.png";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const savePopover = new bootstrap.Popover(document.getElementById("saveImage"), {
+        html: true,
+        content: "<div class='d-flex align-items-center justify-content-center'><a id='saveConfirm' role='button' class='btn btn-secondary'>Save</a></div>",
+        title: 'Do you want to save the image?',
+        placement: "top",
+        trigger: "click",
     });
-    
+
+    savePopover._element.addEventListener("shown.bs.popover", () => {
+        $("#saveConfirm").click(() => {
+            saveImage();
+        });
+    });
+
     $("#centerNetwork").click(() => {
         neoViz.stabilize();
         neoViz.network.fit();
@@ -230,4 +233,14 @@ function drawNeo4j() {
 
     neoViz = new NeoVis.default(config);
     neoViz.render();
+}
+
+function saveImage() {
+    const link = document.createElement("a");
+    const data = neoViz.network.canvas.getContext("2d").canvas.toDataURL("image/png");
+    link.href = data;
+    link.download = "macm.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }

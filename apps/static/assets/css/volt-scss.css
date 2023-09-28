@@ -5661,7 +5661,7 @@ textarea.form-control-lg {
   padding: 0.5rem 1rem;
   margin-bottom: 0;
   font-size: 1rem;
-  color: #1F2937;
+  color: #ffffff !important;
   background-color: #19222d;
   border-bottom: 0.0625rem solid rgba(17, 24, 39, 0.2);
   border-top-left-radius: 0.9375rem;
