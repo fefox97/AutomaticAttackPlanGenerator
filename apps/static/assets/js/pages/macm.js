@@ -134,6 +134,12 @@ $(window).on('load', function() {
         }
         localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     });
+
+    // Collapse all cards
+    $('.card-header.collapsed').each(function() {
+        $(this).parent('.card').find('.collapse').collapse('hide');
+        $(this).parent('.card').find('.collapse').removeClass('show');
+    });
 });
 
 function replaceIDWithButton(table) {

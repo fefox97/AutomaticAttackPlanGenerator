@@ -168,7 +168,7 @@ $(document).ready(function() {
             return;
         }
         $.ajax({
-            url: '/capec',
+            url: '/api/search_capec_by_id',
             type: 'POST',
             data: {
                 'SearchID': $('#SearchID').val(),

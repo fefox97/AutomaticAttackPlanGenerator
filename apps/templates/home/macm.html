@@ -38,15 +38,15 @@
     <div class="col-12">
         <div class="card border-0 shadow mb-3">
             
-            <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingLoadMACM" data-bs-toggle="collapse" data-bs-target="#collapseLoadMACM" aria-expanded="false" aria-controls="collapseLoadMACM">
+            <div class="card-header border-gray-100 d-flex justify-content-between align-items-center {{'collapsed' if table is not none }}" id="headingLoadMACM" data-bs-toggle="collapse" data-bs-target="#collapseLoadMACM" aria-expanded="true" aria-controls="collapseLoadMACM">
                 <h2 class="h4 mb-0">
                     Load MACM
                     <i class="fas fa-chevron-down mr-auto"></i>
                 </h2>
             </div>
             
-            <div id="collapseLoadMACM" class="card-body collapse" aria-labelledby="headingLoadMACM">
-                    <form method="post" enctype="multipart/form-data">
+            <div id="collapseLoadMACM" class="card-body collapse show" aria-labelledby="headingLoadMACM">
+                    <form method="post" enctype="multipart/form-data" action="/api/upload_macm">
                         <label for="macmFile" class="form-label">Insert Cypher File</label>
                         <input class="form-control" type="file" id="macmFile" name="macmFile">
                         <br>
@@ -68,18 +68,19 @@
             
             
             <div class="card-body">
-                <div class="d-block align-items-center pt-5">
-                    <!-- [ stiped-table ] start -->
-                    {% if table is not none %}
+                {% if table is not none %}
+                    <div class="d-block align-items-center pt-5">
+                        <!-- [ stiped-table ] start -->
                         {{ table|safe }}
+                        <!-- [ stiped-table ] end -->
+                    </div>
                     {% else %}
-                        <p class="text-danger mb-1 display-4">No data available</p>
+                        <p class="text-warning mb-1 display-4">No data available, please upload a MACM</p>
                     {% endif %}
-                    <!-- [ stiped-table ] end -->
-                </div>
             </div>
         </div>
         
+        {% if table is not none %}
         <div class="card border-0 shadow">
             
             <div class="card-header border-gray-100 d-flex justify-content-between align-items-center">
@@ -97,6 +98,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
         
     </div>
 
