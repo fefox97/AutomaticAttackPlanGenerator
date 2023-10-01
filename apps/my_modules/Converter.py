@@ -90,11 +90,6 @@ class Converter:
         df = df.sort_values(['Abstraction', 'Capec ID'], ascending=[True, True])
         return df
     
-    def replace_index_with_column(self, df: pd.DataFrame):
-        df.columns.name = df.index.name
-        df.index.name = None
-        return df
-
     def convert_column_names(self, df: pd.DataFrame):
         # position the index column to the first column
         new_columns = []
@@ -106,6 +101,13 @@ class Converter:
             new_columns.append(column)
         df.columns = new_columns
         df.index.name = df.index.name.replace('_', ' ').title().replace('Id', 'ID')
+        return df
+    
+    # HTML converters
+    
+    def replace_index_with_column(self, df: pd.DataFrame):
+        df.columns.name = df.index.name
+        df.index.name = None
         return df
     
     def add_footer_to_html(self, df:pd.DataFrame, df_html:str):

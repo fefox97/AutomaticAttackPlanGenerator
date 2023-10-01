@@ -13,28 +13,28 @@ class AttackPattern:
     converter = Converter()
     
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web2/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
         self.stix_path = f"{self.base_path}/capec_stix"
         self.attack_pattern_path = f'{self.stix_path}/attack-pattern'
         self.fs = FileSystemStore(stix_dir=self.stix_path, bundlify=False)
         self.fs_source = FileSystemSource(stix_dir=self.stix_path)
         
         self.attack_pattern_df = self.read_attack_patterns()
-        # self.attack_pattern_df_str = self.converter.convert_column_to_text(self.attack_pattern_df)
 
     def save_attack_patterns(self, df: pd.DataFrame):
         df.to_pickle(f'{self.base_path}/attack_patterns.pickle')
 
     def read_attack_patterns(self):
         if os.path.exists(f'{self.base_path}/attack_patterns.pickle'):
+            print("\nLoading attack patterns from Pickle...\n")
             df = pd.read_pickle(f'{self.base_path}/attack_patterns.pickle')
         else:
+            print("\nLoading attack patterns from Stix...\n")
             df = self.load_attack_patterns()
             self.save_attack_patterns(df)
         return df
 
     def load_attack_patterns(self):
-        print("\n\n\nLoading attack patterns...\n\n\n")
         attack_pattern_list = []
         for attack_pattern in [x.removesuffix(".json") for x in os.listdir(self.attack_pattern_path)]:
             ap = self.fs.get(attack_pattern)
@@ -70,18 +70,18 @@ class AttackPattern:
 
     def get_child_attack_patterns_recursive(self, parent_id, attack_pattern_df: pd.DataFrame) -> list:
         childs = self.get_child_attack_patterns_by_id(parent_id, attack_pattern_df)
-        if childs is None:
+        if childs is None or len(childs) == 0:
             return []
         else:
             for child in childs:
-                childs += self.get_child_attack_patterns_recursive(child, attack_pattern_df)
+                childs = childs + self.get_child_attack_patterns_recursive(child, attack_pattern_df)
             return childs
 
     def get_child_attack_patterns(self, parent_ids, attack_pattern_df: pd.DataFrame, show_tree=False):
         if type(parent_ids) is not list: parent_ids = [parent_ids]
         childs = [parent_id for parent_id in parent_ids]
         if show_tree:
-            childs += [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id, attack_pattern_df)]
+            childs = childs + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id, attack_pattern_df)]
         childs = list(set(childs))
         return childs # return only the ids, not the dataframe
 
@@ -102,11 +102,11 @@ class ThreatCatalog:
     converter = Converter()
 
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web2/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
         self.threat_catalog_df = self.load_threat_catalog(f"{self.base_path}/ThreatCatalogComplete.xlsx")
 
     def load_threat_catalog(self, filename):
-        print("\n\n\nLoading threat catalog...\n\n\n")
+        print("\nLoading threat catalog...\n")
         df = pd.read_excel(filename, sheet_name="Threat Components", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         df.set_index('TID', inplace=True)
@@ -125,7 +125,7 @@ class Macm:
         self.URI_NEO4J = "neo4j://192.168.40.4:7787"
         self.USER_NEO4J = "neo4j"
         self.PASS_NEO4J = "neo4j#1234"
-        self.base_path = "/Users/fefox/Desktop/Web2/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
         
         self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
         self.driver.verify_connectivity()

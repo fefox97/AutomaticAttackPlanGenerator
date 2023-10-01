@@ -1,8 +1,8 @@
 import Tags from "/static/assets/node_modules/bootstrap5-tags/tags.js";
 
-var capec_table = undefined;
-var default_shown_columns = undefined;
-var tags = undefined;
+let capec_table = undefined;
+let default_shown_columns = undefined;
+let tags = undefined;
 
 $(window).on('load', function() {
 
@@ -113,7 +113,6 @@ $(window).on('load', function() {
     Tags.init("#tags-input");
 
     tags = Tags.getInstance(document.querySelector("#tags-input"));
-    console.log(tags);
     tags.setConfig("onCreateItem", function (item) {
         console.log(item.innerHTML);
     });
@@ -162,7 +161,7 @@ function replaceIDWithButton(table) {
 
 $(document).ready(function() {
 
-    function searchIDQuery ( ) {
+    function searchIDQuery () {
         console.log("Searching for " + $('#SearchID').val());
         if ($('#SearchID').val() === '') {
             capec_table.search('').columns().search('').draw();
@@ -176,10 +175,10 @@ $(document).ready(function() {
                 'ShowTree': $('#ShowTreeToggle').hasClass('active')
             },
             success: function(response) {
-                ids = response.childs.toString().split(',');
+                let ids = response.childs.toString().split(',');
                 ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
                 capec_table.column(0).search(ids, true, false).draw();
-
+                console.log(response);
             },
             error: function(error) {
                 console.log(error);
