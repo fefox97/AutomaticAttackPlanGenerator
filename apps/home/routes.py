@@ -60,6 +60,14 @@ def route_template(template):
             if df is not None and not df.empty:
                 df_html = converter.macm_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='macm_table', escape=False)
             return render_template(f"home/{template}", segment=segment, table=df_html)
+        
+        elif template == 'macm-detail.html':
+            selected_id = request.args.get('id')
+            macm_df = macm.read_macm()
+            selected_macm = macm_df.loc[int(selected_id)]
+            threat_catalog_df = threat_catalog.threat_catalog_df
+            threat_catalog_data = threat_catalog_df.query('Asset == @selected_macm.Type')
+            return render_template(f"home/{template}", segment=segment, macm_data=selected_macm, threat_catalog_data=threat_catalog_data)
 
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)

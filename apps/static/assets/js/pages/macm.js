@@ -119,10 +119,10 @@ $(window).on('load', function() {
     });
     
     // Replace Capec IDs with buttons
-    // replaceIDWithButton(macm);
+    replaceIDWithButton(macm);
 
     macm.on('column-reorder', function (e, settings, details) {
-        // replaceIDWithButton(macm);
+        replaceIDWithButton(macm);
     });
 
     // Save column visibility state
@@ -143,27 +143,20 @@ $(window).on('load', function() {
 });
 
 function replaceIDWithButton(table) {
-    ["CapecMeta", "CapecStandard", 'CapecDetailed'].forEach(element => {
-        table.column(element +':name').nodes().each(function (cell, i) {
-            let content = cell.innerHTML;
-            if (content != "None" && content != "[None]") {
-                let data = JSON.parse(content);
-                let parent = document.createElement('h4');
-                cell.replaceChildren(parent);
-                let badges = [];
-                for(let i = 0; i < data.length; i++) {
-                    let badge = document.createElement('span');
-                    badge.innerHTML = data[i];
-                    badge.className = 'badge badge-primary';
-                    badge.style = 'margin-right: 5px; cursor: pointer;';
-                    badge.addEventListener('click', () => {
-                        window.location.href = '/capec-detail?id=' + data[i];
-                    });
-                    badges.push(badge);
-                }
-                parent.replaceChildren(...badges);
-            }
+    table.column('Component ID:name').nodes().each(function (cell, i) {
+        let id = cell.innerHTML;
+
+        let parent = document.createElement('h3');
+        cell.replaceChildren(parent);
+        cell.addEventListener('click', () => {
+            window.location.href = '/macm-detail?id=' + id;
         });
+        cell.style = 'cursor: pointer;';
+        
+        let new_content = document.createElement('span');
+        new_content.innerHTML = id;
+        new_content.className = 'badge bg-primary';
+        parent.replaceChildren(new_content);
     });
 }
 

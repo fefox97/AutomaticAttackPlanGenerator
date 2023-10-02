@@ -77,12 +77,14 @@ class AttackPattern:
                 childs = childs + self.get_child_attack_patterns_recursive(child, attack_pattern_df)
             return childs
 
-    def get_child_attack_patterns(self, parent_ids, attack_pattern_df: pd.DataFrame, show_tree=False):
+    def get_child_attack_patterns(self, parent_ids, attack_pattern_df: pd.DataFrame, show_tree=False, get_df=False):
         if type(parent_ids) is not list: parent_ids = [parent_ids]
         childs = [parent_id for parent_id in parent_ids]
         if show_tree:
             childs = childs + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id, attack_pattern_df)]
         childs = list(set(childs))
+        if get_df:
+            return attack_pattern_df.loc[childs] # return the dataframe
         return childs # return only the ids, not the dataframe
 
     def query_attack_patterns(self, attack_pattern_df: pd.DataFrame, keywords, search_columns:list=['description'], ap_type:list=['Meta', 'Standard', 'Detailed'], query_type='or'):
@@ -116,6 +118,30 @@ class ThreatCatalog:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
         df['Asset'] = df['Asset'].apply(lambda x: x.replace('.', '_'))
         return df
+    
+    def create_threat_catalog_db(self, driver, threat_catalog_df: pd.DataFrame, database="threats"):
+        for index, row in threat_catalog_df.iterrows():
+            driver.execute_query('''
+                    MERGE (a:'''+ row['Asset'] + ''' {
+                            TID:$TID,
+                            Asset:$Asset,
+                            Threat:$Threat,
+                            Description:$Description,
+                            STRIDE:$STRIDE,
+                            Compromised:$Compromised,
+                            PreConfidentiality:$PreC,
+                            PreIntegrity:$PreI,
+                            PreAvailability:$PreA,
+                            PreCondition:$Precondition,
+                            PostConfidentiality:$PostC,
+                            PostIntegrity:$PostI,
+                            PostAvailability:$PostA,
+                            PostCondition:$PostCondition,
+                            CapecMeta:$CapecMeta,
+                            CapecStandard:$CapecStandard,
+                            CapecDetailed:$CapecDetailed
+                        })
+                    ''', parameters_={'TID': index} | row.to_dict(), database_=database)
 
 class Macm:
 
@@ -134,13 +160,37 @@ class Macm:
         self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
 
     def read_macm(self, database='macm'):
-        macm_df = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
-        macm_df.columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID']
+        macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
+        macm_df.rename(columns={'asset.component_id': 'Component ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App ID'}, inplace=True)
+        macm_df['Component ID'] = macm_df['Component ID'].astype('int')
+        macm_df.set_index('Component ID', inplace=True)
         return macm_df
 
     def upload_macm(self, query, database='macm'):
         self.clear_database(database)
         self.driver.execute_query(query, database_=database)
+
+    def create_enhanced_macm(self, database="emacm"):
+        self.clear_database(database)
+        threat_catalog = ThreatCatalog()
+        attack_pattern = AttackPattern()
+        threat_catalog_df = threat_catalog.threat_catalog_df
+        attack_pattern_df = attack_pattern.attack_pattern_df
+        macm_df = self.read_macm()
+        for index, row in macm_df.iterrows():
+            related_threat_catalog_df = threat_catalog_df[threat_catalog_df['Asset'] == row['Type'].replace('.', '_')]
+            related_attack_pattern = [int(id) for ids in related_threat_catalog_df['CapecMeta'].to_list() + related_threat_catalog_df['CapecStandard'].to_list() + related_threat_catalog_df['CapecDetailed'].to_list() for id in ids if id != 'None']
+            related_attack_pattern = list(set(related_attack_pattern))
+            related_attack_pattern_df = attack_pattern_df.loc[related_attack_pattern]
+            threat_catalog.create_capec_db(self.driver, related_attack_pattern_df, database, show_parent_relationship=False)
+            for capec_id in related_attack_pattern:
+                if capec_id != 'None':
+                    self.driver.execute_query(f"""
+                        MATCH (macm {{component_id: "{row['Component ID']}"}}),
+                                (capec {{Capec_Id: {capec_id}}})
+                        CALL apoc.create.relationship(macm, "has_capec_" + capec.Abstraction, NULL, capec) YIELD rel
+                        RETURN rel
+                    """, database_=database)
 
 class Utils:
 
