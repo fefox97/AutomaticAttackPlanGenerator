@@ -42,7 +42,7 @@ def route_api(api):
                 else:
                     return jsonify({'success': False, 'message': 'No file or Cypher query provided'})
                 macm.upload_macm(query_str)
-                macm.create_enhanced_macm()
+                # macm.create_enhanced_macm()
                 return redirect(url_for('home_blueprint.route_template', template='macm.html'))
         
         elif request.method == 'GET':

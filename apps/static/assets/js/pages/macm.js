@@ -1,13 +1,20 @@
 var macm = undefined;
 var default_shown_columns = undefined;
-let neoViz;
+let neoVizGraph;
+let neoVizSchema;
+var activeTab;
 
 $(window).on('load', function() {
 
     // Draw Neo4j with NeoVis
     drawNeo4j();
 
-    neoViz.registerOnEvent("completed", () => {
+    neoVizGraph.registerOnEvent("completed", () => {
+        $("#saveImage").prop("disabled", false);
+        $("#centerNetwork").prop("disabled", false);
+    });
+    
+    neoVizSchema.registerOnEvent("completed", () => {
         $("#saveImage").prop("disabled", false);
         $("#centerNetwork").prop("disabled", false);
     });
@@ -20,15 +27,35 @@ $(window).on('load', function() {
         trigger: "click",
     });
 
+    const tabList = document.querySelectorAll('#graph-tabs button')
+    tabList.forEach(tabEl => {
+        activeTab = tabEl.ariaSelected === 'true' ? tabEl.id : activeTab;
+        tabEl.addEventListener('click', event => {
+            activeTab = event.target.id;
+        })
+    });
+
     savePopover._element.addEventListener("shown.bs.popover", () => {
         $("#saveConfirm").click(() => {
-            saveImage();
+            if (activeTab === 'graph-tab') {
+                saveImage(neoVizGraph, "graph.png");
+            }
+            else if (activeTab === 'schema-tab') {
+                saveImage(neoVizSchema, "schema.png");
+            }
+            savePopover.hide();
         });
     });
 
     $("#centerNetwork").click(() => {
-        neoViz.stabilize();
-        neoViz.network.fit();
+        if (activeTab === 'graph-tab') {
+            neoVizGraph.stabilize();
+            neoVizGraph.network.fit();
+        }
+        else if (activeTab === 'schema-tab') {
+            neoVizSchema.stabilize();
+            neoVizSchema.network.fit();
+        }
     });
 
     // Set default shown columns
@@ -161,8 +188,8 @@ function replaceIDWithButton(table) {
 }
 
 function drawNeo4j() {
-    const config = {
-        containerId: "viz",
+    const configGraph = {
+        containerId: "graph",
         serverDatabase: "macm",
         neo4j: {
             serverUrl: "bolt://192.168.40.4:7787",
@@ -193,16 +220,6 @@ function drawNeo4j() {
             },
         },
         labels: {
-            "Network": {
-                caption: true,
-                label: "name",
-                group: "type",
-            },
-            "Service.MQTTClient": {
-                caption: true,
-                label: "type",
-                group: "type",
-            },
             [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
                 caption: true,
                 label: "name",
@@ -230,15 +247,76 @@ function drawNeo4j() {
         initialCypher: "MATCH (a)-[b]->(c) RETURN a,b,c"
     };
 
-    neoViz = new NeoVis.default(config);
-    neoViz.render();
+    const configSchema = {
+        containerId: "schema",
+        serverDatabase: "macm",
+        neo4j: {
+            serverUrl: "bolt://192.168.40.4:7787",
+            serverUser: "neo4j",
+            serverPassword: "neo4j#1234",
+        },
+        visConfig: {
+            nodes: {
+            },
+            edges: {
+                arrows: {
+                    to: {enabled: true}
+                },
+            },
+            physics: {
+                enabled: true,
+                barnesHut: {
+                    gravitationalConstant: -2000,
+                    centralGravity: 0.3,
+                    springLength: 95,
+                    springConstant: 0.04,
+                    damping: 0.09,
+                    avoidOverlap: 0.4
+                },
+                
+                solver: 'barnesHut',
+                adaptiveTimestep: true,
+            },
+        },
+        labels: {
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
+                caption: true,
+                label: "name",
+                group: "name",
+                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
+                    cypher: {
+                        value: "MATCH (n) WHERE id(n) = $id RETURN n"
+                    },
+                    function: {
+                        title: NeoVis.objectToTitleHtml,
+                    },
+                }
+            },
+        },
+        relationships: {
+            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
+                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
+                    function: {
+                        label: rel => rel.type,
+                        title: (props) => NeoVis.objectToTitleHtml(props),
+                    },
+                },
+            }
+        },
+        initialCypher: "CALL db.schema.visualization()"
+    };
+
+    neoVizGraph = new NeoVis.default(configGraph);
+    neoVizSchema = new NeoVis.default(configSchema);
+    neoVizGraph.render();
+    neoVizSchema.render();
 }
 
-function saveImage() {
+function saveImage(neoViz, filename) {
     const link = document.createElement("a");
     const data = neoViz.network.canvas.getContext("2d").canvas.toDataURL("image/png");
     link.href = data;
-    link.download = "macm.png";
+    link.download = filename || "network.png";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -3955,8 +3955,8 @@ textarea.form-control-lg {
 
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
-  color: #1F2937;
-  background-color: #f8f8f8; }
+  color: #ffffff;
+  background-color: #1F2937; }
 
 .nav-fill > .nav-link,
 .nav-fill .nav-item {
@@ -16428,9 +16428,9 @@ label {
 
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
-  color: #1F2937;
-  background-color: #f8f8f8;
-  border-color: #1F2937; }
+  color: #ffffff;
+  background-color: #1F2937;
+  border-color: #ffffff; }
 
 .nav-pills.rounded .nav-link {
   border-radius: 30px; }
