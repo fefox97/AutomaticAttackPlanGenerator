@@ -8,11 +8,10 @@ from flask import render_template, request
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from flask import jsonify
 from apps.my_modules import converter, attack_pattern, threat_catalog, macm
 from werkzeug.utils import secure_filename
-from apps import utils
-
+from apps import utils, db
+from apps.databases.models import Capec
 
 @blueprint.route('/index')
 @login_required
@@ -36,16 +35,12 @@ def route_template(template):
 
         # Serve the file (if exists) from app/templates/home/FILE.html
         if template == 'capec.html':
-            df = attack_pattern.attack_pattern_df            
-            df = converter.capec_abstraction_sort(df)
-            if df is not None:
-                df_html = converter.attack_pattern_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='capec_table', escape=False)
-            return render_template(f"home/{template}", segment=segment, table=df_html)
+            table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
+            return render_template(f"home/{template}", segment=segment, table=table)
 
         elif template == 'capec-detail.html':
             selected_id = request.args.get('id')
-            df = attack_pattern.attack_pattern_df
-            selected_attack_pattern = df.loc[int(selected_id)]
+            selected_attack_pattern = Capec.query.filter_by(Capec_ID=selected_id).first()
             return render_template(f"home/{template}", segment=segment, data=selected_attack_pattern)
         
         elif template == 'threat-catalog.html':
@@ -68,7 +63,7 @@ def route_template(template):
             threat_catalog_df = threat_catalog.threat_catalog_df
             threat_catalog_data = threat_catalog_df.query('Asset == @selected_macm.Type')
             return render_template(f"home/{template}", segment=segment, macm_data=selected_macm, threat_catalog_data=threat_catalog_data)
-
+        
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)
 

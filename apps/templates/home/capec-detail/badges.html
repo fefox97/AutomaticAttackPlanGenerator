@@ -5,18 +5,18 @@
             {{ domain }}
         </span>
     {% endfor %}
-    {% if data['Likelihood Of Attack'] is not none %}
-        <span class="badge bg-{{data['Likelihood Of Attack']}}">Likelihood: {{data['Likelihood Of Attack']}}</span>
+    {% if data['Likelihood_Of_Attack'] is not none %}
+        <span class="badge bg-{{data['Likelihood_Of_Attack']}}">Likelihood: {{data['Likelihood_Of_Attack']}}</span>
     {% endif %}
-    {% if data['Typical Severity'] is not none %}
-        <span class="badge bg-{{data['Typical Severity'] | replace(' ', '') }}">Typical Severity: {{data['Typical Severity']}}</span>
+    {% if data['Typical_Severity'] is not none %}
+        <span class="badge bg-{{data['Typical_Severity'] | replace(' ', '') }}">Typical Severity: {{data['Typical_Severity']}}</span>
     {% endif %}
 </h3>
 
-{% if data['Capec Parents ID'] is not none %}
+{% if data['Capec_Parents_ID'] is not none %}
 <h4>
     Parents:
-    {% for parent in data['Capec Parents ID'] | sort %}
+    {% for parent in data['Capec_Parents_ID'] | sort %}
         <span class="badge bg-primary">
             <a href="/capec-detail?id={{ parent }}">{{ parent }}</a>
         </span>
@@ -24,10 +24,10 @@
 </h4>
 {% endif %}
 
-{% if data['Capec Childs ID'] is not none %}
+{% if data['Capec_Childs_ID'] is not none %}
 <h4>
     Childs:
-    {% for child in data['Capec Childs ID'] | sort %}
+    {% for child in data['Capec_Childs_ID'] | sort %}
         <span class="badge bg-primary">
             <a href="/capec-detail?id={{ child }}">{{ child }}</a>
         </span>

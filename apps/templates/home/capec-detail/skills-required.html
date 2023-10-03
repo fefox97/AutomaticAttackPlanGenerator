@@ -6,20 +6,20 @@
         </h2>
     </div>
     <div id="collapseSkillsRequired" class=" card-body collapse show" aria-labelledby="headingSkillsRequired">
-        {% if data['Skills Required'] is none %}
+        {% if data['Skills_Required'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <div class="table-responsive">
                 <table class="table table-hover table-striped">
                     <thead>
                         <tr>
-                            {% for key, value in data['Skills Required'].items() %}
+                            {% for key, value in data['Skills_Required'].items() %}
                             <th scope="col">{{ key.replace('_', ' ') }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
-                        {% for key, value in data['Skills Required'].items() %}
+                        {% for key, value in data['Skills_Required'].items() %}
                         <tr>
                             <td>{{ value }}</td>
                         </tr>

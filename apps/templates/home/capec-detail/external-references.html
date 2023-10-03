@@ -6,7 +6,7 @@
         </h2>
     </div>
     <div id="collapseExternalRef" class=" card-body collapse show" aria-labelledby="headingExternalRef">
-        {% if data['External References'] is none %}
+        {% if data['External_References'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <div class="table-responsive">
@@ -20,7 +20,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for ref in data['External References'] %}
+                        {% for ref in data['External_References'] %}
                         <tr>
                             <th scope="row">{{ ref.external_id }}</th>
                             <td>{{ ref.source_name }}</td>

@@ -1,5 +1,5 @@
 create 
-	(WifiNetwork:Network{component_id:'501',name:"WifiNetwork",app_id:'500', type:"Network",application:'Open Energy Monitor'}),
+	(WifiNetwork:Network{component_id:'501',name:"WifiNetwork",app_id:'501', type:"Network",application:'Open Energy Monitor'}),
 	(Router:IoTgw{component_id:'502',name:"Router",app_id:'500', type:"DEVICE.Iot",application:'Open Energy Monitor'}),
 	(WifiMQTTRelay:MQTTClient{component_id:'503',name:"WifiMQTTRelay",app_id:'500', type:"Service.MQTTClient",application:'Open Energy Monitor'}),
 	(NodeRED:MQTTClient{component_id:'504',name:"NodeRED",app_id:'500', type:"Service.MQTTClient",application:'Open Energy Monitor'}),

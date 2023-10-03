@@ -56,16 +56,18 @@ class Converter:
             return output
 
     def convert_column_to_text(self, df: pd.DataFrame):
-        for column in ['Can Follow Refs', 'Domains', 'Object Marking Refs', 'Prerequisites', 'Alternate Terms', 'Can Precede Refs', 'Resources Required', 'Example Instances']:
+        # for column in ['Can Follow Refs', 'Domains', 'Object Marking Refs', 'Prerequisites', 'Alternate Terms', 'Can Precede Refs', 'Resources Required', 'Example Instances']:
+        for column in ['Can_Follow_Refs', 'Domains', 'Object_Marking_Refs', 'Prerequisites', 'Alternate_Terms', 'Can_Precede_Refs', 'Resources_Required', 'Example_Instances']:
             df[column] = df[column].apply(lambda x: self.list_to_string(x))
 
-        for column in ['Description', 'Extended Description', 'Example Instances', 'Resources Required']:
+        # for column in ['Description', 'Extended Description', 'Example Instances', 'Resources Required']:
+        for column in ['Description', 'Extended_Description', 'Example_Instances', 'Resources_Required']:
             df[column] = df[column].apply(lambda x: self.sub_string(x))
 
-        for column in ['Consequences', 'Skills Required']:
+        for column in ['Consequences', 'Skills_Required']:
             df[column] = df[column].apply(lambda x: self.dict_to_string(x))
 
-        for column in ['External References']:
+        for column in ['External_References']:
             df[column] = df[column].apply(lambda x: self.external_references_to_html(x))
 
         return df
@@ -87,7 +89,7 @@ class Converter:
         if df is None: return None
         sorter = ['Meta', 'Standard', 'Detailed']
         df['Abstraction'] = pd.Categorical(df['Abstraction'], categories=sorter, ordered=True)
-        df = df.sort_values(['Abstraction', 'Capec ID'], ascending=[True, True])
+        df = df.sort_values(['Abstraction', 'Capec_ID'], ascending=[True, True])
         return df
     
     def convert_column_names(self, df: pd.DataFrame):
@@ -95,12 +97,13 @@ class Converter:
         new_columns = []
         for column in df.columns:
             column = column.replace('x_capec_', '')
-            column = column.replace('_', ' ')
+            # column = column.replace('_', ' ')
             column = column.title()
             column = column.replace('Id', 'ID')
             new_columns.append(column)
         df.columns = new_columns
-        df.index.name = df.index.name.replace('_', ' ').title().replace('Id', 'ID')
+        # df.index.name = df.index.name.replace('_', ' ').title().replace('Id', 'ID')
+        df.index.name = df.index.name.title().replace('Id', 'ID')
         return df
     
     # HTML converters

@@ -7,7 +7,7 @@ from functools import reduce
 import re
 from apps.my_modules.Converter import Converter
 from neo4j import GraphDatabase
-
+import sqlalchemy
 class AttackPattern:
     
     converter = Converter()
@@ -28,11 +28,19 @@ class AttackPattern:
         if os.path.exists(f'{self.base_path}/attack_patterns.pickle'):
             print("\nLoading attack patterns from Pickle...\n")
             df = pd.read_pickle(f'{self.base_path}/attack_patterns.pickle')
+            self.save_attack_patterns_to_database(df)
         else:
             print("\nLoading attack patterns from Stix...\n")
             df = self.load_attack_patterns()
             self.save_attack_patterns(df)
         return df
+    
+    def save_attack_patterns_to_database(self, df: pd.DataFrame):
+        print("\nLoading attack patterns from Database...\n")
+        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        df = df.copy()
+        df.drop(['External_References'], axis=1, inplace=True)
+        df.to_sql('Capec', engine, if_exists='replace', index=True, index_label="Capec_ID", dtype={"Capec_ID": sqlalchemy.types.INTEGER, "Created_By_Ref": sqlalchemy.types.JSON, "Object_Marking_Refs": sqlalchemy.types.JSON, "Alternate_Terms": sqlalchemy.types.JSON, "Can_Follow_Refs": sqlalchemy.types.JSON, "Can_Precede_Refs": sqlalchemy.types.JSON, "Consequences": sqlalchemy.types.JSON, "Domains": sqlalchemy.types.JSON, "Example_Instances": sqlalchemy.types.JSON, "Extended_Description": sqlalchemy.types.JSON, "Peer_Of_Refs": sqlalchemy.types.JSON, "Prerequisites": sqlalchemy.types.JSON, "Resources_Required": sqlalchemy.types.JSON, "Skills_Required": sqlalchemy.types.JSON, "Capec_Childs_ID": sqlalchemy.types.JSON, "Capec_Parents_ID": sqlalchemy.types.JSON})
 
     def load_attack_patterns(self):
         attack_pattern_list = []
@@ -169,28 +177,6 @@ class Macm:
     def upload_macm(self, query, database='macm'):
         self.clear_database(database)
         self.driver.execute_query(query, database_=database)
-
-    def create_enhanced_macm(self, database="emacm"):
-        self.clear_database(database)
-        threat_catalog = ThreatCatalog()
-        attack_pattern = AttackPattern()
-        threat_catalog_df = threat_catalog.threat_catalog_df
-        attack_pattern_df = attack_pattern.attack_pattern_df
-        macm_df = self.read_macm()
-        for index, row in macm_df.iterrows():
-            related_threat_catalog_df = threat_catalog_df[threat_catalog_df['Asset'] == row['Type'].replace('.', '_')]
-            related_attack_pattern = [int(id) for ids in related_threat_catalog_df['CapecMeta'].to_list() + related_threat_catalog_df['CapecStandard'].to_list() + related_threat_catalog_df['CapecDetailed'].to_list() for id in ids if id != 'None']
-            related_attack_pattern = list(set(related_attack_pattern))
-            related_attack_pattern_df = attack_pattern_df.loc[related_attack_pattern]
-            threat_catalog.create_capec_db(self.driver, related_attack_pattern_df, database, show_parent_relationship=False)
-            for capec_id in related_attack_pattern:
-                if capec_id != 'None':
-                    self.driver.execute_query(f"""
-                        MATCH (macm {{component_id: "{row['Component ID']}"}}),
-                                (capec {{Capec_Id: {capec_id}}})
-                        CALL apoc.create.relationship(macm, "has_capec_" + capec.Abstraction, NULL, capec) YIELD rel
-                        RETURN rel
-                    """, database_=database)
 
 class Utils:
 

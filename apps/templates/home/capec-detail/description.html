@@ -10,18 +10,18 @@
 </div>
 
 <div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center {{'collapsed' if data['Extended Description'] is none }}" id="headingExtendedDescription" data-bs-toggle="collapse" data-bs-target="#collapseExtendedDescription" aria-expanded="true" aria-controls="collapseExtendedDescription">
+    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center {{'collapsed' if data['Extended_Description'] is none }}" id="headingExtendedDescription" data-bs-toggle="collapse" data-bs-target="#collapseExtendedDescription" aria-expanded="true" aria-controls="collapseExtendedDescription">
         <h2 class="h5 mb-0">
             Extended Description
             <i class="fas fa-chevron-down mr-auto"></i>
         </h2>
     </div>
     <div id="collapseExtendedDescription" class="card-body collapse show" aria-labelledby="headingExtendedDescription">
-        {% if data['Extended Description'] is none %}
+        {% if data['Extended_Description'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <div>
-                {{ data['Extended Description'] | safe}}
+                {{ data['Extended_Description'] | safe}}
             </div>
         {% endif %}
     </div>

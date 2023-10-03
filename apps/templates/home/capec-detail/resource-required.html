@@ -6,11 +6,11 @@
         </h2>
     </div>
     <div id="collapseResourceRequired" class=" card-body collapse show" aria-labelledby="headingResourceRequired">
-        {% if data['Resources Required'] is none %}
+        {% if data['Resources_Required'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <ol>
-                {% for example in data['Resources Required'] %}
+                {% for example in data['Resources_Required'] %}
                     <li>{{ example | safe }}</li>
                 {% endfor %}
             </ol>

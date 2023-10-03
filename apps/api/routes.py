@@ -12,6 +12,7 @@ from flask import jsonify
 from apps.my_modules import converter, attack_pattern, threat_catalog, macm
 from werkzeug.utils import secure_filename
 from apps import utils
+from . import attack_pattern_utils
 
 # @login_required
 @blueprint.route('/<api>', methods=['GET', 'POST'])
@@ -22,13 +23,13 @@ def route_api(api):
         app.logger.info('Serving api ' + api)
 
         if request.method == 'POST':
+                        
             if api == 'search_capec_by_id':
-                df = attack_pattern.attack_pattern_df
                 search_id = request.form.get("SearchID") or ''
                 showTree = True if request.form.get("ShowTree") == 'true' else False
                 getDataframe = True if request.form.get("GetDataframe") == 'true' else False
                 search_id_conv = converter.string_to_int_list(search_id)
-                childs = attack_pattern.get_child_attack_patterns(search_id_conv, df, show_tree=showTree, get_df=getDataframe)
+                childs = attack_pattern_utils.get_child_attack_patterns(search_id_conv, show_tree=showTree)
                 return jsonify({'childs': childs})
 
             elif api == 'upload_macm':
@@ -54,4 +55,3 @@ def route_api(api):
     except:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         return render_template('home/page-500.html'), 500
-

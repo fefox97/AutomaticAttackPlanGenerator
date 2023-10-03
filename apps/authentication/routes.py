@@ -54,12 +54,12 @@ def login():
 
         # Something (user or pass) is not ok
         return render_template('accounts/login.html',
-                               msg='Wrong user or password',
-                               form=login_form)
+                                msg='Wrong user or password',
+                                form=login_form)
 
     if not current_user.is_authenticated:
         return render_template('accounts/login.html',
-                               form=login_form)
+                                form=login_form)
     return redirect(url_for('home_blueprint.index'))
 
 
@@ -75,17 +75,17 @@ def register():
         user = Users.query.filter_by(username=username).first()
         if user:
             return render_template('accounts/register.html',
-                                   msg='Username already registered',
-                                   success=False,
-                                   form=create_account_form)
+                                    msg='Username already registered',
+                                    success=False,
+                                    form=create_account_form)
 
         # Check email exists
         user = Users.query.filter_by(email=email).first()
         if user:
             return render_template('accounts/register.html',
-                                   msg='Email already registered',
-                                   success=False,
-                                   form=create_account_form)
+                                    msg='Email already registered',
+                                    success=False,
+                                    form=create_account_form)
 
         # else we can create the user
         user = Users(**request.form)
@@ -96,9 +96,9 @@ def register():
         logout_user()
         
         return render_template('accounts/register.html',
-                               msg='Account created successfully.',
-                               success=True,
-                               form=create_account_form)
+                                msg='Account created successfully.',
+                                success=True,
+                                form=create_account_form)
 
     else:
         return render_template('accounts/register.html', form=create_account_form)

@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Capec-{{ data.name }}  {% endblock %} 
+{% block title %} Capec-{{ data['Capec_ID'] }}  {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -17,10 +17,10 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item"><a href="/capec">Capec</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Capec-{{ data.name }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">Capec-{{ data['Capec_ID'] }}</li>
                 </ol>
             </nav>
-            <h2 class="h4">Capec-<span class="badge bg-primary">{{ data.name }}</span> Detail</h2>
+            <h2 class="h4">Capec-<span class="badge bg-primary">{{ data['Capec_ID'] }}</span> Detail</h2>
             <p class="text-info mb-0 h3">{{ data['Name'] }}</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">

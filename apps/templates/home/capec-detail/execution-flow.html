@@ -6,11 +6,11 @@
         </h2>
     </div>
     <div id="collapseExecutionFlow" class="card-body collapse show" aria-labelledby="headingExecutionFlow">
-        {% if data['Execution Flow'] is none %}
+        {% if data['Execution_Flow'] is none %}
             <p class="text-warning mb-1">Not present</p>
         {% else %}
             <div class="table-responsive">
-                {{ data['Execution Flow'] | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
+                {{ data['Execution_Flow'] | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
             </div>
         {% endif %}
     </div>
