@@ -63,3 +63,40 @@ class Capec(db.Model):
                 value=Capec.Abstraction
         )
         return (table_ordering)
+    
+class ThreatCatalog(db.Model):
+
+    __tablename__ = 'ThreatCatalog'
+
+    TID                 = db.Column(db.Text, primary_key=True)
+    Asset               = db.Column(db.Text)
+    Threat              = db.Column(db.Text)
+    Description         = db.Column(db.Text)
+    STRIDE              = db.Column(db.Text)
+    Compromised         = db.Column(db.Text)
+    PreC                = db.Column(db.JSON)
+    PreI                = db.Column(db.JSON)
+    PreA                = db.Column(db.JSON)
+    Precondition        = db.Column(db.JSON)
+    PostC               = db.Column(db.JSON)
+    PostI               = db.Column(db.JSON)
+    PostA               = db.Column(db.JSON)
+    PostCondition       = db.Column(db.JSON)
+    CapecMeta           = db.Column(db.JSON)
+    CapecStandard       = db.Column(db.JSON)
+    CapecDetailed       = db.Column(db.JSON)
+    Commento            = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            # depending on whether value is an iterable or not, we must
+            # unpack it's value (when **kwargs is request.form, some values
+            # will be a 1-element list)
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.Asset)

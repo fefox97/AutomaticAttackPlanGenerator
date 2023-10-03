@@ -5,7 +5,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('threat_catalog_columns') === null) {    
-        default_shown_columns = ['TID', 'Asset', 'Threat', 'Description', 'CapecMeta', 'CapecStandard', 'CapecDetailed'];
+        default_shown_columns = ['TID', 'Asset', 'Threat', 'Description', 'Capec Meta', 'Capec Standard', 'Capec Detailed'];
         localStorage.setItem('threat_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('threat_catalog_columns'));
@@ -51,16 +51,11 @@ $(window).on('load', function() {
                 },
             },
         ],
-        lengthMenu: [
-            [ 10, 25, 50, -1 ],
-            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-        ],
         buttons: [
             {
                 extend: 'colvis',
                 columns: ':not(.noVis)'
             },
-            // 'pageLength',
             'searchPanes',
         ],
         initComplete: function () {
@@ -116,10 +111,10 @@ $(window).on('load', function() {
 });
 
 function replaceIDWithButton(table) {
-    ["CapecMeta", "CapecStandard", 'CapecDetailed'].forEach(element => {
+    ["Capec Meta", "Capec Standard", 'Capec Detailed'].forEach(element => {
         table.column(element +':name').nodes().each(function (cell, i) {
             let content = cell.innerHTML;
-            if (content != "None" && content != "[None]") {
+            if (content != "None" && content != "[None]" && content != '["None"]') {
                 let data = JSON.parse(content);
                 let parent = document.createElement('h4');
                 cell.replaceChildren(parent);
@@ -135,6 +130,9 @@ function replaceIDWithButton(table) {
                     badges.push(badge);
                 }
                 parent.replaceChildren(...badges);
+            }
+            else {
+                cell.innerHTML = '';
             }
         });
     });

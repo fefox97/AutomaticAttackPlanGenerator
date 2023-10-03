@@ -11,7 +11,7 @@ from flask import current_app as app
 from apps.my_modules import converter, attack_pattern, threat_catalog, macm
 from werkzeug.utils import secure_filename
 from apps import utils, db
-from apps.databases.models import Capec
+from apps.databases.models import Capec, ThreatCatalog
 
 @blueprint.route('/index')
 @login_required
@@ -44,10 +44,8 @@ def route_template(template):
             return render_template(f"home/{template}", segment=segment, data=selected_attack_pattern)
         
         elif template == 'threat-catalog.html':
-            df = threat_catalog.threat_catalog_df
-            if df is not None:
-                df_html = converter.threat_catalog_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='threat_catalog_table', escape=False)
-            return render_template(f"home/{template}", segment=segment, table=df_html)
+            table = ThreatCatalog.query.all()
+            return render_template(f"home/{template}", segment=segment, table=table)
         
         elif template == 'macm.html':
             df = macm.read_macm()

@@ -114,6 +114,7 @@ class ThreatCatalog:
     def __init__(self):
         self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
         self.threat_catalog_df = self.load_threat_catalog(f"{self.base_path}/ThreatCatalogComplete.xlsx")
+        self.save_threat_catalog_to_database(self.threat_catalog_df)
 
     def load_threat_catalog(self, filename):
         print("\nLoading threat catalog...\n")
@@ -124,32 +125,14 @@ class ThreatCatalog:
         columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
-        df['Asset'] = df['Asset'].apply(lambda x: x.replace('.', '_'))
+        # df['Asset'] = df['Asset'].apply(lambda x: x.replace('.', '_'))
         return df
     
-    def create_threat_catalog_db(self, driver, threat_catalog_df: pd.DataFrame, database="threats"):
-        for index, row in threat_catalog_df.iterrows():
-            driver.execute_query('''
-                    MERGE (a:'''+ row['Asset'] + ''' {
-                            TID:$TID,
-                            Asset:$Asset,
-                            Threat:$Threat,
-                            Description:$Description,
-                            STRIDE:$STRIDE,
-                            Compromised:$Compromised,
-                            PreConfidentiality:$PreC,
-                            PreIntegrity:$PreI,
-                            PreAvailability:$PreA,
-                            PreCondition:$Precondition,
-                            PostConfidentiality:$PostC,
-                            PostIntegrity:$PostI,
-                            PostAvailability:$PostA,
-                            PostCondition:$PostCondition,
-                            CapecMeta:$CapecMeta,
-                            CapecStandard:$CapecStandard,
-                            CapecDetailed:$CapecDetailed
-                        })
-                    ''', parameters_={'TID': index} | row.to_dict(), database_=database)
+    def save_threat_catalog_to_database(self, df: pd.DataFrame):
+        print("\nLoading threat catalog to database...\n")
+        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        df = df.copy()
+        df.to_sql('ThreatCatalog', engine, if_exists='replace', index=True, index_label="TID", dtype={"TID": sqlalchemy.types.Text, "CapecMeta": sqlalchemy.types.JSON, "CapecStandard": sqlalchemy.types.JSON, "CapecDetailed": sqlalchemy.types.JSON, "PreC": sqlalchemy.types.JSON, "PreI": sqlalchemy.types.JSON, "PreA": sqlalchemy.types.JSON, "PostC": sqlalchemy.types.JSON, "PostI": sqlalchemy.types.JSON, "PostA": sqlalchemy.types.JSON, "Precondition": sqlalchemy.types.JSON, "PostCondition": sqlalchemy.types.JSON})
 
 class Macm:
 
