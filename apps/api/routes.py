@@ -45,10 +45,8 @@ def route_api(api):
             
             elif api == 'reload_databases':
                 database = request.form.get('database')
-                if database == 'Capec':
-                    utils.upload_databases('Capec')
-                elif database == 'ThreatCatalog':
-                    utils.upload_databases('ThreatCatalog')
+                if database:
+                    utils.upload_databases(database)
                 return jsonify({'success': True, 'message': f'Database {database} reloaded'})
         
         elif request.method == 'GET':
