@@ -97,13 +97,10 @@ class Converter:
         new_columns = []
         for column in df.columns:
             column = column.replace('x_capec_', '')
-            # column = column.replace('_', ' ')
             column = column.title()
             column = column.replace('Id', 'ID')
             new_columns.append(column)
         df.columns = new_columns
-        # df.index.name = df.index.name.replace('_', ' ').title().replace('Id', 'ID')
-        df.index.name = df.index.name.title().replace('Id', 'ID')
         return df
     
     # HTML converters
