@@ -3,9 +3,9 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from .Utils import *
+from .utils import *
+from .converter import Converter
 
-threat_catalog = ThreatCatalog()
 converter = Converter()
-attack_pattern = AttackPattern()
-macm = Macm()
+macm = MacmUtils()
+utils = Utils()

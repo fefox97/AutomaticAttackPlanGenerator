@@ -3,12 +3,16 @@ import os
 import pandas as pd
 import numpy as np
 from neo4j import Result
-from functools import reduce
 import re
-from apps.my_modules.Converter import Converter
+from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-class AttackPattern:
+from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from apps.databases.models import ThreatCatalog, Capec
+
+class AttackPatternUtils:
     
     converter = Converter()
     
@@ -19,30 +23,10 @@ class AttackPattern:
         self.fs = FileSystemStore(stix_dir=self.stix_path, bundlify=False)
         self.fs_source = FileSystemSource(stix_dir=self.stix_path)
         
-        self.attack_pattern_df = self.read_attack_patterns()
-
-    def save_attack_patterns(self, df: pd.DataFrame):
-        df.to_pickle(f'{self.base_path}/attack_patterns.pickle')
-
-    def read_attack_patterns(self):
-        if os.path.exists(f'{self.base_path}/attack_patterns.pickle'):
-            print("\nLoading attack patterns from Pickle...\n")
-            df = pd.read_pickle(f'{self.base_path}/attack_patterns.pickle')
-            self.save_attack_patterns_to_database(df)
-        else:
-            print("\nLoading attack patterns from Stix...\n")
-            df = self.load_attack_patterns()
-            self.save_attack_patterns(df)
-        return df
-    
-    def save_attack_patterns_to_database(self, df: pd.DataFrame):
-        print("\nLoading attack patterns from Database...\n")
-        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        df = df.copy()
-        df.drop(['External_References'], axis=1, inplace=True)
-        df.to_sql('Capec', engine, if_exists='replace', index=True, index_label="Capec_ID", dtype={"Capec_ID": sqlalchemy.types.INTEGER, "Created_By_Ref": sqlalchemy.types.JSON, "Object_Marking_Refs": sqlalchemy.types.JSON, "Alternate_Terms": sqlalchemy.types.JSON, "Can_Follow_Refs": sqlalchemy.types.JSON, "Can_Precede_Refs": sqlalchemy.types.JSON, "Consequences": sqlalchemy.types.JSON, "Domains": sqlalchemy.types.JSON, "Example_Instances": sqlalchemy.types.JSON, "Extended_Description": sqlalchemy.types.JSON, "Peer_Of_Refs": sqlalchemy.types.JSON, "Prerequisites": sqlalchemy.types.JSON, "Resources_Required": sqlalchemy.types.JSON, "Skills_Required": sqlalchemy.types.JSON, "Capec_Childs_ID": sqlalchemy.types.JSON, "Capec_Parents_ID": sqlalchemy.types.JSON})
+        self.attack_pattern_df = self.load_attack_patterns()
 
     def load_attack_patterns(self):
+        print("\nLoading attack patterns...\n")
         attack_pattern_list = []
         for attack_pattern in [x.removesuffix(".json") for x in os.listdir(self.attack_pattern_path)]:
             ap = self.fs.get(attack_pattern)
@@ -55,86 +39,40 @@ class AttackPattern:
         # replace stix ids with capec ids
         attack_pattern_df.set_index('id', inplace=True)
         attack_pattern_df = self.converter.convert_ids_to_capec_ids(attack_pattern_df)
-        attack_pattern_df.set_index('capec_id', inplace=True)
+        # attack_pattern_df.set_index('capec_id', inplace=True)
 
         # drop columns
         attack_pattern_df.drop(['x_capec_parent_of_refs', 'x_capec_child_of_refs', 'type', 'revoked'], axis=1, inplace=True)
 
         # remove html header from x_capec_execution_flow
         attack_pattern_df['x_capec_execution_flow'] = attack_pattern_df['x_capec_execution_flow'].apply(lambda x: re.sub(r'<h2>(.*?)</h2>', r'', x) if x is not None else None)
-
-        # sort by capec_id and make it categorical
-        attack_pattern_df.index = pd.CategoricalIndex(attack_pattern_df.index, sorted(attack_pattern_df.index.to_list(), key=lambda x: int(x)))
         
         # prettier column names
         attack_pattern_df = self.converter.convert_column_names(attack_pattern_df)
         return attack_pattern_df
+    
 
-    def get_child_attack_patterns_by_id(self, parent_id, attack_pattern_df: pd.DataFrame):
-        try:
-            return attack_pattern_df.loc[parent_id].get('Capec Childs ID') or []
-        except:
-            return None
-
-    def get_child_attack_patterns_recursive(self, parent_id, attack_pattern_df: pd.DataFrame) -> list:
-        childs = self.get_child_attack_patterns_by_id(parent_id, attack_pattern_df)
-        if childs is None or len(childs) == 0:
-            return []
-        else:
-            for child in childs:
-                childs = childs + self.get_child_attack_patterns_recursive(child, attack_pattern_df)
-            return childs
-
-    def get_child_attack_patterns(self, parent_ids, attack_pattern_df: pd.DataFrame, show_tree=False, get_df=False):
-        if type(parent_ids) is not list: parent_ids = [parent_ids]
-        childs = [parent_id for parent_id in parent_ids]
-        if show_tree:
-            childs = childs + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id, attack_pattern_df)]
-        childs = list(set(childs))
-        if get_df:
-            return attack_pattern_df.loc[childs] # return the dataframe
-        return childs # return only the ids, not the dataframe
-
-    def query_attack_patterns(self, attack_pattern_df: pd.DataFrame, keywords, search_columns:list=['description'], ap_type:list=['Meta', 'Standard', 'Detailed'], query_type='or'):
-        if query_type == 'or':
-            keywords = '|'.join(keywords)
-        elif query_type == 'and':
-            keywords = r'(?=.*' + r')(?=.*'.join(keywords) + r')'
-        else:
-            raise Exception('query_type must be "or" or "and"')
-        inds = [attack_pattern_df[x].str.lower().str.contains(keywords.lower()) for x in search_columns]
-        type_inds = [attack_pattern_df['x_capec_abstraction'].isin([x]) for x in ap_type]
-        response = attack_pattern_df[(reduce(lambda x, y: x | y, inds)) & (reduce(lambda x, y: x | y, type_inds))].sort_values(by=['x_capec_abstraction'])
-        return response
-
-class ThreatCatalog:
+class ThreatCatalogUtils:
     
     converter = Converter()
 
     def __init__(self):
         self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
-        self.threat_catalog_df = self.load_threat_catalog(f"{self.base_path}/ThreatCatalogComplete.xlsx")
-        self.save_threat_catalog_to_database(self.threat_catalog_df)
+        self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
+        self.threat_catalog_df = self.load_threat_catalog()
 
-    def load_threat_catalog(self, filename):
+    def load_threat_catalog(self):
         print("\nLoading threat catalog...\n")
-        df = pd.read_excel(filename, sheet_name="Threat Components", header=0)
+        df = pd.read_excel(self.file_path, sheet_name="Threat Components", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
-        df.set_index('TID', inplace=True)
+        # df.set_index('TID', inplace=True)
         df = df.astype('str')
         columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
-        # df['Asset'] = df['Asset'].apply(lambda x: x.replace('.', '_'))
         return df
-    
-    def save_threat_catalog_to_database(self, df: pd.DataFrame):
-        print("\nLoading threat catalog to database...\n")
-        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        df = df.copy()
-        df.to_sql('ThreatCatalog', engine, if_exists='replace', index=True, index_label="TID", dtype={"TID": sqlalchemy.types.Text, "CapecMeta": sqlalchemy.types.JSON, "CapecStandard": sqlalchemy.types.JSON, "CapecDetailed": sqlalchemy.types.JSON, "PreC": sqlalchemy.types.JSON, "PreI": sqlalchemy.types.JSON, "PreA": sqlalchemy.types.JSON, "PostC": sqlalchemy.types.JSON, "PostI": sqlalchemy.types.JSON, "PostA": sqlalchemy.types.JSON, "Precondition": sqlalchemy.types.JSON, "PostCondition": sqlalchemy.types.JSON})
 
-class Macm:
+class MacmUtils:
 
     def __init__(self):
         # neo4j setup
@@ -152,24 +90,44 @@ class Macm:
 
     def read_macm(self, database='macm'):
         macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
-        macm_df.rename(columns={'asset.component_id': 'Component ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App ID'}, inplace=True)
-        macm_df['Component ID'] = macm_df['Component ID'].astype('int')
-        macm_df.set_index('Component ID', inplace=True)
+        macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID'}, inplace=True)
+        # macm_df['Component_ID'] = macm_df['Component_ID'].astype('int')
+        macm_df.set_index('Component_ID', inplace=True)
         return macm_df
+
+    def upload_macm_to_database(self):
+        print("\nLoading macm to database...\n")
+        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        df = self.read_macm()
+        df.to_sql('Macm', engine, if_exists='replace', index=True, index_label="Component_ID", dtype={"Component_ID": sqlalchemy.types.INTEGER, "App_ID": sqlalchemy.types.INTEGER})
 
     def upload_macm(self, query, database='macm'):
         self.clear_database(database)
         self.driver.execute_query(query, database_=database)
+        self.upload_macm_to_database()
+
 
 class Utils:
 
     def __init__(self):
-        self.allowed_extensions = None
+        self.attack_pattern_utils = AttackPatternUtils()
+        self.threat_catalog_utils = ThreatCatalogUtils()
+        self.attack_pattern_df = self.attack_pattern_utils.attack_pattern_df
+        self.threat_catalog_df = self.threat_catalog_utils.threat_catalog_df
+        self.engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
 
-    def init_app(self, app):
-        self.allowed_extensions = app.config['ALLOWED_EXTENSIONS']
+    def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
+        print(f"\nLoading dataframe {mapper.__name__} to database...\n")
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+        if replace:
+            session.query(mapper).delete()
+        session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=True)
+        session.commit()
+        session.close()
 
-    def allowed_file(self, filename, allowed_extensions=None):
-        if allowed_extensions is None:
-            allowed_extensions = self.allowed_extensions
-        return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+    def upload_databases(self, database):
+        if database == 'Capec':
+            self.save_dataframe_to_database(self.attack_pattern_df, Capec)
+        elif database == 'ThreatCatalog':
+            self.save_dataframe_to_database(self.threat_catalog_df, ThreatCatalog)
