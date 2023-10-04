@@ -1,11 +1,15 @@
 $(document).ready(function() {
     $('#ReloadCapec').on('click', function() {
-        console.log("Reloading Databases");
+        console.log("Reloading Capec");
         reloadDatabases("Capec");
     });
     $('#ReloadThreatCatalog').on('click', function() {
-        console.log("Reloading Databases");
+        console.log("Reloading ThreatCatalog");
         reloadDatabases("ThreatCatalog");
+    });
+    $('#ReloadToolCatalog').on('click', function() {
+        console.log("Reloading ToolCatalog");
+        reloadDatabases("ToolCatalog");
     });
 });
 

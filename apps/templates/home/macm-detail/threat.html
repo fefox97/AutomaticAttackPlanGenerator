@@ -10,7 +10,7 @@
     <div id="collapseThreat{{threat_name}}" class="card-body collapse" aria-labelledby="headingThreat{{threat_name}}">
         {{ threat.Description }}
         <div class="d-block mt-3">
-            {% for attackPattern in threat.CapecMeta|list + threat.CapecStandard|list + threat.CapecDetailed|list | sort %}
+            {% for attackPattern in threat.hasCapecMeta|list + threat.hasCapecStandard|list + threat.hasCapecDetailed|list %}
                 {% if attackPattern != 'None' %}
                     {% include 'home/macm-detail/attack_pattern.html' %}
                 {% endif %}

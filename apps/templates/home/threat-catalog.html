@@ -87,10 +87,10 @@
                                     <td>{{ row['PostI'] }}</td>
                                     <td>{{ row['PostA'] }}</td>
                                     <td>{{ row['PostCondition'] }}</td>
-                                    <td>{{ row['CapecMeta'] | tojson }}</td>
-                                    <td>{{ row['CapecStandard'] | tojson }}</td>
-                                    <td>{{ row['CapecDetailed'] | tojson }}</td>
-                                    <td>{{ row['Commento'] }}</td>
+                                    <td>{{ row.hasCapecMeta }}</td>
+                                    <td>{{ row.hasCapecStandard }}</td>
+                                    <td>{{ row.hasCapecDetailed }}</td>
+                                    <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

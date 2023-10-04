@@ -8,7 +8,8 @@ from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, select
+from sqlalchemy.dialects import mysql
 
 from apps import db
 
@@ -56,7 +57,7 @@ class Capec(db.Model):
             setattr(self, property, value)
 
     def __repr__(self):
-        return str(self.Name) 
+        return str(self.Capec_ID) 
 
     @hybrid_property
     def abstraction_order(self):
@@ -84,34 +85,77 @@ class ThreatCatalog(db.Model):
     PostI               = db.Column(db.JSON)
     PostA               = db.Column(db.JSON)
     PostCondition       = db.Column(db.JSON)
-    CapecMeta           = db.Column(db.JSON)
-    CapecStandard       = db.Column(db.JSON)
-    CapecDetailed       = db.Column(db.JSON)
+    # CapecMeta           = db.Column(db.JSON)
+    # CapecStandard       = db.Column(db.JSON)
+    # CapecDetailed       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
     
-    CapecMetaRel: Mapped[List[Capec]] = relationship("Capec", secondary="AssociationTable", backref="ThreatCatalog")
-
-
+    hasCapec            = db.relationship('Capec', secondary='CapecThreatRelTable', backref='hasThreat', lazy='dynamic')
+    
+    @hybrid_property
+    def hasCapecMeta(self):
+        return self.hasCapec.filter(Capec.Abstraction == 'Meta').all()
+    
+    @hybrid_property
+    def hasCapecStandard(self):
+        return self.hasCapec.filter(Capec.Abstraction == 'Standard').all()
+    
+    @hybrid_property
+    def hasCapecDetailed(self):
+        return self.hasCapec.filter(Capec.Abstraction == 'Detailed').all()
+    
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
-            # depending on whether value is an iterable or not, we must
-            # unpack it's value (when **kwargs is request.form, some values
-            # will be a 1-element list)
             if hasattr(value, '__iter__') and not isinstance(value, str):
-                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
                 value = value[0]
 
             setattr(self, property, value)
 
     def __repr__(self):
-        return str(self.Asset)
+        return str(self.TID)
     
-class Association(db.Model):
+class CapecThreatRel(db.Model):
 
-    __tablename__ = 'AssociationTable'
+    __tablename__ = 'CapecThreatRelTable'
 
-    Capec_ID                  = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"), primary_key=True, unique=True, nullable=False)
-    ThreatCatalog_ID          = db.Column(db.Text, ForeignKey("ThreatCatalog.TID"), primary_key=True, unique=True, nullable=False)
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
+    TID          = db.Column(db.Text, ForeignKey("ThreatCatalog.TID"))
+
+class ToolCatalog(db.Model):
+
+    __tablename__ = 'ToolCatalog'
+
+    ToolID      = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Name        = db.Column(db.Text)
+    CapecID     = db.Column(db.JSON)
+    Command     = db.Column(db.Text)
+
+    hasCapec    = db.relationship('Capec', secondary='CapecToolRelTable', backref='hasTool', lazy='dynamic')
+
+    @hybrid_property
+    def hasCapecIDs(self):
+        ids = self.hasCapec.with_entities(Capec.Capec_ID).all()
+        return [id[0] for id in ids]
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.ToolID)
+
+class CapecToolRel(db.Model):
+
+    __tablename__ = 'CapecToolRelTable'
+
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
+    ToolID       = db.Column(db.Text, ForeignKey("ToolCatalog.ToolID"))
+
 class Macm(db.Model):
 
     __tablename__ = 'Macm'
@@ -122,14 +166,9 @@ class Macm(db.Model):
     Type            = db.Column(db.Text)
     App_ID          = db.Column(db.Integer)
     
-
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
-            # depending on whether value is an iterable or not, we must
-            # unpack it's value (when **kwargs is request.form, some values
-            # will be a 1-element list)
             if hasattr(value, '__iter__') and not isinstance(value, str):
-                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
                 value = value[0]
 
             setattr(self, property, value)

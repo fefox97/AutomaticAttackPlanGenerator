@@ -7,10 +7,10 @@ import re
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from apps.databases.models import ThreatCatalog, Capec
+from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel
 
 class AttackPatternUtils:
     
@@ -22,8 +22,7 @@ class AttackPatternUtils:
         self.attack_pattern_path = f'{self.stix_path}/attack-pattern'
         self.fs = FileSystemStore(stix_dir=self.stix_path, bundlify=False)
         self.fs_source = FileSystemSource(stix_dir=self.stix_path)
-        
-        self.attack_pattern_df = self.load_attack_patterns()
+        # self.attack_pattern_df = self.load_attack_patterns()
 
     def load_attack_patterns(self):
         print("\nLoading attack patterns...\n")
@@ -59,7 +58,7 @@ class ThreatCatalogUtils:
     def __init__(self):
         self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
         self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
-        self.threat_catalog_df = self.load_threat_catalog()
+        # self.threat_catalog_df = self.load_threat_catalog()
 
     def load_threat_catalog(self):
         print("\nLoading threat catalog...\n")
@@ -70,6 +69,22 @@ class ThreatCatalogUtils:
         columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
+        return df
+
+class ToolCatalogUtils:
+
+    converter = Converter()
+
+    def __init__(self):
+        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
+        self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
+        # self.tools_catalog_df = self.load_tools_catalog()
+
+    def load_tools_catalog(self):
+        print("\nLoading tools catalog...\n")
+        df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
+        df.replace(np.nan, None, inplace=True) # replace NaN with None
+        df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
         return df
 
 class MacmUtils:
@@ -106,28 +121,69 @@ class MacmUtils:
         self.driver.execute_query(query, database_=database)
         self.upload_macm_to_database()
 
-
 class Utils:
 
     def __init__(self):
         self.attack_pattern_utils = AttackPatternUtils()
         self.threat_catalog_utils = ThreatCatalogUtils()
-        self.attack_pattern_df = self.attack_pattern_utils.attack_pattern_df
-        self.threat_catalog_df = self.threat_catalog_utils.threat_catalog_df
+        self.tool_catalog_utils = ToolCatalogUtils()
         self.engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
         print(f"\nLoading dataframe {mapper.__name__} to database...\n")
         Session = sessionmaker(bind=self.engine)
         session = Session()
-        if replace:
-            session.query(mapper).delete()
+        if inspect(self.engine).has_table(mapper.__tablename__):
+            if replace:
+                session.query(mapper).delete()
+                session.commit()
+        else:
+            mapper.metadata.create_all(self.engine)
         session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=True)
         session.commit()
         session.close()
 
+    def load_capec_threat_relations(self, df: pd.DataFrame):
+        print("\nExtracting Capec-ThreatCatalog relations to database...\n")
+        relations_df = pd.DataFrame(columns=['Capec_ID', 'TID'])
+        for _, threat in df.iterrows():
+            for capec in threat['CapecMeta'] + threat['CapecStandard'] + threat['CapecDetailed']:
+                if capec is not None and capec != 'None':
+                    relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'TID': threat['TID']}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+
+    def load_capec_tool_relations(self, df: pd.DataFrame):
+        print("\nExtracting Capec-ToolCatalog relations to database...\n")
+        relations_df = pd.DataFrame(columns=['Capec_ID', 'ToolID'])
+        for _, tool in df.iterrows():
+            for capec in tool['CapecID']:
+                if capec is not None and capec != 'None':
+                    relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'ToolID': tool['ToolID']}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+
     def upload_databases(self, database):
         if database == 'Capec':
-            self.save_dataframe_to_database(self.attack_pattern_df, Capec)
+            attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
+            self.save_dataframe_to_database(attack_pattern_df, Capec)
         elif database == 'ThreatCatalog':
-            self.save_dataframe_to_database(self.threat_catalog_df, ThreatCatalog)
+            threat_catalog_df = self.threat_catalog_utils.load_threat_catalog()
+            relations = self.load_capec_threat_relations(threat_catalog_df)
+            self.save_dataframe_to_database(threat_catalog_df, ThreatCatalog)
+            self.save_dataframe_to_database(relations, CapecThreatRel)
+        elif database == 'ToolCatalog':
+            tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
+            relations = self.load_capec_tool_relations(tool_catalog_df)
+            self.save_dataframe_to_database(tool_catalog_df, ToolCatalog)
+            self.save_dataframe_to_database(relations, CapecToolRel)
+
+    def update_value(self):
+        print("\nUpdating value...\n")
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+        session.query(Capec).filter(Capec.Capec_ID == 1).update({'Capec_ID': 1000})
+        session.commit()
+        session.close()

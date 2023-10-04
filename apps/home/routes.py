@@ -8,8 +8,9 @@ from flask import render_template, request
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import Capec, ThreatCatalog, Macm
+from apps.databases.models import Capec, ThreatCatalog, Macm, ToolCatalog
 from sqlalchemy.dialects import mysql
+from apps.my_modules.utils import Utils
 
 @blueprint.route('/index')
 @login_required
@@ -49,6 +50,12 @@ def route_template(template):
                 table = None
             return render_template(f"home/{template}", segment=segment, table=table)
         
+        elif template == 'tools.html':
+            table = ToolCatalog.query.all()
+            if len(table) == 0:
+                table = None
+            return render_template(f"home/{template}", segment=segment, table=table)
+
         elif template == 'macm.html':
             table = Macm.query.all()
             if len(table) == 0:

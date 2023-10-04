@@ -34,3 +34,26 @@
     {% endfor %}
 </h4>
 {% endif %}
+
+{% if data.hasThreat is not none %}
+<h4>
+    Threats:
+    {% for threat in data.hasThreat %}
+        <span class="badge bg-primary">
+            <!-- <a href="/capec-detail?id={{ threat }}">{{ threat }}</a> -->
+            {{ threat }}
+        </span>
+    {% endfor %}
+</h4>
+{% endif %}
+
+{% if data.hasTool is not none %}
+<h4>
+    Tools:
+    {% for tool in data.hasTool %}
+        <span class="badge bg-primary">
+            {{ tool }}
+        </span>
+    {% endfor %}
+</h4>
+{% endif %}
