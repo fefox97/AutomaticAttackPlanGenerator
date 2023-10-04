@@ -69,11 +69,41 @@
                 {% if table is not none %}
                     <div class="d-block align-items-center pt-5">
                         <!-- [ stiped-table ] start -->
-                        {{ table|safe }}
+                        <table id="macm_table" class="table table-striped table-hover table-dataframe">
+                            <thead>
+                                <tr>
+                                    <th>Component ID</th>
+                                    <th>Application</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>App ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in table %}
+                                    <tr>
+                                        <th>{{ row['Component_ID'] }}</th>
+                                        <td>{{ row['Application'] }}</td>
+                                        <td>{{ row['Name'] }}</td>
+                                        <td>{{ row['Type'] }}</td>
+                                        <td>{{ row['App_ID'] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Component ID</th>
+                                    <th>Application</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>App ID</th>
+                                </tr>
+                            </tfoot>
+                        </table> 
                         <!-- [ stiped-table ] end -->
                     </div>
                 {% else %}
-                    <p class="text-warning mb-1 display-4">No data available, please upload a MACM</p>
+                    <p class="text-warning mb-1 display-5">No data available, please upload a MACM</p>
                 {% endif %}
             </div>
         </div>

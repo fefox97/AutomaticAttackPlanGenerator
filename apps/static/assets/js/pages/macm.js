@@ -99,16 +99,11 @@ $(window).on('load', function() {
                 },
             },
         ],
-        lengthMenu: [
-            [ 10, 25, 50, -1 ],
-            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-        ],
         buttons: [
             {
                 extend: 'colvis',
                 columns: ':not(.noVis)'
             },
-            // 'pageLength',
             'searchPanes',
         ],
         initComplete: function () {

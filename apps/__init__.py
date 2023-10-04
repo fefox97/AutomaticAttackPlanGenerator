@@ -4,6 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os
+import re
 
 from flask import Flask
 from flask_login import LoginManager
@@ -11,19 +12,16 @@ from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from flask_modals import Modal
 from flask_assets import Environment, Bundle
-from apps.my_modules import Utils
 
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 modal = Modal()
-utils = Utils()
 
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
     modal.init_app(app)
-    utils.init_app(app)
 
 
 def register_assets(app):
@@ -44,6 +42,10 @@ def register_blueprints(app):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
 
+def register_custom_filters(app):
+    @app.template_filter('regex_replace')
+    def regex_replace(s, find, replace):
+        return re.sub(find, replace, s)
 
 def configure_database(app):
 
@@ -74,7 +76,8 @@ def create_app(config):
     register_extensions(app)
     register_blueprints(app)
     register_assets(app)
-
+    register_custom_filters(app)
+    
     app.register_blueprint(github_blueprint, url_prefix="/login") 
     
     configure_database(app)

@@ -8,10 +8,8 @@ from flask import render_template, request
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.my_modules import converter, attack_pattern, threat_catalog, macm
-from werkzeug.utils import secure_filename
-from apps import utils, db
-from apps.databases.models import Capec, ThreatCatalog
+from apps.databases.models import Capec, ThreatCatalog, Macm
+from sqlalchemy.dialects import mysql
 
 @blueprint.route('/index')
 @login_required
@@ -36,6 +34,8 @@ def route_template(template):
         # Serve the file (if exists) from app/templates/home/FILE.html
         if template == 'capec.html':
             table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
+            if len(table) == 0:
+                table = None
             return render_template(f"home/{template}", segment=segment, table=table)
 
         elif template == 'capec-detail.html':
@@ -45,21 +45,20 @@ def route_template(template):
         
         elif template == 'threat-catalog.html':
             table = ThreatCatalog.query.all()
+            if len(table) == 0:
+                table = None
             return render_template(f"home/{template}", segment=segment, table=table)
         
         elif template == 'macm.html':
-            df = macm.read_macm()
-            df_html = None
-            if df is not None and not df.empty:
-                df_html = converter.macm_to_html(df, classes='table table-striped table-hover table-dataframe', table_id='macm_table', escape=False)
-            return render_template(f"home/{template}", segment=segment, table=df_html)
+            table = Macm.query.all()
+            if len(table) == 0:
+                table = None
+            return render_template(f"home/{template}", segment=segment, table=table)
         
         elif template == 'macm-detail.html':
             selected_id = request.args.get('id')
-            macm_df = macm.read_macm()
-            selected_macm = macm_df.loc[int(selected_id)]
-            threat_catalog_df = threat_catalog.threat_catalog_df
-            threat_catalog_data = threat_catalog_df.query('Asset == @selected_macm.Type')
+            selected_macm = Macm.query.filter_by(Component_ID=selected_id).first()
+            threat_catalog_data = ThreatCatalog.query.filter_by(Asset=selected_macm.Type).all()
             return render_template(f"home/{template}", segment=segment, macm_data=selected_macm, threat_catalog_data=threat_catalog_data)
         
         # Serve the file (if exists) from app/templates/home/FILE.html
