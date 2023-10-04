@@ -8,8 +8,9 @@ from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, select, orm
 from sqlalchemy.dialects import mysql
+from sqlalchemy_utils import create_view
 
 from apps import db
 
@@ -160,7 +161,7 @@ class Macm(db.Model):
 
     __tablename__ = 'Macm'
 
-    Component_ID    = db.Column(db.Integer, primary_key=True)
+    Component_ID    = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
@@ -176,3 +177,11 @@ class Macm(db.Model):
     def __repr__(self):
         return str(self.Name)
     
+class AttackView(db.Model):
+
+    __table__ = create_view(
+                "AttackView",
+                select(ToolCatalog, Capec, ThreatCatalog, Macm).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset),
+                db.metadata,
+                replace=True
+                )

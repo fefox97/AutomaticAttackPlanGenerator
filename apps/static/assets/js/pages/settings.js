@@ -11,16 +11,28 @@ $(document).ready(function() {
         console.log("Reloading ToolCatalog");
         reloadDatabases("ToolCatalog");
     });
+    $('#TestButton').on('click', function() {
+        test();
+    });
 });
 
 function reloadDatabases(database) {
-    console.log("Reloading Databases");
     $.ajax({
         url: '/api/reload_databases',
         type: 'POST',
         data: {
             'database': database,
         },
+        success: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+function test(){
+    $.ajax({
+        url: '/api/test',
+        type: 'POST',
         success: function(response) {
             console.log(response);
         }

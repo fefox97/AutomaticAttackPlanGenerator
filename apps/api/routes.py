@@ -11,6 +11,7 @@ from flask import current_app as app
 from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
+from apps.databases.models import Macm
 
 # @login_required
 @blueprint.route('/<api>', methods=['GET', 'POST'])
@@ -32,7 +33,7 @@ def route_api(api):
             elif api == 'upload_macm':
                 if 'macmFile' in request.files:
                     file = request.files['macmFile']
-                    if not APIUtils.allowed_file(file.filename, 'txt', app.config['ALLOWED_EXTENSIONS']):
+                    if not APIUtils().allowed_file(file.filename, 'txt'):
                         return jsonify({'success': False, 'message': 'File type not allowed'})
                     query_str = file.read().decode('utf-8')
                 elif 'macmCypher' in request.form:
@@ -40,7 +41,7 @@ def route_api(api):
                 else:
                     return jsonify({'success': False, 'message': 'No file or Cypher query provided'})
                 macm.upload_macm(query_str)
-                # macm.create_enhanced_macm()
+                utils.upload_databases('Macm')
                 return redirect(url_for('home_blueprint.route_template', template='macm.html'))
             
             elif api == 'reload_databases':
@@ -48,11 +49,15 @@ def route_api(api):
                 if database:
                     utils.upload_databases(database)
                 return jsonify({'success': True, 'message': f'Database {database} reloaded'})
+            
+            elif api == 'test':
+                utils.create_attack_database()
+                return jsonify({'success': True, 'message': 'Test successful'})
         
         elif request.method == 'GET':
             if api == 'clear_macm_database':
                 macm.clear_database('macm')
-                macm.clear_database('emacm')
+                Macm.query.delete()
                 return redirect(url_for('home_blueprint.route_template', template='macm.html'))
 
     except:

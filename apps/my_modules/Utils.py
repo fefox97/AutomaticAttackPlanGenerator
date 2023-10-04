@@ -7,10 +7,10 @@ import re
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import MetaData, inspect
+from sqlalchemy import MetaData, inspect, select
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel
+from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView
+from sqlalchemy_utils import create_view
 
 class AttackPatternUtils:
     
@@ -106,20 +106,11 @@ class MacmUtils:
     def read_macm(self, database='macm'):
         macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
         macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID'}, inplace=True)
-        # macm_df['Component_ID'] = macm_df['Component_ID'].astype('int')
-        macm_df.set_index('Component_ID', inplace=True)
         return macm_df
-
-    def upload_macm_to_database(self):
-        print("\nLoading macm to database...\n")
-        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        df = self.read_macm()
-        df.to_sql('Macm', engine, if_exists='replace', index=True, index_label="Component_ID", dtype={"Component_ID": sqlalchemy.types.INTEGER, "App_ID": sqlalchemy.types.INTEGER})
 
     def upload_macm(self, query, database='macm'):
         self.clear_database(database)
         self.driver.execute_query(query, database_=database)
-        self.upload_macm_to_database()
 
 class Utils:
 
@@ -127,6 +118,7 @@ class Utils:
         self.attack_pattern_utils = AttackPatternUtils()
         self.threat_catalog_utils = ThreatCatalogUtils()
         self.tool_catalog_utils = ToolCatalogUtils()
+        self.macm_utils = MacmUtils()
         self.engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -165,6 +157,15 @@ class Utils:
         relations_df.index.name = 'Id'
         return relations_df
 
+    def create_attack_database(self):
+        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        query = session.query(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset).with_entities(Macm.Component_ID, ThreatCatalog.Asset, ThreatCatalog.Threat, Capec.Name, Capec.Capec_ID, ToolCatalog.Name)
+        output = query.all()
+        print(f"Output: {output}")
+        session.close()
+
     def upload_databases(self, database):
         if database == 'Capec':
             attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
@@ -179,11 +180,7 @@ class Utils:
             relations = self.load_capec_tool_relations(tool_catalog_df)
             self.save_dataframe_to_database(tool_catalog_df, ToolCatalog)
             self.save_dataframe_to_database(relations, CapecToolRel)
-
-    def update_value(self):
-        print("\nUpdating value...\n")
-        Session = sessionmaker(bind=self.engine)
-        session = Session()
-        session.query(Capec).filter(Capec.Capec_ID == 1).update({'Capec_ID': 1000})
-        session.commit()
-        session.close()
+        elif database == 'Macm':
+            macm_df = self.macm_utils.read_macm()
+            self.save_dataframe_to_database(macm_df, Macm)
+            AttackView.metadata.create_all(self.engine)
