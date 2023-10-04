@@ -11,7 +11,8 @@ from flask import current_app as app
 from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
-from apps.databases.models import Macm
+from apps.databases.models import AttackView, Macm
+from apps import db
 
 # @login_required
 @blueprint.route('/<api>', methods=['GET', 'POST'])
@@ -57,7 +58,8 @@ def route_api(api):
         elif request.method == 'GET':
             if api == 'clear_macm_database':
                 macm.clear_database('macm')
-                Macm.query.delete()
+                db.session.query(Macm).delete()
+                db.session.commit()
                 return redirect(url_for('home_blueprint.route_template', template='macm.html'))
 
     except:
