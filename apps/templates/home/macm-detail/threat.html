@@ -1,20 +1,20 @@
-{% set threat_name = threat.Threat | regex_replace ("[^A-Za-z0-9]","") %}
+{% set threat_name = attack.Threat | regex_replace("[^A-Za-z0-9]","") %}
+{% set attack_pattern_name = attack.Attack_Pattern | regex_replace("[^A-Za-z0-9]","") %}
+{% set attack_tool_name = attack.Tool_Name | regex_replace("[^A-Za-z0-9]","") %}
+{% set attack_name = [threat_name, attack_pattern_name, attack_tool_name] | join('_') %}
 
 <div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingThreat{{threat_name}}" data-bs-toggle="collapse" data-bs-target="#collapseThreat{{threat_name}}" aria-expanded="true" aria-controls="collapseThreat{{threat_name}}">
+    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="heading{{attack_name}}" data-bs-toggle="collapse" data-bs-target="#collapse{{attack_name}}" aria-expanded="true" aria-controls="collapse{{attack_name}}">
         <h2 class="h5 mb-0">
-            {{ threat.Threat }}
+            {{ attack.Threat }} <i class="fas fa-chevron-right"></i> {{ attack.Attack_Pattern }} <i class="fas fa-chevron-right"></i> {{ attack.Tool_Name }}
             <i class="fas fa-chevron-down"></i>
         </h2>
     </div>
-    <div id="collapseThreat{{threat_name}}" class="card-body collapse" aria-labelledby="headingThreat{{threat_name}}">
-        {{ threat.Description }}
+    <div id="collapse{{attack_name}}" class="card-body collapse" aria-labelledby="heading{{attack_name}}">
         <div class="d-block mt-3">
-            {% for attackPattern in threat.hasCapecMeta|list + threat.hasCapecStandard|list + threat.hasCapecDetailed|list %}
-                {% if attackPattern != 'None' %}
-                    {% include 'home/macm-detail/attack_pattern.html' %}
-                {% endif %}
-            {% endfor %}
+            {{ attack.Threat_Description }}
+            {{ attack.Execution_Flow | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
+            
         </div>
     </div>
 </div>

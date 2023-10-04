@@ -8,7 +8,7 @@ from flask import render_template, request
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import Capec, ThreatCatalog, Macm, ToolCatalog
+from apps.databases.models import AttackView, Capec, ThreatCatalog, Macm, ToolCatalog
 from sqlalchemy.dialects import mysql
 from apps.my_modules.utils import Utils
 
@@ -64,9 +64,8 @@ def route_template(template):
         
         elif template == 'macm-detail.html':
             selected_id = request.args.get('id')
-            selected_macm = Macm.query.filter_by(Component_ID=selected_id).first()
-            threat_catalog_data = ThreatCatalog.query.filter_by(Asset=selected_macm.Type).all()
-            return render_template(f"home/{template}", segment=segment, macm_data=selected_macm, threat_catalog_data=threat_catalog_data)
+            attack_data = AttackView.query.filter_by(Component_ID=selected_id).all()
+            return render_template(f"home/{template}", segment=segment, attack_data=attack_data)
         
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)

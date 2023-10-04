@@ -181,7 +181,7 @@ class AttackView(db.Model):
 
     __table__ = create_view(
                 "AttackView",
-                select(ToolCatalog, Capec, ThreatCatalog, Macm).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset),
+                select(ToolCatalog.Name.label("Tool_Name"), ToolCatalog.Command, Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), Capec.Execution_Flow, ThreatCatalog.Asset.label("Asset_Type"), ThreatCatalog.Threat, ThreatCatalog.Description.label("Threat_Description"), Macm.Component_ID, Macm.Name.label("Asset")).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset),
                 db.metadata,
                 replace=True
                 )
