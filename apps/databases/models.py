@@ -8,7 +8,7 @@ from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ForeignKey, select, orm
+from sqlalchemy import ForeignKey, select, orm, func
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
 
@@ -95,15 +95,18 @@ class ThreatCatalog(db.Model):
     
     @hybrid_property
     def hasCapecMeta(self):
-        return self.hasCapec.filter(Capec.Abstraction == 'Meta').all()
+        ids = self.hasCapec.filter(Capec.Abstraction == 'Meta').with_entities(Capec.Capec_ID).all()
+        return [id[0] for id in ids]
     
     @hybrid_property
     def hasCapecStandard(self):
-        return self.hasCapec.filter(Capec.Abstraction == 'Standard').all()
+        ids = self.hasCapec.filter(Capec.Abstraction == 'Standard').with_entities(Capec.Capec_ID).all()
+        return [id[0] for id in ids]
     
     @hybrid_property
     def hasCapecDetailed(self):
-        return self.hasCapec.filter(Capec.Abstraction == 'Detailed').all()
+        ids = self.hasCapec.filter(Capec.Abstraction == 'Detailed').with_entities(Capec.Capec_ID).all()
+        return [id[0] for id in ids]
     
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -178,10 +181,14 @@ class Macm(db.Model):
         return str(self.Name)
     
 class AttackView(db.Model):
-
+    row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    
     __table__ = create_view(
                 "AttackView",
-                select(ToolCatalog.Name.label("Tool_Name"), ToolCatalog.Command, Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), Capec.Execution_Flow, ThreatCatalog.Asset.label("Asset_Type"), ThreatCatalog.Threat, ThreatCatalog.Description.label("Threat_Description"), Macm.Component_ID, Macm.Name.label("Asset")).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset),
+                select(ToolCatalog.ToolID.label("Tool_ID"), ToolCatalog.Name.label("Tool_Name"), ToolCatalog.Command, Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), Capec.Execution_Flow, ThreatCatalog.TID.label("Threat_ID"), ThreatCatalog.Asset.label("Asset_Type"), ThreatCatalog.Threat, ThreatCatalog.Description.label("Threat_Description"), Macm.Component_ID, Macm.Name.label("Asset")).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset).add_columns(row_number_column),
                 db.metadata,
                 replace=True
                 )
+    
+    def __repr__(self):
+        return str(f'{self.Component_ID}-{self.Capec_ID}')
