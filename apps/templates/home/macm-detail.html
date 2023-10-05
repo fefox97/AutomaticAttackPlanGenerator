@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} MACM-{{ attack_data[0].Component_ID }}  {% endblock %} 
+{% block title %} MACM-{{ macm_data.Component_ID }}  {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -17,11 +17,11 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item"><a href="/macm">MACM</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">MACM-{{ attack_data[0].Component_ID }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">MACM-{{ macm_data.Component_ID }}</li>
                 </ol>
             </nav>
-            <h2 class="h4">MACM-<span class="badge bg-primary">{{ attack_data[0].Component_ID }}</span> Detail</h2>
-            <p class="text-info mb-0 h3">{{ attack_data[0].Asset }}</p>
+            <h2 class="h4">MACM-<span class="badge bg-macm">{{ macm_data.Component_ID }}</span> Detail</h2>
+            <p class="text-info mb-0 h3"> <i class="fas fa-bullseye"></i> {{ macm_data.Type }}</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
@@ -52,9 +52,16 @@
                     <!-- Description -->
 
                     <div class="accordion" id="accordionOne">
-                        {% for attack in attack_data %}
-                            {% include 'home/macm-detail/threat.html' %}
-                        {% endfor %}
+                        {% if attack_data|length > 0 %}
+                            {% for attack in attack_data %}
+                                {% include 'home/macm-detail/attack.html' %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-info" role="alert">
+                                <h4 class="alert-heading">No Attack Data</h4>
+                                <p>There is no attack data for this MACM component.</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
