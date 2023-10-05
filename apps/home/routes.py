@@ -64,8 +64,9 @@ def route_template(template):
         
         elif template == 'macm-detail.html':
             selected_id = request.args.get('id')
+            macm_data = Macm.query.filter_by(Component_ID=selected_id).first()
             attack_data = AttackView.query.filter_by(Component_ID=selected_id).all()
-            return render_template(f"home/{template}", segment=segment, attack_data=attack_data)
+            return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data)
         
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)
