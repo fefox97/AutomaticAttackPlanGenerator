@@ -107,7 +107,7 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        <th>{{ row['Capec_ID'] }}</th>
+                                        <th><h2><a class="badge bg-capec" href="/capec-detail?id={{ row['Capec_ID'] }}">{{ row['Capec_ID'] }}</a></h2></th>
                                         <td>{{ row['Name'] }}</td>
                                         <td>{{ row['Description'] }}</td>
                                         <td>{{ row['Created'] }}</td>
@@ -132,8 +132,24 @@
                                         <td>{{ row['Status'] }}</td>
                                         <td>{{ row['Typical_Severity'] }}</td>
                                         <td>{{ row['Version'] }}</td>
-                                        <td>{{ row['Capec_Childs_ID'] }}</td>
-                                        <td>{{ row['Capec_Parents_ID'] }}</td>
+                                        <td class="text-nowrap">
+                                            {% if row['Capec_Childs_ID'] is not none %}
+                                                <div class="h4 d-flex flex-wrap">
+                                                        {% for child in row['Capec_Childs_ID'] | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-nowrap">
+                                            {% if row['Capec_Parents_ID'] is not none %}
+                                                <div class="h4 d-flex flex-wrap">
+                                                        {% for child in row['Capec_Parents_ID'] | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

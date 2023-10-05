@@ -59,7 +59,7 @@
                         <tbody>
                             {% for row in table %}
                                 <tr>
-                                    <th>{{ row['ToolID'] }}</th>
+                                    <th><h2><span class="badge bg-tool">{{ row['ToolID'] }}</span></h2></th>
                                     <td>{{ row['Name'] }}</td>
                                     <td>{{ row.hasCapecIDs | sort }}</td>
                                     <td>{{ row['Command'] }}</td>

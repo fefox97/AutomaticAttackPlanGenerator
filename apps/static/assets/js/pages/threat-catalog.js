@@ -91,13 +91,6 @@ $(window).on('load', function() {
     threat_catalog.settings()[0].aoColumns.forEach(function(column) {
         column.sName = column.sTitle;
     });
-    
-    // Replace Capec IDs with buttons
-    replaceIDWithButton(threat_catalog);
-
-    threat_catalog.on('column-reorder', function (e, settings, details) {
-        replaceIDWithButton(threat_catalog);
-    });
 
     // Save column visibility state
     threat_catalog.on('column-visibility.dt', function (e, settings, column, state) {

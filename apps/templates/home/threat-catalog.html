@@ -73,7 +73,7 @@
                         <tbody>
                             {% for row in table %}
                                 <tr>
-                                    <th>{{ row['TID'] }}</th>
+                                    <th><h2><span class="badge bg-threat">{{ row['TID'] }}</span></h2></th>
                                     <td>{{ row['Asset'] }}</td>
                                     <td>{{ row['Threat'] }}</td>
                                     <td>{{ row['Description'] }}</td>
@@ -87,9 +87,33 @@
                                     <td>{{ row['PostI'] }}</td>
                                     <td>{{ row['PostA'] }}</td>
                                     <td>{{ row['PostCondition'] }}</td>
-                                    <td>{{ row.hasCapecMeta }}</td>
-                                    <td>{{ row.hasCapecStandard }}</td>
-                                    <td>{{ row.hasCapecDetailed }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasCapecMeta is not none %}
+                                            <div class="h4 d-flex flex-wrap">
+                                                    {% for child in row.hasCapecMeta | sort %}
+                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasCapecStandard is not none %}
+                                            <div class="h4 d-flex flex-wrap">
+                                                    {% for child in row.hasCapecStandard | sort %}
+                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasCapecDetailed is not none %}
+                                            <div class="h4 d-flex flex-wrap">
+                                                    {% for child in row.hasCapecDetailed | sort %}
+                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}

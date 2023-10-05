@@ -91,13 +91,6 @@ $(window).on('load', function() {
     capec_table.settings()[0].aoColumns.forEach(function(column) {
         column.sName = column.sTitle;
     });
-    
-    // Replace Capec IDs with buttons
-    replaceIDWithButton(capec_table);
-
-    capec_table.on('column-reorder', function (e, settings, details) {
-        replaceIDWithButton(capec_table);
-    });
 
     // Save column visibility state
     capec_table.on('column-visibility.dt', function (e, settings, column, state) {
@@ -117,47 +110,6 @@ $(window).on('load', function() {
         console.log(item.innerHTML);
     });
 });
-
-function replaceIDWithButton(table) {
-    table.column('Capec ID:name').nodes().each(function (cell, i) {
-        let id = cell.innerHTML;
-
-        let parent = document.createElement('h3');
-        cell.replaceChildren(parent);
-        cell.addEventListener('click', () => {
-            window.location.href = '/capec-detail?id=' + id;
-        });
-        cell.style = 'cursor: pointer;';
-        
-        let new_content = document.createElement('span');
-        new_content.innerHTML = id;
-        new_content.className = 'badge bg-primary';
-        parent.replaceChildren(new_content);
-    });
-
-    ["Capec Parents ID", "Capec Childs ID", 'Peer Of Refs'].forEach(element => {
-        table.column(element +':name').nodes().each(function (cell, i) {
-            let content = cell.innerHTML;
-            if (content != "None") {
-                let data = JSON.parse(content);
-                let parent = document.createElement('h4');
-                cell.replaceChildren(parent);
-                let badges = [];
-                for(const element of data) {
-                    let badge = document.createElement('span');
-                    badge.innerHTML = element;
-                    badge.className = 'badge bg-primary';
-                    badge.style = 'margin-right: 5px; cursor: pointer;';
-                    badge.addEventListener('click', () => {
-                        window.location.href = '/capec-detail?id=' + element;
-                    });
-                    badges.push(badge);
-                }
-                parent.replaceChildren(...badges);
-            }
-        });
-    });
-}
 
 $(document).ready(function() {
 

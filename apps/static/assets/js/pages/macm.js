@@ -140,12 +140,6 @@ $(window).on('load', function() {
         column.sName = column.sTitle;
     });
     
-    // Replace Capec IDs with buttons
-    replaceIDWithButton(macm);
-
-    macm.on('column-reorder', function (e, settings, details) {
-        replaceIDWithButton(macm);
-    });
 
     // Save column visibility state
     macm.on('column-visibility.dt', function (e, settings, column, state) {
@@ -163,24 +157,6 @@ $(window).on('load', function() {
         $(this).parent('.card').find('.collapse').removeClass('show');
     });
 });
-
-function replaceIDWithButton(table) {
-    table.column('Component ID:name').nodes().each(function (cell, i) {
-        let id = cell.innerHTML;
-
-        let parent = document.createElement('h3');
-        cell.replaceChildren(parent);
-        cell.addEventListener('click', () => {
-            window.location.href = '/macm-detail?id=' + id;
-        });
-        cell.style = 'cursor: pointer;';
-        
-        let new_content = document.createElement('span');
-        new_content.innerHTML = id;
-        new_content.className = 'badge bg-primary';
-        parent.replaceChildren(new_content);
-    });
-}
 
 function drawNeo4j() {
     const configGraph = {
