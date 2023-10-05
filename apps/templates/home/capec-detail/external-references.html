@@ -1,36 +1,39 @@
-<div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingExternalRef" data-bs-toggle="collapse" data-bs-target="#collapseExternalRef" aria-expanded="true" aria-controls="collapseExternalRef">
-        <h2 class="h5 mb-0">
-            External References
-            <i class="fas fa-chevron-down"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingExternalRef">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExternalRef" aria-expanded="false" aria-controls="collapseExternalRef">
+            <h2 class="h5 mb-0">
+                External References
+            </h2>
+        </div>
     </div>
-    <div id="collapseExternalRef" class=" card-body collapse show" aria-labelledby="headingExternalRef">
-        {% if data['External_References'] is none %}
-            <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">External ID</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Link</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ref in data['External_References'] %}
-                        <tr>
-                            <th scope="row">{{ ref.external_id }}</th>
-                            <td>{{ ref.source_name }}</td>
-                            <td><a href="{{ ref.url }}">{{ ref.url }}</a></td>
-                            <td>{{ ref.description }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
+    <div id="collapseExternalRef" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['External_References'] is none %}
+                <p class="text-warning mb-1">Not present</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">External ID</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Link</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ref in data['External_References'] %}
+                            <tr>
+                                <th scope="row">{{ ref.external_id }}</th>
+                                <td>{{ ref.source_name }}</td>
+                                <td><a href="{{ ref.url }}">{{ ref.url }}</a></td>
+                                <td>{{ ref.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>

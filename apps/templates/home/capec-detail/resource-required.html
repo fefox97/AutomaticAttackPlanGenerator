@@ -1,19 +1,22 @@
-<div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingResourceRequired" data-bs-toggle="collapse" data-bs-target="#collapseResourceRequired" aria-expanded="true" aria-controls="collapseResourceRequired">
-        <h2 class="h5 mb-0">
-            Resource Required
-            <i class="fas fa-chevron-down"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingResourceRequired">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResourceRequired" aria-expanded="false" aria-controls="collapseResourceRequired">
+            <h2 class="h5 mb-0">
+                Resource Required
+            </h2>
+        </div>
     </div>
-    <div id="collapseResourceRequired" class=" card-body collapse show" aria-labelledby="headingResourceRequired">
-        {% if data['Resources_Required'] is none %}
-            <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <ol>
-                {% for example in data['Resources_Required'] %}
-                    <li>{{ example | safe }}</li>
-                {% endfor %}
-            </ol>
-        {% endif %}
+    <div id="collapseResourceRequired" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['Resources_Required'] is none %}
+                <p class="text-warning mb-1">Not present</p>
+            {% else %}
+                <ol>
+                    {% for example in data['Resources_Required'] %}
+                        <li>{{ example | safe }}</li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </div>
     </div>
 </div>

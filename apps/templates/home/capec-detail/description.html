@@ -1,28 +1,35 @@
-<div class="card border-0 shadow mb-2">
-
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Description</h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingDescription">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDescription" aria-expanded="true" aria-controls="collapseDescription">
+            <h2 class="h5 mb-0">
+                Description
+            </h2>
+        </div>
     </div>
-    
-    <div class="card-body">
-        {{ data['Description'] | safe}}
+    <div id="collapseDescription" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {{ data['Description'] | safe}}
+        </div>
     </div>
 </div>
 
-<div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center {{'collapsed' if data['Extended_Description'] is none }}" id="headingExtendedDescription" data-bs-toggle="collapse" data-bs-target="#collapseExtendedDescription" aria-expanded="true" aria-controls="collapseExtendedDescription">
-        <h2 class="h5 mb-0">
-            Extended Description
-            <i class="fas fa-chevron-down mr-auto"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingExtendedDescription">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExtendedDescription" aria-expanded={{'true' if data['Extended_Description'] is not none else 'false'}} aria-controls="collapseExtendedDescription">
+            <h2 class="h5 mb-0">
+                Extended Description
+            </h2>
+        </div>
     </div>
-    <div id="collapseExtendedDescription" class="card-body collapse show" aria-labelledby="headingExtendedDescription">
-        {% if data['Extended_Description'] is none %}
-            <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <div>
-                {{ data['Extended_Description'] | safe}}
-            </div>
-        {% endif %}
+    <div id="collapseExtendedDescription" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['Extended_Description'] is none %}
+                <p class="text-warning mb-1">Not present</p>
+            {% else %}
+                <div>
+                    {{ data['Extended_Description'] | safe}}
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>

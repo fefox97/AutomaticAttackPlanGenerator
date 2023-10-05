@@ -13,33 +13,33 @@
     {% endif %}
 </h3>
 
-{% if data['Capec_Parents_ID'] is not none %}
+{% if data['Capec_Parents_ID'] is not none and data['Capec_Parents_ID']|length > 0 %}
 <h4>
     Parents:
     {% for parent in data['Capec_Parents_ID'] | sort %}
-        <span class="badge bg-primary">
+        <span class="badge bg-capec">
             <a href="/capec-detail?id={{ parent }}">{{ parent }}</a>
         </span>
     {% endfor %}
 </h4>
 {% endif %}
 
-{% if data['Capec_Childs_ID'] is not none %}
+{% if data['Capec_Childs_ID'] is not none and data['Capec_Childs_ID']|length > 0 %}
 <h4>
     Childs:
     {% for child in data['Capec_Childs_ID'] | sort %}
-        <span class="badge bg-primary">
+        <span class="badge bg-capec">
             <a href="/capec-detail?id={{ child }}">{{ child }}</a>
         </span>
     {% endfor %}
 </h4>
 {% endif %}
 
-{% if data.hasThreat is not none %}
+{% if data.hasThreat is not none and data.hasThreat|length > 0 %}
 <h4>
     Threats:
     {% for threat in data.hasThreat %}
-        <span class="badge bg-primary">
+        <span class="badge bg-threat">
             <!-- <a href="/capec-detail?id={{ threat }}">{{ threat }}</a> -->
             {{ threat }}
         </span>
@@ -47,11 +47,11 @@
 </h4>
 {% endif %}
 
-{% if data.hasTool is not none %}
+{% if data.hasTool is not none and data.hasTool|length > 0 %}
 <h4>
     Tools:
     {% for tool in data.hasTool %}
-        <span class="badge bg-primary">
+        <span class="badge bg-tool">
             {{ tool }}
         </span>
     {% endfor %}

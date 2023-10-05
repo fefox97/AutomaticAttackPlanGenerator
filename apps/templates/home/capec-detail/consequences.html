@@ -1,39 +1,42 @@
-<div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingConsequences" data-bs-toggle="collapse" data-bs-target="#collapseConsequences" aria-expanded="true" aria-controls="collapseConsequences">
-        <h2 class="h5 mb-0">
-            Consequences
-            <i class="fas fa-chevron-down"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingConsequences">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConsequences" aria-expanded="false" aria-controls="collapseConsequences">
+            <h2 class="h5 mb-0">
+                Consequences
+            </h2>
+        </div>
     </div>
-    <div id="collapseConsequences" class="card-body collapse show" aria-labelledby="headingConsequences">
-        {% if data['Consequences'] is none %}
+    <div id="collapseConsequences" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['Consequences'] is none %}
             <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <!-- get maximum lenght of data['Consequences'].values() -->
-            {% set max_len = [] %}
-            {% for key, value in data['Consequences'].items() %}
-                {% set tmp =  max_len.append(value|length) %}
-            {% endfor %}
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead>
-                        <tr>
-                            {% for key, value in data['Consequences'].items() %}
-                            <th scope="col">{{ key.replace('_', ' ') }}</th>
+            {% else %}
+                <!-- get maximum lenght of data['Consequences'].values() -->
+                {% set max_len = [] %}
+                {% for key, value in data['Consequences'].items() %}
+                    {% set tmp =  max_len.append(value|length) %}
+                {% endfor %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                {% for key, value in data['Consequences'].items() %}
+                                <th scope="col">{{ key.replace('_', ' ') }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(max_len|max) %}
+                            <tr>
+                                {% for key, value in data['Consequences'].items() %}
+                                <td>{{ value[i] }}</td>
+                                {% endfor %}
+                            </tr>
                             {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in range(max_len|max) %}
-                        <tr>
-                            {% for key, value in data['Consequences'].items() %}
-                            <td>{{ value[i] }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>

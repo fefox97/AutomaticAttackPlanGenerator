@@ -1,17 +1,20 @@
-<div class="card border-0 shadow mb-2">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingExecutionFlow" data-bs-toggle="collapse" data-bs-target="#collapseExecutionFlow" aria-expanded="true" aria-controls="collapseExecutionFlow">
-        <h2 class="h5 mb-0">
-            Execution Flow
-            <i class="fas fa-chevron-down"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingExecutionFlow">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExecutionFlow" aria-expanded="false" aria-controls="collapseExecutionFlow">
+            <h2 class="h5 mb-0">
+                Execution Flow
+            </h2>
+        </div>
     </div>
-    <div id="collapseExecutionFlow" class="card-body collapse show" aria-labelledby="headingExecutionFlow">
-        {% if data['Execution_Flow'] is none %}
-            <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <div class="table-responsive">
-                {{ data['Execution_Flow'] | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
-            </div>
-        {% endif %}
+    <div id="collapseExecutionFlow" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['Execution_Flow'] is none %}
+                <p class="text-warning mb-1">Not present</p>
+            {% else %}
+                <div class="table-responsive">
+                    {{ data['Execution_Flow'] | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>

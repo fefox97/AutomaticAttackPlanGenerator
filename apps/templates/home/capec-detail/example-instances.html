@@ -1,19 +1,22 @@
-<div class="card border-0 shadow">
-    <div class="card-header border-gray-100 d-flex justify-content-between align-items-center collapsed" id="headingExampleInstances" data-bs-toggle="collapse" data-bs-target="#collapseExampleInstances" aria-expanded="true" aria-controls="collapseExampleInstances">
-        <h2 class="h5 mb-0">
-            Example Instances
-            <i class="fas fa-chevron-down"></i>
-        </h2>
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center colla" id="headingExampleInstances">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExampleInstances" aria-expanded="false" aria-controls="collapseExampleInstances">
+            <h2 class="h5 mb-0">
+                Example Instances
+            </h2>
+        </div>
     </div>
-    <div id="collapseExampleInstances" class="card-body collapse show" aria-labelledby="headingExampleInstances">
-        {% if data['Example_Instances'] is none %}
-            <p class="text-warning mb-1">Not present</p>
-        {% else %}
-            <ol>
-                {% for example in data['Example_Instances'] %}
-                    <li>{{ example | safe }}</li>
-                {% endfor %}
-            </ol>
-        {% endif %}
+    <div id="collapseExampleInstances" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            {% if data['Example_Instances'] is none %}
+                <p class="text-warning mb-1">Not present</p>
+            {% else %}
+                <ol>
+                    {% for example in data['Example_Instances'] %}
+                        <li>{{ example | safe }}</li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </div>
     </div>
 </div>
