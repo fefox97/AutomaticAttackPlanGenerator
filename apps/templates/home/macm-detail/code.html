@@ -13,7 +13,7 @@
         <div class="accordion-body">
             <div class="input-group mb-3 command">
                 <span class="input-group-text command-input">{{ attack.Command | safe_substitute(attack.Parameters) | regex_replace('({)(.*?)(})', tags) | safe}}</span>
-                <button type="button" class="btn btn-secondary"><i class="fas fa-paste"></i></button>
+                <button type="button" class="btn btn-secondary"><i class="fas fa-copy"></i></button>
             </div>
         </div>
     </div>
