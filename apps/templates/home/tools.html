@@ -23,16 +23,6 @@
             <h2 class="h4">Tools</h2>
             <p class="mb-0">Description</p>
         </div>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
-                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                New Plan
-            </a>
-            <div class="btn-group ms-2 ms-lg-3">
-                <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
-                <button type="button" class="btn btn-sm btn-outline-gray-600">Export</button>
-            </div>
-        </div>
     </div>
     
     <div class="col-12">
@@ -61,7 +51,15 @@
                                 <tr>
                                     <th><h2><span class="badge bg-tool">{{ row['ToolID'] }}</span></h2></th>
                                     <td>{{ row['Name'] }}</td>
-                                    <td>{{ row.hasCapecIDs | sort }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasCapecIDs  is not none %}
+                                            <div class="h4 d-flex flex-wrap">
+                                                    {% for capec in row.hasCapecIDs  | sort %}
+                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ capec }}">{{ capec }}</a>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ row['Command'] }}</td>
                                 </tr>
                             {% endfor %}

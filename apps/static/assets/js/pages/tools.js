@@ -1,4 +1,4 @@
-var threat_catalog = undefined;
+var tool_catalog = undefined;
 var default_shown_columns = undefined;
 
 $(window).on('load', function() {
@@ -11,7 +11,7 @@ $(window).on('load', function() {
         default_shown_columns = JSON.parse(localStorage.getItem('tools_catalog_columns'));
     }
     
-    threat_catalog = $('#tools_catalog_table').DataTable({
+    tool_catalog = $('#tools_catalog_table').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],
@@ -81,19 +81,13 @@ $(window).on('load', function() {
     });
 
     // Set column names for search
-    threat_catalog.settings()[0].aoColumns.forEach(function(column) {
+    tool_catalog.settings()[0].aoColumns.forEach(function(column) {
         column.sName = column.sTitle;
     });
     
-    // Replace Capec IDs with buttons
-    replaceIDWithButton(threat_catalog);
-
-    threat_catalog.on('column-reorder', function (e, settings, details) {
-        replaceIDWithButton(threat_catalog);
-    });
 
     // Save column visibility state
-    threat_catalog.on('column-visibility.dt', function (e, settings, column, state) {
+    tool_catalog.on('column-visibility.dt', function (e, settings, column, state) {
         if (state) {
             default_shown_columns.push(settings.aoColumns[column].sTitle);
         } else {
@@ -102,34 +96,6 @@ $(window).on('load', function() {
         localStorage.setItem('tools_catalog_columns', JSON.stringify(default_shown_columns));
     });
 });
-
-function replaceIDWithButton(table) {
-    ["Capec ID"].forEach(element => {
-        table.column(element +':name').nodes().each(function (cell, i) {
-            let content = cell.innerHTML;
-            if (content != "None" && content != "[None]" && content != '["None"]') {
-                let data = JSON.parse(content);
-                let parent = document.createElement('h4');
-                cell.replaceChildren(parent);
-                let badges = [];
-                for(let i = 0; i < data.length; i++) {
-                    let badge = document.createElement('span');
-                    badge.innerHTML = data[i];
-                    badge.className = 'badge bg-primary';
-                    badge.style = 'margin-right: 5px; cursor: pointer;';
-                    badge.addEventListener('click', () => {
-                        window.location.href = '/capec-detail?id=' + data[i];
-                    });
-                    badges.push(badge);
-                }
-                parent.replaceChildren(...badges);
-            }
-            else {
-                cell.innerHTML = '';
-            }
-        });
-    });
-}
 
 $(document).ready(function() {
     
