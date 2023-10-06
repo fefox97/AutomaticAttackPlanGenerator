@@ -186,7 +186,10 @@
                             </tfoot>
                         </table> 
                     {% else %}
-                        <p class="text-danger mb-1 display-4">No data available</p>
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">No Capec Data</h4>
+                            <p>There is no Capec data.</p>
+                        </div>
                     {% endif %}
                     <!-- [ stiped-table ] end -->
                 </div>
