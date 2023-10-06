@@ -5,6 +5,12 @@ import bleach
 
 class Converter:
 
+    def tuple_list_to_dict(self, tuple_list: list):
+        if tuple_list is None:
+            return None
+        else:
+            return {k: v for k, v in tuple_list}
+
     def string_to_list(self, string: str, sepator=r'[ ,]+'):
         if string is None:
             return None
