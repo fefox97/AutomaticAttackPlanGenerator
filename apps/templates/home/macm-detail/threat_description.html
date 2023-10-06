@@ -1,4 +1,4 @@
-{% if attack_data[0].Threat_Description is not none %}
+{% if attack_data is not none and attack_data|length>0 and attack_data[0].Threat_Description is not none %}
 <div class="card border-0 shadow mb-3">
     <div class="card-header border-gray-100 d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0">Threat Description</h2>
