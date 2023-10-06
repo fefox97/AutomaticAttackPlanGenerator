@@ -46,6 +46,10 @@ def register_custom_filters(app):
     @app.template_filter('regex_replace')
     def regex_replace(s, find, replace):
         return re.sub(find, replace, s)
+    
+    @app.template_filter('regex_split')
+    def regex_split(s, find):
+        return re.split(find, s)
 
 def configure_database(app):
 
