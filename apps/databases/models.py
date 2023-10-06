@@ -169,6 +169,7 @@ class Macm(db.Model):
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
     App_ID          = db.Column(db.Integer)
+    Parameters      = db.Column(db.JSON)
     
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -185,7 +186,7 @@ class AttackView(db.Model):
     
     __table__ = create_view(
                 "AttackView",
-                select(ToolCatalog.ToolID.label("Tool_ID"), ToolCatalog.Name.label("Tool_Name"), ToolCatalog.Command, Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), Capec.Execution_Flow, ThreatCatalog.TID.label("Threat_ID"), ThreatCatalog.Asset.label("Asset_Type"), ThreatCatalog.Threat, ThreatCatalog.Description.label("Threat_Description"), Macm.Component_ID, Macm.Name.label("Asset")).select_from(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset).add_columns(row_number_column),
+                select(ToolCatalog.ToolID.label("Tool_ID"), ToolCatalog.Name.label("Tool_Name"), ToolCatalog.Command, Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), Capec.Execution_Flow, Capec.Description.label("Capec_Description"), ThreatCatalog.TID.label("Threat_ID"), ThreatCatalog.Asset.label("Asset_Type"), ThreatCatalog.Threat, ThreatCatalog.Description.label("Threat_Description"), Macm.Component_ID, Macm.Name.label("Asset"), Macm.Parameters).select_from(Macm).join(ThreatCatalog, Macm.Type==ThreatCatalog.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalog).add_columns(row_number_column),
                 db.metadata,
                 replace=True
                 )
