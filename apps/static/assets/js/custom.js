@@ -1,0 +1,1 @@
+codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));

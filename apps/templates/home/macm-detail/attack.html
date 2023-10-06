@@ -14,8 +14,9 @@
     </div>
     <div id="collapse{{attack.Attack_Number}}" class="accordion-collapse collapse show">
         <div class="accordion-body">
-            {{ attack.Threat_Description }}
+            {% include 'home/macm-detail/description.html' %}
             {% include 'home/macm-detail/execution_flow.html' %}
+            {% include 'home/macm-detail/code.html' %}
         </div>
     </div>
 </div>

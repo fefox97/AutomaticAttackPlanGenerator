@@ -1,0 +1,19 @@
+{% if attack.Command %}
+<div class="accordion-item">
+    <div class="accordion-header d-flex align-items-center" id="heading{{attack.Attack_Number}}Command">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{attack.Attack_Number}}Command" aria-expanded="true" aria-controls="collapse{{attack.Attack_Number}}Command">
+            <h2 class="h6 mb-0">
+                Command
+            </h2>
+        </div>
+    </div>
+    <div id="collapse{{attack.Attack_Number}}Command" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+            <div class="code position-relative">
+                <button type="button" class="btn btn-primary position-absolute top-0 end-0"><i class="fas fa-paste"></i></button>
+                <code-input lang="bash"> {{ attack.Command }} </code-input>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
