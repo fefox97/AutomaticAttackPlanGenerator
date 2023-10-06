@@ -5,7 +5,7 @@
 .badge {
     font-size:$badge-font-size;
     font-weight: $badge-font-weight;
-
+    vertical-align: middle;
     a {
         color: $white;
     }
@@ -16,9 +16,9 @@
 
 }
 
-.bg-primary a:hover {
-    color: $link-hover-light-color;
-}
+// .bg-primary a:hover {
+//     color: $link-hover-light-color;
+// }
 
 .bg-secondary {
     color: $bg-secondary-color;

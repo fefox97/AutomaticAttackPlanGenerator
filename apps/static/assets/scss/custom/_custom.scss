@@ -89,6 +89,16 @@
     float: right;
 }
 
+.card-header[data-bs-toggle="collapse"] {
+    cursor: pointer !important;
+}
+.card-header.collapsed .fa-chevron-down {
+    transform: rotate(-90deg);
+}
+.fa-chevron-down{
+    transition: all 0.3s ease-in-out;
+}
+
 code-input {
     & textarea, & pre{
         width: 100% !important;
@@ -99,4 +109,8 @@ code-input {
 pre[class*=language-]{
     background: $gray-100 !important;
     border-radius: 10px !important;
+}
+
+.material-symbols-outlined{
+    vertical-align: middle;
 }

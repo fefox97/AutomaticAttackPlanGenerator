@@ -14490,14 +14490,12 @@ label {
  */
 .badge {
   font-size: 0.75em;
-  font-weight: 600; }
+  font-weight: 600;
+  vertical-align: middle; }
   .badge a {
     color: #ffffff; }
   .badge.super-badge {
     vertical-align: super; }
-
-.bg-primary a:hover {
-  color: #d4dce7; }
 
 .bg-secondary {
   color: #1F2937; }
@@ -17507,7 +17505,7 @@ a, .text-action {
   color: #1F2937;
   transition: all 0.2s ease; }
   a:hover, .text-action:hover {
-    color: black;
+    color: #cccccc;
     cursor: pointer; }
 
 .lead + .btn-wrapper {
@@ -18161,16 +18159,16 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
   background-color: #93a007 !important; }
 
 .bg-capec {
-  background-color: #b49000 !important; }
+  background-color: #6C969D !important; }
 
 .bg-threat {
-  background-color: #b83228 !important; }
+  background-color: #A14A76 !important; }
 
 .bg-macm {
-  background-color: #1b7818 !important; }
+  background-color: #044FC8 !important; }
 
 .bg-tool {
-  background-color: #6c51b0 !important; }
+  background-color: #C84C09 !important; }
 
 .accordion-options {
   width: 100%;
@@ -18181,6 +18179,15 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
 .accordion-options .btn {
   float: right; }
 
+.card-header[data-bs-toggle="collapse"] {
+  cursor: pointer !important; }
+
+.card-header.collapsed .fa-chevron-down {
+  transform: rotate(-90deg); }
+
+.fa-chevron-down {
+  transition: all 0.3s ease-in-out; }
+
 code-input {
   height: 100px !important; }
   code-input textarea, code-input pre {
@@ -18189,3 +18196,6 @@ code-input {
 pre[class*=language-] {
   background: #F2F4F6 !important;
   border-radius: 10px !important; }
+
+.material-symbols-outlined {
+  vertical-align: middle; }
