@@ -47,6 +47,15 @@ class Converter:
             if type(list(dict.values())[0]) is list:
                 return '\n\n'.join([f"{k}: {', '.join(v)}" for k, v in dict.items()])
             return '\n\n'.join([f"{k}: {v}" for k, v in dict.items()])
+    
+    def string_to_dict(self, string: str):
+        if string is None:
+            return None
+        else:
+            string = string.replace('{', '').replace('}', '')
+            out_dict = {k.strip(): v.strip() for k, v in [x.split(':') for x in string.split(',')]}
+            out_dict = {k.removeprefix("'").removesuffix("'"): v.removeprefix("'").removesuffix("'") for k, v in out_dict.items()}
+            return out_dict
         
     def external_references_to_html(self, list: list):
         output = ''

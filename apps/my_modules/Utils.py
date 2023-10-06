@@ -89,6 +89,8 @@ class ToolCatalogUtils:
 
 class MacmUtils:
 
+    converter = Converter()
+
     def __init__(self):
         # neo4j setup
         #URI_NEO4J = "neo4j://192.168.1.6:7687"
@@ -104,8 +106,9 @@ class MacmUtils:
         self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
 
     def read_macm(self, database='macm'):
-        macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id", database_=database, result_transformer_=Result.to_df)
-        macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID'}, inplace=True)
+        macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters", database_=database, result_transformer_=Result.to_df)
+        macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters'}, inplace=True)
+        macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: self.converter.string_to_dict(x))
         return macm_df
 
     def upload_macm(self, query, database='macm'):
@@ -157,14 +160,13 @@ class Utils:
         relations_df.index.name = 'Id'
         return relations_df
 
-    def create_attack_database(self):
-        engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        query = session.query(CapecToolRel).join(ToolCatalog).join(Capec).join(CapecThreatRel).join(ThreatCatalog).join(Macm, Macm.Type==ThreatCatalog.Asset).with_entities(Macm.Component_ID, ThreatCatalog.Asset, ThreatCatalog.Threat, Capec.Name, Capec.Capec_ID, ToolCatalog.Name)
-        output = query.all()
+    def test_function(self):
+        # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        # Session = sessionmaker(bind=engine)
+        # session = Session()
+        output = AttackView.query.all()
         print(f"Output: {output}")
-        session.close()
+        # session.close()
 
     def upload_databases(self, database):
         if database == 'Capec':

@@ -3,7 +3,7 @@ create
 	(Router:IoTgw{component_id:'502',name:"Router",app_id:'500', type:"DEVICE.Iot",application:'Open Energy Monitor'}),
 	(WifiMQTTRelay:MQTTClient{component_id:'503',name:"WifiMQTTRelay",app_id:'500', type:"Service.MQTTClient",application:'Open Energy Monitor'}),
 	(NodeRED:MQTTClient{component_id:'504',name:"NodeRED",app_id:'500', type:"Service.MQTTClient",application:'Open Energy Monitor'}),
-	(emonTh:IOTDevice{component_id:'505',name:"emonTh",app_id:'500', type:"HW.IOTDevice",application:'Open Energy Monitor', parameters:"{'sensor_type':'DHT22','sensor_pin':'D3'}"}),
+	(emonTh:IOTDevice{component_id:'505',name:"emonTh",app_id:'500', type:"HW.IOTDevice",application:'Open Energy Monitor', parameters:"{'sensor_type':'DHT22','sensor_pin':'D3', 'url':'192.128.20.1'}"}),
 	(emonTx:IOTDevice{component_id:'506',name:"emonTx",app_id:'500', type:"HW.IOTDevice",application:'Open Energy Monitor'}),
 	(emonBase:IOTDevice{component_id:'507',name:"emonBase",app_id:'500', type:"HW.IOTGW",application:'Open Energy Monitor'}),
 	(emonCMS:IOTDevice{component_id:'508',name:"emonCMS",app_id:'500', type:"Service.MQTTClient",application:'Open Energy Monitor'}),

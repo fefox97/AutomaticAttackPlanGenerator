@@ -40,6 +40,9 @@
         <!-- Badges start -->
         {% include 'home/macm-detail/badges.html' %}
         <!-- Badges end -->
+        
+        <!-- Threat Description -->
+        {% include 'home/macm-detail/threat_description.html' %}
 
         <div class="accordion-options">
             <button type="button" class="btn btn-outline-tertiary" data-bs-toggle="button" id="ExpandToggle" aria-pressed="false">Expand All</button>
@@ -48,9 +51,6 @@
             <!-- [ Cards ] start -->
             <div class="row">
                 <div class="col">
-                    
-                    <!-- Description -->
-
                     <div class="accordion" id="accordionOne">
                         {% if attack_data|length > 0 %}
                             {% for attack in attack_data %}

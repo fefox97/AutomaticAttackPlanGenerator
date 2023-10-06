@@ -13,7 +13,6 @@ from importlib import import_module
 from flask_modals import Modal
 from flask_assets import Environment, Bundle
 
-
 db = SQLAlchemy()
 login_manager = LoginManager()
 modal = Modal()
@@ -50,6 +49,13 @@ def register_custom_filters(app):
     @app.template_filter('regex_split')
     def regex_split(s, find):
         return re.split(find, s)
+    
+    @app.template_filter('safe_substitute')
+    def safe_substitute(s, in_dict):
+        if type(in_dict) is not dict:
+            in_dict = {}
+        out_dict = MyDict(in_dict)
+        return s.format_map(out_dict)
 
 def configure_database(app):
 
@@ -86,3 +92,7 @@ def create_app(config):
     
     configure_database(app)
     return app
+
+class MyDict(dict):
+    def __missing__(self, key):
+        return key.join("{}")

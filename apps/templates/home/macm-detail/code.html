@@ -1,4 +1,4 @@
-{% set tags = '</span> <div class="form-floating"><input type="text" class="form-control command-input" id="floatingInputValue" placeholder="\g<2>"> <label for="floatingInputValue">\g<2></label> </div>' %}
+{% set tags = '</span> <div class="form-floating"><input type="text" class="form-control command-input" id="floatingInputValue" placeholder="\g<2>"> <label for="floatingInputValue">\g<2></label> </div> <span class="input-group-text command-input">' %}
 
 {% if attack.Command %}
 <div class="accordion-item">
@@ -12,7 +12,7 @@
     <div id="collapse{{attack.Attack_Number}}Command" class="accordion-collapse collapse show">
         <div class="accordion-body">
             <div class="input-group mb-3 command">
-                <span class="input-group-text command-input">{{ attack.Command | regex_replace('(<)(.*?)(>)', tags) | safe}}</span>
+                <span class="input-group-text command-input">{{ attack.Command | safe_substitute(attack.Parameters) | regex_replace('({)(.*?)(})', tags) | safe}}</span>
                 <button type="button" class="btn btn-secondary"><i class="fas fa-paste"></i></button>
             </div>
         </div>

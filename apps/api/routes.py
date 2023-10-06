@@ -52,7 +52,7 @@ def route_api(api):
                 return jsonify({'success': True, 'message': f'Database {database} reloaded'})
             
             elif api == 'test':
-                utils.create_attack_database()
+                utils.test_function()
                 return jsonify({'success': True, 'message': 'Test successful'})
         
         elif request.method == 'GET':

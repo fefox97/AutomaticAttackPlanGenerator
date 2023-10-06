@@ -77,6 +77,7 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>App ID</th>
+                                    <th>Parameters</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -102,6 +103,13 @@
                                         <td>{{ row['Name'] }}</td>
                                         <td>{{ row['Type'] }}</td>
                                         <td>{{ row['App_ID'] }}</td>
+                                        <td class="text-nowrap">
+                                            {% if row['Parameters'] is not none %}
+                                                {% for key, parameter in row['Parameters'].items() %}
+                                                    {{ key }}: {{ parameter }}<br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -112,6 +120,7 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>App ID</th>
+                                    <th>Parameters</th>
                                 </tr>
                             </tfoot>
                         </table> 
