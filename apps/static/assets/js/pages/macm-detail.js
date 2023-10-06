@@ -17,6 +17,9 @@ $(document).ready(function() {
     });
     $('.command').children('button').click(copySingleCommand);
     $('#copyAllCommands').click(copyAllCommands);
+    $('.bg-capec').click(function() {
+        window.open($(this).attr('href'), '_blank');
+    });
 });
 
 function copySingleCommand(element) {
