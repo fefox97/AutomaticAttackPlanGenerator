@@ -14497,6 +14497,9 @@ label {
   .badge.super-badge {
     vertical-align: super; }
 
+a.badge:hover {
+  color: #e6e6e6; }
+
 .bg-secondary {
   color: #1F2937; }
 
@@ -17505,7 +17508,7 @@ a, .text-action {
   color: #1F2937;
   transition: all 0.2s ease; }
   a:hover, .text-action:hover {
-    color: #cccccc;
+    color: black;
     cursor: pointer; }
 
 .lead + .btn-wrapper {

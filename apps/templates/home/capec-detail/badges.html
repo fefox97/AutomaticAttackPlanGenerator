@@ -17,9 +17,7 @@
 <h4>
     Parents:
     {% for parent in data['Capec_Parents_ID'] | sort %}
-        <span class="badge bg-capec">
-            <a href="/capec-detail?id={{ parent }}">{{ parent }}</a>
-        </span>
+        <a class="badge bg-capec" href="/capec-detail?id={{ parent }}">{{ parent }}</a>
     {% endfor %}
 </h4>
 {% endif %}
@@ -28,9 +26,7 @@
 <h4>
     Childs:
     {% for child in data['Capec_Childs_ID'] | sort %}
-        <span class="badge bg-capec">
-            <a href="/capec-detail?id={{ child }}">{{ child }}</a>
-        </span>
+        <a class="badge bg-capec" href="/capec-detail?id={{ child }}">{{ child }}</a>
     {% endfor %}
 </h4>
 {% endif %}

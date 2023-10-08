@@ -16,6 +16,12 @@
 
 }
 
+a {
+    &.badge:hover {
+        color: darken($white, $amount: 10)
+    }
+}
+
 // .bg-primary a:hover {
 //     color: $link-hover-light-color;
 // }
