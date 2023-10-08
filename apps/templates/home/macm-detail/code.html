@@ -1,5 +1,3 @@
-{% set tags = '</span> <div class="form-floating"><input type="text" class="form-control command-input" id="floatingInputValue" placeholder="\g<2>"> <label for="floatingInputValue">\g<2></label> </div> <span class="input-group-text command-input">' %}
-
 {% if attack.Command %}
 <div class="accordion-item">
     <div class="accordion-header d-flex align-items-center" id="heading{{attack.Attack_Number}}Command">
@@ -12,7 +10,20 @@
     <div id="collapse{{attack.Attack_Number}}Command" class="accordion-collapse collapse show">
         <div class="accordion-body">
             <div class="input-group mb-3 command">
-                <span class="input-group-text command-input">{{ attack.Command | safe_substitute(attack.Parameters) | regex_replace('({)(.*?)(})', tags) | safe}}</span>
+                {% for part in attack.Command|regex_split("({.*?})") %}
+                    {% if not part.isspace() and part != '' %}
+                        {% if '{' in part %}
+                            {% set parameter = part|safe_substitute(attack.Parameters) %}
+                            {% set label = part|regex_replace("[{}]", "") %}
+                            <div class="form-floating">
+                                <input type="text" class="form-control command-input" id="floatingInputValue" placeholder="{{ label }}" value="{{ parameter if parameter != part }}">
+                                <label for="floatingInputValue">{{ label }}</label>
+                            </div>
+                        {% else %}
+                            <span class="input-group-text command-input">{{ part }}</span>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
                 <button type="button" class="btn btn-secondary"><i class="fas fa-copy"></i></button>
             </div>
         </div>
