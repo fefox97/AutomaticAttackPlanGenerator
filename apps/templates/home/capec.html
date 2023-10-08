@@ -62,26 +62,23 @@
                 <div class="d-block align-items-center pt-5">
                     <!-- [ stiped-table ] start -->
                     {% if table is not none %}
-                        <table id="capec_table" class="table table-striped table-hover table-dataframe">
+                        <table id="capec_table" class="table table-striped table-hover table-df">
                             <thead>
                                 <tr>
                                     <th>Capec ID</th>
                                     <th>Name</th>
                                     <th>Description</th>
+                                    <th>Extended Description</th>
                                     <th>Created</th>
-                                    <th>Created By Ref</th>
+                                    <th>External References</th>
                                     <th>Modified</th>
-                                    <th>Object Marking Refs</th>
                                     <th>Spec Version</th>
                                     <th>Abstraction</th>
                                     <th>Alternate Terms</th>
-                                    <th>Can Follow Refs</th>
-                                    <th>Can Precede Refs</th>
                                     <th>Consequences</th>
                                     <th>Domains</th>
                                     <th>Example Instances</th>
                                     <th>Execution Flow</th>
-                                    <th>Extended Description</th>
                                     <th>Likelihood Of Attack</th>
                                     <th>Peer Of Refs</th>
                                     <th>Prerequisites</th>
@@ -97,44 +94,138 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        <th><h2><a class="badge bg-capec" href="/capec-detail?id={{ row['Capec_ID'] }}">{{ row['Capec_ID'] }}</a></h2></th>
-                                        <td>{{ row['Name'] }}</td>
-                                        <td>{{ row['Description'] }}</td>
-                                        <td>{{ row['Created'] }}</td>
-                                        <td>{{ row['Created_By_Ref'] }}</td>
-                                        <td>{{ row['Modified'] }}</td>
-                                        <td>{{ row['Object_Marking_Refs'] }}</td>
-                                        <td>{{ row['Spec_Version'] }}</td>
-                                        <td>{{ row['Abstraction'] }}</td>
-                                        <td>{{ row['Alternate_Terms'] }}</td>
-                                        <td>{{ row['Can_Follow_Refs'] }}</td>
-                                        <td>{{ row['Can_Precede_Refs'] }}</td>
-                                        <td>{{ row['Consequences'] }}</td>
-                                        <td>{{ row['Domains'] }}</td>
-                                        <td>{{ row['Example_Instances'] }}</td>
-                                        <td>{{ row['Execution_Flow'] | safe }}</td>
-                                        <td>{{ row['Extended_Description'] }}</td>
-                                        <td>{{ row['Likelihood_Of_Attack'] }}</td>
-                                        <td>{{ row['Peer_Of_Refs'] }}</td>
-                                        <td>{{ row['Prerequisites'] }}</td>
-                                        <td>{{ row['Resources_Required'] }}</td>
-                                        <td>{{ row['Skills_Required'] }}</td>
-                                        <td>{{ row['Status'] }}</td>
-                                        <td>{{ row['Typical_Severity'] }}</td>
-                                        <td>{{ row['Version'] }}</td>
-                                        <td class="text-nowrap">
-                                            {% if row['Capec_Childs_ID'] is not none %}
+                                        <th><h2><a class="badge bg-capec" href="/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></th>
+                                        <!-- Name -->
+                                        <td class="text-wrap"><strong>{{ row.Name }}</strong></td>
+                                        <!-- Description -->
+                                        <td class="text-wrap">{{ row.Description }}</td>
+                                        <!-- Extended Description -->
+                                        <td class="text-wrap">{{ row.Extended_Description }}</td>
+                                        <!-- Created -->
+                                        <td>{{ row.Created }}</td>
+                                        <!-- External References -->
+                                        <td>
+                                            {% for reference in row.External_References %}
+                                                {{ reference.source_name | title }}: <a class="link" href="{{ reference.url }}">{{ reference.external_id if reference.external_id else reference.description}}</a>
+                                                <br>
+                                            {% endfor %}
+                                        </td>
+                                        <!-- Modified -->
+                                        <td>{{ row.Modified }}</td>
+                                        <!-- Spec Version -->
+                                        <td>{{ row.Spec_Version }}</td>
+                                        <!-- Abstraction -->
+                                        <td>
+                                            <span class="badge bg-{{row.Abstraction}}">{{ row.Abstraction }}</span>
+                                        </td>
+                                        <!-- Alternate Terms -->
+                                        <td>
+                                            {% if row.Alternate_Terms is not none %}
+                                            <ul>
+                                                {% for term in row.Alternate_Terms %}
+                                                    <li>{{ term }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Consequences -->
+                                        <td>
+                                            {% if row.Consequences is not none %}
+                                                {% for key, value in row.Consequences.items() %}
+                                                    <strong>{{ key.replace('_', ' ') }}</strong>:
+                                                    <ul>
+                                                        {% for consequence in value %}
+                                                            <li>{{ consequence }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Domains -->
+                                        <td>
+                                            {% if row.Domains is not none %}
+                                                {% for domain in row.Domains %}
+                                                    <span class="badge bg-domains me-1 mb-1">{{ domain }}</span> <br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Example Instances -->
+                                        <td>
+                                            {% if row.Example_Instances is not none %}
+                                                <ol>
+                                                    {% for example in row.Example_Instances %}
+                                                        <li>{{ example  }}</li>
+                                                    {% endfor %}
+                                                </ol>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Execution Flow -->
+                                        <td class="text-wrap">{{ row.Execution_Flow | replace('<table>', '<table class="table table-striped table-ef">') | replace('<p>', '') | replace('</p>', '') | safe }}</td>
+                                        <!-- Likelihood Of Attack -->
+                                        <td>
+                                            <span class="badge bg-{{row.Likelihood_Of_Attack}}">{{ row.Likelihood_Of_Attack }}</span>
+                                        </td>
+                                        <!-- Peer Of Refs -->
+                                        <td>
+                                            {% if row.Peer_Of_Refs is not none %}
                                                 <div class="h4 d-flex flex-wrap">
-                                                        {% for child in row['Capec_Childs_ID'] | sort %}
+                                                        {% for peer in row.Peer_Of_Refs | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ peer }}">{{ peer }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Prerequisites -->
+                                        <td>
+                                            {% if row.Prerequisites is not none %}
+                                            <ul>
+                                                {% for prerequisite in row.Prerequisites %}
+                                                    <li>{{ prerequisite }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Resources Required -->
+                                        <td>
+                                            {% if row.Resources_Required is not none %}
+                                            <ul>
+                                                {% for resource in row.Resources_Required %}
+                                                    <li>{{ resource }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Skills Required -->
+                                        <td class="text-wrap">
+                                            {% if row.Skills_Required is not none %}
+                                                {% for key, value in row.Skills_Required.items() %}
+                                                    <strong>{{ key.replace('_', ' ') }}</strong>: {{ value }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Status -->
+                                        <td>{{ row.Status }}</td>
+                                        <!-- Typical Severity -->
+                                        <td>
+                                            <span class="badge bg-{{row.Typical_Severity}}">{{ row.Typical_Severity }}</span>
+                                        </td>
+                                        <!-- Version -->
+                                        <td>{{ row.Version }}</td>
+                                        <!-- Capec Childs ID -->
+                                        <td>
+                                            {% if row.Capec_Childs_ID is not none %}
+                                                <div class="d-flex flex-wrap">
+                                                        {% for child in row.Capec_Childs_ID | sort %}
                                                         <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}
                                                 </div>
                                             {% endif %}
                                         </td>
-                                        <td class="text-nowrap">
-                                            {% if row['Capec_Parents_ID'] is not none %}
+                                        <!-- Capec Parents ID -->
+                                        <td>
+                                            {% if row.Capec_Parents_ID is not none %}
                                                 <div class="h4 d-flex flex-wrap">
-                                                        {% for child in row['Capec_Parents_ID'] | sort %}
+                                                        {% for child in row.Capec_Parents_ID | sort %}
                                                         <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}
                                                 </div>
@@ -148,20 +239,17 @@
                                     <th>Capec ID</th>
                                     <th>Name</th>
                                     <th>Description</th>
+                                    <th>Extended Description</th>
                                     <th>Created</th>
-                                    <th>Created By Ref</th>
+                                    <th>External References</th>
                                     <th>Modified</th>
-                                    <th>Object Marking Refs</th>
                                     <th>Spec Version</th>
                                     <th>Abstraction</th>
                                     <th>Alternate Terms</th>
-                                    <th>Can Follow Refs</th>
-                                    <th>Can Precede Refs</th>
                                     <th>Consequences</th>
                                     <th>Domains</th>
                                     <th>Example Instances</th>
                                     <th>Execution Flow</th>
-                                    <th>Extended Description</th>
                                     <th>Likelihood Of Attack</th>
                                     <th>Peer Of Refs</th>
                                     <th>Prerequisites</th>

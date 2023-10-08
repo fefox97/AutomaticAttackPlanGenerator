@@ -10,7 +10,6 @@ import sqlalchemy
 from sqlalchemy import MetaData, inspect, select
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView
-from sqlalchemy_utils import create_view
 
 class AttackPatternUtils:
     

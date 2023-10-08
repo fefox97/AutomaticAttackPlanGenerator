@@ -5,30 +5,31 @@
 .table-dataframe{
     width: 100% !important;
     /* border-collapse: separate !important; */
-}
-.table-dataframe tbody th, th{
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    font-weight: bold;
-    min-width: 110px !important;
-}
-.table-dataframe tbody td, td{
-    text-align: left;
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    word-wrap: break-word;
-    vertical-align: top;
-    white-space: pre-line;
-}
-.table-dataframe tbody th {
-    text-align: center;
-    vertical-align: middle;
-}
-.table-dataframe .filter-input{
-    &::placeholder{
-        animation: floatText 5s infinite linear;
+
+    tbody th, th{
+        text-align: center;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        font-weight: bold;
+        min-width: 110px !important;
     }
-    &:focus::placeholder{
-        animation: finalText 0.2s linear;
+    tbody td, td{
+        text-align: left;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        word-wrap: break-word;
+        vertical-align: top;
+        white-space: pre-line;
+    }
+    tbody th {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .filter-input{
+        &::placeholder{
+            animation: floatText 5s infinite linear;
+        }
+        &:focus::placeholder{
+            animation: finalText 0.2s linear;
+        }
     }
 }
 @-webkit-keyframes floatText {
@@ -38,6 +39,20 @@
 @-webkit-keyframes finalText {
     from{text-indent:50%;}
     to{text-indent:0%;}
+}
+
+.table-df{
+    & li {
+        word-wrap: break-word;
+        white-space: pre-line;
+    }
+}
+
+.table-ef{
+    tbody td, td{
+        word-wrap: break-word;
+        white-space: pre-line;
+    }
 }
 
 .bg-Meta{

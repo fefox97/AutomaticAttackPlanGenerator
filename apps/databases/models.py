@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import ForeignKey, select, orm, func
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
+from .types import ExternalReferencesType
 
 from apps import db
 
@@ -32,6 +33,7 @@ class Capec(db.Model):
     Can_Precede_Refs        = db.Column(db.JSON)
     Consequences            = db.Column(db.JSON)
     Domains                 = db.Column(db.JSON)
+    External_References     = db.Column(ExternalReferencesType)
     Example_Instances       = db.Column(db.JSON)
     Execution_Flow          = db.Column(db.Text)
     Extended_Description    = db.Column(db.JSON)
