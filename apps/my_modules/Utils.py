@@ -44,6 +44,9 @@ class AttackPatternUtils:
 
         # remove html header from x_capec_execution_flow
         attack_pattern_df['x_capec_execution_flow'] = attack_pattern_df['x_capec_execution_flow'].apply(lambda x: re.sub(r'<h2>(.*?)</h2>', r'', x) if x is not None else None)
+
+        for column in ['description', 'x_capec_extended_description', 'x_capec_example_instances', 'x_capec_resources_required']:
+            attack_pattern_df[column] = attack_pattern_df[column].apply(lambda x: self.converter.sub_string(x))
         
         # prettier column names
         attack_pattern_df = self.converter.convert_column_names(attack_pattern_df)

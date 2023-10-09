@@ -207,7 +207,7 @@
                                         <td>{{ row.Status }}</td>
                                         <!-- Typical Severity -->
                                         <td>
-                                            <span class="badge bg-{{row.Typical_Severity}}">{{ row.Typical_Severity }}</span>
+                                            <span class="badge bg-{{ row.Typical_Severity | replace(' ', '') }}">{{ row.Typical_Severity }}</span>
                                         </td>
                                         <!-- Version -->
                                         <td>{{ row.Version }}</td>
