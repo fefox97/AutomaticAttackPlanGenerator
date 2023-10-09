@@ -155,26 +155,13 @@ class Utils:
         print("\nExtracting Capec-ToolCatalog relations to database...\n")
         relations_df = pd.DataFrame(columns=['Capec_ID', 'ToolID'])
         for _, tool in df.iterrows():
-            for capec in tool['CapecID']:
-                if capec is not None and capec != 'None':
-                    relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'ToolID': tool['ToolID']}
+            if tool['CapecID'] is not None:
+                for capec in tool['CapecID']:
+                    if capec is not None and capec != 'None':
+                        relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'ToolID': tool['ToolID']}
         relations_df.drop_duplicates(inplace=True)
         relations_df.index.name = 'Id'
         return relations_df
-
-    def test_function(self):
-        # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        # Session = sessionmaker(bind=engine)
-        # session = Session()
-        search_keys = ['SQL', 'SQL Injection']
-        search_cols = [Capec.Name, Capec.Description]
-        search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
-        query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
-        compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
-        print(f"Query: {compiled}")
-        output = query.all()
-        print(f"Output: {output}")
-        # session.close()
 
     def upload_databases(self, database):
         if database == 'Capec':
@@ -194,3 +181,17 @@ class Utils:
             macm_df = self.macm_utils.read_macm()
             self.save_dataframe_to_database(macm_df, Macm)
             AttackView.metadata.create_all(self.engine)
+
+    def test_function(self):
+        # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        # Session = sessionmaker(bind=engine)
+        # session = Session()
+        search_keys = ['SQL', 'SQL Injection']
+        search_cols = [Capec.Name, Capec.Description]
+        search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
+        query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
+        compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
+        print(f"Query: {compiled}")
+        output = query.all()
+        print(f"Output: {output}")
+        # session.close()
