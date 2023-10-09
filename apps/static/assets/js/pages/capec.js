@@ -33,17 +33,28 @@ $(window).on('load', function() {
                 className: 'noVis'
             },
             {
-                targets: [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23],
+                targets: [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23],
                 searchPanes: {
                     show: false,
                 },
             },
             {
-                targets: [8, 11, 20],
+                targets: [2, 11, 20],
                 searchPanes: {
                     show: true,
                 },
             },
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'type') {
+                            if (data.includes('Meta')) { return 0; }
+                            else if (data.includes('Standard')) { return 1; }
+                            else { return 2; }
+                    }
+                    return data;
+                }   
+            }
         ],
         lengthMenu: [
             [ 10, 25, 50, -1 ],

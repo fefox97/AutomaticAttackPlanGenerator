@@ -74,13 +74,13 @@
                                 <tr>
                                     <th>Capec ID</th>
                                     <th>Name</th>
+                                    <th>Abstraction</th>
                                     <th>Description</th>
                                     <th>Extended Description</th>
                                     <th>Created</th>
                                     <th>External References</th>
                                     <th>Modified</th>
                                     <th>Spec Version</th>
-                                    <th>Abstraction</th>
                                     <th>Alternate Terms</th>
                                     <th>Consequences</th>
                                     <th>Domains</th>
@@ -104,6 +104,10 @@
                                         <td><div class="id-badge"><h2><a class="badge bg-capec" href="/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></div></td>
                                         <!-- Name -->
                                         <td class="text-wrap"><strong>{{ row.Name }}</strong></td>
+                                        <!-- Abstraction -->
+                                        <td>
+                                            <span class="badge bg-{{row.Abstraction}}">{{ row.Abstraction }}</span>
+                                        </td>
                                         <!-- Description -->
                                         <td class="text-wrap">{{ row.Description }}</td>
                                         <!-- Extended Description -->
@@ -121,10 +125,6 @@
                                         <td>{{ row.Modified }}</td>
                                         <!-- Spec Version -->
                                         <td>{{ row.Spec_Version }}</td>
-                                        <!-- Abstraction -->
-                                        <td>
-                                            <span class="badge bg-{{row.Abstraction}}">{{ row.Abstraction }}</span>
-                                        </td>
                                         <!-- Alternate Terms -->
                                         <td>
                                             {% if row.Alternate_Terms is not none %}
@@ -245,13 +245,13 @@
                                 <tr>
                                     <th>Capec ID</th>
                                     <th>Name</th>
+                                    <th>Abstraction</th>
                                     <th>Description</th>
                                     <th>Extended Description</th>
                                     <th>Created</th>
                                     <th>External References</th>
                                     <th>Modified</th>
                                     <th>Spec Version</th>
-                                    <th>Abstraction</th>
                                     <th>Alternate Terms</th>
                                     <th>Consequences</th>
                                     <th>Domains</th>
