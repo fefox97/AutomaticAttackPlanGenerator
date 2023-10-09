@@ -100,7 +100,7 @@
                                         <!-- Description -->
                                         <td class="text-wrap">{{ row.Description }}</td>
                                         <!-- Extended Description -->
-                                        <td class="text-wrap">{{ row.Extended_Description }}</td>
+                                        <td class="text-wrap">{{ row.Extended_Description if row.Extended_Description is not none }}</td>
                                         <!-- Created -->
                                         <td>{{ row.Created }}</td>
                                         <!-- External References -->
