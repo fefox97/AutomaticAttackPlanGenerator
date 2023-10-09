@@ -44,13 +44,14 @@
                                 <th>Name</th>
                                 <th>Capec ID</th>
                                 <th>Command</th>
+                                <th>Description</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for row in table %}
                                 <tr>
-                                    <td><div class="id-badge"><h2><span class="badge bg-tool">{{ row['ToolID'] }}</span></h2></div></td>
-                                    <td>{{ row['Name'] }}</td>
+                                    <td><div class="id-badge"><h2><span class="badge bg-tool">{{ row.ToolID }}</span></h2></div></td>
+                                    <td>{{ row.Name }}</td>
                                     <td class="text-nowrap">
                                         {% if row.hasCapecIDs  is not none %}
                                             <div class="d-flex flex-wrap">
@@ -60,7 +61,8 @@
                                             </div>
                                         {% endif %}
                                     </td>
-                                    <td>{{ row['Command'] }}</td>
+                                    <td>{{ row.Command }}</td>
+                                    <td>{{ row.Description if row.Description }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -70,6 +72,7 @@
                                 <th>Name</th>
                                 <th>Capec ID</th>
                                 <th>Command</th>
+                                <th>Description</th>
                             </tr>
                         </tfoot>
                     </table> 

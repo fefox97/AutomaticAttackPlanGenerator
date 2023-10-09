@@ -5,7 +5,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('tools_catalog_columns') === null) {    
-        default_shown_columns = ['Tool ID', 'Name', 'Capec ID', 'Command'];
+        default_shown_columns = ['Tool ID', 'Name', 'Capec ID', 'Command', 'Description'];
         localStorage.setItem('tools_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('tools_catalog_columns'));
