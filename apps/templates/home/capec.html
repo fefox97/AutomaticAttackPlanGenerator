@@ -44,7 +44,6 @@
                 <small id="SearchIDHelp" class="form-text text-muted">Enter one or multiple IDs.</small>
                 
                 <div class="d-block align-items-center pt-3">
-                    <!-- TODO: Non completo -->
                     <div class="row">
                         <label for="tags-input" class="form-label">Tags</label>
                         <div class="col">
@@ -54,7 +53,15 @@
                             <div class="invalid-feedback">Please select a valid tag.</div>
                         </div>
                         <div class="col-auto">
-                            <button type="reset" class="btn btn-secondary" data-bs-toggle="tooltip" id="ResetTagButton">Reset</button>
+                            <div class="btn-group" role="group" aria-label="Search type button group">
+                                <input type="radio" class="btn-check" name="SearchType" id="andSearch" autocomplete="off" value="and" checked>
+                                <label class="btn btn-outline-primary" for="andSearch">And</label>
+                                <input type="radio" class="btn-check" name="SearchType" id="orSearch" autocomplete="off" value="or">
+                                <label class="btn btn-outline-primary" for="orSearch">Or</label>
+                            </div>
+                        </div>
+                        <div class="col-auto">    
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" id="ResetTagButton">Reset</button>
                         </div>
                     </div>
                 </div>

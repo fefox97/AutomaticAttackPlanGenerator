@@ -2,7 +2,6 @@ import Tags from "/static/assets/node_modules/bootstrap5-tags/tags.js";
 
 let capec_table = undefined;
 let default_shown_columns = undefined;
-let tags = undefined;
 
 $(window).on('load', function() {
 
@@ -101,42 +100,9 @@ $(window).on('load', function() {
         }
         localStorage.setItem('capec_table_columns', JSON.stringify(default_shown_columns));
     });
-
-    // Add tags
-    Tags.init("#tags-input");
-
-    tags = Tags.getInstance(document.querySelector("#tags-input"));
-    tags.setConfig("onCreateItem", function (item) {
-        console.log(item.innerHTML);
-    });
 });
 
 $(document).ready(function() {
-
-    function searchIDQuery () {
-        console.log("Searching for " + $('#SearchID').val());
-        if ($('#SearchID').val() === '') {
-            capec_table.search('').columns().search('').draw();
-            return;
-        }
-        $.ajax({
-            url: '/api/search_capec_by_id',
-            type: 'POST',
-            data: {
-                'SearchID': $('#SearchID').val(),
-                'ShowTree': $('#ShowTreeToggle').hasClass('active')
-            },
-            success: function(response) {
-                let ids = response.childs.toString().split(',');
-                ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
-                capec_table.column(0).search(ids, true, false).draw();
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    };
     
     $('#SearchIDButton').on('click', searchIDQuery);
 
@@ -151,10 +117,73 @@ $(document).ready(function() {
     $('#SearchID').on('keyup', function(e) {
         searchIDQuery();
     });
+
+    // Add tags
+    Tags.init("#tags-input");
+    $("#tags-input").on("change", function (event) {
+        searchKeywordQuery();
+    });
     
+    let tags = Tags.getInstance(document.querySelector("#tags-input"));
     $('#ResetTagButton').on('click', function() {
         console.log("Resetting tags");
         tags.removeAll();
+        searchKeywordQuery();
     });
 
+    $('[name="SearchType"]').on('change', function() {
+        searchKeywordQuery();
+    });
 });
+
+function searchIDQuery () {
+    if ($('#SearchID').val() === '') {
+        capec_table.search('').columns().search('').draw();
+        return;
+    }
+    console.log("Searching for " + $('#SearchID').val());
+    $.ajax({
+        url: '/api/search_capec_by_id',
+        type: 'POST',
+        data: {
+            'SearchID': $('#SearchID').val(),
+            'ShowTree': $('#ShowTreeToggle').hasClass('active')
+        },
+        success: function(response) {
+            let ids = response.childs.toString().split(',');
+            ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
+            capec_table.column(0).search(ids, true, false).draw();
+            console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+};
+
+function searchKeywordQuery() {
+    let tags = $("#tags-input").val();
+    if (tags.length === 0) {
+        capec_table.search('').columns().search('').draw();
+        return;
+    }
+    console.log("Searching for " + tags);
+    $.ajax({
+        url: '/api/search_capec_by_keyword',
+        type: 'POST',
+        data: {
+            'SearchKeyword': JSON.stringify(tags),
+            'SearchType': $('[name="SearchType"]:checked').val()
+        },
+        success: function(response) {
+            let ids = response.ids;
+            ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
+            capec_table.column(0).search(ids, true, false).draw();
+            console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+
+}

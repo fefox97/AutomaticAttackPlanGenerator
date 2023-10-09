@@ -1,6 +1,7 @@
 from apps import db
 from apps.databases.models import Capec
 from flask import current_app as app
+from sqlalchemy import or_, and_
 
 class AttackPatternAPIUtils:
 
@@ -27,6 +28,19 @@ class AttackPatternAPIUtils:
             childs = childs + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id)]
         childs = list(set(childs))
         return childs # return only the ids, not the dataframe
+    
+    def search_capec_by_keyword(self, search_keys, search_type):
+        search_cols = [Capec.Name, Capec.Description, Capec.Extended_Description, Capec.Example_Instances, Capec.Execution_Flow]
+        if search_type == 'and':
+            search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
+        else:
+            search_args = [or_(col.ilike(f"%{key}%") for key in search_keys for col in search_cols)]
+        query = Capec.query.filter(*search_args).with_entities(Capec.Capec_ID)
+        output = query.all()
+        # compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
+        # print(f"Query: {compiled}")
+        # print(f"Output: {output}")
+        return [x[0] for x in output]
     
 class APIUtils:
 

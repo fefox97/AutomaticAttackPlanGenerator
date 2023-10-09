@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import json
 from apps.api import blueprint
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required, current_user
@@ -30,6 +31,16 @@ def route_api(api):
                 search_id_conv = converter.string_to_int_list(search_id)
                 childs = AttackPatternAPIUtils().get_child_attack_patterns(search_id_conv, show_tree=showTree)
                 return jsonify({'childs': childs})
+            
+            elif api == 'search_capec_by_keyword':
+                search_keys = request.form.get("SearchKeyword")
+                search_type = request.form.get("SearchType")
+                if search_keys is None:
+                    return jsonify({'ids': []})
+                search_keys = json.loads(search_keys)
+                app.logger.info(f"Searching for {search_keys} with type {search_type}")
+                result = AttackPatternAPIUtils().search_capec_by_keyword(search_keys, search_type)
+                return jsonify({'ids': result})
 
             elif api == 'upload_macm':
                 if 'macmFile' in request.files:

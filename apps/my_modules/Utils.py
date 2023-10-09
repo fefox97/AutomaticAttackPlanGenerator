@@ -7,7 +7,7 @@ import re
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import MetaData, inspect, select
+from sqlalchemy import MetaData, inspect, select, or_, and_
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView
 
@@ -166,7 +166,13 @@ class Utils:
         # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
         # Session = sessionmaker(bind=engine)
         # session = Session()
-        output = AttackView.query.all()
+        search_keys = ['SQL', 'SQL Injection']
+        search_cols = [Capec.Name, Capec.Description]
+        search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
+        query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
+        compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
+        print(f"Query: {compiled}")
+        output = query.all()
         print(f"Output: {output}")
         # session.close()
 
