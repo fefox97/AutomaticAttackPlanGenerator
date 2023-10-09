@@ -86,19 +86,21 @@
                                         {% if attack_for_each_component is not none%}
                                             {% set attack_for_this_component = attack_for_each_component[row['Component_ID']] %}
                                         {% endif %}
-                                        <th>
-                                            <h2>
-                                                <a class="badge bg-macm position-relative" href="/macm-detail?id={{ row['Component_ID'] }}">
-                                                    {{ row['Component_ID'] }}
-                                                    {% if attack_for_this_component %}
-                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                            {{attack_for_each_component[row['Component_ID']]}}
-                                                            <span class="visually-hidden">Attacks available</span>
-                                                        </span>
-                                                    {% endif %}
-                                                </a>
-                                            </h2>
-                                        </th>
+                                        <td>
+                                            <div class="id-badge">
+                                                <h2>
+                                                    <a class="badge bg-macm position-relative" href="/macm-detail?id={{ row['Component_ID'] }}">
+                                                        {{ row['Component_ID'] }}
+                                                        {% if attack_for_this_component %}
+                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                {{attack_for_each_component[row['Component_ID']]}}
+                                                                <span class="visually-hidden">Attacks available</span>
+                                                            </span>
+                                                        {% endif %}
+                                                    </a>
+                                                </h2>
+                                            </div>
+                                        </td>
                                         <td>{{ row['Application'] }}</td>
                                         <td>{{ row['Name'] }}</td>
                                         <td>{{ row['Type'] }}</td>

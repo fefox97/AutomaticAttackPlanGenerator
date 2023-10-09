@@ -37,7 +37,7 @@
                 <div class="d-block align-items-center">
                     <!-- [ stiped-table ] start -->
                     {% if table is not none %}
-                    <table id="threat_catalog_table" class="table table-striped table-hover table-dataframe">
+                    <table id="threat_catalog_table" class="table table-striped table-hover table-dataframe text-wrap">
                         <thead>
                             <tr>
                                 <th>TID</th>
@@ -63,7 +63,7 @@
                         <tbody>
                             {% for row in table %}
                                 <tr>
-                                    <th><h2><span class="badge bg-threat">{{ row['TID'] }}</span></h2></th>
+                                    <td><div class="id-badge"><h2><span class="badge bg-threat">{{ row['TID'] }}</span></h2></div></td>
                                     <td>{{ row['Asset'] }}</td>
                                     <td>{{ row['Threat'] }}</td>
                                     <td>{{ row['Description'] }}</td>
@@ -79,7 +79,7 @@
                                     <td>{{ row['PostCondition'] }}</td>
                                     <td class="text-nowrap">
                                         {% if row.hasCapecMeta is not none %}
-                                            <div class="h4 d-flex flex-wrap">
+                                            <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecMeta | sort %}
                                                     <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}
@@ -88,7 +88,7 @@
                                     </td>
                                     <td class="text-nowrap">
                                         {% if row.hasCapecStandard is not none %}
-                                            <div class="h4 d-flex flex-wrap">
+                                            <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecStandard | sort %}
                                                     <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}
@@ -97,7 +97,7 @@
                                     </td>
                                     <td class="text-nowrap">
                                         {% if row.hasCapecDetailed is not none %}
-                                            <div class="h4 d-flex flex-wrap">
+                                            <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecDetailed | sort %}
                                                     <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}

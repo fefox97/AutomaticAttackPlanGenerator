@@ -18098,28 +18098,6 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
 .neovis {
   height: 50vh; }
 
-.table-dataframe {
-  width: 100% !important;
-  /* border-collapse: separate !important; */ }
-  .table-dataframe tbody th, .table-dataframe th {
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    font-weight: bold;
-    min-width: 110px !important; }
-  .table-dataframe tbody td, .table-dataframe td {
-    text-align: left;
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    word-wrap: break-word;
-    vertical-align: top;
-    white-space: pre-line; }
-  .table-dataframe tbody th {
-    text-align: center;
-    vertical-align: middle; }
-  .table-dataframe .filter-input::placeholder {
-    animation: floatText 5s infinite linear; }
-  .table-dataframe .filter-input:focus::placeholder {
-    animation: finalText 0.2s linear; }
-
 @-webkit-keyframes floatText {
   0% {
     text-indent: 100%; }
@@ -18132,9 +18110,28 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
   to {
     text-indent: 0%; } }
 
-.table-df li {
+.table-dataframe td:first-child, .table-dataframe th {
+  text-align: center !important; }
+  .table-dataframe td:first-child .id-badge, .table-dataframe th .id-badge {
+    vertical-align: top;
+    position: sticky;
+    z-index: 4;
+    top: 0; }
+
+.table-dataframe th, .table-dataframe td {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  border-collapse: collapse !important; }
+
+.table-dataframe li {
   word-wrap: break-word;
   white-space: pre-line; }
+
+.table-dataframe.text-wrap tbody td, .table-dataframe.text-wrap td {
+  word-wrap: break-word;
+  white-space: pre-line; }
+
+.dataTables_scrollBody thead {
+  visibility: hidden; }
 
 .table-ef tbody td, .table-ef td {
   word-wrap: break-word;

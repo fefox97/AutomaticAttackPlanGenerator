@@ -62,7 +62,7 @@
                 <div class="d-block align-items-center pt-5">
                     <!-- [ stiped-table ] start -->
                     {% if table is not none %}
-                        <table id="capec_table" class="table table-striped table-hover table-df">
+                        <table id="capec_table" class="table table-striped table-hover table-dataframe">
                             <thead>
                                 <tr>
                                     <th>Capec ID</th>
@@ -94,7 +94,7 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        <th><h2><a class="badge bg-capec" href="/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></th>
+                                        <td><div class="id-badge"><h2><a class="badge bg-capec" href="/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></div></td>
                                         <!-- Name -->
                                         <td class="text-wrap"><strong>{{ row.Name }}</strong></td>
                                         <!-- Description -->
@@ -224,7 +224,7 @@
                                         <!-- Capec Parents ID -->
                                         <td>
                                             {% if row.Capec_Parents_ID is not none %}
-                                                <div class="h4 d-flex flex-wrap">
+                                                <div class="d-flex flex-wrap">
                                                         {% for child in row.Capec_Parents_ID | sort %}
                                                         <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}

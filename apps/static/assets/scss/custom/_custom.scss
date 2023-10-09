@@ -2,36 +2,36 @@
     height: 50vh;
 }
 
-.table-dataframe{
-    width: 100% !important;
-    /* border-collapse: separate !important; */
+// .table-dataframe{
+//     width: 100% !important;
+//     /* border-collapse: separate !important; */
 
-    tbody th, th{
-        text-align: center;
-        border: 1px solid rgba(0, 0, 0, 0.2) !important;
-        font-weight: bold;
-        min-width: 110px !important;
-    }
-    tbody td, td{
-        text-align: left;
-        border: 1px solid rgba(0, 0, 0, 0.2) !important;
-        word-wrap: break-word;
-        vertical-align: top;
-        white-space: pre-line;
-    }
-    tbody th {
-        text-align: center;
-        vertical-align: middle;
-    }
-    .filter-input{
-        &::placeholder{
-            animation: floatText 5s infinite linear;
-        }
-        &:focus::placeholder{
-            animation: finalText 0.2s linear;
-        }
-    }
-}
+//     tbody th, th{
+//         text-align: center;
+//         border: 1px solid rgba(0, 0, 0, 0.2) !important;
+//         font-weight: bold;
+//         min-width: 110px !important;
+//     }
+//     tbody td, td{
+//         text-align: left;
+//         border: 1px solid rgba(0, 0, 0, 0.2) !important;
+//         word-wrap: break-word;
+//         vertical-align: top;
+//         white-space: pre-line;
+//     }
+//     tbody th {
+//         text-align: center;
+//         vertical-align: middle;
+//     }
+//     .filter-input{
+//         &::placeholder{
+//             animation: floatText 5s infinite linear;
+//         }
+//         &:focus::placeholder{
+//             animation: finalText 0.2s linear;
+//         }
+//     }
+// }
 @-webkit-keyframes floatText {
     0% {text-indent:100%;}
     100% {text-indent:-100%;}
@@ -41,10 +41,35 @@
     to{text-indent:0%;}
 }
 
-.table-df{
+.table-dataframe{
+    td:first-child, th{
+        text-align: center !important;
+        .id-badge{
+            vertical-align: top;
+            position: sticky;
+            z-index: 4;
+            top: 0;
+        }
+    }
+    th, td{
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        border-collapse: collapse !important;
+    }
     & li {
         word-wrap: break-word;
         white-space: pre-line;
+    }
+    &.text-wrap {
+        tbody td, td {
+            word-wrap: break-word;
+            white-space: pre-line;
+        }
+    }
+}
+
+.dataTables_scrollBody {
+    thead {
+        visibility: hidden;
     }
 }
 
