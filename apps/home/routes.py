@@ -4,7 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from apps.home import blueprint
-from flask import render_template, request
+from flask import redirect, render_template, request, url_for
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
@@ -13,12 +13,10 @@ from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
 
+# @login_required
 @blueprint.route('/index')
-@login_required
 def index():
-    return render_template('home/dashboard.html', 
-                            segment='dashboard', 
-                            user_id=current_user.id)
+    return redirect(url_for('home_blueprint.route_template', template='macm.html'))
 
 # @login_required
 @blueprint.route('/<template>', methods=['GET'])
