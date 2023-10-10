@@ -92,7 +92,7 @@
                                                     <a class="badge bg-macm position-relative" href="/macm-detail?id={{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if attack_for_this_component %}
-                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                            <span class="position-absolute fs-8 top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                 {{attack_for_each_component[row['Component_ID']]}}
                                                                 <span class="visually-hidden">Attacks available</span>
                                                             </span>
