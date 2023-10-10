@@ -7,7 +7,7 @@
         {
             "name": "Python: Flask",
             "type": "python",
-            "python": "/Users/fefox/.pyenv/versions/3.10.6/envs/web3/bin/python",
+            "python": "/Users/fefox/.pyenv/versions/3.10.6/envs/web/bin/python",
             "request": "launch",
             "module": "flask",
             "env": {

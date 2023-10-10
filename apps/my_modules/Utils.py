@@ -16,7 +16,7 @@ class AttackPatternUtils:
     converter = Converter()
     
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
         self.stix_path = f"{self.base_path}/capec_stix"
         self.attack_pattern_path = f'{self.stix_path}/attack-pattern'
         self.fs = FileSystemStore(stix_dir=self.stix_path, bundlify=False)
@@ -58,7 +58,7 @@ class ThreatCatalogUtils:
     converter = Converter()
 
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
         self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
         # self.threat_catalog_df = self.load_threat_catalog()
 
@@ -78,7 +78,7 @@ class ToolCatalogUtils:
     converter = Converter()
 
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
         self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
         # self.tools_catalog_df = self.load_tools_catalog()
 
@@ -99,7 +99,7 @@ class MacmUtils:
         self.URI_NEO4J = "neo4j://192.168.40.4:7787"
         self.USER_NEO4J = "neo4j"
         self.PASS_NEO4J = "neo4j#1234"
-        self.base_path = "/Users/fefox/Desktop/Web3/apps/static/assets/dbs"
+        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
         
         self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
         self.driver.verify_connectivity()

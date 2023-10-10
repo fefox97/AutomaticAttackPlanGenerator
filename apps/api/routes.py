@@ -45,7 +45,7 @@ def route_api(api):
             elif api == 'upload_macm':
                 if 'macmFile' in request.files:
                     file = request.files['macmFile']
-                    if not APIUtils().allowed_file(file.filename, 'txt'):
+                    if not APIUtils().allowed_file(file.filename, ['txt', 'macm']):
                         return jsonify({'success': False, 'message': 'File type not allowed'})
                     query_str = file.read().decode('utf-8')
                 elif 'macmCypher' in request.form:
