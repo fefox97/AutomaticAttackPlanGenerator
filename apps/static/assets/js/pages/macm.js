@@ -85,6 +85,12 @@ $(window).on('load', function() {
                 targets: 0,
                 className: 'noVis',
                 width: '120px',
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'type') {
+                        return parseInt(data);
+                    }
+                    return data;
+                }
             },
             {
                 targets: [0, 1, 4],
