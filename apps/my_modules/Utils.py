@@ -132,10 +132,9 @@ class Utils:
         session = Session()
         if inspect(self.engine).has_table(mapper.__tablename__):
             if replace:
-                session.query(mapper).delete()
+                mapper.__table__.drop(self.engine)
                 session.commit()
-        else:
-            mapper.metadata.create_all(self.engine)
+        mapper.metadata.create_all(self.engine)
         session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=True)
         session.commit()
         session.close()
