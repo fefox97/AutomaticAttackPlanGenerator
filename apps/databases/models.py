@@ -135,6 +135,7 @@ class ToolCatalog(db.Model):
     ToolID      = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Name        = db.Column(db.Text)
     CapecID     = db.Column(db.JSON)
+    CypherQuery = db.Column(db.Text)
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
 
