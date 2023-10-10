@@ -1,13 +1,13 @@
 {% if attack.Capec_Description %}
 <div class="accordion-item">
-    <div class="accordion-header d-flex align-items-center colla" id="heading{{attack.Attack_Number}}Description">
-        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{attack.Attack_Number}}Description" aria-expanded="true" aria-controls="collapse{{attack.Attack_Number}}Description">
+    <div class="accordion-header d-flex align-items-center colla" id="heading{{attack.Attack_Number}}CapecDescription">
+        <div class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{attack.Attack_Number}}CapecDescription" aria-expanded="true" aria-controls="collapse{{attack.Attack_Number}}CapecDescription">
             <h2 class="h6 mb-0">
-                Description
+                Capec Description
             </h2>
         </div>
     </div>
-    <div id="collapse{{attack.Attack_Number}}Description" class="accordion-collapse collapse show">
+    <div id="collapse{{attack.Attack_Number}}CapecDescription" class="accordion-collapse collapse show">
         <div class="accordion-body">
             {{ attack.Capec_Description }}
         </div>
