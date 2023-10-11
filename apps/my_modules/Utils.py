@@ -9,7 +9,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import MetaData, inspect, select, or_, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView
+from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 
 class AttackPatternUtils:
     
@@ -117,6 +117,16 @@ class MacmUtils:
         self.clear_database(database)
         self.driver.execute_query(query, database_=database)
 
+    def tool_asset_type_rel(self, database='macm'):
+        queries = ToolCatalog.query.with_entities(ToolCatalog.ToolID, ToolCatalog.CypherQuery).all()
+        tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID'])
+        for query in queries:
+            if query.CypherQuery is not None:
+                component_id = [element['component_id'] for element in self.driver.execute_query(query.CypherQuery, database_='macm').records]
+                tool_asset_type_df = pd.concat([tool_asset_type_df, pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component_id})], ignore_index=True)
+        tool_asset_type_df.drop_duplicates(inplace=True)
+        return tool_asset_type_df
+
 class Utils:
 
     def __init__(self):
@@ -178,21 +188,43 @@ class Utils:
             self.save_dataframe_to_database(relations, CapecToolRel)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm()
+            tool_asset_type_df = self.macm_utils.tool_asset_type_rel()
             self.save_dataframe_to_database(macm_df, Macm)
+            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetTypeRel)
             AttackView.metadata.create_all(self.engine)
 
+    # def test_function(self):
+    #     response = {}
+    #     # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+    #     # Session = sessionmaker(bind=engine)
+    #     # session = Session()
+    #     search_keys = ['SQL', 'SQL Injection']
+    #     search_cols = [Capec.Name, Capec.Description]
+    #     search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
+    #     query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
+    #     compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
+    #     response['query'] = str(compiled)
+    #     output = query.all()
+    #     response['output'] = str(output)
+    #     # session.close()
+    #     return response
+    
     def test_function(self):
         response = {}
-        # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-        # Session = sessionmaker(bind=engine)
-        # session = Session()
-        search_keys = ['SQL', 'SQL Injection']
-        search_cols = [Capec.Name, Capec.Description]
-        search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
-        query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
-        compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
-        response['query'] = str(compiled)
-        output = query.all()
-        response['output'] = str(output)
-        # session.close()
+        URI_NEO4J = "neo4j://192.168.40.4:7787"
+        USER_NEO4J = "neo4j"
+        PASS_NEO4J = "neo4j#1234"
+
+        driver = GraphDatabase.driver(URI_NEO4J, auth=(USER_NEO4J, PASS_NEO4J))
+        driver.verify_connectivity()
+
+        queries = ToolCatalog.query.with_entities(ToolCatalog.ToolID, ToolCatalog.CypherQuery).all()
+
+        output = pd.DataFrame(columns=['ToolID', 'AssetType'])
+        for query in queries:
+            if query.CypherQuery is not None:
+                asset_types = [element['type'] for element in driver.execute_query(query.CypherQuery, database_='macm').records]
+                output = pd.concat([output, pd.DataFrame({'ToolID': query.ToolID, 'AssetType': asset_types})], ignore_index=True)
+        print(output.drop_duplicates())
+        # response['output'] = output
         return response

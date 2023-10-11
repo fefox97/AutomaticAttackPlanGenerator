@@ -8,7 +8,7 @@ from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ForeignKey, select, orm, func
+from sqlalchemy import ForeignKey, select, orm, func, and_
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
@@ -185,6 +185,24 @@ class Macm(db.Model):
     def __repr__(self):
         return str(self.Name)
     
+class ToolAssetTypeRel(db.Model):
+
+    __tablename__ = 'ToolAssetTypeRel'
+
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalog.ToolID"))
+    ComponentID    = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(f'{self.ToolID}-{self.AssetType}')
+
 class AttackView(db.Model):
     row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
     
@@ -211,6 +229,7 @@ class AttackView(db.Model):
                 .join(Capec)
                 .join(CapecToolRel)
                 .join(ToolCatalog)
+                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalog.ToolID))
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True
