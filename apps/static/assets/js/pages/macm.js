@@ -162,6 +162,27 @@ $(window).on('load', function() {
         $(this).parent('.card').find('.collapse').collapse('hide');
         $(this).parent('.card').find('.collapse').removeClass('show');
     });
+    
+});
+
+$(document).ready(function() {
+    $('#uploadMacmForm').submit(function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        $.ajax({
+            url: '/api/upload_macm',
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+        }).done(function(response) {
+            location.reload();
+        }).fail(function(response) {
+            showModal("Upload failed", JSON.parse(response.responseText));
+        });
+    });
 });
 
 function drawNeo4j() {
