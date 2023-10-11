@@ -1,14 +1,11 @@
 $(document).ready(function() {
     $('#ReloadCapec').on('click', function() {
-        console.log("Reloading Capec");
         reloadDatabases("Capec");
     });
     $('#ReloadThreatCatalog').on('click', function() {
-        console.log("Reloading ThreatCatalog");
         reloadDatabases("ThreatCatalog");
     });
     $('#ReloadToolCatalog').on('click', function() {
-        console.log("Reloading ToolCatalog");
         reloadDatabases("ToolCatalog");
     });
     $('#TestButton').on('click', function() {
@@ -22,10 +19,11 @@ function reloadDatabases(database) {
         type: 'POST',
         data: {
             'database': database,
-        },
-        success: function(response) {
-            console.log(response);
         }
+    }).done(function(response) {
+        showModal("Success", response);
+    }).fail(function(response) {
+        showModal("Error", JSON.parse(response.responseText));
     });
 }
 
@@ -33,8 +31,9 @@ function test(){
     $.ajax({
         url: '/api/test',
         type: 'POST',
-        success: function(response) {
-            console.log(response);
-        }
+    }).done(function(response) {
+        showModal("Success", response);
+    }).fail(function(response) {
+        showModal("Error", JSON.parse(response.responseText));
     });
 }
