@@ -120,7 +120,6 @@ $(document).ready(function() {
     $("#ShowTreeToggle").on('click', searchIDQuery);
 
     $('#ResetIDButton').on('click', function() {
-        console.log("Resetting filters");
         $('#SearchID').val('');
         capec_table.search('').columns().search('').draw();
     });
@@ -137,7 +136,6 @@ $(document).ready(function() {
     
     let tags = Tags.getInstance(document.querySelector("#tags-input"));
     $('#ResetTagButton').on('click', function() {
-        console.log("Resetting tags");
         tags.removeAll();
         searchKeywordQuery();
     });
@@ -152,7 +150,6 @@ function searchIDQuery () {
         capec_table.search('').columns().search('').draw();
         return;
     }
-    console.log("Searching for " + $('#SearchID').val());
     $.ajax({
         url: '/api/search_capec_by_id',
         type: 'POST',
@@ -160,15 +157,12 @@ function searchIDQuery () {
             'SearchID': $('#SearchID').val(),
             'ShowTree': $('#ShowTreeToggle').hasClass('active')
         },
-        success: function(response) {
-            let ids = response.childs.toString().split(',');
-            ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
-            capec_table.column(0).search(ids, true, false).draw();
-            console.log(response);
-        },
-        error: function(error) {
-            console.log(error);
-        }
+    }).done(function(response) {
+        let ids = response.childs.toString().split(',');
+        ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
+        capec_table.column(0).search(ids, true, false).draw();
+    }).fail(function(error) {
+        console.log(error);
     });
 };
 
@@ -186,15 +180,11 @@ function searchKeywordQuery() {
             'SearchKeyword': JSON.stringify(tags),
             'SearchType': $('[name="SearchType"]:checked').val()
         },
-        success: function(response) {
-            let ids = response.ids;
-            ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
-            capec_table.column(0).search(ids, true, false).draw();
-            console.log(response);
-        },
-        error: function(error) {
-            console.log(error);
-        }
+    }).done(function(response) {
+        let ids = response.ids;
+        ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
+        capec_table.column(0).search(ids, true, false).draw();
+    }).fail(function(error) {
+        console.log(error);
     });
-
 }
