@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import json
 from apps.api import blueprint
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
@@ -43,28 +43,34 @@ def route_api(api):
                 return jsonify({'ids': result})
 
             elif api == 'upload_macm':
-                if 'macmFile' in request.files:
+                if 'macmFile' in request.files and request.files['macmFile'].filename != '':
                     file = request.files['macmFile']
+                    app.logger.info(f"Uploading MACM from file {request.files['macmFile']}")
                     if not APIUtils().allowed_file(file.filename, ['txt', 'macm']):
-                        return jsonify({'success': False, 'message': 'File type not allowed'})
+                        return make_response(jsonify({'message': 'File type not allowed'}), 400)
                     query_str = file.read().decode('utf-8')
-                elif 'macmCypher' in request.form:
+                elif 'macmCypher' in request.form and request.form.get('macmCypher') != '':
                     query_str = request.form.get('macmCypher')
                 else:
-                    return jsonify({'success': False, 'message': 'No file or Cypher query provided'})
-                macm.upload_macm(query_str)
-                utils.upload_databases('Macm')
-                return redirect(url_for('home_blueprint.route_template', template='macm.html'))
+                    return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
+                try:
+                    macm.upload_macm(query_str)
+                    utils.upload_databases('Macm')
+                    return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
+                except Exception as error:
+                    return make_response(jsonify({'message': error.args}), 400)
             
             elif api == 'reload_databases':
                 database = request.form.get('database')
                 if database:
                     utils.upload_databases(database)
-                return jsonify({'success': True, 'message': f'Database {database} reloaded'})
+                    return make_response(jsonify({'message': f'Database {database} reloaded'}), 200)
+                else:
+                    return make_response(jsonify({'message': 'No database provided'}), 400)
             
             elif api == 'test':
-                utils.test_function()
-                return jsonify({'success': True, 'message': 'Test successful'})
+                response = utils.test_function()
+                return make_response(jsonify(response), 200)
         
         elif request.method == 'GET':
             if api == 'clear_macm_database':
@@ -73,6 +79,6 @@ def route_api(api):
                 db.session.commit()
                 return redirect(url_for('home_blueprint.route_template', template='macm.html'))
 
-    except:
+    except Exception as e:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         return render_template('home/page-500.html'), 500
