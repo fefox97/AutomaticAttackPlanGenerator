@@ -112,7 +112,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
     // Popovers
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-      return new bootstrap.Popover(popoverTriggerEl)
+        return new bootstrap.Popover(popoverTriggerEl)
     })
     
 
@@ -121,7 +121,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
     var datepickersList = datepickers.map(function (el) {
         return new Datepicker(el, {
             buttonClass: 'btn'
-          });
+        });
     })
 
     if(d.querySelector('.input-slider-container')) {
@@ -173,17 +173,17 @@ d.addEventListener("DOMContentLoaded", function(event) {
 
     if(d.querySelector('.ct-chart-sales-value')) {
         //Chart 5
-          new Chartist.Line('.ct-chart-sales-value', {
+        new Chartist.Line('.ct-chart-sales-value', {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             series: [
                 [0, 10, 30, 40, 80, 60, 100]
             ]
-          }, {
+        }, {
             low: 0,
             showArea: true,
             fullWidth: true,
             plugins: [
-              Chartist.plugins.tooltip()
+            Chartist.plugins.tooltip()
             ],
             axisX: {
                 // On the x-axis start means top and end means bottom
@@ -203,40 +203,40 @@ d.addEventListener("DOMContentLoaded", function(event) {
 
     if(d.querySelector('.ct-chart-ranking')) {
         var chart = new Chartist.Bar('.ct-chart-ranking', {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            series: [
-              [1, 5, 2, 5, 4, 3],
-              [2, 3, 4, 8, 1, 2],
-            ]
-          }, {
-            low: 0,
-            showArea: true,
-            plugins: [
-              Chartist.plugins.tooltip()
-            ],
-            axisX: {
-                // On the x-axis start means top and end means bottom
-                position: 'end'
-            },
-            axisY: {
-                // On the y-axis start means left and end means right
-                showGrid: false,
-                showLabel: false,
-                offset: 0
-            }
-            });
-          
-          chart.on('draw', function(data) {
-            if(data.type === 'line' || data.type === 'area') {
-              data.element.animate({
-                d: {
-                  begin: 2000 * data.index,
-                  dur: 2000,
-                  from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
-                  to: data.path.clone().stringify(),
-                  easing: Chartist.Svg.Easing.easeOutQuint
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                series: [
+                [1, 5, 2, 5, 4, 3],
+                [2, 3, 4, 8, 1, 2],
+                ]
+            }, {
+                low: 0,
+                showArea: true,
+                plugins: [
+                Chartist.plugins.tooltip()
+                ],
+                axisX: {
+                    // On the x-axis start means top and end means bottom
+                    position: 'end'
+                },
+                axisY: {
+                    // On the y-axis start means left and end means right
+                    showGrid: false,
+                    showLabel: false,
+                    offset: 0
                 }
-              });
+            });
+
+        chart.on('draw', function(data) {
+            if(data.type === 'line' || data.type === 'area') {
+                data.element.animate({
+                    d: {
+                    begin: 2000 * data.index,
+                    dur: 2000,
+                    from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
+                    to: data.path.clone().stringify(),
+                    easing: Chartist.Svg.Easing.easeOutQuint
+                    }
+                });
             }
         });
     }
@@ -244,13 +244,13 @@ d.addEventListener("DOMContentLoaded", function(event) {
     if(d.querySelector('.ct-chart-traffic-share')) {
         var data = {
             series: [70, 20, 10]
-          };
-          
-          var sum = function(a, b) { return a + b };
-          
-          new Chartist.Pie('.ct-chart-traffic-share', data, {
+        };
+        
+        var sum = function(a, b) { return a + b };
+        
+        new Chartist.Pie('.ct-chart-traffic-share', data, {
             labelInterpolationFnc: function(value) {
-              return Math.round(value / data.series.reduce(sum) * 100) + '%';
+            return Math.round(value / data.series.reduce(sum) * 100) + '%';
             },            
             low: 0,
             high: 8,
@@ -260,7 +260,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             fullWidth: false,
             showLabel: false,
             plugins: [
-              Chartist.plugins.tooltip()
+                Chartist.plugins.tooltip()
             ],
         });         
     }
@@ -298,7 +298,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             type: 'carousel',
             startAt: 0,
             perView: 3
-          }).mount();
+        }).mount();
     }
 
     if (d.querySelector('.glide-testimonials')) {
@@ -307,7 +307,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             startAt: 0,
             perView: 1,
             autoplay: 2000
-          }).mount();
+        }).mount();
     }
 
     if (d.querySelector('.glide-clients')) {
@@ -316,7 +316,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             startAt: 0,
             perView: 5,
             autoplay: 2000
-          }).mount();
+        }).mount();
     }
 
     if (d.querySelector('.glide-news-widget')) {
@@ -325,7 +325,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             startAt: 0,
             perView: 1,
             autoplay: 2000
-          }).mount();
+        }).mount();
     }
 
     if (d.querySelector('.glide-autoplay')) {
@@ -334,7 +334,7 @@ d.addEventListener("DOMContentLoaded", function(event) {
             startAt: 0,
             perView: 3,
             autoplay: 2000
-          }).mount();
+        }).mount();
     }
 
     // Pricing countup
