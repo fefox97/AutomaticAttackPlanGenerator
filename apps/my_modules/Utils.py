@@ -182,6 +182,7 @@ class Utils:
             AttackView.metadata.create_all(self.engine)
 
     def test_function(self):
+        response = {}
         # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
         # Session = sessionmaker(bind=engine)
         # session = Session()
@@ -190,7 +191,8 @@ class Utils:
         search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
         query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
         compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
-        print(f"Query: {compiled}")
+        response['query'] = str(compiled)
         output = query.all()
-        print(f"Output: {output}")
+        response['output'] = str(output)
         # session.close()
+        return response
