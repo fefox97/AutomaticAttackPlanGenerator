@@ -45,7 +45,7 @@ $(window).on('load', function() {
                 },
             },
             {
-                targets: 8,
+                targets: 2,
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'type') {
                             if (data.includes('Meta')) { return 0; }
