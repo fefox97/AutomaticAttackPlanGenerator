@@ -21,7 +21,7 @@ function reloadDatabases(database) {
             'database': database,
         }
     }).done(function(response) {
-        showModal("Success", response);
+        showModal("Success", response, true);
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));
     });
