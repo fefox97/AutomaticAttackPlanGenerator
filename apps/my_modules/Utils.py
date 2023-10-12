@@ -7,7 +7,7 @@ import re
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import MetaData, inspect, select, or_, and_
+from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 
@@ -210,21 +210,6 @@ class Utils:
     #     return response
     
     def test_function(self):
-        response = {}
-        URI_NEO4J = "neo4j://192.168.40.4:7787"
-        USER_NEO4J = "neo4j"
-        PASS_NEO4J = "neo4j#1234"
-
-        driver = GraphDatabase.driver(URI_NEO4J, auth=(USER_NEO4J, PASS_NEO4J))
-        driver.verify_connectivity()
-
-        queries = ToolCatalog.query.with_entities(ToolCatalog.ToolID, ToolCatalog.CypherQuery).all()
-
-        output = pd.DataFrame(columns=['ToolID', 'AssetType'])
-        for query in queries:
-            if query.CypherQuery is not None:
-                asset_types = [element['type'] for element in driver.execute_query(query.CypherQuery, database_='macm').records]
-                output = pd.concat([output, pd.DataFrame({'ToolID': query.ToolID, 'AssetType': asset_types})], ignore_index=True)
-        print(output.drop_duplicates())
-        # response['output'] = output
+        
+        response = {"message": "PDF generated"}
         return response

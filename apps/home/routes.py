@@ -4,7 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from apps.home import blueprint
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
@@ -84,7 +84,7 @@ def route_template(template):
             macm_data = Macm.query.filter_by(Component_ID=selected_id).first()
             attack_data = AttackView.query.filter_by(Component_ID=selected_id).all()
             return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data)
-        
+
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)
 
