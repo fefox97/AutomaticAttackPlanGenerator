@@ -10,13 +10,14 @@ import sqlalchemy
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
+from apps.config import Config
 
 class AttackPatternUtils:
     
     converter = Converter()
     
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
+        self.base_path = Config.DBS_PATH
         self.stix_path = f"{self.base_path}/capec_stix"
         self.attack_pattern_path = f'{self.stix_path}/attack-pattern'
         self.fs = FileSystemStore(stix_dir=self.stix_path, bundlify=False)
@@ -58,8 +59,8 @@ class ThreatCatalogUtils:
     converter = Converter()
 
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
-        self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
+        self.base_path = Config.DBS_PATH
+        self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
         # self.threat_catalog_df = self.load_threat_catalog()
 
     def load_threat_catalog(self):
@@ -78,8 +79,8 @@ class ToolCatalogUtils:
     converter = Converter()
 
     def __init__(self):
-        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
-        self.file_path = f"{self.base_path}/ThreatCatalogComplete.xlsx"
+        self.base_path = Config.DBS_PATH
+        self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
         # self.tools_catalog_df = self.load_tools_catalog()
 
     def load_tools_catalog(self):
@@ -95,12 +96,10 @@ class MacmUtils:
 
     def __init__(self):
         # neo4j setup
-        #URI_NEO4J = "neo4j://192.168.1.6:7687"
-        self.URI_NEO4J = "neo4j://192.168.40.4:7787"
-        self.USER_NEO4J = "neo4j"
-        self.PASS_NEO4J = "neo4j#1234"
-        self.base_path = "/Users/fefox/Desktop/Web/apps/static/assets/dbs"
-        
+        self.URI_NEO4J = Config.URI_NEO4J
+        self.USER_NEO4J = Config.USER_NEO4J
+        self.PASS_NEO4J = Config.PASS_NEO4J
+
         self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
         self.driver.verify_connectivity()
 
@@ -134,7 +133,7 @@ class Utils:
         self.threat_catalog_utils = ThreatCatalogUtils()
         self.tool_catalog_utils = ToolCatalogUtils()
         self.macm_utils = MacmUtils()
-        self.engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
+        self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
         print(f"\nLoading dataframe {mapper.__name__} to database...\n")

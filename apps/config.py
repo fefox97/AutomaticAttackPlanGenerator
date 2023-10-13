@@ -40,9 +40,11 @@ class Config(object):
 
     USE_SQLITE  = True
 
-    DBS_PATH                = os.getenv('DBS_PATH'    , None)
-    STIX_PATH               = os.getenv('STIX_PATH'   , None)
-    ATTACK_PATTERN_PATH     = os.getenv('ATTACK_PATTERN_PATH', None)
+    DBS_PATH                    = os.getenv('DBS_PATH'    , None)
+    THREAT_CATALOG_FILE_NAME    = os.getenv('THREAT_CATALOG_FILE_NAME'    , None)
+    URI_NEO4J                   = os.getenv('URI_NEO4J'    , None)
+    USER_NEO4J                  = os.getenv('USER_NEO4J'    , None)
+    PASS_NEO4J                  = os.getenv('PASS_NEO4J'    , None)
 
     # try to set up a Relational DBMS
     if DB_ENGINE and DB_NAME and DB_USERNAME:
