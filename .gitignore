@@ -11,9 +11,14 @@ __pycache__/
 *.sqlite3
 *.log
 
+# vscode
+.vscode
+
 # venv
 env
 venv
+.env
+.venv
 
 # other
 .DS_Store
