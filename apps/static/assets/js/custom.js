@@ -35,3 +35,7 @@ function showAlert(response, type, icon){
         wrapper.remove()
     }, 5000)
 }
+
+$(document).ready(function() {
+    $('.nav-item.active').children('.multi-level.collapse').collapse('show');
+});

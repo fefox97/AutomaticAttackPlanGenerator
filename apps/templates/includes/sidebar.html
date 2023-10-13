@@ -45,36 +45,72 @@
                 </a>
               </li>
               <li class="nav-item {% if 'macm' in segment %} active {% endif %}">
-                <a href="/macm.html" class="nav-link">
-                  <span class="sidebar-icon">
-                    <span class="material-symbols-outlined">network_node</span>
-                  </span> 
-                  <span class="sidebar-text">MACM</span>
-                </a>
+                <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
+                  <span>
+                    <span class="sidebar-icon">
+                      <span class="material-symbols-outlined">apps</span>
+                    </span> 
+                    <span class="sidebar-text">Apps</span>
+                  </span>
+                  <span class="link-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                  </span>
+                </span>
+                <div class="multi-level collapse"
+                  role="list" id="submenu-app" aria-expanded="false">
+                  <ul class="flex-column nav">
+                    <li class="nav-item {% if 'macm' in segment %} active {% endif %}">
+                      <a href="/macm.html" class="nav-link">
+                        <span class="sidebar-icon">
+                          <span class="material-symbols-outlined">network_node</span>
+                        </span> 
+                        <span class="sidebar-text">MACM</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
-              <li class="nav-item {% if 'threat-catalog' in segment %} active {% endif %}">
-                <a href="/threat-catalog.html" class="nav-link">
-                  <span class="sidebar-icon">
-                    <span class="material-symbols-outlined">destruction</span>
-                  </span> 
-                  <span class="sidebar-text">Threat Catalog</span>
-                </a>
-              </li>
-              <li class="nav-item {% if 'capec' in segment %} active {% endif %}">
-                <a href="/capec.html" class="nav-link">
-                  <span class="sidebar-icon">
-                    <span class="material-symbols-outlined">pattern</span>
-                  </span> 
-                  <span class="sidebar-text">Capec</span>
-                </a>
-              </li>
-              <li class="nav-item {% if 'tools' in segment %} active {% endif %}">
-                <a href="/tools.html" class="nav-link">
-                  <span class="sidebar-icon">
-                    <span class="material-symbols-outlined">construction</span>
-                  </span> 
-                  <span class="sidebar-text">Tools</span>
-                </a>
+              <li class="nav-item {% if 'threat-catalog' in segment or 'capec' in segment or 'tools' in segment %} active {% endif %}">
+                <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-catalog">
+                  <span>
+                    <span class="sidebar-icon">
+                      <span class="material-symbols-outlined">library_books</span>
+                    </span> 
+                    <span class="sidebar-text">Catalogs</span>
+                  </span>
+                  <span class="link-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                  </span>
+                </span>
+                <div class="multi-level collapse"
+                  role="list" id="submenu-catalog" aria-expanded="false">
+                  <ul class="flex-column nav">
+                    <li class="nav-item {% if 'threat-catalog' in segment %} active {% endif %}">
+                      <a href="/threat-catalog.html" class="nav-link">
+                        <span class="sidebar-icon">
+                          <span class="material-symbols-outlined">destruction</span>
+                        </span> 
+                        <span class="sidebar-text">Threat Catalog</span>
+                      </a>
+                    </li>
+                    <li class="nav-item {% if 'capec' in segment %} active {% endif %}">
+                      <a href="/capec.html" class="nav-link">
+                        <span class="sidebar-icon">
+                          <span class="material-symbols-outlined">pattern</span>
+                        </span> 
+                        <span class="sidebar-text">Capec</span>
+                      </a>
+                    </li>
+                    <li class="nav-item {% if 'tools' in segment %} active {% endif %}">
+                      <a href="/tools.html" class="nav-link">
+                        <span class="sidebar-icon">
+                          <span class="material-symbols-outlined">construction</span>
+                        </span> 
+                        <span class="sidebar-text">Tools</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
               <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
                 <a href="/settings.html" class="nav-link">
