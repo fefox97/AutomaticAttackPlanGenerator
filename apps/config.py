@@ -38,7 +38,11 @@ class Config(object):
     DB_PORT     = os.getenv('DB_PORT'     , None)
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
-    USE_SQLITE  = True 
+    USE_SQLITE  = True
+
+    DBS_PATH                = os.getenv('DBS_PATH'    , None)
+    STIX_PATH               = os.getenv('STIX_PATH'   , None)
+    ATTACK_PATTERN_PATH     = os.getenv('ATTACK_PATTERN_PATH', None)
 
     # try to set up a Relational DBMS
     if DB_ENGINE and DB_NAME and DB_USERNAME:
