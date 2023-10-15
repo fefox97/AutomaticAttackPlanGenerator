@@ -11,6 +11,8 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 from apps.config import Config
+from sqlalchemy_schemadisplay import create_schema_graph
+from apps import db
 
 class AttackPatternUtils:
     
@@ -210,5 +212,9 @@ class Utils:
     
     def test_function(self):
         
-        response = {"message": "PDF generated"}
+        er_diagram_filename = 'er_diagram.png'
+        er_diagram_path = f'{Config.DBS_PATH}/images/{er_diagram_filename}'
+        graph = create_schema_graph(metadata=db.metadata, show_datatypes=True, show_indexes=True, rankdir='LR', font='Helvetica', concentrate=False)
+        graph.write_png(er_diagram_path)
+        response = {'message': 'ER diagram generated successfully'}
         return response
