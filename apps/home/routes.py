@@ -35,11 +35,20 @@ def route_template(template):
         if template == 'capec.html':
             try:
                 table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
+                meta_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Meta').count()
+                standard_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Standard').count()
+                detailed_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Detailed').count()
                 if len(table) == 0:
                     table = None
+                    meta_attack_pattern_number = None
+                    standard_attack_pattern_number = None
+                    detailed_attack_pattern_number = None
             except:
                 table = None
-            return render_template(f"home/{template}", segment=segment, table=table)
+                meta_attack_pattern_number = None
+                standard_attack_pattern_number = None
+                detailed_attack_pattern_number = None
+            return render_template(f"home/{template}", segment=segment, table=table, meta_attack_pattern_number=meta_attack_pattern_number, standard_attack_pattern_number=standard_attack_pattern_number, detailed_attack_pattern_number=detailed_attack_pattern_number)
 
         elif template == 'capec-detail.html':
             selected_id = request.args.get('id')

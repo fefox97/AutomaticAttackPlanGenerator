@@ -81,13 +81,13 @@
 }
 
 .bg-Meta{
-    background-color: #0009b4 !important;
+    background-color: $bg-meta-background !important;
 }
 .bg-Standard{
-    background-color: #2830b8 !important;
+    background-color: $bg-standard-background !important;
 }
 .bg-Detailed{
-    background-color: #5156b0 !important;
+    background-color: $bg-detailed-background !important;
 }
 .bg-domains{
     background-color: #07a081 !important;

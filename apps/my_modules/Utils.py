@@ -210,11 +210,16 @@ class Utils:
     #     # session.close()
     #     return response
     
-    def test_function(self):
+    # def test_function(self):
         
-        er_diagram_filename = 'er_diagram.png'
-        er_diagram_path = f'{Config.DBS_PATH}/images/{er_diagram_filename}'
-        graph = create_schema_graph(metadata=db.metadata, show_datatypes=True, show_indexes=True, rankdir='LR', font='Helvetica', concentrate=False)
-        graph.write_png(er_diagram_path)
-        response = {'message': 'ER diagram generated successfully'}
+    #     er_diagram_filename = 'er_diagram.png'
+    #     er_diagram_path = f'{Config.DBS_PATH}/images/{er_diagram_filename}'
+    #     graph = create_schema_graph(metadata=db.metadata, show_datatypes=True, show_indexes=True, rankdir='LR', font='Helvetica', concentrate=False)
+    #     graph.write_png(er_diagram_path)
+    #     response = {'message': 'ER diagram generated successfully'}
+    #     return response
+
+    def test_function(self):
+        number = Capec.query.filter(Capec.Abstraction=='Meta').count()
+        response = {'message': number}
         return response
