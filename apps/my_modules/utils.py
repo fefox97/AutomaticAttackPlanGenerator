@@ -9,7 +9,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import ThreatCatalog, Capec, CapecThreatRel, ToolCatalog, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
+from apps.databases.models import ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 from apps.config import Config
 from sqlalchemy_schemadisplay import create_schema_graph
 from apps import db
@@ -123,7 +123,7 @@ class MacmUtils:
         self.driver.execute_query(query, database_=database)
 
     def tool_asset_type_rel(self, database='macm'):
-        queries = ToolCatalog.query.with_entities(ToolCatalog.ToolID, ToolCatalog.CypherQuery).all()
+        queries = ToolCatalogue.query.with_entities(ToolCatalogue.ToolID, ToolCatalogue.CypherQuery).all()
         tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID'])
         for query in queries:
             if query.CypherQuery is not None:
@@ -184,12 +184,12 @@ class Utils:
         elif database == 'ThreatCatalog':
             threat_catalog_df = self.threat_catalog_utils.load_threat_catalog()
             relations = self.load_capec_threat_relations(threat_catalog_df)
-            self.save_dataframe_to_database(threat_catalog_df, ThreatCatalog)
+            self.save_dataframe_to_database(threat_catalog_df, ThreatCatalogue)
             self.save_dataframe_to_database(relations, CapecThreatRel)
         elif database == 'ToolCatalog':
             tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
             relations = self.load_capec_tool_relations(tool_catalog_df)
-            self.save_dataframe_to_database(tool_catalog_df, ToolCatalog)
+            self.save_dataframe_to_database(tool_catalog_df, ToolCatalogue)
             self.save_dataframe_to_database(relations, CapecToolRel)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm()

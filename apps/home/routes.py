@@ -8,7 +8,7 @@ from flask import redirect, render_template, request, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, ThreatCatalog, Macm, ToolCatalog
+from apps.databases.models import AttackView, Capec, ThreatCatalogue, Macm, ToolCatalogue
 from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
@@ -57,7 +57,7 @@ def route_template(template):
         
         elif template == 'threat-catalog.html':
             try:
-                table = ThreatCatalog.query.all()
+                table = ThreatCatalogue.query.all()
                 if len(table) == 0:
                     table = None
             except:
@@ -66,7 +66,7 @@ def route_template(template):
         
         elif template == 'tools.html':
             try:
-                table = ToolCatalog.query.all()
+                table = ToolCatalogue.query.all()
                 if len(table) == 0:
                     table = None
             except:

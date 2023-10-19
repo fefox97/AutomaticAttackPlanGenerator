@@ -70,9 +70,9 @@ class Capec(db.Model):
         )
         return (table_ordering)
     
-class ThreatCatalog(db.Model):
+class ThreatCatalogue(db.Model):
 
-    __tablename__ = 'ThreatCatalog'
+    __tablename__ = 'ThreatCatalogue'
 
     TID                 = db.Column(db.Text, primary_key=True, unique=True, nullable=False)
     Asset               = db.Column(db.Text)
@@ -93,7 +93,7 @@ class ThreatCatalog(db.Model):
     # CapecDetailed       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
     
-    hasCapec            = db.relationship('Capec', secondary='CapecThreatRelTable', backref='hasThreat', lazy='dynamic')
+    hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat', lazy='dynamic')
     
     @hybrid_property
     def hasCapecMeta(self):
@@ -122,15 +122,15 @@ class ThreatCatalog(db.Model):
     
 class CapecThreatRel(db.Model):
 
-    __tablename__ = 'CapecThreatRelTable'
+    __tablename__ = 'CapecThreatRel'
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    TID          = db.Column(db.Text, ForeignKey("ThreatCatalog.TID"))
+    TID          = db.Column(db.Text, ForeignKey("ThreatCatalogue.TID"))
 
-class ToolCatalog(db.Model):
+class ToolCatalogue(db.Model):
 
-    __tablename__ = 'ToolCatalog'
+    __tablename__ = 'ToolCatalogue'
 
     ToolID      = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Name        = db.Column(db.Text)
@@ -139,7 +139,7 @@ class ToolCatalog(db.Model):
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
 
-    hasCapec    = db.relationship('Capec', secondary='CapecToolRelTable', backref='hasTool', lazy='dynamic')
+    hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
 
     @hybrid_property
     def hasCapecIDs(self):
@@ -158,11 +158,11 @@ class ToolCatalog(db.Model):
 
 class CapecToolRel(db.Model):
 
-    __tablename__ = 'CapecToolRelTable'
+    __tablename__ = 'CapecToolRel'
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    ToolID       = db.Column(db.Text, ForeignKey("ToolCatalog.ToolID"))
+    ToolID       = db.Column(db.Text, ForeignKey("ToolCatalogue.ToolID"))
 
 class Macm(db.Model):
 
@@ -190,7 +190,7 @@ class ToolAssetTypeRel(db.Model):
     __tablename__ = 'ToolAssetTypeRel'
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalog.ToolID"))
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
     ComponentID    = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
 
     def __init__(self, **kwargs):
@@ -209,27 +209,27 @@ class AttackView(db.Model):
     __table__ = create_view(
                 "AttackView",
                 select(
-                    ToolCatalog.ToolID.label("Tool_ID"), 
-                    ToolCatalog.Name.label("Tool_Name"), 
-                    ToolCatalog.Command, ToolCatalog.Description, 
+                    ToolCatalogue.ToolID.label("Tool_ID"), 
+                    ToolCatalogue.Name.label("Tool_Name"), 
+                    ToolCatalogue.Command, ToolCatalogue.Description, 
                     Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
                     Capec.Execution_Flow, 
                     Capec.Description.label("Capec_Description"), 
-                    ThreatCatalog.TID.label("Threat_ID"), 
-                    ThreatCatalog.Asset.label("Asset_Type"), 
-                    ThreatCatalog.Threat, 
-                    ThreatCatalog.Description.label("Threat_Description"), 
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"), 
                     Macm.Component_ID, 
                     Macm.Name.label("Asset"), 
                     Macm.Parameters
                 )
                 .select_from(Macm)
-                .join(ThreatCatalog, Macm.Type==ThreatCatalog.Asset)
+                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
                 .join(CapecThreatRel)
                 .join(Capec)
                 .join(CapecToolRel)
-                .join(ToolCatalog)
-                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalog.ToolID))
+                .join(ToolCatalogue)
+                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID))
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True
