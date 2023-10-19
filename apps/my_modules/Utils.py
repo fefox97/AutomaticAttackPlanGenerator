@@ -98,9 +98,13 @@ class MacmUtils:
 
     def __init__(self):
         # neo4j setup
-        self.URI_NEO4J = Config.URI_NEO4J
-        self.USER_NEO4J = Config.USER_NEO4J
-        self.PASS_NEO4J = Config.PASS_NEO4J
+        # self.URI_NEO4J = Config.URI_NEO4J
+        # self.USER_NEO4J = Config.USER_NEO4J
+        # self.PASS_NEO4J = Config.PASS_NEO4J
+
+        self.URI_NEO4J  = os.getenv('URI_NEO4J'     , None)
+        self.USER_NEO4J = os.getenv('USER_NEO4J'    , None)
+        self.PASS_NEO4J = os.getenv('PASS_NEO4J'    , None)
 
         self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
         self.driver.verify_connectivity()

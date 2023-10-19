@@ -4,10 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os, random, string
+from dotenv import load_dotenv
 
 class Config(object):
 
     basedir = os.path.abspath(os.path.dirname(__file__))
+
+    # Load .env file
+    load_dotenv()
 
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
