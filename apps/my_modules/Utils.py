@@ -7,7 +7,7 @@ import re
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import inspect
+from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 from apps.config import Config
@@ -224,6 +224,23 @@ class Utils:
     #     return response
 
     def test_function(self):
-        number = Capec.query.filter(Capec.Abstraction=='Meta').count()
-        response = {'message': number}
+        row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+        query = select(
+                    ToolCatalogue.ToolID.label("Tool_ID"), 
+                    ToolCatalogue.Name.label("Tool_Name"), 
+                    ToolCatalogue.Command, ToolCatalogue.Description, 
+                    Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
+                    Capec.Execution_Flow, 
+                    Capec.Description.label("Capec_Description"), 
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    Macm.Component_ID, 
+                    Macm.Name.label("Asset"), 
+                    Macm.Parameters
+                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID)).add_columns(row_number_column)
+        compiled = query.compile(compile_kwargs={"literal_binds": True})
+        response = {'query': str(compiled)}
+        
         return response

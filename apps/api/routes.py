@@ -15,8 +15,8 @@ from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.databases.models import AttackView, Macm
 from apps import db
 
-# @login_required
 @blueprint.route('/<api>', methods=['GET', 'POST'])
+@login_required
 def route_api(api):
     try:
 
