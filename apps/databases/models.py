@@ -211,7 +211,8 @@ class AttackView(db.Model):
                 select(
                     ToolCatalogue.ToolID.label("Tool_ID"), 
                     ToolCatalogue.Name.label("Tool_Name"), 
-                    ToolCatalogue.Command, ToolCatalogue.Description, 
+                    ToolCatalogue.Command,
+                    ToolCatalogue.Description.label("Tool_Description"),
                     Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
                     Capec.Execution_Flow, 
                     Capec.Description.label("Capec_Description"), 

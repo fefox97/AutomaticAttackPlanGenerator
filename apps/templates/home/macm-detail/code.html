@@ -9,6 +9,9 @@
     </div>
     <div id="collapse{{attack.Attack_Number}}Command" class="accordion-collapse collapse show">
         <div class="accordion-body">
+            {% if attack.Tool_Description != '' %}
+                <p class="mb-2">{{ attack.Tool_Description }}</p>
+            {% endif %}
             <div class="input-group mb-3 command">
                 {% for part in attack.Command|regex_split("({.*?})") %}
                     {% if not part.isspace() and part != '' %}
