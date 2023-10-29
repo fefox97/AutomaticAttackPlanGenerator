@@ -10,7 +10,7 @@
             <h2 class="h5">
                 <span class="badge bg-macm"> <span class="material-symbols-outlined">target</span> {{ attack.Asset }}</span>
                 <i class="fas fa-chevron-right"></i>
-                <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{ attack.Threat }}</span>
+                <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{attack.Threat_ID}}-{{ attack.Threat }}</span>
                 <i class="fas fa-chevron-right"></i>
                 <a class="badge bg-capec" href="/capec-detail?id={{attack.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{attack.Capec_ID}}-{{attack.Attack_Pattern}}</a>
                 <i class="fas fa-chevron-right"></i>
