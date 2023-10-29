@@ -66,7 +66,7 @@ class ThreatCatalogUtils:
         # self.threat_catalog_df = self.load_threat_catalog()
 
     def load_threat_catalog(self):
-        print("\nLoading threat catalog...\n")
+        print("\nLoading threat catalogue...\n")
         df = pd.read_excel(self.file_path, sheet_name="Threat Components", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         # df.set_index('TID', inplace=True)
