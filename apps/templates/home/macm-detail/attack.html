@@ -8,6 +8,8 @@
         <div class="accordion-button" type="button" role="button" data-bs-toggle="collapse" data-bs-target="#collapse{{attack.Attack_Number}}" aria-expanded="true" aria-controls="collapse{{attack.Attack_Number}}">
             <h2 class="me-2 mt-n1"><span class="badge bg-secondary"><span class="material-symbols-outlined">swords</span> Attack {{ attack.Attack_Number }}</span></h2>
             <h2 class="h5">
+                <span class="badge bg-macm"> <span class="material-symbols-outlined">target</span> {{ attack.Asset }}</span>
+                <i class="fas fa-chevron-right"></i>
                 <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{ attack.Threat }}</span>
                 <i class="fas fa-chevron-right"></i>
                 <a class="badge bg-capec" href="/capec-detail?id={{attack.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{attack.Capec_ID}}-{{attack.Attack_Pattern}}</a>

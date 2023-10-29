@@ -9,7 +9,7 @@
     </div>
     <div id="collapse{{attack.Attack_Number}}Command" class="accordion-collapse collapse show">
         <div class="accordion-body">
-            {% if attack.Tool_Description != '' %}
+            {% if attack.Tool_Description != '' and attack.Tool_Description != None and attack.Tool_Description != 'None' %}
                 <p class="mb-2">{{ attack.Tool_Description }}</p>
             {% endif %}
             <div class="input-group mb-3 command">
