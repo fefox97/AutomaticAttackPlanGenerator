@@ -9,7 +9,7 @@
     </div>
     <div id="collapse{{attack.Attack_Number}}ExecutionFlow" class="accordion-collapse collapse show">
         <div class="accordion-body">
-            {{ attack.Execution_Flow | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | safe }}
+            {{ attack.Execution_Flow | replace('<table>', '<table class="table table-hover table-striped">') | replace('h3', 'h5') | replace('td', 'td class="text-wrap"') | safe }}
         </div>
     </div>
 </div>
