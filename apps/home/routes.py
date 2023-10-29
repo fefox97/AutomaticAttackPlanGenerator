@@ -83,10 +83,12 @@ def route_template(template):
             try:
                 attack_for_each_component = AttackView.query.with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
                 attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
+                attack_number = AttackView.query.count()
             except:
                 app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
                 attack_for_each_component = None
-            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component)
+                attack_number = None
+            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number)
         
         elif template == 'macm-detail.html':
             selected_id = request.args.get('id')
