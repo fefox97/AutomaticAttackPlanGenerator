@@ -1,3 +1,4 @@
+import json
 from stix2 import FileSystemStore, FileSystemSource
 import os
 import pandas as pd
@@ -115,7 +116,7 @@ class MacmUtils:
     def read_macm(self, database='macm'):
         macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters", database_=database, result_transformer_=Result.to_df)
         macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters'}, inplace=True)
-        macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: self.converter.string_to_dict(x))
+        macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
         return macm_df
 
     def upload_macm(self, query, database='macm'):
