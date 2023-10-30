@@ -22,10 +22,10 @@
 </h4>
 {% endif %}
 
-{% if data['Capec_Childs_ID'] is not none and data['Capec_Childs_ID']|length > 0 %}
+{% if data['Capec_Children_ID'] is not none and data['Capec_Children_ID']|length > 0 %}
 <h4>
-    Childs:
-    {% for child in data['Capec_Childs_ID'] | sort %}
+    Children:
+    {% for child in data['Capec_Children_ID'] | sort %}
         <a class="badge bg-capec" href="/capec-detail?id={{ child }}">{{ child }}</a>
     {% endfor %}
 </h4>

@@ -29,8 +29,8 @@ def route_api(api):
                 search_id = request.form.get("SearchID") or ''
                 showTree = True if request.form.get("ShowTree") == 'true' else False
                 search_id_conv = converter.string_to_int_list(search_id)
-                childs = AttackPatternAPIUtils().get_child_attack_patterns(search_id_conv, show_tree=showTree)
-                return jsonify({'childs': childs})
+                children = AttackPatternAPIUtils().get_child_attack_patterns(search_id_conv, show_tree=showTree)
+                return jsonify({'children': children})
             
             elif api == 'search_capec_by_keyword':
                 search_keys = request.form.get("SearchKeyword")

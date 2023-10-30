@@ -147,7 +147,7 @@ $(document).ready(function() {
                 'ShowTree': $('#ShowTreeToggle').is(':checked')
             },
             success: function(response) {
-                ids = response.childs.toString().split(',');
+                ids = response.children.toString().split(',');
                 ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
                 threat_catalog.column(0).search(ids, true, false).draw();
 

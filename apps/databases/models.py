@@ -45,7 +45,7 @@ class Capec(db.Model):
     Status                  = db.Column(db.Text)
     Typical_Severity        = db.Column(db.Text)
     Version                 = db.Column(db.Text)
-    Capec_Childs_ID         = db.Column(db.JSON)
+    Capec_Children_ID         = db.Column(db.JSON)
     Capec_Parents_ID        = db.Column(db.JSON)
 
     def __init__(self, **kwargs):

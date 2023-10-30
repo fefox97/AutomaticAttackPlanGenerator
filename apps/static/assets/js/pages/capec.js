@@ -7,7 +7,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('capec_table_columns') === null) {    
-        default_shown_columns = ['Capec ID', 'Name', 'Capec Parents ID', 'Capec Childs ID', 'Abstraction', 'Description', 'Extended Description'];
+        default_shown_columns = ['Capec ID', 'Name', 'Capec Parents ID', 'Capec Children ID', 'Abstraction', 'Description', 'Extended Description'];
         localStorage.setItem('capec_table_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('capec_table_columns'));
@@ -158,7 +158,7 @@ function searchIDQuery () {
             'ShowTree': $('#ShowTreeToggle').hasClass('active')
         },
     }).done(function(response) {
-        let ids = response.childs.toString().split(',');
+        let ids = response.children.toString().split(',');
         ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
         capec_table.column(0).search(ids, true, false).draw();
     }).fail(function(error) {

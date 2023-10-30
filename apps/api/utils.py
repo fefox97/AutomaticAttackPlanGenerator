@@ -7,27 +7,27 @@ class AttackPatternAPIUtils:
 
     def get_child_attack_patterns_by_id(self, parent_id):
         try:
-            return Capec.query.filter_by(Capec_ID=parent_id).first().Capec_Childs_ID or []
+            return Capec.query.filter_by(Capec_ID=parent_id).first().Capec_Children_ID or []
         except:
-            app.logger.error(f"Error getting childs of {parent_id}", exc_info=True)
+            app.logger.error(f"Error getting children of {parent_id}", exc_info=True)
             return None
 
     def get_child_attack_patterns_recursive(self, parent_id) -> list:
-        childs = self.get_child_attack_patterns_by_id(parent_id)
-        if childs is None or len(childs) == 0:
+        children = self.get_child_attack_patterns_by_id(parent_id)
+        if children is None or len(children) == 0:
             return []
         else:
-            for child in childs:
-                childs = childs + self.get_child_attack_patterns_recursive(child)
-            return childs
+            for child in children:
+                children = children + self.get_child_attack_patterns_recursive(child)
+            return children
 
     def get_child_attack_patterns(self, parent_ids, show_tree=False):
         if type(parent_ids) is not list: parent_ids = [parent_ids]
-        childs = [parent_id for parent_id in parent_ids]
+        children = [parent_id for parent_id in parent_ids]
         if show_tree:
-            childs = childs + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id)]
-        childs = list(set(childs))
-        return childs # return only the ids, not the dataframe
+            children = children + [child for parent_id in parent_ids for child in self.get_child_attack_patterns_recursive(parent_id)]
+        children = list(set(children))
+        return children # return only the ids, not the dataframe
     
     def search_capec_by_keyword(self, search_keys, search_type):
         search_cols = [Capec.Name, Capec.Description, Capec.Extended_Description, Capec.Example_Instances, Capec.Execution_Flow]

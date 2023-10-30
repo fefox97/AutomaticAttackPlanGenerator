@@ -94,7 +94,7 @@
                                     <th>Status</th>
                                     <th>Typical Severity</th>
                                     <th>Version</th>
-                                    <th>Capec Childs ID</th>
+                                    <th>Capec Children ID</th>
                                     <th>Capec Parents ID</th>
                                 </tr>
                             </thead>
@@ -218,11 +218,11 @@
                                         </td>
                                         <!-- Version -->
                                         <td>{{ row.Version }}</td>
-                                        <!-- Capec Childs ID -->
+                                        <!-- Capec Children ID -->
                                         <td>
-                                            {% if row.Capec_Childs_ID is not none %}
+                                            {% if row.Capec_Children_ID is not none %}
                                                 <div class="d-flex flex-wrap">
-                                                        {% for child in row.Capec_Childs_ID | sort %}
+                                                        {% for child in row.Capec_Children_ID | sort %}
                                                         <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}
                                                 </div>
@@ -265,7 +265,7 @@
                                     <th>Status</th>
                                     <th>Typical Severity</th>
                                     <th>Version</th>
-                                    <th>Capec Childs ID</th>
+                                    <th>Capec Children ID</th>
                                     <th>Capec Parents ID</th>
                                 </tr>
                             </tfoot>
