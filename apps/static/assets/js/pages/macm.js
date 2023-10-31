@@ -205,12 +205,12 @@ function drawNeo4j() {
             physics: {
                 enabled: true,
                 barnesHut: {
-                    gravitationalConstant: -2000,
-                    centralGravity: 0.3,
-                    springLength: 95,
+                    gravitationalConstant: -4000,
+                    centralGravity: 0.5,
+                    springLength: 150,
                     springConstant: 0.04,
                     damping: 0.09,
-                    avoidOverlap: 0.4
+                    avoidOverlap: 0.5
                 },
                 
                 solver: 'barnesHut',
@@ -264,12 +264,12 @@ function drawNeo4j() {
             physics: {
                 enabled: true,
                 barnesHut: {
-                    gravitationalConstant: -2000,
-                    centralGravity: 0.3,
-                    springLength: 95,
+                    gravitationalConstant: -4000,
+                    centralGravity: 0.5,
+                    springLength: 150,
                     springConstant: 0.04,
                     damping: 0.09,
-                    avoidOverlap: 0.4
+                    avoidOverlap: 0.5
                 },
                 
                 solver: 'barnesHut',
