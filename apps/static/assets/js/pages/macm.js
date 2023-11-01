@@ -190,9 +190,13 @@ function drawNeo4j() {
         containerId: "graph",
         serverDatabase: "macm",
         neo4j: {
-            serverUrl: "bolt://192.168.40.4:7787",
+            serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neo4j",
             serverPassword: "neo4j#1234",
+            driverConfig: {
+                encrypted: "ENCRYPTION_ON",
+                trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
+            },
         },
         visConfig: {
             nodes: {
@@ -249,9 +253,13 @@ function drawNeo4j() {
         containerId: "schema",
         serverDatabase: "macm",
         neo4j: {
-            serverUrl: "bolt://192.168.40.4:7787",
+            serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neo4j",
             serverPassword: "neo4j#1234",
+            driverConfig: {
+                encrypted: "ENCRYPTION_ON",
+                trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
+            },
         },
         visConfig: {
             nodes: {
