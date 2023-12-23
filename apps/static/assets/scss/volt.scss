@@ -20,7 +20,6 @@
 // update variables here
 @import "../node_modules/bootstrap/scss/functions";
 @import "volt/variables";
-@import "custom/variables";
 
 // Third party
 // @import '../node_modules/vanillajs-datepicker/sass/datepicker.scss';
@@ -28,8 +27,15 @@
 
 // Bootstrap
 @import "../node_modules/bootstrap/scss/variables";
+// @import "../node_modules/bootstrap/scss/variables-dark";
+
+@import "custom/variables";
+@import "custom/variables-dark";
+
 @import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/maps";
 @import "../node_modules/bootstrap/scss/utilities";
+
 
 // Modify utilities here
 @import "volt/utilities";
@@ -89,3 +95,4 @@
 
 // write your custom styles here!
 @import "custom/custom";
+@import "custom/custom-dark";

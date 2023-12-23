@@ -1,0 +1,10 @@
+$color-mode-type: data;
+
+@include color-mode(dark) {
+    .card {
+        background-color: $card-bg-dark !important;
+        color: $card-color-dark !important;
+    }
+
+    --bs-table-striped-color: red !important;
+}

@@ -38,4 +38,11 @@ function showAlert(response, type, icon){
 
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
+    $('#DarkMode').on('click', function() {
+        if ($('#DarkMode').hasClass('active')) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+    });
 });
