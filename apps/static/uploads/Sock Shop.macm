@@ -1,0 +1,134 @@
+	CREATE
+		(CSC:any {name:'CSC', type:'User', app_id:'101',application:'Sock Shop'}),
+		(CSP:CSP:service {component_id:'16', name:'Cloud Service Provider', type:'CSP', app_id:'101',application:'Sock Shop'}),
+
+		(FrontEnd:SaaS:service {component_id:'2', name:'FrontEnd', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Payment:SaaS:service {component_id:'3', name:'Payment', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Cart:SaaS:service {component_id:'4', name:'Cart', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+
+		(MongoDB1:SaaS:service {component_id:'5', name:'MongoDB1', type:'SERVICE.Storage', app_id:'101',application:'Sock Shop'}),
+		(MongoDB2:SaaS:service {component_id:'6', name:'MongoDB2', type:'SERVICE.Storage', app_id:'101',application:'Sock Shop'}),
+		(MongoDB3:SaaS:service {component_id:'7', name:'MongoDB3', type:'SERVICE.Storage', app_id:'101',application:'Sock Shop'}),
+		(MYSQL:SaaS:service {component_id:'8', name:'MySQL', type:'SERVICE.Storage', app_id:'101',application:'Sock Shop'}),
+		(UserManagement:SaaS:service {component_id:'9', name:'User Management', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Order:SaaS:service {component_id:'10', name:'Order', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Shipping:SaaS:service {component_id:'11', name:'Shipping', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Catalogue:SaaS:service {component_id:'12', name:'Catalogue', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(Queue:SaaS:service {component_id:'13', name:'Queue', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		(QueueMaster:SaaS:service {component_id:'14', name:'QueueMaster', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+			/*Kubernetes di che tipo è?  */
+		(Kubernetes:CaaS:service {component_id:'15', name:'Kubernetes', type:'SERVICE.Web', app_id:'101',application:'Sock Shop'}),
+		
+		(C1:PaaS:service {component_id:'17', name:'C1', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.11'}),
+		(C2:PaaS:service {component_id:'18', name:'C2', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C3:PaaS:service {component_id:'19', name:'C3', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C4:PaaS:service {component_id:'20', name:'C4', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Debian 8'}),
+		(C5:PaaS:service {component_id:'21', name:'C5', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Ubuntu 16.04 LTS'}),
+		(C6:PaaS:service {component_id:'22', name:'C6', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C7:PaaS:service {component_id:'23', name:'C7', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Debian 8'}),
+		(C8:PaaS:service {component_id:'24', name:'C8', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C9:PaaS:service {component_id:'25', name:'C9', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C10:PaaS:service {component_id:'26', name:'C10', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C11:PaaS:service {component_id:'27', name:'C11', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		(C12:PaaS:service {component_id:'28', name:'C12', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Debian 8'}),
+		(C13:PaaS:service {component_id:'29', name:'C13', type:'Container', app_id:'101',application:'Sock Shop', OperativeSystem:'Alpine Linux v3.4'}),
+		
+		(VM1:IaaS:service {component_id:'30', name:'VM1', type:'VM', app_id:'101',application:'Sock Shop', OperativeSystem:'Ubuntu 20.04'}),
+		(VM2:IaaS:service {component_id:'31', name:'VM2', type:'VM', app_id:'101',application:'Sock Shop', OperativeSystem:'Ubuntu 20.04'}),
+		(VM3:IaaS:service {component_id:'31', name:'VM3', type:'VM', app_id:'101',application:'Sock Shop', OperativeSystem:'Ubuntu 20.04'}),
+		
+		(Net1:Network:service {component_id:'32', name:'CSPnet1', type:'Network', app_id:'101',application:'Sock Shop', access:'public'}),
+		(Net2:Network:service {component_id:'33', name:'CSPnet2', type:'Network', app_id:'101',application:'Sock Shop', access:'private'}),
+		(Net3:Network:service {component_id:'32', name:'Knet', type:'Network', app_id:'101',application:'Sock Shop', access:'private'}),
+	
+
+		
+		(VM3)-[:hosts]->(CSC),
+
+
+		(CSC)-[:uses{protocol:'http'}]->(FrontEnd),
+
+		(UserManagement)-[:uses{protocol:'MongoDB Wire'}]->(MongoDB1),
+		(Cart)-[:uses{protocol:'MongoDB Wire'}]->(MongoDB2),
+		(Order)-[:uses{protocol:'MongoDB Wire'}]->(MongoDB3),
+		(Catalogue)-[:uses{protocol:'mysql'}]->(MYSQL),
+		(FrontEnd)-[:uses{protocol:'http'}]->(Catalogue),
+		(FrontEnd)-[:uses{protocol:'http'}]->(Cart),
+		(FrontEnd)-[:uses{protocol:'http'}]->(Order),
+		(FrontEnd)-[:uses{protocol:'http'}]->(UserManagement),
+		(Order)-[:uses{protocol:'http'}]->(UserManagement),
+		(Order)-[:uses{protocol:'http'}]->(Payment),
+		(Order)-[:uses{protocol:'http'}]->(Shipping),
+		(Shipping)-[:uses{protocol:'RabbitMQ'}]->(Queue),
+		(Queue)-[:uses{protocol:'RabbitMQ'}]->(QueueMaster),
+		
+
+		
+		(Kubernetes)-[:hosts]->(C1),
+		(Kubernetes)-[:hosts]->(C2),
+		(Kubernetes)-[:hosts]->(C3),
+		(Kubernetes)-[:hosts]->(C4),
+		(Kubernetes)-[:hosts]->(C5),
+		(Kubernetes)-[:hosts]->(C6),
+		(Kubernetes)-[:hosts]->(C7),
+		(Kubernetes)-[:hosts]->(C8),
+		(Kubernetes)-[:hosts]->(C9),
+		(Kubernetes)-[:hosts]->(C10),
+		(Kubernetes)-[:hosts]->(C11),
+		(Kubernetes)-[:hosts]->(C12),
+		(Kubernetes)-[:hosts]->(C13),
+		
+		
+		(C1)-[:hosts]->(FrontEnd),
+		(C2)-[:hosts]->(Payment),
+		(C3)-[:hosts]->(Cart),
+		(C4)-[:hosts]->(MongoDB1),
+		(C5)-[:hosts]->(MongoDB2),
+		(C6)-[:hosts]->(MongoDB3),
+		(C7)-[:hosts]->(MYSQL),
+		(C8)-[:hosts]->(UserManagement),
+		(C9)-[:hosts]->(Order),
+		(C10)-[:hosts]->(Shipping),
+		(C11)-[:hosts]->(Catalogue),
+		(C12)-[:hosts]->(Queue),
+		(C13)-[:hosts]->(QueueMaster),
+		
+		
+		(CSP)-[:provides]->(VM1),
+		(CSP)-[:provides]->(VM2),
+		
+		(VM1)-[:hosts]->(Kubernetes),
+		(VM2)-[:hosts]->(Kubernetes),
+		
+		(C1)- [:connects]->(Net1),
+		(CSC)- [:connects]->(Net1),
+		(VM1)- [:connects]->(Net1),
+		(VM2)- [:connects]->(Net1),
+		
+		(VM1)- [:connects]->(Net2),
+		(VM2)- [:connects]->(Net2),
+		
+		
+		
+		
+		(C1)- [:connects]->(Net3),
+		(C2)- [:connects]->(Net3),
+		(C3)- [:connects]->(Net3),
+		(C4)- [:connects]->(Net3),
+		(C5)- [:connects]->(Net3),
+		(C6)- [:connects]->(Net3),
+		(C7)- [:connects]->(Net3),
+		(C8)- [:connects]->(Net3),
+		(C9)- [:connects]->(Net3),
+		(C10)- [:connects]->(Net3),
+		(C11)- [:connects]->(Net3),
+		(C12)- [:connects]->(Net3),
+		(C13)- [:connects]->(Net3)
+		
+		
+		
+
+
+
+
+

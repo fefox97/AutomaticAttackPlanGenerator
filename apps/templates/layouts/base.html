@@ -62,11 +62,6 @@
     <link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
     <link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/notyf/notyf.min.css" rel="stylesheet">
 
-    <!-- Custom Volt SCSS -->
-    {% assets "css_all" %}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-
     <!-- Fontawesome -->
     <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 
@@ -88,6 +83,11 @@
     <!-- Code-Input -->
     <link href="{{ config.ASSETS_ROOT }}/custom_modules/code-input/code-input.min.css" rel="stylesheet" />
 
+    <!-- Custom Volt SCSS -->
+    {% assets "css_all" %}
+        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+    
     <!-- Specific Page JS goes HERE  -->    
     {% block stylesheets %}{% endblock stylesheets %}
 

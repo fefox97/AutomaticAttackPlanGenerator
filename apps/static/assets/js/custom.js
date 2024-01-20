@@ -36,13 +36,19 @@ function showAlert(response, type, icon){
     }, 5000)
 }
 
+function toggleDarkMode() {
+    if ($('#DarkMode').hasClass('active')) {
+        $('#DarkMode').removeClass('active');
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+    } else {
+        $('#DarkMode').addClass('active');
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
+}
+
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     $('#DarkMode').on('click', function() {
-        if ($('#DarkMode').hasClass('active')) {
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-bs-theme', 'light');
-        }
+        toggleDarkMode();
     });
 });

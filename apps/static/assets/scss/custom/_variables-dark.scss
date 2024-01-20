@@ -74,6 +74,11 @@ $form-invalid-color-dark:           $red-300 !default;
 $form-invalid-border-color-dark:    $red-300 !default;
 // scss-docs-end form-validation-colors-dark
 
+$form-control-bg-dark:                      $gray-800 !default;
+$form-control-color-dark:                   $gray-100 !default;
+$form-control-placeholder-color-dark:       $gray-500 !default;
+$form-control-border-color-dark:            $gray-600 !default;
+$form-control-focus-border-color-dark:      $secondary !default;
 
 //
 // Accordion
@@ -98,3 +103,20 @@ $card-bg-dark                 : $gray-700 !default;
 
 $table-color-dark             : $gray-100 !default;
 $table-bg-dark                : $gray-700 !default;
+
+// Footer
+
+$footer-color-dark            : $gray-100 !default;
+$footer-bg-dark               : $gray-700 !default;
+
+// Breadcrumb
+
+$breadcrumb-divider-color-dark  : $gray-400 !default;
+$breadcrumb-active-color-dark   : $gray-200 !default;
+
+// Dropdowns
+
+$dropdown-color-dark            : $gray-100 !default;
+$dropdown-bg-dark               : $gray-700 !default;
+$dropdown-border-color-dark     : $gray-500 !default;
+$dropdown-box-shadow-dark       : 0 .5rem 1rem rgba($black, .625) !default;

@@ -6,5 +6,85 @@ $color-mode-type: data;
         color: $card-color-dark !important;
     }
 
-    --bs-table-striped-color: red !important;
+    .table td, th{
+        background-color: $table-bg-dark !important;
+        color: $table-color-dark !important;
+    }
+
+    .form-control {
+        background-color: $form-control-bg-dark !important;
+        color: $form-control-color-dark !important;
+        .form-control-placeholder {
+            color: $form-control-placeholder-color-dark !important;
+        }
+        border-color: $form-control-border-color-dark !important;
+        &:focus {
+            
+            box-shadow: 0 0 0 0.2rem $form-control-focus-border-color-dark !important;
+        }
+    }
+
+    .input-group-text{
+        background-color: $form-control-bg-dark !important;
+        color: $form-control-color-dark !important;
+        border-color: $form-control-border-color-dark !important;
+    }
+
+    .list-group {
+        .list-group-item {
+            background-color: transparent !important;
+            color: $form-control-color-dark !important;
+            border-color: $form-control-border-color-dark !important;
+        }
+    }
+
+    .footer {
+        background-color: $footer-bg-dark !important;
+        color: $footer-color-dark !important;
+    }
+
+    .text-primary {
+        color: $white !important;
+    }
+
+    .breadcrumb {
+        background-color: transparent !important;
+        .breadcrumb-item {
+            &::before, a {
+                color: $breadcrumb-divider-color-dark !important;
+            }
+            &.active {
+                color: $breadcrumb-active-color-dark !important;
+            }
+        }
+    }
+
+    .dropdown-menu {
+        background-color: $dropdown-bg-dark !important;
+        color: $dropdown-color-dark !important;
+        border-color: $dropdown-border-color-dark !important;
+        box-shadow: $dropdown-box-shadow-dark !important;
+        .dropdown-item {
+            color: $dropdown-dark-link-color !important;
+            &:hover, &:focus {
+                color: $dropdown-dark-link-hover-color !important;
+                background-color: $dropdown-dark-link-hover-bg !important;
+            }
+            &.active, &:active {
+                color: $dropdown-dark-link-active-color !important;
+                background-color: $dropdown-dark-link-active-bg !important;
+            }
+            &.disabled, &:disabled {
+                color: $dropdown-dark-link-disabled-color !important;
+                background-color: transparent !important;
+            }
+        }
+        .dropdown-divider {
+            background-color: $dropdown-dark-divider-bg !important;
+        }
+    }
+
+    div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
+        background-color: red !important;
+    }
 }
