@@ -1,4 +1,5 @@
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
+const DarkModeButton = document.getElementById('DarkMode');
 
 function showModal(title, response, autohide = false){
     $("#modal-title").text(title);
@@ -36,19 +37,25 @@ function showAlert(response, type, icon){
     }, 5000)
 }
 
-function toggleDarkMode() {
-    if ($('#DarkMode').hasClass('active')) {
-        $('#DarkMode').removeClass('active');
-        document.documentElement.setAttribute('data-bs-theme', 'light');
-    } else {
-        $('#DarkMode').addClass('active');
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
-    }
+function turnOnDarkMode() {
+    localStorage.setItem('dark_mode', 'true');
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+    DarkModeButton.classList.add('active');
+}
+
+function turnOffDarkMode() {
+    console.log('turnOffDarkMode');
+    localStorage.setItem('dark_mode', 'false');
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+    DarkModeButton.classList.remove('active');
 }
 
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
+
+    localStorage.getItem('dark_mode') == 'true' ? turnOnDarkMode() : turnOffDarkMode();
+
     $('#DarkMode').on('click', function() {
-        toggleDarkMode();
+        localStorage.getItem('dark_mode') == 'true' ? turnOffDarkMode() : turnOnDarkMode();
     });
 });

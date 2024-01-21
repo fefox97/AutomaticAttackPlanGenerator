@@ -19761,6 +19761,10 @@ pre[class*=language-] {
 [data-bs-theme="dark"] .card {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
+  [data-bs-theme="dark"] .card.theme-settings {
+    background-color: #1F2937 !important; }
+    [data-bs-theme="dark"] .card.theme-settings .theme-settings-close {
+      filter: invert(0); }
 
 [data-bs-theme="dark"] .table td, [data-bs-theme="dark"] th {
   background-color: #374151 !important;
