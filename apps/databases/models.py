@@ -138,6 +138,7 @@ class ToolCatalogue(db.Model):
     CypherQuery = db.Column(db.Text)
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
+    Phase       = db.Column(db.Integer)
 
     hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
 
