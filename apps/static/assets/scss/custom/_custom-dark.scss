@@ -93,4 +93,8 @@ $color-mode-type: data;
     div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
         background-color: red !important;
     }
+
+    .modal-content {
+        background-color: $modal-bg-dark !important;
+    }
 }

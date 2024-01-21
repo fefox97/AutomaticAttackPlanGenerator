@@ -19824,3 +19824,6 @@ pre[class*=language-] {
 
 [data-bs-theme="dark"] div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
   background-color: red !important; }
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #374151 !important; }
