@@ -15,6 +15,13 @@ from .types import ExternalReferencesType
 
 from apps import db
 
+class PentestPhases(db.Model):
+
+    __tablename__ = 'PentestPhases'
+
+    PhaseID                = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    PhaseName              = db.Column(db.Text)
+
 class Capec(db.Model):
 
     __tablename__ = 'Capec'
@@ -138,7 +145,7 @@ class ToolCatalogue(db.Model):
     CypherQuery = db.Column(db.Text)
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
-    Phase       = db.Column(db.Integer)
+    Phase       = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID"))
 
     hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
 

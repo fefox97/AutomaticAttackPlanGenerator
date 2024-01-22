@@ -10,7 +10,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
+from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
 from apps.config import Config
 from sqlalchemy_schemadisplay import create_schema_graph
 from apps import db
@@ -91,6 +91,14 @@ class ToolCatalogUtils:
         df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
+        return df
+    
+    def load_pentest_phases(self):
+        print("\nLoading pentest phases...\n")
+        df = pd.read_excel(self.file_path, sheet_name="Pentest Phases", header=0)
+        df.replace(np.nan, None, inplace=True)
+        df['PhaseID'] = df['PhaseID'].apply(lambda x: int(x) if x is not None else None)
+        print(df)
         return df
 
 class MacmUtils:
@@ -189,7 +197,9 @@ class Utils:
             self.save_dataframe_to_database(relations, CapecThreatRel)
         elif database == 'ToolCatalog':
             tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
+            pentest_phases_df = self.tool_catalog_utils.load_pentest_phases()
             relations = self.load_capec_tool_relations(tool_catalog_df)
+            self.save_dataframe_to_database(pentest_phases_df, PentestPhases)
             self.save_dataframe_to_database(tool_catalog_df, ToolCatalogue)
             self.save_dataframe_to_database(relations, CapecToolRel)
         elif database == 'Macm':
