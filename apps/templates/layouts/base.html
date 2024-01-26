@@ -98,16 +98,19 @@
     {% include 'includes/sidebar.html' %}
     
     <main class="content">
+    
+        <!-- Settings Box + Dark Mode Script -->
+        {% include 'includes/settings-box.html' %}
+        <script src="{{ config.ASSETS_ROOT }}/js/dark-mode.js"></script>
 
-    {% include 'includes/navigation.html' %}
+        {% include 'includes/navigation.html' %}
 
-    {% include 'home/modals/error_modal.html' %}
+        {% include 'home/modals/error_modal.html' %}
 
-    {% block content %}{% endblock content %} 
+        {% block content %}{% endblock content %} 
 
-    {% include 'includes/settings-box.html' %}
 
-    {% include 'includes/footer.html' %}
+        {% include 'includes/footer.html' %}
 
     </main>
 

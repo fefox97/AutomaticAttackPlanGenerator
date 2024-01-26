@@ -97,4 +97,32 @@ $color-mode-type: data;
     .modal-content {
         background-color: $modal-bg-dark !important;
     }
+
+    .pagination {
+        .page-item {
+            &.active {
+                .page-link {
+                    background-color: $pagination-dark-active-bg !important;
+                    border-color: $pagination-dark-active-border !important;
+                }
+            }
+            &.disabled {
+                .page-link {
+                    color: $pagination-dark-disabled-color !important;
+                    background-color: $pagination-dark-disabled-bg !important;
+                    border-color: $pagination-dark-disabled-border !important;
+                }
+            }
+            .page-link {
+                color: $pagination-dark-link-color !important;
+                background-color: $pagination-dark-link-bg !important;
+                border-color: $pagination-dark-link-border !important;
+                &:hover, &:focus {
+                    color: $pagination-dark-link-hover-color !important;
+                    background-color: $pagination-dark-link-hover-bg !important;
+                    border-color: $pagination-dark-link-hover-border !important;
+                }
+            }
+        }
+    }
 }

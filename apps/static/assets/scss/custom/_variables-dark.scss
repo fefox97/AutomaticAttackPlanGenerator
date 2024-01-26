@@ -125,3 +125,20 @@ $dropdown-box-shadow-dark       : 0 .5rem 1rem rgba($black, .625) !default;
 
 $modal-color-dark               : $gray-100 !default;
 $modal-bg-dark                  : $gray-700 !default;
+
+// Pagination
+
+$pagination-color-dark          : $gray-100 !default;
+$pagination-bg-dark             : $gray-700 !default;
+$pagination-border-color-dark   : $gray-500 !default;
+$pagination-dark-active-bg    : $gray-500 !default;
+$pagination-dark-active-border  : $gray-500 !default;
+$pagination-dark-disabled-color : $gray-500 !default;
+$pagination-dark-disabled-border: $gray-500 !default;
+$pagination-dark-disabled-bg    : $gray-700 !default;
+$pagination-dark-link-color      : $gray-100 !default;
+$pagination-dark-link-bg        : $gray-700 !default;
+$pagination-dark-link-border     : $gray-500 !default;
+$pagination-dark-link-hover-color : $gray-100 !default;
+$pagination-dark-link-hover-bg   : $gray-500 !default;
+$pagination-dark-link-hover-border: $gray-500 !default;

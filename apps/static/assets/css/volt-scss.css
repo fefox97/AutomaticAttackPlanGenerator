@@ -19827,3 +19827,21 @@ pre[class*=language-] {
 
 [data-bs-theme="dark"] .modal-content {
   background-color: #374151 !important; }
+
+[data-bs-theme="dark"] .pagination .page-item.active .page-link {
+  background-color: #6B7280 !important;
+  border-color: #6B7280 !important; }
+
+[data-bs-theme="dark"] .pagination .page-item.disabled .page-link {
+  color: #6B7280 !important;
+  background-color: #374151 !important;
+  border-color: #6B7280 !important; }
+
+[data-bs-theme="dark"] .pagination .page-item .page-link {
+  color: #F2F4F6 !important;
+  background-color: #374151 !important;
+  border-color: #6B7280 !important; }
+  [data-bs-theme="dark"] .pagination .page-item .page-link:hover, [data-bs-theme="dark"] .pagination .page-item .page-link:focus {
+    color: #F2F4F6 !important;
+    background-color: #6B7280 !important;
+    border-color: #6B7280 !important; }
