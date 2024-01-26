@@ -8,7 +8,7 @@ function showModal(title, response, autohide = false){
         messages = response;
     } else {
         for (let key in response) {
-            messages += response[key] + "\n";
+            messages += key + ": " + response[key] + "\n";
         }
     }
     $("#modal-body-text").text(messages);
