@@ -8,12 +8,13 @@ from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ForeignKey, select, orm, func, and_
+from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
 
 from apps import db
+from sqlalchemy import UniqueConstraint
 
 class PentestPhases(db.Model):
 
@@ -191,13 +192,13 @@ class Macm(db.Model):
 
     __tablename__ = 'Macm'
 
-    Component_ID    = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Component_ID    = db.Column(db.Integer, primary_key=True, nullable=False)
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
-    App_ID          = db.Column(db.Integer)
+    App_ID          = db.Column(db.Text, primary_key=True, nullable=False)
     Parameters      = db.Column(db.JSON)
-    
+
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
             if hasattr(value, '__iter__') and not isinstance(value, str):
@@ -208,13 +209,34 @@ class Macm(db.Model):
     def __repr__(self):
         return str(self.Name)
     
+
+class MacmUser(db.Model):
+
+    __tablename__ = 'MacmUser'
+
+    UserID         = db.Column(db.Integer, ForeignKey("Users.id"), primary_key=True, nullable=False)
+    AppID          = db.Column(db.Text, ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
+    AppName        = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.UserID)
+    
 class ToolAssetTypeRel(db.Model):
 
     __tablename__ = 'ToolAssetTypeRel'
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
-    ComponentID    = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
+    ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
+    AppID        = db.Column(db.Integer, ForeignKey("Macm.App_ID"))
+    __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -254,7 +276,7 @@ class AttackView(db.Model):
                 .join(Capec)
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
-                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID))
+                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetTypeRel.AppID))
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True

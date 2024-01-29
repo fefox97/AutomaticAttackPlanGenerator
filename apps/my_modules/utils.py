@@ -5,12 +5,16 @@ import pandas as pd
 import numpy as np
 from neo4j import Result
 import re
+import uuid
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel
+from apps.databases.models import ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel, MacmUser
+from flask_login import (
+    current_user
+)
 from apps.config import Config
 from sqlalchemy_schemadisplay import create_schema_graph
 from apps import db
@@ -113,6 +117,12 @@ class MacmUtils:
     def clear_database(self, database):
         self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
 
+    def create_database(self, database):
+        self.driver.execute_query(f"CREATE DATABASE `{database}`")
+    
+    def delete_database(self, database):
+        self.driver.execute_query(f"DROP DATABASE `{database}`")
+
     def read_macm(self, database='macm'):
         macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters", database_=database, result_transformer_=Result.to_df)
         macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters'}, inplace=True)
@@ -120,7 +130,11 @@ class MacmUtils:
         return macm_df
 
     def upload_macm(self, query, database='macm'):
-        self.clear_database(database)
+        try:
+            self.clear_database(database)
+        except:
+            print(f"Database {database} does not exist: creating it...")
+            self.create_database(database)
         self.driver.execute_query(query, database_=database)
 
     def tool_asset_type_rel(self, database='macm'):
@@ -128,7 +142,7 @@ class MacmUtils:
         tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID'])
         for query in queries:
             if query.CypherQuery is not None:
-                component_id = [element['component_id'] for element in self.driver.execute_query(query.CypherQuery, database_='macm').records]
+                component_id = [element['component_id'] for element in self.driver.execute_query(query.CypherQuery, database_=database).records]
                 tool_asset_type_df = pd.concat([tool_asset_type_df, pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component_id})], ignore_index=True)
         tool_asset_type_df.drop_duplicates(inplace=True)
         return tool_asset_type_df
@@ -178,7 +192,7 @@ class Utils:
         relations_df.index.name = 'Id'
         return relations_df
 
-    def upload_databases(self, database):
+    def upload_databases(self, database, neo4j_db='macm'):
         if database == 'Capec':
             attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
             self.save_dataframe_to_database(attack_pattern_df, Capec)
@@ -193,10 +207,18 @@ class Utils:
             self.save_dataframe_to_database(tool_catalog_df, ToolCatalogue)
             self.save_dataframe_to_database(relations, CapecToolRel)
         elif database == 'Macm':
-            macm_df = self.macm_utils.read_macm()
-            tool_asset_type_df = self.macm_utils.tool_asset_type_rel()
-            self.save_dataframe_to_database(macm_df, Macm)
-            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetTypeRel)
+            macm_df = self.macm_utils.read_macm(database=neo4j_db)
+            tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
+            app_name = macm_df['Application'].iloc[0]
+            macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'AppName': app_name}, index=[0])
+            
+            macm_df['App_ID'] = neo4j_db
+            tool_asset_type_df['AppID'] = neo4j_db
+            
+            self.save_dataframe_to_database(macm_df, Macm, replace=False)
+            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetTypeRel, replace=False)
+            self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
+
             AttackView.metadata.create_all(self.engine)
 
     # def test_function(self):
@@ -224,24 +246,31 @@ class Utils:
     #     response = {'message': 'ER diagram generated successfully'}
     #     return response
 
-    def test_function(self):
-        row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
-        query = select(
-                    ToolCatalogue.ToolID.label("Tool_ID"), 
-                    ToolCatalogue.Name.label("Tool_Name"), 
-                    ToolCatalogue.Command, ToolCatalogue.Description, 
-                    Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
-                    Capec.Execution_Flow, 
-                    Capec.Description.label("Capec_Description"), 
-                    ThreatCatalogue.TID.label("Threat_ID"), 
-                    ThreatCatalogue.Asset.label("Asset_Type"), 
-                    ThreatCatalogue.Threat, 
-                    ThreatCatalogue.Description.label("Threat_Description"), 
-                    Macm.Component_ID, 
-                    Macm.Name.label("Asset"), 
-                    Macm.Parameters
-                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID)).add_columns(row_number_column)
-        compiled = query.compile(compile_kwargs={"literal_binds": True})
-        response = {'query': str(compiled)}
+    # def test_function(self):
+    #     row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    #     query = select(
+    #                 ToolCatalogue.ToolID.label("Tool_ID"), 
+    #                 ToolCatalogue.Name.label("Tool_Name"), 
+    #                 ToolCatalogue.Command, ToolCatalogue.Description, 
+    #                 Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
+    #                 Capec.Execution_Flow, 
+    #                 Capec.Description.label("Capec_Description"), 
+    #                 ThreatCatalogue.TID.label("Threat_ID"), 
+    #                 ThreatCatalogue.Asset.label("Asset_Type"), 
+    #                 ThreatCatalogue.Threat, 
+    #                 ThreatCatalogue.Description.label("Threat_Description"), 
+    #                 Macm.Component_ID, 
+    #                 Macm.Name.label("Asset"), 
+    #                 Macm.Parameters
+    #             ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID)).add_columns(row_number_column)
+    #     compiled = query.compile(compile_kwargs={"literal_binds": True})
+    #     response = {'query': str(compiled)}
         
+    #     return response
+            
+
+    def test_function(self):
+        response = {}
+        output = current_user.id
+        response['output'] = str(output)
         return response

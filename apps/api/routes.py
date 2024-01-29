@@ -14,6 +14,7 @@ from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.databases.models import AttackView, Macm
 from apps import db
+import hashlib
 
 @blueprint.route('/<api>', methods=['GET', 'POST'])
 @login_required
@@ -54,8 +55,9 @@ def route_api(api):
                 else:
                     return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
                 try:
-                    macm.upload_macm(query_str)
-                    utils.upload_databases('Macm')
+                    macm_db = f'db.{hashlib.sha1(query_str.encode("utf-8")).hexdigest()}'
+                    macm.upload_macm(query_str, database=macm_db)
+                    utils.upload_databases('Macm', neo4j_db=macm_db)
                     return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
                 except Exception as error:
                     return make_response(jsonify({'message': error.args}), 400)
