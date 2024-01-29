@@ -87,7 +87,8 @@ $(window).on('load', function() {
                 width: '120px',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'type') {
-                        return parseInt(data);
+                        let id = data.match(/(<a.*>\s*)(\d*)(\s)/)[2];
+                        return parseInt(id);
                     }
                     return data;
                 }
