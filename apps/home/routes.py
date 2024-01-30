@@ -8,7 +8,7 @@ from flask import redirect, render_template, request, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, ThreatCatalogue, Macm, ToolCatalogue
+from apps.databases.models import AttackView, Capec, MacmUser, ThreatCatalogue, Macm, ToolCatalogue
 from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
@@ -73,9 +73,17 @@ def route_template(template):
                 table = None
             return render_template(f"home/{template}", segment=segment, table=table)
 
+        elif template == 'penetration-tests.html':
+            try:
+                pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
+            except:
+                pentests = None
+            return render_template(f"home/{template}", segment=segment, pentests=pentests)
+
         elif template == 'macm.html':
             try:
-                table = Macm.query.all()
+                selected_macm = request.args.get('app-id')
+                table = Macm.query.filter_by(App_ID=selected_macm).all()
                 if len(table) == 0:
                     table = None
             except:

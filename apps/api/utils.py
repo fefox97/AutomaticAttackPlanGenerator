@@ -1,7 +1,9 @@
 from apps import db
-from apps.databases.models import Capec
+from apps.databases.models import Capec, MacmUser, Macm, ToolAssetTypeRel
 from flask import current_app as app
 from sqlalchemy import or_, and_
+
+from apps.my_modules.utils import MacmUtils
 
 class AttackPatternAPIUtils:
 
@@ -46,3 +48,15 @@ class APIUtils:
 
     def allowed_file(self, filename, allowed_extensions):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+    
+    def delete_macm(app_id):
+        try:
+            Macm.query.filter_by(App_ID=app_id).delete()
+            MacmUser.query.filter_by(AppID=app_id).delete()
+            ToolAssetTypeRel.query.filter_by(AppID=app_id).delete()
+            MacmUtils().delete_database(app_id)
+            db.session.commit()
+            return True
+        except:
+            app.logger.error(f"Error deleting MACM {app_id}", exc_info=True)
+            return False

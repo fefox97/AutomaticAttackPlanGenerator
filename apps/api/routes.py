@@ -55,7 +55,7 @@ def route_api(api):
                 else:
                     return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
                 try:
-                    macm_db = f'db.{hashlib.sha1(query_str.encode("utf-8")).hexdigest()}'
+                    macm_db = f'db.{current_user.id}.{hashlib.sha1(query_str.encode("utf-8")).hexdigest()}'
                     macm.upload_macm(query_str, database=macm_db)
                     utils.upload_databases('Macm', neo4j_db=macm_db)
                     return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
@@ -73,13 +73,12 @@ def route_api(api):
             elif api == 'test':
                 response = utils.test_function()
                 return make_response(jsonify(response), 200)
-        
-        elif request.method == 'GET':
-            if api == 'clear_macm_database':
-                macm.clear_database('macm')
-                db.session.query(Macm).delete()
-                db.session.commit()
-                return redirect(url_for('home_blueprint.route_template', template='macm.html'))
+    
+            elif api == 'clear_macm':
+                selected_macm = request.form.get('app-id')
+                app.logger.info(f"Deleting MACM {selected_macm}")
+                APIUtils.delete_macm(selected_macm)
+                return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
 
     except Exception as e:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
