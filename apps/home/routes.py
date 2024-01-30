@@ -16,7 +16,7 @@ from apps.my_modules import converter
 @blueprint.route('/index')
 @login_required
 def index():
-    return redirect(url_for('home_blueprint.route_template', template='macm.html'))
+    return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
 
 @blueprint.route('/<template>', methods=['GET'])
 @login_required
@@ -76,6 +76,8 @@ def route_template(template):
         elif template == 'penetration-tests.html':
             try:
                 pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
+                if len(pentests) == 0:
+                    pentests = None
             except:
                 pentests = None
             return render_template(f"home/{template}", segment=segment, pentests=pentests)
