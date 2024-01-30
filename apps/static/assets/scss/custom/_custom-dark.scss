@@ -125,4 +125,13 @@ $color-mode-type: data;
             }
         }
     }
+
+    .alert {
+        a {
+            color: $alert-dark-link-color !important;
+            &:hover, &:focus {
+                color: $alert-dark-link-hover-color !important;
+            }
+        }
+    }
 }

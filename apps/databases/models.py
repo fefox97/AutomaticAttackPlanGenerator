@@ -268,7 +268,8 @@ class AttackView(db.Model):
                     ThreatCatalogue.Description.label("Threat_Description"), 
                     Macm.Component_ID, 
                     Macm.Name.label("Asset"), 
-                    Macm.Parameters
+                    Macm.Parameters,
+                    Macm.App_ID.label("AppID"),
                 )
                 .select_from(Macm)
                 .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)

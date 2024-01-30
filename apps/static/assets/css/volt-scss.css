@@ -19845,3 +19845,8 @@ pre[class*=language-] {
     color: #F2F4F6 !important;
     background-color: #6B7280 !important;
     border-color: #6B7280 !important; }
+
+[data-bs-theme="dark"] .alert a {
+  color: #E5E7EB !important; }
+  [data-bs-theme="dark"] .alert a:hover, [data-bs-theme="dark"] .alert a:focus {
+    color: #D1D5DB !important; }

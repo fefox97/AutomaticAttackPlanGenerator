@@ -15,6 +15,7 @@
                             <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         </a>
                     </li>
+                    <li class="breadcrumb-item"><a href="/penetration-tests">Penetration Tests</a></li>
                     <li class="breadcrumb-item active" aria-current="page">MACM</li>
                 </ol>
             </nav>
@@ -100,7 +101,7 @@
                 {% else %}
                     <div class="alert alert-warning" role="alert">
                         <h4 class="alert-heading">No MACM Data</h4>
-                        <p>No data available, please upload a MACM</p>
+                        <p>No data available, please select or upload a MACM in the <a class="warning" href="/penetration-tests">dedicated page</a>.</p>
                     </div>
                 {% endif %}
             </div>
@@ -140,12 +141,14 @@
             </div>
         </div>
         {% endif %}
-        
     </div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+    <script type="text/javascript">
+        var app_id = "{{table[0].App_ID if table is not none | tojson }}";
+    </script>
     <script type="module" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
 {% endblock javascripts %}

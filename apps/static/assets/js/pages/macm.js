@@ -7,7 +7,7 @@ var activeTab;
 $(window).on('load', function() {
 
     // Draw Neo4j with NeoVis
-    drawNeo4j();
+    drawNeo4j(app_id);
 
     neoVizGraph.registerOnEvent("completed", () => {
         $("#saveImage").prop("disabled", false);
@@ -166,10 +166,10 @@ $(window).on('load', function() {
     
 });
 
-function drawNeo4j() {
+function drawNeo4j(database) {
     const configGraph = {
         containerId: "graph",
-        serverDatabase: "macm",
+        serverDatabase: database,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neo4j",
@@ -232,7 +232,7 @@ function drawNeo4j() {
 
     const configSchema = {
         containerId: "schema",
-        serverDatabase: "macm",
+        serverDatabase: database,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neo4j",

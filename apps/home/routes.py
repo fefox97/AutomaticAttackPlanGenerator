@@ -91,9 +91,9 @@ def route_template(template):
             except:
                 table = None
             try:
-                attack_for_each_component = AttackView.query.with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
+                attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
                 attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
-                attack_number = AttackView.query.count()
+                attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
             except:
                 app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
                 attack_for_each_component = None
