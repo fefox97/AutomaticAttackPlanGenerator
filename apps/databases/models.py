@@ -285,3 +285,64 @@ class AttackView(db.Model):
     
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Capec_ID}')
+
+class ThreatAgentReply(db.Model):
+
+    __tablename__ = 'ThreatAgentReply'
+
+    Id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    attribute = db.Column(db.Text)
+    attribute_value = db.Column(db.Text)
+    description = db.Column(db.Text,nullable=True)
+    score = db.Column(db.Integer)
+
+class ThreatAgentAttribute(db.Model):
+
+    __tablename__ = 'ThreatAgentAttribute'
+
+    Id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    attribute = db.Column(db.Text)
+    attribute_value = db.Column(db.Text)
+    description = db.Column(db.Text,nullable=True)
+    score = db.Column(db.Integer)
+
+
+
+class ThreatAgentCategory(db.Model):
+
+    __tablename__ = 'ThreatAgentCategory'
+
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Category       = db.Column(db.Text)
+    Description       = db.Column(db.Text)
+    CommonAction       = db.Column(db.Text)
+    #Replies       = db.Column(db.Text)
+    hasReply = db.relationship('Reply', secondary='CategoryThreatRel', backref='hasCategory', lazy='dynamic')
+
+    @hybrid_property
+    def hasReply(self):
+        ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
+        return [id[0] for id in ids]
+    Attributes       = db.Column(db.Text)
+
+    @hybrid_property
+    def hasAttribute(self):
+        ids = self.hasAttribute.filter().with_entities(ThreatAgentAttribute.Id).all()
+        return [id[0] for id in ids]
+
+
+class ThreatAgentQuestion(db.Model):
+
+    __tablename__ = 'ThreatAgentQuestion'
+
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Question       = db.Column(db.Text)
+    Qid       = db.Column(db.Text)
+    #Replies       = db.Column(db.Text)
+    hasReply = db.relationship('Reply', secondary='CategoryThreatRel', backref='hasCategory', lazy='dynamic')
+
+    @hybrid_property
+    def hasReply(self):
+        ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
+        return [id[0] for id in ids]
+    Attributes       = db.Column(db.Text)
