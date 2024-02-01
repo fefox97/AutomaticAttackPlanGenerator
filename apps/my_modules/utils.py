@@ -274,3 +274,42 @@ class Utils:
         output = current_user.id
         response['output'] = str(output)
         return response
+
+class ThreatAgentUtils():
+    converter = Converter()
+
+    def __init__(self):
+        self.base_path = Config.DBS_PATH
+        self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+        # self.threat_catalog_df = self.load_threat_catalog()
+
+    def load_threat_agent_category_df(self):
+        print("\nLoading threat agents info...\n")
+        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentCategory", header=0)
+        #df.replace(np.nan, None, inplace=True) # replace NaN with None
+        df = df.astype('str')
+        columns_to_convert = ['Reply', 'Attribute']
+        for column in columns_to_convert:
+            df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
+        return df
+
+    def load_threat_agent_questions(self):
+        print("\nLoading threat questions info...\n")
+        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentQuestions", header=0)
+        df = df.astype('str')
+        columns_to_convert = ['Replies']
+        for column in columns_to_convert:
+            df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
+        return df
+
+    def load_threat_agent_replies(self):
+        print("\nLoading threat replies info...\n")
+        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReply", header=0)
+        df = df.astype('str')
+        return df
+
+    def load_threat_agent_attributes(self):
+        print("\nLoading threat agent attributes info...\n")
+        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentAttribute", header=0)
+        df = df.astype('str')
+        return df
