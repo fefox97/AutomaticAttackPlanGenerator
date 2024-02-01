@@ -126,12 +126,43 @@ $color-mode-type: data;
         }
     }
 
-    .alert {
-        a {
-            color: $alert-dark-link-color !important;
+    a {
+        color: $alert-dark-link-color !important;
+        &:hover, &:focus {
+            color: $alert-dark-link-hover-color !important;
+        }
+        &.btn-secondary {
+            color: var(--bs-btn-active-color) !important;
             &:hover, &:focus {
-                color: $alert-dark-link-hover-color !important;
+                color: var(--bs-btn-active-color) !important;
             }
         }
     }
+
+    .accordion-item{
+        .accordion-button {
+            background-color: $accordion-button-bg-dark !important;
+            color: $accordion-button-color-dark !important;
+            &:hover, &:focus {
+                background-color: $accordion-button-hover-bg-dark !important;
+                color: $accordion-button-hover-color-dark !important;
+            }
+            &.collapsed {
+                background-color: $accordion-button-collapsed-bg-dark !important;
+                color: $accordion-button-collapsed-color-dark !important;
+                &:hover, &:focus {
+                    background-color: $accordion-button-collapsed-hover-bg-dark !important;
+                    color: $accordion-button-collapsed-hover-color-dark !important;
+                }
+            }
+        }
+        .accordion-body {
+            color: $accordion-body-color-dark !important;
+        }
+    }
+
+    .btn-outline-tertiary {
+        @include button-outline-variant($tertiary-dark);
+    }
+
 }

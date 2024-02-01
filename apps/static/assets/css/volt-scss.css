@@ -19846,7 +19846,43 @@ pre[class*=language-] {
     background-color: #6B7280 !important;
     border-color: #6B7280 !important; }
 
-[data-bs-theme="dark"] .alert a {
+[data-bs-theme="dark"] a {
   color: #E5E7EB !important; }
-  [data-bs-theme="dark"] .alert a:hover, [data-bs-theme="dark"] .alert a:focus {
+  [data-bs-theme="dark"] a:hover, [data-bs-theme="dark"] a:focus {
     color: #D1D5DB !important; }
+  [data-bs-theme="dark"] a.btn-secondary {
+    color: var(--bs-btn-active-color) !important; }
+    [data-bs-theme="dark"] a.btn-secondary:hover, [data-bs-theme="dark"] a.btn-secondary:focus {
+      color: var(--bs-btn-active-color) !important; }
+
+[data-bs-theme="dark"] .accordion-item .accordion-button {
+  background-color: #374151 !important;
+  color: #F2F4F6 !important; }
+  [data-bs-theme="dark"] .accordion-item .accordion-button:hover, [data-bs-theme="dark"] .accordion-item .accordion-button:focus {
+    background-color: #4B5563 !important;
+    color: #F2F4F6 !important; }
+  [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed {
+    background-color: #4B5563 !important;
+    color: #F2F4F6 !important; }
+    [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed:hover, [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed:focus {
+      background-color: #4B5563 !important;
+      color: #F2F4F6 !important; }
+
+[data-bs-theme="dark"] .accordion-item .accordion-body {
+  color: #F2F4F6 !important; }
+
+[data-bs-theme="dark"] .btn-outline-tertiary {
+  --bs-btn-color: #6e6ede;
+  --bs-btn-border-color: #6e6ede;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #6e6ede;
+  --bs-btn-hover-border-color: #6e6ede;
+  --bs-btn-focus-shadow-rgb: 110, 110, 222;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #6e6ede;
+  --bs-btn-active-border-color: #6e6ede;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(17, 24, 39, 0.125);
+  --bs-btn-disabled-color: #6e6ede;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #6e6ede;
+  --bs-gradient: none; }
