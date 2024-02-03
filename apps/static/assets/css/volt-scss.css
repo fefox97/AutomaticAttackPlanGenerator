@@ -19758,6 +19758,9 @@ pre[class*=language-] {
 .material-symbols-outlined {
   vertical-align: middle; }
 
+.footer {
+  background-color: #ffffff !important; }
+
 [data-bs-theme="dark"] .card {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
