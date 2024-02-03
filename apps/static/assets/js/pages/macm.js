@@ -172,8 +172,8 @@ function drawNeo4j(database) {
         serverDatabase: database,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
-            serverUser: "neo4j",
-            serverPassword: "neo4j#1234",
+            serverUser: "neovis",
+            serverPassword: "neovis#123",
             driverConfig: {
                 encrypted: "ENCRYPTION_ON",
                 trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
@@ -235,8 +235,8 @@ function drawNeo4j(database) {
         serverDatabase: database,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
-            serverUser: "neo4j",
-            serverPassword: "neo4j#1234",
+            serverUser: "neovis",
+            serverPassword: "neovis#123",
             driverConfig: {
                 encrypted: "ENCRYPTION_ON",
                 trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
