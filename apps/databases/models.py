@@ -22,21 +22,18 @@ class PentestPhases(db.Model):
 
     PhaseID                = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     PhaseName              = db.Column(db.Text)
+    IsSubPhaseOf           = db.Column(db.Integer)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
-            # depending on whether value is an iterable or not, we must
-            # unpack it's value (when **kwargs is request.form, some values
-            # will be a 1-element list)
             if hasattr(value, '__iter__') and not isinstance(value, str):
-                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
                 value = value[0]
 
             setattr(self, property, value)
 
     def __repr__(self):
         return str(self.PhaseID)
-    
+
 class Capec(db.Model):
 
     __tablename__ = 'Capec'
@@ -67,16 +64,12 @@ class Capec(db.Model):
     Status                  = db.Column(db.Text)
     Typical_Severity        = db.Column(db.Text)
     Version                 = db.Column(db.Text)
-    Capec_Children_ID         = db.Column(db.JSON)
+    Capec_Children_ID       = db.Column(db.JSON)
     Capec_Parents_ID        = db.Column(db.JSON)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
-            # depending on whether value is an iterable or not, we must
-            # unpack it's value (when **kwargs is request.form, some values
-            # will be a 1-element list)
             if hasattr(value, '__iter__') and not isinstance(value, str):
-                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
                 value = value[0]
 
             setattr(self, property, value)
