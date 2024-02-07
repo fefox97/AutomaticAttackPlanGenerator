@@ -242,7 +242,8 @@ class ToolAssetTypeRel(db.Model):
         return str(f'{self.ToolID}-{self.AssetType}')
 
 class AttackView(db.Model):
-    row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Attack_Number')
     
     __table__ = create_view(
                 "AttackView",
