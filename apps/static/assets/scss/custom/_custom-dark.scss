@@ -165,4 +165,14 @@ $color-mode-type: data;
         @include button-outline-variant($tertiary-dark);
     }
 
+    .form-floating {
+        > .form-control:not(:placeholder-shown) {
+            ~ label {
+                &::after {
+                    background-color: transparent !important;
+                }
+            }
+        }
+    }
+
 }

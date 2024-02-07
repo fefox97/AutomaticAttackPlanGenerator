@@ -19889,3 +19889,6 @@ pre[class*=language-] {
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #6e6ede;
   --bs-gradient: none; }
+
+[data-bs-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label::after {
+  background-color: transparent !important; }
