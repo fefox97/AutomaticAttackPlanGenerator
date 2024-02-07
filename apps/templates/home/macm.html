@@ -59,7 +59,7 @@
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/macm-detail?id={{ row['Component_ID'] }}">
+                                                    <a class="badge bg-macm position-relative" href="/macm-detail?app-id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if attack_for_this_component %}
                                                             <span class="position-absolute fs-8 top-0 start-100 translate-middle badge rounded-pill bg-danger">

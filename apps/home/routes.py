@@ -101,9 +101,10 @@ def route_template(template):
             return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number)
         
         elif template == 'macm-detail.html':
+            selected_macm = request.args.get('app-id')
             selected_id = request.args.get('id')
-            macm_data = Macm.query.filter_by(Component_ID=selected_id).first()
-            attack_data = AttackView.query.filter_by(Component_ID=selected_id).all()
+            macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
+            attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
             return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data)
 
         # Serve the file (if exists) from app/templates/home/FILE.html

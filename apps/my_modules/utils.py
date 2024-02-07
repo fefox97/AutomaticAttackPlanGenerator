@@ -281,8 +281,8 @@ class Utils:
 
     def test_function(self):
         response = {}
-        output = current_user.id
-        response['output'] = str(output)
+        attack_data = AttackView.query.filter_by(Component_ID=1).all()
+        response['output'] = str(attack_data)
         return response
 
 class ThreatAgentUtils():
