@@ -16,7 +16,8 @@
                             <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item"><a href="/macm">MACM</a></li>
+                    <li class="breadcrumb-item"><a href="/penetration-tests">Penetration Tests</a></li>
+                    <li class="breadcrumb-item"><a href="/macm?app-id={{ macm_data.App_ID }}">MACM</a></li>
                     <li class="breadcrumb-item active" aria-current="page">MACM-{{ macm_data.Component_ID }}</li>
                 </ol>
             </nav>
@@ -35,25 +36,44 @@
             <button type="button" class="btn btn-outline-tertiary" data-bs-toggle="button" id="ExpandToggle" aria-pressed="false">Expand All</button>
         </div>
 
-            <!-- Accordion start -->
+        {% if attack_data|length > 0 %}
             <div class="row">
-                <div class="col">
-                    <div class="accordion" id="accordionOne">
-                        {% if attack_data|length > 0 %}
-                            {% for attack in attack_data %}
-                                {% include 'home/macm-detail/attack.html' %}
+                <div class="col-2">
+                    <nav id="navbar-phases" class="h-100 flex-column align-items-stretch pe-4 border-end">
+                        <nav class="nav nav-pills flex-column">
+                            {% for pentest_phase in av_pentest_phases %}
+                                <a class="nav-link" href="#Phase{{ pentest_phase.PhaseID }}">{{ pentest_phase.PhaseName }}</a>
                             {% endfor %}
-                        {% else %}
-                            <div class="alert alert-info" role="alert">
-                                <h4 class="alert-heading">No Attack Data</h4>
-                                <p>There is no attack data for this MACM component.</p>
+                        </nav>
+                    </nav>
+                </div>
+            
+                <div class="col-10">
+                    <div data-bs-spy="scroll" data-bs-target="#navbar-phases" data-bs-smooth-scroll="true" tabindex="0" class="scrollspy-container">
+                        {% for phaseID, attacks in attack_data | groupby('PhaseID') %}
+                            <div id="Phase{{ pentest_phases[phaseID-1].PhaseID }}">
+                                <h4>{{ pentest_phases[phaseID-1].PhaseName }}</h4>
+                                {% for attack in attacks %}
+                                    <div class="accordion" id="accordionOne">
+                                        {% include 'home/macm-detail/attack.html' %}
+                                    </div>
+                                {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-            <!-- Accordion end -->
-            {% include 'home/macm-detail/all_commands.html' %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">No Attack Data</h4>
+                <p>There is no attack data for this MACM component.</p>
+            </div>
+        {% endif %}
+
+
+
+
+        {% include 'home/macm-detail/all_commands.html' %}
         </div>
     </div>
 

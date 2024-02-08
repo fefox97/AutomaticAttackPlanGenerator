@@ -161,3 +161,8 @@ pre[class*=language-]{
 .footer {
     background-color: $white !important;
 }
+
+.scrollspy-container{
+    height: 550px;
+    overflow: auto;
+}

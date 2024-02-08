@@ -19761,6 +19761,10 @@ pre[class*=language-] {
 .footer {
   background-color: #ffffff !important; }
 
+.scrollspy-container {
+  height: 550px;
+  overflow: auto; }
+
 [data-bs-theme="dark"] .card {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
