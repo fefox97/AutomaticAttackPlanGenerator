@@ -281,7 +281,7 @@ class Utils:
 
     def test_function(self):
         response = {}
-        attack_data = AttackView.query.filter_by(Component_ID=1).all()
+        attack_data = AttackView.query.filter_by(Component_ID=2).group_by(AttackView.PhaseID).with_entities(AttackView.PhaseID, func.count(AttackView.PhaseID)).all()
         response['output'] = str(attack_data)
         return response
 

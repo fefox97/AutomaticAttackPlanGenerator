@@ -264,6 +264,8 @@ class AttackView(db.Model):
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
                     Macm.App_ID.label("AppID"),
+                    PentestPhases.PhaseID.label("PhaseID"),
+                    PentestPhases.PhaseName.label("PhaseName")
                 )
                 .select_from(Macm)
                 .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
@@ -272,6 +274,7 @@ class AttackView(db.Model):
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
                 .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetTypeRel.AppID))
+                .join(PentestPhases, ToolCatalogue.PhaseID==PentestPhases.PhaseID)
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True
