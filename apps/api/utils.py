@@ -1,5 +1,5 @@
 from apps import db
-from apps.databases.models import Capec, MacmUser, Macm, ToolAssetTypeRel
+from apps.databases.models import Capec, MacmUser, Macm, ToolAssetRel
 from flask import current_app as app
 from sqlalchemy import or_, and_
 
@@ -53,7 +53,7 @@ class APIUtils:
         try:
             Macm.query.filter_by(App_ID=app_id).delete()
             MacmUser.query.filter_by(AppID=app_id).delete()
-            ToolAssetTypeRel.query.filter_by(AppID=app_id).delete()
+            ToolAssetRel.query.filter_by(AppID=app_id).delete()
             MacmUtils().delete_database(app_id)
             db.session.commit()
             return True

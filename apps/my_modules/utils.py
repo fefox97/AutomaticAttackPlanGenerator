@@ -11,7 +11,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetTypeRel, MacmUser
+from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser
 from flask_login import (
     current_user
 )
@@ -226,7 +226,7 @@ class Utils:
             tool_asset_type_df['AppID'] = neo4j_db
             
             self.save_dataframe_to_database(macm_df, Macm, replace=False)
-            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetTypeRel, replace=False)
+            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetRel, replace=False)
             self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
 
             AttackView.metadata.create_all(self.engine)
@@ -256,34 +256,39 @@ class Utils:
     #     response = {'message': 'ER diagram generated successfully'}
     #     return response
 
-    # def test_function(self):
-    #     row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
-    #     query = select(
-    #                 ToolCatalogue.ToolID.label("Tool_ID"), 
-    #                 ToolCatalogue.Name.label("Tool_Name"), 
-    #                 ToolCatalogue.Command, ToolCatalogue.Description, 
-    #                 Capec.Capec_ID, Capec.Name.label("Attack_Pattern"), 
-    #                 Capec.Execution_Flow, 
-    #                 Capec.Description.label("Capec_Description"), 
-    #                 ThreatCatalogue.TID.label("Threat_ID"), 
-    #                 ThreatCatalogue.Asset.label("Asset_Type"), 
-    #                 ThreatCatalogue.Threat, 
-    #                 ThreatCatalogue.Description.label("Threat_Description"), 
-    #                 Macm.Component_ID, 
-    #                 Macm.Name.label("Asset"), 
-    #                 Macm.Parameters
-    #             ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID)).add_columns(row_number_column)
-    #     compiled = query.compile(compile_kwargs={"literal_binds": True})
-    #     response = {'query': str(compiled)}
+    def test_function(self):
+        row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+        query = select(
+                    ToolCatalogue.ToolID.label("Tool_ID"), 
+                    ToolCatalogue.Name.label("Tool_Name"), 
+                    ToolCatalogue.Command,
+                    ToolCatalogue.Description.label("Tool_Description"),
+                    Capec.Capec_ID,
+                    Capec.Name.label("Attack_Pattern"), 
+                    Capec.Execution_Flow, 
+                    Capec.Description.label("Capec_Description"), 
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    Macm.Component_ID, 
+                    Macm.Name.label("Asset"), 
+                    Macm.Parameters,
+                    Macm.App_ID.label("AppID"),
+                    PentestPhases.PhaseID.label("PhaseID"),
+                    PentestPhases.PhaseName.label("PhaseName")
+                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID)).join(PentestPhases, ToolCatalogue.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
+        compiled = query.compile(compile_kwargs={"literal_binds": True})
+        response = {'query': str(compiled)}
         
-    #     return response
+        return response
             
 
-    def test_function(self):
-        response = {}
-        attack_data = AttackView.query.filter_by(Component_ID=2).group_by(AttackView.PhaseID).with_entities(AttackView.PhaseID, func.count(AttackView.PhaseID)).all()
-        response['output'] = str(attack_data)
-        return response
+    # def test_function(self):
+    #     response = {}
+    #     attack_data = AttackView.query.all()
+    #     response['output'] = str(attack_data)
+    #     return response
 
 class ThreatAgentUtils():
     converter = Converter()

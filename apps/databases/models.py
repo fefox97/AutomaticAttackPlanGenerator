@@ -221,9 +221,9 @@ class MacmUser(db.Model):
     def __repr__(self):
         return str(self.UserID)
     
-class ToolAssetTypeRel(db.Model):
+class ToolAssetRel(db.Model):
 
-    __tablename__ = 'ToolAssetTypeRel'
+    __tablename__ = 'ToolAssetRel'
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
@@ -273,7 +273,7 @@ class AttackView(db.Model):
                 .join(Capec)
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
-                .join(ToolAssetTypeRel, and_(Macm.Component_ID==ToolAssetTypeRel.ComponentID, ToolAssetTypeRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetTypeRel.AppID))
+                .join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID))
                 .join(PentestPhases, ToolCatalogue.PhaseID==PentestPhases.PhaseID)
                 .add_columns(row_number_column),
                 db.metadata,
