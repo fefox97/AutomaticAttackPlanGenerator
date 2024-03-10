@@ -14,12 +14,12 @@ from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
 
 @blueprint.route('/index')
-# @login_required
+@login_required
 def index():
     return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
 
 @blueprint.route('/<template>', methods=['GET'])
-# @login_required
+@login_required
 def route_template(template):
 
     try:

@@ -11,7 +11,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser
+from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -94,6 +94,7 @@ class ToolCatalogUtils:
         df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
+        df['PhaseID'] = df['PhaseID'].apply(lambda x: self.converter.string_to_int_list(x))
         return df
 
     def load_pentest_phases(self):
@@ -199,6 +200,18 @@ class Utils:
         relations_df.drop_duplicates(inplace=True)
         relations_df.index.name = 'Id'
         return relations_df
+    
+    def laod_tool_phases_relations(self, df: pd.DataFrame):
+        print("\nExtracting ToolCatalog-PentestPhases relations to database...\n")
+        relations_df = pd.DataFrame(columns=['ToolID', 'PhaseID'])
+        for _, tool in df.iterrows():
+            if tool['PhaseID'] is not None:
+                for phase in tool['PhaseID']:
+                    if phase is not None:
+                        relations_df.loc[len(relations_df)] = {'ToolID': tool['ToolID'], 'PhaseID': phase}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
 
     def upload_databases(self, database, neo4j_db='macm'):
         if database == 'Capec':
@@ -212,10 +225,12 @@ class Utils:
         elif database == 'ToolCatalog':
             tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
             pentest_phases_df = self.tool_catalog_utils.load_pentest_phases()
-            relations = self.load_capec_tool_relations(tool_catalog_df)
+            capec_tool_relations = self.load_capec_tool_relations(tool_catalog_df)
+            tool_phases_relations = self.laod_tool_phases_relations(tool_catalog_df)
             self.save_dataframe_to_database(pentest_phases_df, PentestPhases)
             self.save_dataframe_to_database(tool_catalog_df, ToolCatalogue)
-            self.save_dataframe_to_database(relations, CapecToolRel)
+            self.save_dataframe_to_database(capec_tool_relations, CapecToolRel)
+            self.save_dataframe_to_database(tool_phases_relations, ToolPhaseRel)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)

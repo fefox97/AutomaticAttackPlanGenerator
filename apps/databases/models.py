@@ -153,14 +153,19 @@ class ToolCatalogue(db.Model):
     CypherQuery = db.Column(db.Text)
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
-    PhaseID     = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID"))
+    PhaseID     = db.Column(db.JSON)
     
-    hasPhase       = db.relationship("PentestPhases", backref="hasTool", lazy=True)
+    hasPhase       = db.relationship("PentestPhases", secondary='ToolPhaseRel', backref='hasTool', lazy='dynamic')
     hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
 
     @hybrid_property
     def hasCapecIDs(self):
         ids = self.hasCapec.with_entities(Capec.Capec_ID).all()
+        return [id[0] for id in ids]
+    
+    @hybrid_property
+    def hasPhaseIDs(self):
+        ids = self.hasPhase.with_entities(PentestPhases.PhaseID).all()
         return [id[0] for id in ids]
 
     def __init__(self, **kwargs):
@@ -240,6 +245,25 @@ class ToolAssetRel(db.Model):
 
     def __repr__(self):
         return str(f'{self.ToolID}-{self.AssetType}')
+    
+class ToolPhaseRel(db.Model):
+
+    __tablename__ = 'ToolPhaseRel'
+
+    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
+    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID"))
+    __table_args__ =  (UniqueConstraint('ToolID', 'PhaseID', name='uix_1'),)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(f'{self.ToolID}-{self.PhaseID}')
 
 class AttackView(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
@@ -274,7 +298,8 @@ class AttackView(db.Model):
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
                 .join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID))
-                .join(PentestPhases, ToolCatalogue.PhaseID==PentestPhases.PhaseID)
+                .join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID)
+                .join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID)
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True

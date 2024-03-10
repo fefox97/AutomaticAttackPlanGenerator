@@ -18,6 +18,7 @@ class Converter:
             return re.split(sepator, string)
 
     def string_to_int_list(self, string: str, sepator=r'[ ,]+'):
+        string = f"{string}"
         if string in [None, '', 'None']:
             return None
         else:
