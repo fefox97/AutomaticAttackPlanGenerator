@@ -292,7 +292,7 @@ class Utils:
                     Macm.App_ID.label("AppID"),
                     PentestPhases.PhaseID.label("PhaseID"),
                     PentestPhases.PhaseName.label("PhaseName")
-                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID)).join(PentestPhases, ToolCatalogue.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
+                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
         compiled = query.compile(compile_kwargs={"literal_binds": True})
         response = {'query': str(compiled)}
         

@@ -42,7 +42,7 @@
                     <nav id="navbar-phases" class="h-100 flex-column align-items-stretch pe-4 border-end">
                         <nav class="nav nav-pills flex-column">
                             {% for pentest_phase in av_pentest_phases %}
-                                <a class="nav-link" href="#Phase{{ pentest_phase.PhaseID }}">{{ pentest_phase.PhaseName }}</a>
+                                <a class="nav-link mb-2" href="#Phase{{ pentest_phase.PhaseID }}">{{ pentest_phase.PhaseName }}</a>
                             {% endfor %}
                         </nav>
                     </nav>
@@ -54,7 +54,7 @@
                             <div id="Phase{{ pentest_phases[phaseID-1].PhaseID }}">
                                 <h4>{{ pentest_phases[phaseID-1].PhaseName }}</h4>
                                 {% for attack in attacks %}
-                                    <div class="accordion" id="accordionOne">
+                                    <div class="accordion mb-3" id="accordionOne">
                                         {% include 'home/macm-detail/attack.html' %}
                                     </div>
                                 {% endfor %}

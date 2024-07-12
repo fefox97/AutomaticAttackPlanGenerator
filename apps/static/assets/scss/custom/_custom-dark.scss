@@ -175,4 +175,12 @@ $color-mode-type: data;
         }
     }
 
+    pre[class*=language-]{
+        background: $gray-800 !important;
+        border-radius: 10px !important;
+        code {
+            color: $white !important;
+        }
+    }
+
 }

@@ -19896,3 +19896,9 @@ pre[class*=language-] {
 
 [data-bs-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label::after {
   background-color: transparent !important; }
+
+[data-bs-theme="dark"] pre[class*=language-] {
+  background: #1F2937 !important;
+  border-radius: 10px !important; }
+  [data-bs-theme="dark"] pre[class*=language-] code {
+    color: #ffffff !important; }
