@@ -30,7 +30,7 @@ The methodology is supported by a framework. The framework is composed by the fo
   - Generate the penetration test plan.
 - **Knowledge Editor**: The knowledge editor is used to edit the knowledge stored in the knowledge bases.
 
-![ESSecA Framework](README/EssecaFramework.png)
+![ESSecA Framework](README/EssecaFramework.jpeg)
 
 ### System Model
 The system model is a graph-based representation of the SuA. The SuA is modeled as a graph, using the MACM (Multi-purpose Application Composition Model). The MACM is stored into a GDBMS (Graph Database Management System). In particular, it is stored into a [Neo4j](https://neo4j.com) database, queried using the [Cypher](https://neo4j.com/docs/cypher-manual/current/introduction/) query language. The system model is used as input for the engine.
