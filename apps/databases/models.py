@@ -154,6 +154,8 @@ class ToolCatalogue(db.Model):
     Command     = db.Column(db.Text)
     Description = db.Column(db.Text)
     PhaseID     = db.Column(db.JSON)
+    IsExecutable = db.Column(db.Boolean)
+    OutputParser = db.Column(db.Text)
     
     hasPhase       = db.relationship("PentestPhases", secondary='ToolPhaseRel', backref='hasTool', lazy='dynamic')
     hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
@@ -276,6 +278,8 @@ class AttackView(db.Model):
                     ToolCatalogue.Name.label("Tool_Name"), 
                     ToolCatalogue.Command,
                     ToolCatalogue.Description.label("Tool_Description"),
+                    ToolCatalogue.IsExecutable.label("Is_Executable"),
+                    ToolCatalogue.OutputParser.label("Output_Parser"),
                     Capec.Capec_ID,
                     Capec.Name.label("Attack_Pattern"), 
                     Capec.Execution_Flow, 

@@ -20,7 +20,28 @@ $(document).ready(function() {
     $('.bg-capec').click(function() {
         window.open($(this).attr('href'), '_blank');
     });
+    $('.output-file').children('button').click(upload_output_file);
 });
+
+function upload_output_file() {
+    let fileDiv = $(this).parent('.output-file').find('#outputFile');
+    let file = fileDiv[0].files[0];
+    let formData = new FormData();
+    formData.append('outputFile', file);
+    $.ajax({
+        url: '/api/' + fileDiv.attr('parser'),
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+            showModal("Upload successful", data, false, true);
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+}
 
 function copySingleCommand(element) {
     let command = '';

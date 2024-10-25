@@ -79,6 +79,19 @@ def route_api(api):
                 app.logger.info(f"Deleting MACM {selected_macm}")
                 APIUtils.delete_macm(selected_macm)
                 return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
+            
+            elif api == 'nmap_classic':
+                # Get the file
+                if 'outputFile' in request.files and request.files['outputFile'].filename != '':
+                    file = request.files['outputFile']
+                    if not APIUtils().allowed_file(file.filename, ['txt']):
+                        return make_response(jsonify({'message': 'File type not allowed'}), 400)
+                    output = file.read().decode('utf-8')
+                    app.logger.info(output)
+                    # Parse the output
+                    return jsonify({'message': 'Nmap output parsed successfully', 'output': output})
+                else:
+                    return make_response(jsonify({'message': 'No file provided'}), 400)
 
     except Exception as e:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)

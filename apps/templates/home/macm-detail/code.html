@@ -29,6 +29,14 @@
                 {% endfor %}
                 <button type="button" class="btn btn-secondary"><i class="fas fa-copy"></i></button>
             </div>
+            {% if attack.Output_Parser %}
+            <p class="mb-2">Upload the output command file to parse the output.</p>
+            <div class="input-group mb-3 output-file">
+                    <span class="input-group-text">Output File</span>
+                    <input type="file" class="form-control" id="outputFile" parser="{{ attack.Output_Parser }}">
+                    <button type="button" class="btn btn-secondary" id="uploadOutputFile"><i class="fas fa-upload"></i></button>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

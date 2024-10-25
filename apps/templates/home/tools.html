@@ -47,6 +47,7 @@
                                 <th>Command</th>
                                 <th>Description</th>
                                 <th>Phase</th>
+                                <th>Is Executable</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,6 +76,7 @@
                                             </div>
                                         {% endif %}
                                     </td>
+                                    <td>{{ row.IsExecutable }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -87,6 +89,7 @@
                                 <th>Command</th>
                                 <th>Description</th>
                                 <th>Phase</th>
+                                <th>Is Executable</th>
                             </tr>
                         </tfoot>
                     </table> 

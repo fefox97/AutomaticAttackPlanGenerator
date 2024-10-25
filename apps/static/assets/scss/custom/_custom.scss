@@ -166,3 +166,8 @@ pre[class*=language-]{
     height: 550px;
     overflow: auto;
 }
+
+.modal-body-text{
+    white-space: pre-line;
+    line-break: anywhere;
+}

@@ -1,6 +1,6 @@
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
 
-function showModal(title, response, autohide = false){
+function showModal(title, response, autohide = false, large = false){
     $("#modal-title").text(title);
     let messages = "";
     if (typeof response === "string") {
@@ -11,6 +11,9 @@ function showModal(title, response, autohide = false){
         }
     }
     $("#modal-body-text").text(messages);
+    if (large) {
+        $("#modal-upload").addClass("modal-lg");
+    }
     $("#modal-upload").modal("show");
     if (autohide) {
         setTimeout(function() {
