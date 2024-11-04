@@ -41,5 +41,7 @@ Flask-Modals-markupsafe
 
 neo4j
 
+python-nmap
+
 # flask_mysqldb
 # psycopg2-binary
