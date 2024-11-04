@@ -11,7 +11,7 @@ $(window).on('load', function() {
         default_shown_columns = JSON.parse(localStorage.getItem('tools_catalog_columns'));
     }
     
-    tool_catalog = $('#tools_catalog_table').DataTable({
+    tool_catalog = $('#toolsCatalogTable').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],

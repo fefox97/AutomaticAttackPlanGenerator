@@ -39,7 +39,7 @@
                 {% if table is not none %}
                     <div class="d-block align-items-center">
                         <!-- [ stiped-table ] start -->
-                        <table id="macm_table" class="table table-striped table-hover table-dataframe">
+                        <table id="macmTable" class="table table-striped table-hover table-dataframe">
                             <thead>
                                 <tr>
                                     <th>Component ID</th>
@@ -190,7 +190,6 @@
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" id="deleteComponentID" name="deleteComponentID" value="">
-                    <input type="hidden" id="deleteAppID" name="deleteAppID" value="">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-danger" id="deleteComponentConfirm">Delete</button>
                 </div>

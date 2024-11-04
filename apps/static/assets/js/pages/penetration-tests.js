@@ -27,13 +27,13 @@ $(document).ready(function() {
     $('#editMacmModal').on('show.bs.modal', function(event) {
         const AppID = event.relatedTarget.getAttribute('data-bs-AppID');
         const AppName = event.relatedTarget.getAttribute('data-bs-AppName');
-        this.querySelector('#edit-app-id').value = AppID;
-        this.querySelector('#edit-app-name').textContent = AppName;
+        this.querySelector('#editAppID').value = AppID;
+        this.querySelector('#editAppName').textContent = AppName;
     });
 
     $('#edit-submit').click(function() {
-        const AppID = $('#edit-app-id').val();
-        const QueryCypher = $('#edit-query-cypher').val();
+        const AppID = $('#editAppID').val();
+        const QueryCypher = $('#editQueryCypher').val();
         $.ajax({
             url: '/api/update_macm',
             type: 'POST',
@@ -55,7 +55,7 @@ $(document).ready(function() {
         const button = event.relatedTarget;
         const AppID = button.getAttribute('data-bs-AppID');
         const AppName = button.getAttribute('data-bs-AppName');
-        $('#app-name-body').text(AppName);
-        this.querySelector('#delete-app-id').value = AppID;
+        $('#appNameBody').text(AppName);
+        this.querySelector('#deleteAppID').value = AppID;
     });
 });

@@ -11,7 +11,7 @@ $(window).on('load', function() {
         default_shown_columns = JSON.parse(localStorage.getItem('threat_catalog_columns'));
     }
     
-    threat_catalog = $('#threat_catalog_table').DataTable({
+    threat_catalog = $('#threatCatalogTable').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],

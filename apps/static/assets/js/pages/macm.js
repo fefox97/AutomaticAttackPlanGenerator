@@ -68,7 +68,7 @@ $(window).on('load', function() {
     
     DataTable.Buttons.defaults.dom.button.className = 'btn';
 
-    macm = $('#macm_table').DataTable({
+    macm = $('#macmTable').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],
@@ -200,19 +200,16 @@ $(window).on('load', function() {
     $('#deleteComponentModal').on('show.bs.modal', function (event) {
         let ComponentName = event.relatedTarget.getAttribute('data-bs-ComponentName');
         let ComponentID = event.relatedTarget.getAttribute('data-bs-ComponentID');
-        let AppID = event.relatedTarget.getAttribute('data-bs-AppID');
         this.querySelector('#deleteComponentID').value = ComponentID;
         this.querySelector('#deleteComponentName').textContent = ComponentName;
-        this.querySelector('#deleteAppID').value = AppID;
     });
     $('#deleteComponentConfirm').click(function() {
         let ComponentID = $('#deleteComponentID').val();
-        let AppID = $('#deleteAppID').val();
         $.ajax({
             url: '/api/delete_macm_component',
             type: 'POST',
             data: {
-                AppID: AppID,
+                AppID: app_id,
                 ComponentID: ComponentID,
             },
             success: function(response) {
