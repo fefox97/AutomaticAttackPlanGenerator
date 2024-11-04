@@ -100,7 +100,7 @@ def test():
 
 @blueprint.route('/clear_macm', methods=['POST'])
 def clear_macm():
-    selected_macm = request.form.get('app-id')
+    selected_macm = request.form.get('deleteAppID')
     app.logger.info(f"Deleting MACM {selected_macm}")
     macm.delete_macm(selected_macm)
     return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))

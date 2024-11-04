@@ -178,7 +178,7 @@ class MacmUtils:
             db.session.commit()
             return True
         except:
-            print(f"Error deleting MACM {app_id}", exc_info=True)
+            print(f"Error deleting MACM {app_id}")
             return False
 
     def tool_asset_type_rel(self, database='macm'):
