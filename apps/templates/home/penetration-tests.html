@@ -60,11 +60,15 @@
                                         <h3 class="h6 mb-1">{{ pentest.AppName }}</h3>
                                     </div>
                                     <div>
-                                        <a class="btn btn-secondary btn-sm" href="/macm.html?app-id={{pentest.AppID}}" role="button">
+                                        <a class="btn btn-secondary btn-sm" href="/macm.html?app_id={{pentest.AppID}}" role="button">
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
-                                        <button type="button" class="btn btn-secondary btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteMacmModal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
+                                        <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#editMacmModal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
+                                            <i class="fas fa-edit mr-auto"></i>
+                                            Edit
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteMacmModal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
                                             <i class="fas fa-trash mr-auto"></i>
                                             Delete
                                         </button>
@@ -83,7 +87,32 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editMacmModal" tabindex="-1" aria-labelledby="editMacmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMacmModalLabel">Edit <span id="edit-app-name"></span> MACM</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <span class="h6">Insert the Cypher query</span>
+                    </div>
+                    <textarea class="form-control" id="edit-query-cypher" name="edit-query-cypher" rows="3" placeholder="Cypher Query"></textarea>
+                </div>
+        
+                <div class="modal-footer">
+                    <input type="hidden" id="edit-app-id" name="edit-app-id" value="">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="edit-submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
     <div class="modal fade" id="deleteMacmModal" tabindex="-1" aria-labelledby="deleteMacmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -98,7 +127,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <input type="hidden" id="app-id" name="app-id" value="">
+                        <input type="hidden" id="delete-app-id" name="app-id" value="">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </div>

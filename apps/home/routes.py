@@ -84,7 +84,7 @@ def route_template(template):
 
         elif template == 'macm.html':
             try:
-                selected_macm = request.args.get('app-id')
+                selected_macm = request.args.get('app_id')
                 table = Macm.query.filter_by(App_ID=selected_macm).all()
                 if len(table) == 0:
                     table = None
@@ -101,7 +101,7 @@ def route_template(template):
             return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number)
         
         elif template == 'macm-detail.html':
-            selected_macm = request.args.get('app-id')
+            selected_macm = request.args.get('app_id')
             selected_id = request.args.get('id')
             macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
             attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()

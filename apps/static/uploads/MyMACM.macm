@@ -1,0 +1,5 @@
+	CREATE
+		(CSC:any {component_id:'1', name:'CSC', type:'User', app_id:'102',application:'Proxmox'}),
+		(CSP:CSP:service {component_id:'2', name:'Cloud Service Provider', type:'CSP', app_id:'102',application:'Proxmox'}),
+		
+		(Net1:Network:service {component_id:'3', name:'CSPnet1', type:'Network', app_id:'102',application:'Proxmox', access:'public', parameters: '{"ip_range":"192.168.40.1/24"}'})

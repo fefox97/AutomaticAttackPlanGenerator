@@ -6,6 +6,7 @@ import numpy as np
 from neo4j import Result
 import re
 import uuid
+from apps.api.utils import APIUtils
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
@@ -93,6 +94,7 @@ class ToolCatalogUtils:
         print("\nLoading tools catalog...\n")
         df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
+        df['AllowedOutputExtensions'] = df['AllowedOutputExtensions'].apply(lambda x: self.converter.string_to_list(x))
         df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
         df['PhaseID'] = df['PhaseID'].apply(lambda x: self.converter.string_to_int_list(x))
         return df
@@ -144,7 +146,40 @@ class MacmUtils:
         except:
             print(f"Database {database} does not exist: creating it...")
             self.create_database(database)
+        self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
         self.driver.execute_query(query, database_=database)
+
+    def update_macm(self, query, database='macm'):
+        try:
+            self.driver.execute_query(query, database_=database)
+            self.delete_macm(database, delete_neo4j=False)
+            Utils().upload_databases('Macm', neo4j_db=database)
+        except Exception as error:
+            print(f"Error updating MACM: {error}")
+            raise error
+
+    def delete_macm_component(self, database, component_id):
+        try:
+            self.driver.execute_query(f"MATCH (asset {{component_id: '{component_id}'}}) DETACH DELETE asset", database_=database)
+            self.delete_macm(database, delete_neo4j=False)
+            Utils().upload_databases('Macm', neo4j_db=database)
+            return True
+        except:
+            print(f"Error deleting component {component_id} from MACM {database}", exc_info=True)
+            return False
+
+    def delete_macm(self, app_id, delete_neo4j=True):
+        try:
+            Macm.query.filter_by(App_ID=app_id).delete()
+            MacmUser.query.filter_by(AppID=app_id).delete()
+            ToolAssetRel.query.filter_by(AppID=app_id).delete()
+            if delete_neo4j:
+                self.delete_database(app_id)
+            db.session.commit()
+            return True
+        except:
+            print(f"Error deleting MACM {app_id}", exc_info=True)
+            return False
 
     def tool_asset_type_rel(self, database='macm'):
         queries = ToolCatalogue.query.with_entities(ToolCatalogue.ToolID, ToolCatalogue.CypherQuery).all()

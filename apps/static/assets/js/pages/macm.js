@@ -60,12 +60,14 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('macm_columns') === null) {    
-        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID'];
+        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID', 'Action'];
         localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('macm_columns'));
     }
     
+    DataTable.Buttons.defaults.dom.button.className = 'btn';
+
     macm = $('#macm_table').DataTable({
         "paging": false,
         "ordering": true,
@@ -94,7 +96,7 @@ $(window).on('load', function() {
                 }
             },
             {
-                targets: [0, 1, 4],
+                targets: [0, 1, 4, 5],
                 searchPanes: {
                     show: false,
                 },
@@ -108,10 +110,21 @@ $(window).on('load', function() {
         ],
         buttons: [
             {
+                className: 'btn-secondary',
                 extend: 'colvis',
                 columns: ':not(.noVis)'
             },
-            'searchPanes',
+            {
+                className: 'btn-secondary',
+                extend: 'searchPanes'
+            },
+            {   
+                className: 'btn-primary',
+                text: 'Edit MACM',
+                action: function (e, dt, node, config) {
+                    $('#editMacmModal').modal('show');
+                }
+            }
         ],
         initComplete: function () {
             // Add search bar for each column
@@ -147,7 +160,6 @@ $(window).on('load', function() {
         column.sName = column.sTitle;
     });
     
-
     // Save column visibility state
     macm.on('column-visibility.dt', function (e, settings, column, state) {
         if (state) {
@@ -164,6 +176,54 @@ $(window).on('load', function() {
         $(this).parent('.card').find('.collapse').removeClass('show');
     });
     
+    // Edit MACM
+    $('#edit-submit').click(function() {
+        const QueryCypher = $('#edit-query-cypher').val();
+        $.ajax({
+            url: '/api/update_macm',
+            type: 'POST',
+            data: {
+                AppID: app_id,
+                QueryCypher: QueryCypher,
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: function(response) {
+                $('#editMacmModal').modal('hide');
+                showModal("Update failed", JSON.parse(response.responseText));
+            }
+        })
+    });
+
+    // Delete MACM component
+    $('#deleteComponentModal').on('show.bs.modal', function (event) {
+        let ComponentName = event.relatedTarget.getAttribute('data-bs-ComponentName');
+        let ComponentID = event.relatedTarget.getAttribute('data-bs-ComponentID');
+        let AppID = event.relatedTarget.getAttribute('data-bs-AppID');
+        this.querySelector('#deleteComponentID').value = ComponentID;
+        this.querySelector('#deleteComponentName').textContent = ComponentName;
+        this.querySelector('#deleteAppID').value = AppID;
+    });
+    $('#deleteComponentConfirm').click(function() {
+        let ComponentID = $('#deleteComponentID').val();
+        let AppID = $('#deleteAppID').val();
+        $.ajax({
+            url: '/api/delete_macm_component',
+            type: 'POST',
+            data: {
+                AppID: AppID,
+                ComponentID: ComponentID,
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: function(response) {
+                $('#deleteComponentModal').modal('hide');
+                showModal("Delete failed", JSON.parse(response.responseText));
+            }
+        })
+    });
 });
 
 function drawNeo4j(database) {

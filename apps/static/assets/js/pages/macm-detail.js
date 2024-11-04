@@ -25,8 +25,10 @@ $(document).ready(function() {
 
 function upload_output_file() {
     let fileDiv = $(this).parent('.output-file').find('#outputFile');
+    let macmID = fileDiv.attr('macmID');
     let file = fileDiv[0].files[0];
     let formData = new FormData();
+    formData.append('macmID', macmID);
     formData.append('outputFile', file);
     $.ajax({
         url: '/api/' + fileDiv.attr('parser'),

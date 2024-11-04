@@ -30,10 +30,14 @@
                 <button type="button" class="btn btn-secondary"><i class="fas fa-copy"></i></button>
             </div>
             {% if attack.Output_Parser %}
-            <p class="mb-2">Upload the output command file to parse the output.</p>
+            <p class="mb-2">Upload the output command file to parse the output. The allowed file extensions are: 
+                {% for extension in attack.Allowed_Output_Extensions %}
+                    {{ extension }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
             <div class="input-group mb-3 output-file">
                     <span class="input-group-text">Output File</span>
-                    <input type="file" class="form-control" id="outputFile" parser="{{ attack.Output_Parser }}">
+                    <input type="file" class="form-control" id="outputFile" parser="{{ attack.Output_Parser }}" accept="{{ attack.Allowed_Output_Extensions|join(',') }}" macmID="{{ attack.AppID }}">
                     <button type="button" class="btn btn-secondary" id="uploadOutputFile"><i class="fas fa-upload"></i></button>
             </div>
             {% endif %}

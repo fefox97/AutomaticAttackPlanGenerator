@@ -48,6 +48,7 @@
                                     <th>Type</th>
                                     <th>App ID</th>
                                     <th>Parameters</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,7 +60,7 @@
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/macm-detail?app-id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
+                                                    <a class="badge bg-macm position-relative" href="/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if attack_for_this_component %}
                                                             <span class="position-absolute fs-8 top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -82,6 +83,14 @@
                                                 {% endfor %}
                                             {% endif %}
                                         </td>
+                                        <td>
+                                            <div class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteComponentModal" data-bs-ComponentID="{{row['Component_ID']}}" data-bs-AppID="{{row['App_ID']}}" data-bs-ComponentName="{{row['Name']}}">
+                                                <i class="fas fa-trash mr-auto"></i>
+                                                Delete
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -93,6 +102,7 @@
                                     <th>Type</th>
                                     <th>App ID</th>
                                     <th>Parameters</th>
+                                    <th>Action</th>
                                 </tr>
                             </tfoot>
                         </table> 
@@ -141,6 +151,51 @@
             </div>
         </div>
         {% endif %}
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editMacmModal" tabindex="-1" aria-labelledby="editMacmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMacmModalLabel">Edit {{ table[0].Application if table is not none }} MACM</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <span class="h6">Insert the Cypher query</span>
+                    </div>
+                    <textarea class="form-control" id="edit-query-cypher" name="edit-query-cypher" rows="3" placeholder="Cypher Query"></textarea>
+                </div>
+        
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="edit-submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Component Modal -->
+    <div class="modal fade" id="deleteComponentModal" tabindex="-1" aria-labelledby="deleteComponentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteComponentModalLabel">Delete Component</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the component <span id="deleteComponentName"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="deleteComponentID" name="deleteComponentID" value="">
+                    <input type="hidden" id="deleteAppID" name="deleteAppID" value="">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="deleteComponentConfirm">Delete</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock content %}
