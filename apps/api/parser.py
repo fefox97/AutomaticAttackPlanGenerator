@@ -9,15 +9,15 @@ class NmapParser:
         
     def __init__(self):
         self.converter = Converter()
+        self.macmUtils = MacmUtils()
         
     def nmap_classic(self, macmID, content):
         app.logger.info(f"Running nmap classic parser on MACM {macmID}")
         scanner = nm.PortScanner()
         output = scanner.analyse_nmap_xml_scan(content)
         hosts = output['scan'].keys()
-        check = self.check_hosts(macmID, hosts)
-        output = self.converter.list_to_string(hosts)
-        return output
+        query = self.add_hosts(macmID, hosts)
+        return query
     
     def check_hosts(self, macmID, hosts):
         app.logger.info(f"Checking if hosts are already in MACM {macmID}")
@@ -27,10 +27,19 @@ class NmapParser:
                 ip = asset.Parameters.get('ip')
                 if ip in hosts:
                     hosts.remove(ip)
-        return True
+        return hosts
     
     def add_hosts(self, macmID, hosts):
-        app.logger.info(f"Adding hosts to MACM {macmID}")
+        hosts = self.check_hosts(macmID, hosts)
+        appID, applicationName, maxID = self.macmUtils.get_macm_info(macmID)
+        maxID = int(maxID) + 1
+        query = ''
         for host in hosts:
-            MacmUtils().add_asset(macmID, 'Service.VM', {'ip': host})
-        return True
+            app.logger.info(f"Adding host {host} to MACM {macmID}")
+            app.logger.info(type(host))
+            query += f"""CREATE (VM{maxID}:service {{component_id:'{maxID}', name:'VM{maxID}', type:'Service.VM', app_id:'{appID}',application:'{applicationName}', parameters: '{{"ip":"{host}"}}'}})
+                WITH VM{maxID}
+                MATCH (net {{name:'CSPnet1'}})
+                MERGE (VM{maxID})<-[:connects]-(net)\n"""
+            maxID += 1
+        return query

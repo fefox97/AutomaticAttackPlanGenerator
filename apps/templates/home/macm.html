@@ -45,6 +45,7 @@
                                     <th>Component ID</th>
                                     <th>Application</th>
                                     <th>Name</th>
+                                    <th>Labels</th>
                                     <th>Type</th>
                                     <th>App ID</th>
                                     <th>Parameters</th>
@@ -74,6 +75,11 @@
                                         </td>
                                         <td>{{ row['Application'] }}</td>
                                         <td>{{ row['Name'] }}</td>
+                                        <td>
+                                            {% for label in row['Labels'] %}
+                                                <span class="badge bg-macm-label me-1 mb-1">{{ label }}</span>
+                                            {% endfor %}
+                                        </td>
                                         <td>{{ row['Type'] }}</td>
                                         <td>{{ row['App_ID'] }}</td>
                                         <td class="text-nowrap">
@@ -99,6 +105,7 @@
                                     <th>Component ID</th>
                                     <th>Application</th>
                                     <th>Name</th>
+                                    <th>Labels</th>
                                     <th>Type</th>
                                     <th>App ID</th>
                                     <th>Parameters</th>
@@ -166,7 +173,7 @@
                     <div class="mb-3">
                         <span class="h6">Insert the Cypher query</span>
                     </div>
-                    <textarea class="form-control" id="edit-query-cypher" name="edit-query-cypher" rows="3" placeholder="Cypher Query"></textarea>
+                    <textarea class="form-control" id="edit-query-cypher" name="edit-query-cypher" rows="6" placeholder="Cypher Query"></textarea>
                 </div>
         
                 <div class="modal-footer">

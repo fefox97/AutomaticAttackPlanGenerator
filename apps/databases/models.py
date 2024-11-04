@@ -198,6 +198,7 @@ class Macm(db.Model):
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
     App_ID          = db.Column(db.Text, primary_key=True, nullable=False)
+    Labels          = db.Column(db.JSON)
     Parameters      = db.Column(db.JSON)
 
     def __init__(self, **kwargs):

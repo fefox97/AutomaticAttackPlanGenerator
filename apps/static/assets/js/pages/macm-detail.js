@@ -21,6 +21,9 @@ $(document).ready(function() {
         window.open($(this).attr('href'), '_blank');
     });
     $('.output-file').children('button').click(upload_output_file);
+    $('#copyParserOutput').click(function() {
+        navigator.clipboard.writeText($(this).attr('data-clipboard-text'));
+    });
 });
 
 function upload_output_file() {
@@ -37,7 +40,10 @@ function upload_output_file() {
         contentType: false,
         processData: false,
         success: function(data) {
-            showModal("Upload successful", data, false, true);
+            $('#copyParserOutput').attr('data-clipboard-text', data.output);
+            $('#parserOutput').text(data.output);
+            $('#modalParserOutput').modal('show');
+            window.Prism.highlightAll();
         },
         error: function(data) {
             console.log(data);

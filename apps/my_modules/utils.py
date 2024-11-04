@@ -134,9 +134,25 @@ class MacmUtils:
     def delete_database(self, database):
         self.driver.execute_query(f"DROP DATABASE `{database}`")
 
+    def get_greatest_component_id(self, database='macm'):
+        query = "MATCH (asset) RETURN max(toInteger(asset.component_id)) as max_id"
+        max_id = self.driver.execute_query(query, database_=database, result_transformer_=Result.to_df).iloc[0]['max_id']
+        return max_id if max_id is not None else 0
+    
+    def get_macm_info(self, database='macm'):
+        appID = Macm.query.with_entities(Macm.App_ID).distinct().all()
+        appID = [app[0] for app in appID]
+        appID = appID[0] if appID else None
+        applicationName = Macm.query.with_entities(Macm.Application).distinct().all()
+        applicationName = [app[0] for app in applicationName]
+        applicationName = applicationName[0] if applicationName else None
+        maxID = self.get_greatest_component_id(database)
+        return appID, applicationName, maxID
+
+
     def read_macm(self, database='macm'):
-        macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters", database_=database, result_transformer_=Result.to_df)
-        macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters'}, inplace=True)
+        macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters, labels(asset)", database_=database, result_transformer_=Result.to_df)
+        macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters', 'labels(asset)': 'Labels'}, inplace=True)
         macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
         return macm_df
 
@@ -151,7 +167,12 @@ class MacmUtils:
 
     def update_macm(self, query, database='macm'):
         try:
-            self.driver.execute_query(query, database_=database)
+            with self.driver.session(database=database) as neo4j_session:
+                with neo4j_session.begin_transaction() as transaction:
+                    for query in query.split(';'):
+                        transaction.run(query)
+                    transaction.commit()
+                    transaction.close()
             self.delete_macm(database, delete_neo4j=False)
             Utils().upload_databases('Macm', neo4j_db=database)
         except Exception as error:
