@@ -140,10 +140,10 @@ class MacmUtils:
         return max_id if max_id is not None else 0
     
     def get_macm_info(self, database='macm'):
-        appID = Macm.query.with_entities(Macm.App_ID).distinct().all()
+        appID = Macm.query.filter_by(App_ID=database).with_entities(Macm.App_ID).distinct().all()
         appID = [app[0] for app in appID]
         appID = appID[0] if appID else None
-        applicationName = Macm.query.with_entities(Macm.Application).distinct().all()
+        applicationName = Macm.query.filter_by(App_ID=database).with_entities(Macm.Application).distinct().all()
         applicationName = [app[0] for app in applicationName]
         applicationName = applicationName[0] if applicationName else None
         maxID = self.get_greatest_component_id(database)
