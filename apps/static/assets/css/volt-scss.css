@@ -211,7 +211,7 @@
   --bs-code-color: #f590b5;
   --bs-highlight-color: #D1D5DB;
   --bs-highlight-bg: #e4bb85;
-  --bs-border-color: #374151;
+  --bs-border-color: #6B7280;
   --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
   --bs-form-valid-color: #1abc86;
   --bs-form-valid-border-color: #1abc86;
@@ -4583,7 +4583,7 @@ textarea.form-control-lg {
   --bs-accordion-color: #374151;
   --bs-accordion-bg: transparent;
   --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
-  --bs-accordion-border-color: #9CA3AF;
+  --bs-accordion-border-color: #9CA3AF !important;
   --bs-accordion-border-width: 0.0625rem;
   --bs-accordion-border-radius: 0.5rem;
   --bs-accordion-inner-border-radius: 0.4375rem;
@@ -19682,6 +19682,9 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
   word-wrap: break-word;
   white-space: pre-line; }
 
+div.dataTables_scrollBody {
+  border-left: none !important; }
+
 .dataTables_scrollBody thead {
   visibility: hidden; }
 
@@ -19868,21 +19871,24 @@ pre[class*=language-] {
     [data-bs-theme="dark"] a.btn-secondary:hover, [data-bs-theme="dark"] a.btn-secondary:focus {
       color: var(--bs-btn-active-color) !important; }
 
-[data-bs-theme="dark"] .accordion-item .accordion-button {
+[data-bs-theme="dark"] .accordion .accordion-item .accordion-button {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
-  [data-bs-theme="dark"] .accordion-item .accordion-button:hover, [data-bs-theme="dark"] .accordion-item .accordion-button:focus {
+  [data-bs-theme="dark"] .accordion .accordion-item .accordion-button:hover, [data-bs-theme="dark"] .accordion .accordion-item .accordion-button:focus {
     background-color: #4B5563 !important;
     color: #F2F4F6 !important; }
-  [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed {
+  [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed {
     background-color: #4B5563 !important;
     color: #F2F4F6 !important; }
-    [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed:hover, [data-bs-theme="dark"] .accordion-item .accordion-button.collapsed:focus {
+    [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed:hover, [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed:focus {
       background-color: #4B5563 !important;
       color: #F2F4F6 !important; }
 
-[data-bs-theme="dark"] .accordion-item .accordion-body {
+[data-bs-theme="dark"] .accordion .accordion-item .accordion-body {
   color: #F2F4F6 !important; }
+
+[data-bs-theme="dark"] .nav-pills .nav-link {
+  border-color: #6B7280 !important; }
 
 [data-bs-theme="dark"] .btn-outline-tertiary {
   --bs-btn-color: #6e6ede;

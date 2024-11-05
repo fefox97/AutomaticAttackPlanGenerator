@@ -1,6 +1,7 @@
 $color-mode-type: data;
 
 @include color-mode(dark) {
+
     .card {
         background-color: $card-bg-dark !important;
         color: $card-color-dark !important;
@@ -139,25 +140,33 @@ $color-mode-type: data;
         }
     }
 
-    .accordion-item{
-        .accordion-button {
-            background-color: $accordion-button-bg-dark !important;
-            color: $accordion-button-color-dark !important;
-            &:hover, &:focus {
-                background-color: $accordion-button-hover-bg-dark !important;
-                color: $accordion-button-hover-color-dark !important;
-            }
-            &.collapsed {
-                background-color: $accordion-button-collapsed-bg-dark !important;
-                color: $accordion-button-collapsed-color-dark !important;
+    .accordion {
+        .accordion-item{
+            .accordion-button {
+                background-color: $accordion-button-bg-dark !important;
+                color: $accordion-button-color-dark !important;
                 &:hover, &:focus {
-                    background-color: $accordion-button-collapsed-hover-bg-dark !important;
-                    color: $accordion-button-collapsed-hover-color-dark !important;
+                    background-color: $accordion-button-hover-bg-dark !important;
+                    color: $accordion-button-hover-color-dark !important;
+                }
+                &.collapsed {
+                    background-color: $accordion-button-collapsed-bg-dark !important;
+                    color: $accordion-button-collapsed-color-dark !important;
+                    &:hover, &:focus {
+                        background-color: $accordion-button-collapsed-hover-bg-dark !important;
+                        color: $accordion-button-collapsed-hover-color-dark !important;
+                    }
                 }
             }
+            .accordion-body {
+                color: $accordion-body-color-dark !important;
+            }
         }
-        .accordion-body {
-            color: $accordion-body-color-dark !important;
+    }
+
+    .nav-pills {
+        .nav-link {
+            border-color: $nav-pills-border-color-dark !important;
         }
     }
 
