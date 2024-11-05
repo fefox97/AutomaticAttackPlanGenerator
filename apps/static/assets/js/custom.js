@@ -1,3 +1,16 @@
+import { minimalEditor, basicEditor, fullEditor, readonlyEditor } from "prism-code-editor/setups"
+// Importing Prism grammars
+import "prism-code-editor/prism/languages/markup"
+
+const editor = basicEditor(
+  "#editor",
+  {
+    language: "html",
+    theme: "github-dark",
+  },
+  () => console.log("ready"),
+)
+
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
 
 function showModal(title, response, autohide = false, large = false){

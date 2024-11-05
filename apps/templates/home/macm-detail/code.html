@@ -37,7 +37,7 @@
             </p>
             <div class="input-group mb-3 output-file">
                     <span class="input-group-text">Output File</span>
-                    <input type="file" class="form-control" id="outputFile" parser="{{ attack.Output_Parser }}" accept="{{ attack.Allowed_Output_Extensions|join(',') }}" macmID="{{ attack.AppID }}">
+                    <input type="file" class="form-control" id="outputFile" parser="{{ attack.Output_Parser }}" accept="{{ attack.Allowed_Output_Extensions|join(',') }}" macmID="{{ attack.AppID }}" componentID="{{ attack.Component_ID }}">
                     <button type="button" class="btn btn-secondary" id="uploadOutputFile"><i class="fas fa-upload"></i></button>
             </div>
             {% endif %}

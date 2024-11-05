@@ -7,7 +7,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <pre class="line-numbers"><code class="language-cypher" id="parserOutput"></code></pre>
+                <pre class="line-numbers" id="parserOutputPre"><code class="language-cypher" id="parserOutput"></code></pre>
+                <div class="alert alert-info" id="modalParserAlert" role="alert" style="display: none;">
+                    <h5 class="alert-heading">Nothing to do</h5>
+                    <p>There is nothing to add to the MACM model.</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="copyParserOutput">Copy</button>

@@ -114,7 +114,7 @@ def nmap_classic():
             return make_response(jsonify({'message': 'File type not allowed'}), 400)
         content = file.read().decode('utf-8')
         # Parse the output
-        output = NmapParser().nmap_classic(request.form.get('macmID'), content)
+        output = NmapParser().nmap_classic(request.form.get('macmID'), request.form.get('componentID'), content)
         return jsonify({'message': 'Nmap output parsed successfully', 'output': output})
     else:
         return make_response(jsonify({'message': 'No file provided'}), 400)

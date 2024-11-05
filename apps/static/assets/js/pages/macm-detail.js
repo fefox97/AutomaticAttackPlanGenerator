@@ -29,9 +29,11 @@ $(document).ready(function() {
 function upload_output_file() {
     let fileDiv = $(this).parent('.output-file').find('#outputFile');
     let macmID = fileDiv.attr('macmID');
+    let componentID = fileDiv.attr('componentID');
     let file = fileDiv[0].files[0];
     let formData = new FormData();
     formData.append('macmID', macmID);
+    formData.append('componentID', componentID);
     formData.append('outputFile', file);
     $.ajax({
         url: '/api/' + fileDiv.attr('parser'),
@@ -41,9 +43,15 @@ function upload_output_file() {
         processData: false,
         success: function(data) {
             $('#copyParserOutput').attr('data-clipboard-text', data.output);
-            $('#parserOutput').text(data.output);
+            if (data.output.length > 0) {
+                $('#parserOutput').text(data.output);
+                window.Prism.highlightAll();
+            } else {
+                $('#parserOutputPre').hide();
+                $('#modalParserAlert').show();
+                $('#copyParserOutput').hide();
+            }
             $('#modalParserOutput').modal('show');
-            window.Prism.highlightAll();
         },
         error: function(data) {
             console.log(data);
