@@ -25,6 +25,7 @@ stix2
 pandas
 numpy
 neo4j
+PyMySQL
 html2text
 openpyxl
 Flask-WTF
