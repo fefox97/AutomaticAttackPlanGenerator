@@ -89,7 +89,7 @@ class ThreatCatalogue(db.Model):
 
     __tablename__ = 'ThreatCatalogue'
 
-    TID                 = db.Column(db.String(10), primary_key=True, unique=True, nullable=False)
+    TID                 = db.Column(db.String(32), primary_key=True, unique=True, nullable=False)
     Asset               = db.Column(db.Text)
     Threat              = db.Column(db.Text)
     Description         = db.Column(db.Text)
@@ -141,7 +141,7 @@ class CapecThreatRel(db.Model):
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    TID          = db.Column(db.Text, ForeignKey("ThreatCatalogue.TID"))
+    TID          = db.Column(db.String(32), ForeignKey("ThreatCatalogue.TID"))
 
 class ToolCatalogue(db.Model):
 
@@ -187,7 +187,7 @@ class CapecToolRel(db.Model):
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    ToolID       = db.Column(db.Text, ForeignKey("ToolCatalogue.ToolID"))
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
 
 class Macm(db.Model):
 
@@ -197,7 +197,7 @@ class Macm(db.Model):
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
-    App_ID          = db.Column(db.String(32), primary_key=True, nullable=False)
+    App_ID          = db.Column(db.String(32), primary_key=True, nullable=False, index=True)
     Labels          = db.Column(db.JSON)
     Parameters      = db.Column(db.JSON)
 
@@ -237,7 +237,7 @@ class ToolAssetRel(db.Model):
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
     ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
-    AppID        = db.Column(db.Integer, ForeignKey("Macm.App_ID"))
+    AppID        = db.Column(db.String(32), ForeignKey("Macm.App_ID"))
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __init__(self, **kwargs):
