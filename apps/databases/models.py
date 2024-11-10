@@ -52,7 +52,7 @@ class Capec(db.Model):
     Can_Precede_Refs        = db.Column(db.JSON)
     Consequences            = db.Column(db.JSON)
     Domains                 = db.Column(db.JSON)
-    External_References     = db.Column(ExternalReferencesType)
+    External_References     = db.Column(ExternalReferencesType(2000))
     Example_Instances       = db.Column(db.JSON)
     Execution_Flow          = db.Column(db.Text)
     Extended_Description    = db.Column(db.JSON)
