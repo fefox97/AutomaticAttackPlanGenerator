@@ -197,7 +197,7 @@ class Macm(db.Model):
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
-    App_ID          = db.Column(db.Text, primary_key=True, nullable=False)
+    App_ID          = db.Column(db.String(32), primary_key=True, nullable=False)
     Labels          = db.Column(db.JSON)
     Parameters      = db.Column(db.JSON)
 
@@ -217,7 +217,7 @@ class MacmUser(db.Model):
     __tablename__ = 'MacmUser'
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id"), primary_key=True, nullable=False)
-    AppID          = db.Column(db.Text, ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(32), ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
