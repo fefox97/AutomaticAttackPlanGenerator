@@ -89,7 +89,7 @@ class ThreatCatalogue(db.Model):
 
     __tablename__ = 'ThreatCatalogue'
 
-    TID                 = db.Column(db.Text(10), primary_key=True, unique=True, nullable=False)
+    TID                 = db.Column(db.String(10), primary_key=True, unique=True, nullable=False)
     Asset               = db.Column(db.Text)
     Threat              = db.Column(db.Text)
     Description         = db.Column(db.Text)
