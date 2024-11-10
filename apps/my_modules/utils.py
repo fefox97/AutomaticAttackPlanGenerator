@@ -227,7 +227,11 @@ class Utils:
         session = Session()
         if inspect(self.engine).has_table(mapper.__tablename__):
             if replace:
+                session.execute('SET FOREIGN_KEY_CHECKS=0')
+                session.commit()
                 mapper.__table__.drop(self.engine)
+                session.commit()
+                session.execute('SET FOREIGN_KEY_CHECKS=1')
                 session.commit()
         mapper.metadata.create_all(self.engine)
         session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=True)
