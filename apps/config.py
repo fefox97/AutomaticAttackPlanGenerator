@@ -42,6 +42,8 @@ class Config(object):
     DB_PORT     = os.getenv('DB_PORT'     , None)
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
+    DATABASE_URL = os.getenv('DATABASE_URL', None)
+
     USE_SQLITE  = True
 
     DBS_PATH                    = os.getenv('DBS_PATH'    , None)
@@ -51,26 +53,30 @@ class Config(object):
     PASS_NEO4J                  = os.getenv('PASS_NEO4J'    , None)
 
     # try to set up a Relational DBMS
-    if DB_ENGINE and DB_NAME and DB_USERNAME:
+    # if DB_ENGINE and DB_NAME and DB_USERNAME:
 
-        try:
+    #     try:
             
-            # Relational DBMS: PSQL, MySql
-            SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
-                DB_ENGINE,
-                DB_USERNAME,
-                DB_PASS,
-                DB_HOST,
-                DB_PORT,
-                DB_NAME
-            ) 
+    #         # Relational DBMS: PSQL, MySql
+    #         SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
+    #             DB_ENGINE,
+    #             DB_USERNAME,
+    #             DB_PASS,
+    #             DB_HOST,
+    #             DB_PORT,
+    #             DB_NAME
+    #         ) 
 
-            USE_SQLITE  = False
+    #         USE_SQLITE  = False
 
-        except Exception as e:
+    #     except Exception as e:
 
-            print('> Error: DBMS Exception: ' + str(e) )
-            print('> Fallback to SQLite ')    
+    #         print('> Error: DBMS Exception: ' + str(e) )
+    #         print('> Fallback to SQLite ')    
+
+    if DATABASE_URL not in [None, '']:
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+        USE_SQLITE = False
 
     if USE_SQLITE:
 
