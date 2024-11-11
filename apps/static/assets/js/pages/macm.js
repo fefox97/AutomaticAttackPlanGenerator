@@ -227,6 +227,7 @@ function drawNeo4j(database) {
     const configGraph = {
         containerId: "graph",
         serverDatabase: database,
+        consoleDebug: true,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neovis",
@@ -284,7 +285,11 @@ function drawNeo4j(database) {
                 },
             }
         },
-        initialCypher: "MATCH (a)-[b]->(c) RETURN a,b,c"
+        initialCypher: `
+                        MATCH (a)
+                        OPTIONAL MATCH (a)-[b]->(c)
+                        RETURN a,b,c
+                        `
     };
 
     const configSchema = {
