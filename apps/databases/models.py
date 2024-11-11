@@ -100,7 +100,7 @@ class ThreatCatalogue(db.Model):
 
     __tablename__ = 'ThreatCatalogue'
 
-    TID                 = db.Column(db.String(32), primary_key=True, unique=True, nullable=False)
+    TID                 = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
     Asset               = db.Column(db.Text)
     Threat              = db.Column(db.Text)
     Description         = db.Column(db.Text)
@@ -152,7 +152,7 @@ class CapecThreatRel(db.Model):
 
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
-    TID          = db.Column(db.String(32), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
+    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
 
 class ToolCatalogue(db.Model):
 
@@ -208,7 +208,7 @@ class Macm(db.Model):
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
-    App_ID          = db.Column(db.String(32), primary_key=True, nullable=False, index=True)
+    App_ID          = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
     Labels          = db.Column(db.JSON)
     Parameters      = db.Column(db.JSON)
 
@@ -228,7 +228,7 @@ class MacmUser(db.Model):
     __tablename__ = 'MacmUser'
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
-    AppID          = db.Column(db.String(32), ForeignKey("Macm.App_ID", ondelete='CASCADE'), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='CASCADE'), primary_key=True, nullable=False)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
@@ -248,7 +248,7 @@ class ToolAssetRel(db.Model):
     Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
     ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID", ondelete='CASCADE'))
-    AppID        = db.Column(db.String(32), ForeignKey("Macm.App_ID", ondelete='CASCADE'))
+    AppID        = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='CASCADE'))
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __init__(self, **kwargs):
