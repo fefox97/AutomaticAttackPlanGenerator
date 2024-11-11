@@ -49,6 +49,7 @@ function upload_output_file() {
         processData: false,
         success: function(data) {
             $('#copyParserOutput').attr('data-clipboard-text', data.output);
+            $('#executeParserOutput').on('click', function() { executeParser(data.output, macmID); });
             if (data.output.length > 0) {
                 $('#parserOutput').text(data.output);
                 window.Prism.highlightAll();
@@ -56,8 +57,29 @@ function upload_output_file() {
                 $('#parserOutputPre').hide();
                 $('#modalParserAlert').show();
                 $('#copyParserOutput').hide();
+                $('#executeParserOutput').hide();
             }
             $('#modalParserOutput').modal('show');
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+}
+
+function executeParser(query, macmID) {
+    let formData = new FormData();
+    formData.append('AppID', macmID);
+    formData.append('QueryCypher', query);
+    $.ajax({
+        url: '/api/update_macm',
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        data: formData,
+        success: function(data) {
+            $('#modalParserOutput').modal('hide');
+            showModal("MACM Update", data, autohide = true,)
         },
         error: function(data) {
             console.log(data);
