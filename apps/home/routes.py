@@ -8,7 +8,7 @@ from flask import redirect, render_template, request, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, ThreatCatalogue, Macm, ToolCatalogue, PentestPhases
+from apps.databases.models import AttackView, Capec, MacmUser, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
 from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
@@ -104,10 +104,11 @@ def route_template(template):
             selected_macm = request.args.get('app_id')
             selected_id = request.args.get('id')
             macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
+            threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
             attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
             pentest_phases = PentestPhases.query.all()
             av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
-            return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases)
+            return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data)
 
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)

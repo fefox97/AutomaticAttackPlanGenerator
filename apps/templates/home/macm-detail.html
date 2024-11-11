@@ -31,6 +31,27 @@
         <!-- Badges start -->
         {% include 'home/macm-detail/badges.html' %}
         <!-- Badges end -->
+        
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if threat_data|length <= 0 }}" id="headingThreats" data-bs-toggle="collapse" data-bs-target="#collapseThreats" aria-expanded="true" aria-controls="collapseThreats">
+                <h2 class="h5 mb-0">
+                    Threats
+                    <i class="fas fa-chevron-down mr-auto"></i>
+                </h2>
+            </div>
+            
+            <div id="collapseThreats" class="card-body collapse show" aria-labelledby="headingThreats">
+                {% if threat_data|length > 0 %}
+                    {% include 'home/macm-detail/threats.html' %}
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">No Threat Data</h4>
+                        <p>There is no threat data for this MACM component.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
 
         <div class="card border-0 shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -77,8 +98,6 @@
                 {% endif %}
             </div>
         </div>
-
-        
 
         {% include 'home/macm-detail/all_commands.html' %}
     </div>

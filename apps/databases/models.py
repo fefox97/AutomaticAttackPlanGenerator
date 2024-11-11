@@ -291,7 +291,7 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.Asset.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
                     ThreatCatalogue.Description.label("Threat_Description"), 
-                    Macm.Component_ID, 
+                    Macm.Component_ID,
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
                     Macm.App_ID.label("AppID")
@@ -304,7 +304,7 @@ class ThreatModel(db.Model):
                 )
     
     def __repr__(self):
-        return str(f'{self.Component_ID}-{self.Capec_ID}')
+        return str(f'{self.Component_ID}-{self.Threat_ID}')
 
 class AttackView(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')

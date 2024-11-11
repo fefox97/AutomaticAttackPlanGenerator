@@ -1,4 +1,10 @@
 $(document).ready(function() {
+
+    $('.card-header.collapsed').each(function() {
+        $(this).parent('.card').find('.collapse').collapse('hide');
+        $(this).parent('.card').find('.collapse').removeClass('show');
+    });
+
     getAllCommands();
     $('.command-input').on('change', function() {
         getAllCommands();
