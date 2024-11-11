@@ -16,22 +16,22 @@ from .types import ExternalReferencesType
 from apps import db
 from sqlalchemy import UniqueConstraint
 
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
-from sqlite3 import Connection as SQLite3Connection
+# from sqlalchemy import event
+# from sqlalchemy.engine import Engine
+# from sqlite3 import Connection as SQLite3Connection
 
-@event.listens_for(Engine, "connect")
-def _set_sqlite_pragma(dbapi_connection, connection_record):
-    if isinstance(dbapi_connection, SQLite3Connection):
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON;")
-        cursor.close()
+# @event.listens_for(Engine, "connect")
+# def _set_sqlite_pragma(dbapi_connection, connection_record):
+#     if isinstance(dbapi_connection, SQLite3Connection):
+#         cursor = dbapi_connection.cursor()
+#         cursor.execute("PRAGMA foreign_keys=ON;")
+#         cursor.close()
 
 class PentestPhases(db.Model):
 
     __tablename__ = 'PentestPhases'
 
-    PhaseID                = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    PhaseID                = db.Column(db.Integer, primary_key=True, nullable=False)
     PhaseName              = db.Column(db.Text)
     IsSubPhaseOf           = db.Column(db.Integer)
 
@@ -49,7 +49,7 @@ class Capec(db.Model):
 
     __tablename__ = 'Capec'
 
-    Capec_ID                = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Capec_ID                = db.Column(db.Integer, primary_key=True, nullable=False)
     Created                 = db.Column(db.TIMESTAMP)
     Created_By_Ref          = db.Column(db.JSON)
     Description             = db.Column(db.Text)
@@ -100,7 +100,7 @@ class ThreatCatalogue(db.Model):
 
     __tablename__ = 'ThreatCatalogue'
 
-    TID                 = db.Column(db.String(100), primary_key=True, unique=True, nullable=False)
+    TID                 = db.Column(db.String(100), primary_key=True, nullable=False)
     Asset               = db.Column(db.Text)
     Threat              = db.Column(db.Text)
     Description         = db.Column(db.Text)
@@ -150,15 +150,15 @@ class CapecThreatRel(db.Model):
 
     __tablename__ = 'CapecThreatRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
-    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
+    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID"))
 
 class ToolCatalogue(db.Model):
 
     __tablename__ = 'ToolCatalogue'
 
-    ToolID      = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    ToolID      = db.Column(db.Integer, primary_key=True, nullable=False)
     Name        = db.Column(db.Text)
     CapecID     = db.Column(db.JSON)
     CypherQuery = db.Column(db.Text)
@@ -196,9 +196,9 @@ class CapecToolRel(db.Model):
 
     __tablename__ = 'CapecToolRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
 
 class Macm(db.Model):
 
@@ -227,8 +227,8 @@ class MacmUser(db.Model):
 
     __tablename__ = 'MacmUser'
 
-    UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
-    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='CASCADE'), primary_key=True, nullable=False)
+    UserID         = db.Column(db.Integer, ForeignKey("Users.id"), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
@@ -245,10 +245,10 @@ class ToolAssetRel(db.Model):
 
     __tablename__ = 'ToolAssetRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
-    ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID", ondelete='CASCADE'))
-    AppID        = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='CASCADE'))
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
+    ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
+    AppID        = db.Column(db.String(100), ForeignKey("Macm.App_ID"))
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __init__(self, **kwargs):
@@ -265,9 +265,9 @@ class ToolPhaseRel(db.Model):
 
     __tablename__ = 'ToolPhaseRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
-    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID", ondelete='CASCADE'))
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
+    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID"))
     __table_args__ =  (UniqueConstraint('ToolID', 'PhaseID', name='uix_1'),)
 
     def __init__(self, **kwargs):
@@ -279,6 +279,32 @@ class ToolPhaseRel(db.Model):
 
     def __repr__(self):
         return str(f'{self.ToolID}-{self.PhaseID}')
+
+class ThreatModel(db.Model):
+    # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('TM_Number')
+    
+    __table__ = create_view(
+                "ThreatModel",
+                select(
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    Macm.Component_ID, 
+                    Macm.Name.label("Asset"), 
+                    Macm.Parameters,
+                    Macm.App_ID.label("AppID")
+                )
+                .select_from(Macm)
+                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
+                .add_columns(row_number_column),
+                db.metadata,
+                replace=True
+                )
+    
+    def __repr__(self):
+        return str(f'{self.Component_ID}-{self.Capec_ID}')
 
 class AttackView(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
@@ -330,7 +356,7 @@ class ThreatAgentReply(db.Model):
 
     __tablename__ = 'ThreatAgentReply'
 
-    Id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
     attribute = db.Column(db.Text)
     attribute_value = db.Column(db.Text)
     description = db.Column(db.Text,nullable=True)
@@ -340,7 +366,7 @@ class ThreatAgentAttribute(db.Model):
 
     __tablename__ = 'ThreatAgentAttribute'
 
-    Id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
     attribute = db.Column(db.Text)
     attribute_value = db.Column(db.Text)
     description = db.Column(db.Text,nullable=True)
@@ -352,7 +378,7 @@ class ThreatAgentCategory(db.Model):
 
     __tablename__ = 'ThreatAgentCategory'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
     Category       = db.Column(db.Text)
     Description       = db.Column(db.Text)
     CommonAction       = db.Column(db.Text)
@@ -375,7 +401,7 @@ class ThreatAgentQuestion(db.Model):
 
     __tablename__ = 'ThreatAgentQuestion'
 
-    Id           = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
     Question       = db.Column(db.Text)
     Qid       = db.Column(db.Text)
     #Replies       = db.Column(db.Text)

@@ -12,7 +12,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
+from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -198,8 +198,8 @@ class MacmUtils:
                 self.delete_database(app_id)
             db.session.commit()
             return True
-        except:
-            print(f"Error deleting MACM {app_id}")
+        except Exception as error:
+            print(f"Error deleting MACM {app_id}:\n {error}")
             return False
 
     def tool_asset_type_rel(self, database='macm'):
@@ -227,12 +227,14 @@ class Utils:
         session = Session()
         if inspect(self.engine).has_table(mapper.__tablename__):
             if replace:
-                session.execute('SET FOREIGN_KEY_CHECKS=0')
-                session.commit()
+                if self.engine.name != 'sqlite':
+                    session.execute('SET FOREIGN_KEY_CHECKS=0')
+                    session.commit()
                 mapper.__table__.drop(self.engine)
                 session.commit()
-                session.execute('SET FOREIGN_KEY_CHECKS=1')
-                session.commit()
+                if self.engine.name != 'sqlite':
+                    session.execute('SET FOREIGN_KEY_CHECKS=1')
+                    session.commit()
         mapper.metadata.create_all(self.engine)
         session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=True)
         session.commit()
@@ -305,6 +307,7 @@ class Utils:
             self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
 
             AttackView.metadata.create_all(self.engine)
+            ThreatModel.metadata.create_all(self.engine)
 
     # def test_function(self):
     #     response = {}

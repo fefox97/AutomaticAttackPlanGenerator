@@ -19774,6 +19774,9 @@ pre[class*=language-] {
   white-space: pre-line;
   line-break: anywhere; }
 
+.sidebar .multi-level .nav-link {
+  padding-left: 2rem !important; }
+
 [data-bs-theme="dark"] .card {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
