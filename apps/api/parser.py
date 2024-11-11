@@ -71,7 +71,7 @@ class NmapParser:
         app.logger.info(f"Checking if services are already in MACM {macmID}")
         macmAssets = MacmUtils().make_query(f"MATCH (asset {{component_id:'{componentID}'}})-[:hosts]->(service) RETURN service.component_id, service.parameters", macmID)
         for _, asset in macmAssets.iterrows():
-            parameters = self.converter.string_to_dict(asset['service.parameters'])
+            parameters = json.loads(asset['service.parameters'])
             if parameters is not None:
                 port = int(parameters.get('port'))
                 if port in services.keys():

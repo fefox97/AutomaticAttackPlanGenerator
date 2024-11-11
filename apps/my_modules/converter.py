@@ -59,7 +59,7 @@ class Converter:
         else:
             string = string.replace('{', '').replace('}', '')
             out_dict = {k.strip(): v.strip() for k, v in [x.split(':') for x in string.split(',')]}
-            out_dict = {k.removeprefix("'").removeprefix('"').removesuffix('"').removesuffix("'"): v.removeprefix("'").removeprefix('"').removesuffix('"').removesuffix("'") for k, v in out_dict.items()}
+            out_dict = {k.removeprefix("'").removesuffix("'"): v.removeprefix("'").removesuffix("'") for k, v in out_dict.items()}
             return out_dict
 
     def convert_column_to_text(self, df: pd.DataFrame):
