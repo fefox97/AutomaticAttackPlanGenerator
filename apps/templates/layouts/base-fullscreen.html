@@ -16,19 +16,19 @@
 
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head> 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- Primary Meta Tags -->
 
 <title>
-    Flask Volt Dashboard - {% block title %}{% endblock %} | AppSeed
+    VSecLab - {% block title %}{% endblock %} | AppSeed
 </title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="title" content="Volt Free Bootstrap Dashboard - Sign up page">
-<meta name="author" content="Themesberg">
+<meta name="title" content="VSecLab">
+<meta name="author" content="Felice Moretta">
 <meta name="description" content="Volt Pro is a Premium Bootstrap 5 Admin Dashboard featuring over 800 components, 10+ plugins and 20 example pages using Vanilla JS.">
 <meta name="keywords" content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, themesberg, themesberg dashboard, themesberg admin dashboard" />
 <link rel="canonical" href="https://appseed.us/product/volt-dashboard/flask/">
@@ -69,12 +69,20 @@
 <!-- Volt CSS -->
 <link type="text/css" href="{{ config.ASSETS_ROOT }}/css/volt.css" rel="stylesheet">
 
+<!-- Custom Volt SCSS -->
+{% assets "css_all" %}
+<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+{% endassets %}
+
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}
 
 </head>
 <body>
-
+    <!-- Settings Box + Dark Mode Script -->
+    {% include 'includes/settings-box.html' %}
+    <script src="{{ config.ASSETS_ROOT }}/js/dark-mode.js"></script>
+    
     {% block content %}{% endblock content %}
 
     {% include 'includes/scripts.html' %}
