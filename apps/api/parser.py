@@ -1,3 +1,4 @@
+import json
 from flask import current_app as app
 from apps.databases.models import Macm
 from apps.my_modules.converter import Converter
@@ -41,3 +42,38 @@ class NmapParser:
                 MERGE (VM{maxID})<-[:connects]-(net)\n"""
             maxID += 1
         return query
+    
+    def nmap_services(self, macmID, componentID, content):
+        app.logger.info(f"Running nmap services parser on MACM {macmID}")
+        scanner = nm.PortScanner()
+        output = scanner.analyse_nmap_xml_scan(content)
+        services = next(iter(output['scan'].values()))['tcp']
+        query = self.add_services(macmID, componentID, services)
+        return query
+    
+    def add_services(self, macmID, componentID, services):
+        services = self.check_services(macmID, componentID, services)
+        appID, applicationName, maxID = self.macmUtils.get_macm_info(macmID)
+        maxID = int(maxID) + 1
+        query = ''
+        for port, values in services.items():
+            product = values['product']
+            del values['product']
+            values['port'] = f"{port}"
+            query += f"""CREATE (service{maxID}:service {{component_id:'{maxID}', name:'{product}', type:'Service', app_id:'{appID}',application:'{applicationName}', parameters: '{json.dumps(values).replace(';', '')}'}})
+                WITH service{maxID}
+                MATCH (host {{component_id:'{componentID}'}})
+                MERGE (service{maxID})<-[:hosts]-(host)\n"""
+            maxID += 1
+        return query
+    
+    def check_services(self, macmID, componentID, services):
+        app.logger.info(f"Checking if services are already in MACM {macmID}")
+        macmAssets = MacmUtils().make_query(f"MATCH (asset {{component_id:'{componentID}'}})-[:hosts]->(service) RETURN service.component_id, service.parameters", macmID)
+        for _, asset in macmAssets.iterrows():
+            parameters = self.converter.string_to_dict(asset['service.parameters'])
+            if parameters is not None:
+                port = int(parameters.get('port'))
+                if port in services.keys():
+                    del services[port]
+        return services

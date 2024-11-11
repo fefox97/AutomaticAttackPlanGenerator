@@ -105,16 +105,16 @@ def clear_macm():
     macm.delete_macm(selected_macm)
     return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
     
-@blueprint.route('/nmap_classic', methods=['GET', 'POST'])
-def nmap_classic():
+@blueprint.route('/nmap/<string:parser>', methods=['POST'])
+def nmap_classic(parser):
     if 'outputFile' in request.files and request.files['outputFile'].filename != '':
         file = request.files['outputFile']
-        allowed_extensions = ToolCatalogue.query.filter_by(OutputParser='nmap_classic').first().AllowedOutputExtensions
+        allowed_extensions = ToolCatalogue.query.filter_by(OutputParser=f'nmap/{parser}').first().AllowedOutputExtensions
         if not APIUtils().allowed_file(file.filename, allowed_extensions):
             return make_response(jsonify({'message': 'File type not allowed'}), 400)
         content = file.read().decode('utf-8')
         # Parse the output
-        output = NmapParser().nmap_classic(request.form.get('macmID'), request.form.get('componentID'), content)
+        output = getattr(NmapParser(), f'nmap_{parser}')(request.form.get('macmID'), request.form.get('componentID'), content)
         return jsonify({'message': 'Nmap output parsed successfully', 'output': output})
     else:
         return make_response(jsonify({'message': 'No file provided'}), 400)

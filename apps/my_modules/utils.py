@@ -134,6 +134,14 @@ class MacmUtils:
     def delete_database(self, database):
         self.driver.execute_query(f"DROP DATABASE `{database}`")
 
+    def make_query(self, query, database='macm'):
+        try:
+            output = self.driver.execute_query(query, database_=database, result_transformer_=Result.to_df)
+            return output
+        except Exception as error:
+            print(f"Error executing query {query}: {error}")
+            return None
+
     def get_greatest_component_id(self, database='macm'):
         query = "MATCH (asset) RETURN max(toInteger(asset.component_id)) as max_id"
         max_id = self.driver.execute_query(query, database_=database, result_transformer_=Result.to_df).iloc[0]['max_id']
