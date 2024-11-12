@@ -384,6 +384,32 @@ class AttackView(db.Model):
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Capec_ID}')
 
+class MethodologyView(db.Model):
+    # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+    row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
+    
+    __table__ = create_view(
+                "MethodologyView",
+                select(
+                    MethodologyCatalogue.MID, 
+                    MethodologyCatalogue.Name, 
+                    MethodologyCatalogue.Description,
+                    MethodologyCatalogue.Link,
+                    ThreatModel.Threat_ID,
+                    Macm.Component_ID,
+                    Macm.App_ID.label("AppID")
+                ).select_from(Macm)
+                .join(ThreatModel, and_(Macm.Component_ID==ThreatModel.Component_ID, Macm.App_ID==ThreatModel.AppID))
+                .join(MethodologyThreatRel, ThreatModel.Threat_ID==MethodologyThreatRel.TID)
+                .join(MethodologyCatalogue, MethodologyThreatRel.MID==MethodologyCatalogue.MID)
+                .add_columns(row_number_column),
+                db.metadata,
+                replace=True
+                )
+    
+    def __repr__(self):
+        return str(f'{self.Component_ID}-{self.Methodology_ID}')
+
 class ThreatAgentReply(db.Model):
 
     __tablename__ = 'ThreatAgentReply'
@@ -403,8 +429,6 @@ class ThreatAgentAttribute(db.Model):
     attribute_value = db.Column(db.Text)
     description = db.Column(db.Text,nullable=True)
     score = db.Column(db.Integer)
-
-
 
 class ThreatAgentCategory(db.Model):
 
@@ -427,7 +451,6 @@ class ThreatAgentCategory(db.Model):
     def hasAttribute(self):
         ids = self.hasAttribute.filter().with_entities(ThreatAgentAttribute.Id).all()
         return [id[0] for id in ids]
-
 
 class ThreatAgentQuestion(db.Model):
 

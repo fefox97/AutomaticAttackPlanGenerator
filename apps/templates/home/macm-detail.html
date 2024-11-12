@@ -51,7 +51,26 @@
                 {% endif %}
             </div>
         </div>
-
+        
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if methodologies_data|length <= 0 }}" id="headingMethodologies" data-bs-toggle="collapse" data-bs-target="#collapseMethodologies" aria-expanded="true" aria-controls="collapseMethodologies">
+                <h2 class="h5 mb-0">
+                    Methodologies
+                    <i class="fas fa-chevron-down mr-auto"></i>
+                </h2>
+            </div>
+            
+            <div id="collapseMethodologies" class="card-body collapse show" aria-labelledby="headingMethodologies">
+                {% if methodologies_data|length > 0 %}
+                    {% include 'home/macm-detail/methodology.html' %}
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">No Methodology Data</h4>
+                        <p>There is no methodology data for this MACM component.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
         <div class="card border-0 shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">

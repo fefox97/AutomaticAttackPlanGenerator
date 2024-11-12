@@ -12,7 +12,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -348,6 +348,7 @@ class Utils:
 
             AttackView.metadata.create_all(self.engine)
             ThreatModel.metadata.create_all(self.engine)
+            MethodologyView.metadata.create_all(self.engine)
 
     # def test_function(self):
     #     response = {}
