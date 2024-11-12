@@ -24,16 +24,3 @@ $bg-network-background          : rgb(158,57,38) !default;
 
 $accordion-button-active-bg     : $gray-200 !important;
 $accordion-border-color         : $gray-400 !important;
-
-$font-sizes: (
-    1: $font-size-base * 2.5,
-    2: $font-size-base * 2,
-    3: $font-size-base * 1.75,
-    4: $font-size-base * 1.5,
-    5: $font-size-base * 1.25,
-    6: $font-size-base,
-    7: $font-size-base * 0.875,
-    8: $font-size-base * 0.75,
-    9: $font-size-base * 0.625,
-    10: $font-size-base * 0.5,
-) !default;

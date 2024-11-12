@@ -19740,6 +19740,9 @@ div.dataTables_scrollBody {
 .bg-network {
   background-color: #9e3926 !important; }
 
+.badge-macm-detail {
+  font-size: 0.8rem; }
+
 .accordion-options {
   width: 100%;
   clear: both;

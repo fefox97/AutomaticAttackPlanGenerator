@@ -21,7 +21,7 @@
             </nav>
             <h2 class="h4">MACM</h2>
             {% if table is not none %}
-                <p class="mb-0 text-danger fw-bold">{{ attack_number }} attacks found</p>
+                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats and {{ attack_number }} attacks found</p>
             {% endif %}
             <p class="mb-0"></p>
         </div>
@@ -58,15 +58,24 @@
                                         {% if attack_for_each_component is not none%}
                                             {% set attack_for_this_component = attack_for_each_component[row['Component_ID']] %}
                                         {% endif %}
+                                        {% if threat_for_each_component is not none%}
+                                            {% set threat_for_this_component = threat_for_each_component[row['Component_ID']] %}
+                                        {% endif %}
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
                                                     <a class="badge bg-macm position-relative" href="/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if attack_for_this_component %}
-                                                            <span class="position-absolute fs-8 top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-capec badge-macm-detail">
                                                                 {{attack_for_each_component[row['Component_ID']]}}
                                                                 <span class="visually-hidden">Attacks available</span>
+                                                            </span>
+                                                        {% endif %}
+                                                        {% if threat_for_this_component %}
+                                                            <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-threat badge-macm-detail">
+                                                                {{threat_for_each_component[row['Component_ID']]}}
+                                                                <span class="visually-hidden">Threats available</span>
                                                             </span>
                                                         {% endif %}
                                                     </a>

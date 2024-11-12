@@ -103,11 +103,14 @@ def route_template(template):
                 attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
                 attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
                 attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
+                threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+                threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+                threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
             except:
                 app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
                 attack_for_each_component = None
                 attack_number = None
-            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number)
+            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number)
         
         elif template == 'macm-detail.html':
             selected_macm = request.args.get('app_id')
