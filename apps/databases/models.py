@@ -120,7 +120,8 @@ class ThreatCatalogue(db.Model):
     Commento            = db.Column(db.Text)
     
     hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat', lazy='dynamic')
-    
+    hasMethodology      = db.relationship('MethodologyCatalogue', secondary='MethodologyThreatRel', backref='hasThreat', lazy='dynamic')
+
     @hybrid_property
     def hasCapecMeta(self):
         ids = self.hasCapec.filter(Capec.Abstraction == 'Meta').with_entities(Capec.Capec_ID).all()
@@ -135,6 +136,11 @@ class ThreatCatalogue(db.Model):
     def hasCapecDetailed(self):
         ids = self.hasCapec.filter(Capec.Abstraction == 'Detailed').with_entities(Capec.Capec_ID).all()
         return [id[0] for id in ids]
+
+    @hybrid_property
+    def hasMethodologyIDs(self):
+        ids = self.hasMethodology.with_entities(MethodologyCatalogue.MID).all()
+        return [id[0] for id in ids]
     
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -146,6 +152,14 @@ class ThreatCatalogue(db.Model):
     def __repr__(self):
         return str(self.TID)
     
+class MethodologyThreatRel(db.Model):
+    
+        __tablename__ = 'MethodologyThreatRel'
+    
+        Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+        MID          = db.Column(db.Integer, ForeignKey("MethodologyCatalogue.MID"))
+        TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID"))
+
 class CapecThreatRel(db.Model):
 
     __tablename__ = 'CapecThreatRel'
@@ -191,6 +205,24 @@ class ToolCatalogue(db.Model):
 
     def __repr__(self):
         return str(self.ToolID)
+
+class MethodologyCatalogue(db.Model):
+
+    __tablename__ = 'MethodologyCatalogue'
+
+    MID = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    Link = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.MID)
 
 class CapecToolRel(db.Model):
 

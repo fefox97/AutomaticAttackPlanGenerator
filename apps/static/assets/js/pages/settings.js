@@ -8,6 +8,9 @@ $(document).ready(function() {
     $('#ReloadToolCatalog').on('click', function() {
         reloadDatabases("ToolCatalog");
     });
+    $('#ReloadMethodologyCatalog').on('click', function() {
+        reloadDatabases("MethodologyCatalog");
+    });
     $('#TestButton').on('click', function() {
         test();
     });

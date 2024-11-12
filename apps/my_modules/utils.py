@@ -12,7 +12,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -76,7 +76,7 @@ class ThreatCatalogUtils:
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         # df.set_index('TID', inplace=True)
         df = df.astype('str')
-        columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
+        columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed', 'Methodology']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
         return df
@@ -106,6 +106,21 @@ class ToolCatalogUtils:
         df['PhaseID'] = df['PhaseID'].apply(lambda x: int(x) if x is not None else None)
         df['IsSubPhaseOf'] = df['IsSubPhaseOf'].apply(lambda x: int(x) if x is not None else None)
         print(df)
+        return df
+
+class MethodologyCatalogUtils:
+
+    converter = Converter()
+
+    def __init__(self):
+        self.base_path = Config.DBS_PATH
+        self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+        # self.tools_catalog_df = self.load_tools_catalog()
+
+    def load_methodology_catalog(self):
+        print("\nLoading methodology catalog...\n")
+        df = pd.read_excel(self.file_path, sheet_name="Methodologies", header=0)
+        df.replace(np.nan, None, inplace=True) # replace NaN with None
         return df
 
 class MacmUtils:
@@ -156,7 +171,6 @@ class MacmUtils:
         applicationName = applicationName[0] if applicationName else None
         maxID = self.get_greatest_component_id(database)
         return appID, applicationName, maxID
-
 
     def read_macm(self, database='macm'):
         macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters, labels(asset)", database_=database, result_transformer_=Result.to_df)
@@ -227,6 +241,7 @@ class Utils:
         self.threat_catalog_utils = ThreatCatalogUtils()
         self.tool_catalog_utils = ToolCatalogUtils()
         self.macm_utils = MacmUtils()
+        self.methodology_catalog_utils = MethodologyCatalogUtils()
         self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -282,16 +297,30 @@ class Utils:
         relations_df.drop_duplicates(inplace=True)
         relations_df.index.name = 'Id'
         return relations_df
-
+    
+    def load_methodology_threat_relations(self, df: pd.DataFrame):
+        print("\nExtracting Methodology-ThreatCatalog relations to database...\n")
+        relations_df = pd.DataFrame(columns=['MID', 'TID'])
+        for _, threat in df.iterrows():
+            for methodology in threat['Methodology']:
+                if methodology is not None and methodology != 'None':
+                    relations_df.loc[len(relations_df)] = {'MID': methodology, 'TID': threat['TID']}
+        print(relations_df)
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+    
     def upload_databases(self, database, neo4j_db='macm'):
         if database == 'Capec':
             attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
             self.save_dataframe_to_database(attack_pattern_df, Capec)
         elif database == 'ThreatCatalog':
             threat_catalog_df = self.threat_catalog_utils.load_threat_catalog()
-            relations = self.load_capec_threat_relations(threat_catalog_df)
+            threat_capec_relations = self.load_capec_threat_relations(threat_catalog_df)
+            threat_methodology_relations = self.load_methodology_threat_relations(threat_catalog_df)
             self.save_dataframe_to_database(threat_catalog_df, ThreatCatalogue)
-            self.save_dataframe_to_database(relations, CapecThreatRel)
+            self.save_dataframe_to_database(threat_capec_relations, CapecThreatRel)
+            self.save_dataframe_to_database(threat_methodology_relations, MethodologyThreatRel)
         elif database == 'ToolCatalog':
             tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
             pentest_phases_df = self.tool_catalog_utils.load_pentest_phases()
@@ -301,6 +330,9 @@ class Utils:
             self.save_dataframe_to_database(tool_catalog_df, ToolCatalogue)
             self.save_dataframe_to_database(capec_tool_relations, CapecToolRel)
             self.save_dataframe_to_database(tool_phases_relations, ToolPhaseRel)
+        elif database == 'MethodologyCatalog':
+            methodology_catalog_df = self.methodology_catalog_utils.load_methodology_catalog()
+            self.save_dataframe_to_database(methodology_catalog_df, MethodologyCatalogue)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)

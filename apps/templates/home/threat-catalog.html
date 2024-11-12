@@ -57,6 +57,7 @@
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
+                                <th>Methodology</th>
                                 <th>Commento</th>
                             </tr>
                         </thead>
@@ -104,6 +105,15 @@
                                             </div>
                                         {% endif %}
                                     </td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasMethodologyIDs is not none %}
+                                            <div class="d-flex flex-wrap">
+                                                    {% for methodology in row.hasMethodologyIDs | sort %}
+                                                    <span class="badge bg-methodology me-1 mb-1">{{ methodology }}</span>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}
@@ -127,6 +137,7 @@
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
+                                <th>Methodology</th>
                                 <th>Commento</th>
                             </tr>
                         </tfoot>
