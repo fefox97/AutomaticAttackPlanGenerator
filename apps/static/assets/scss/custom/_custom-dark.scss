@@ -143,14 +143,14 @@ $color-mode-type: data;
     .accordion {
         .accordion-item{
             .accordion-button {
-                background-color: $accordion-button-bg-dark !important;
+                background: $accordion-button-bg-dark !important;
                 color: $accordion-button-color-dark !important;
                 &:hover, &:focus {
                     background-color: $accordion-button-hover-bg-dark !important;
                     color: $accordion-button-hover-color-dark !important;
                 }
                 &.collapsed {
-                    background-color: $accordion-button-collapsed-bg-dark !important;
+                    background: $accordion-button-collapsed-bg-dark !important;
                     color: $accordion-button-collapsed-color-dark !important;
                     &:hover, &:focus {
                         background-color: $accordion-button-collapsed-hover-bg-dark !important;

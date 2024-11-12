@@ -19881,16 +19881,16 @@ pre[class*=language-] {
       color: var(--bs-btn-active-color) !important; }
 
 [data-bs-theme="dark"] .accordion .accordion-item .accordion-button {
-  background-color: #374151 !important;
+  background: #1F2937 !important;
   color: #F2F4F6 !important; }
   [data-bs-theme="dark"] .accordion .accordion-item .accordion-button:hover, [data-bs-theme="dark"] .accordion .accordion-item .accordion-button:focus {
-    background-color: #4B5563 !important;
+    background-color: #374151 !important;
     color: #F2F4F6 !important; }
   [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed {
-    background-color: #4B5563 !important;
+    background: #1F2937 !important;
     color: #F2F4F6 !important; }
     [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed:hover, [data-bs-theme="dark"] .accordion .accordion-item .accordion-button.collapsed:focus {
-      background-color: #4B5563 !important;
+      background-color: #374151 !important;
       color: #F2F4F6 !important; }
 
 [data-bs-theme="dark"] .accordion .accordion-item .accordion-body {

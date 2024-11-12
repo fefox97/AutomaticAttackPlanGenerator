@@ -92,16 +92,16 @@ $accordion-icon-active-color-dark:  $primary-text-emphasis-dark !default;
 $accordion-button-icon-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
 $accordion-button-active-icon-dark:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
 
-$accordion-button-bg-dark:                      $gray-700 !default;
+$accordion-button-bg-dark:                      $gray-800 !default;
 $accordion-button-color-dark:                   $gray-100 !default;
-$accordion-button-hover-bg-dark:                $gray-600 !default;
+$accordion-button-hover-bg-dark:                $gray-700 !default;
 $accordion-button-hover-color-dark:             $gray-100 !default;
-$accordion-button-active-bg-dark:               $gray-600 !default;
+$accordion-button-active-bg-dark:               $gray-700 !default;
 $accordion-button-active-color-dark:            $gray-100 !default;
-$accordion-button-collapsed-bg-dark:            $gray-600 !default;
+$accordion-button-collapsed-bg-dark:            $gray-800 !default;
 $accordion-button-collapsed-color-dark:         $gray-100 !default;
 $accordion-button-collapsed-hover-color-dark:   $gray-100 !default;
-$accordion-button-collapsed-hover-bg-dark:      $gray-600 !default;
+$accordion-button-collapsed-hover-bg-dark:      $gray-700 !default;
 
 $accordion-body-color-dark:                     $gray-100 !default;
 

@@ -124,11 +124,11 @@ def route_template(template):
         return render_template(f"home/{template}", segment=segment)
 
     except TemplateNotFound:
-        return render_template('home/page-404.html'), 404
+        return render_template('errors/page-404.html'), 404
 
     except:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
-        return render_template('home/page-500.html'), 500
+        return render_template('errors/page-404.html'), 500
 
 # Helper - Extract current page name from request
 def get_segment(request):
