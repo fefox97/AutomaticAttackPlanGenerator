@@ -4,20 +4,22 @@
             <span class="badge bg-primary">Type: {{ macm_data.Type }}</span>
         {% endif %}
     </h3>
-    {% if 'ip' in macm_data.Parameters.keys() %}
-    <h3 class="ms-2">
-        <span class="badge bg-network">
-            <i class="fa-solid fa-network-wired"></i>
-            {{ macm_data.Parameters.ip }}
-        </span>
-    </h3>
-    {% endif %}
-    {% if 'ip_range' in macm_data.Parameters.keys() %}
-    <h3 class="ms-2">
-        <span class="badge bg-network">
-            <i class="fa-solid fa-network-wired"></i>
-            {{ macm_data.Parameters.ip_range }}
-        </span>
-    </h3>
+    {% if macm_data.Parameters is not none %}
+        {% if 'ip' in macm_data.Parameters.keys() %}
+        <h3 class="ms-2">
+            <span class="badge bg-network">
+                <i class="fa-solid fa-network-wired"></i>
+                {{ macm_data.Parameters.ip }}
+            </span>
+        </h3>
+        {% endif %}
+        {% if 'ip_range' in macm_data.Parameters.keys() %}
+        <h3 class="ms-2">
+            <span class="badge bg-network">
+                <i class="fa-solid fa-network-wired"></i>
+                {{ macm_data.Parameters.ip_range }}
+            </span>
+        </h3>
+        {% endif %}
     {% endif %}
 </div>
