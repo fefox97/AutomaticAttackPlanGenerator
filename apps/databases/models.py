@@ -157,16 +157,16 @@ class MethodologyThreatRel(db.Model):
         __tablename__ = 'MethodologyThreatRel'
     
         Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-        MID          = db.Column(db.Integer, ForeignKey("MethodologyCatalogue.MID"))
-        TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID"))
+        MID          = db.Column(db.Integer, ForeignKey("MethodologyCatalogue.MID", ondelete='CASCADE'))
+        TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
 
 class CapecThreatRel(db.Model):
 
     __tablename__ = 'CapecThreatRel'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID"))
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
+    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
 
 class ToolCatalogue(db.Model):
 
@@ -229,8 +229,8 @@ class CapecToolRel(db.Model):
     __tablename__ = 'CapecToolRel'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID"))
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
+    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
 
 class Macm(db.Model):
 
@@ -259,8 +259,8 @@ class MacmUser(db.Model):
 
     __tablename__ = 'MacmUser'
 
-    UserID         = db.Column(db.Integer, ForeignKey("Users.id"), primary_key=True, nullable=False)
-    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
+    UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='CASCADE'), primary_key=True, nullable=False)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
@@ -293,8 +293,8 @@ class ToolPhaseRel(db.Model):
     __tablename__ = 'ToolPhaseRel'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
-    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID"))
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID", ondelete='CASCADE'))
     __table_args__ =  (UniqueConstraint('ToolID', 'PhaseID', name='uix_1'),)
 
     def __init__(self, **kwargs):
