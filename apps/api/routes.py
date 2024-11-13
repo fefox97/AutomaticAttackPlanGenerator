@@ -167,7 +167,7 @@ def download_report():
     try:
         path = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['path']
         filename = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['filename']
-        return send_file(f'../{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
+        return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
     except Exception as error:
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
