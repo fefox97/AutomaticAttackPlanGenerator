@@ -12,7 +12,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, ToolAssetRel, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -94,7 +94,7 @@ class ToolCatalogUtils:
         print("\nLoading tools catalog...\n")
         df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
-        df['AllowedOutputExtensions'] = df['AllowedOutputExtensions'].apply(lambda x: self.converter.string_to_list(x))
+        df['AllowedReportExtensions'] = df['AllowedReportExtensions'].apply(lambda x: self.converter.string_to_list(x))
         df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
         df['PhaseID'] = df['PhaseID'].apply(lambda x: self.converter.string_to_int_list(x))
         return df
@@ -215,7 +215,7 @@ class MacmUtils:
         try:
             Macm.query.filter_by(App_ID=app_id).delete()
             MacmUser.query.filter_by(AppID=app_id).delete()
-            ToolAssetRel.query.filter_by(AppID=app_id).delete()
+            Attack.query.filter_by(AppID=app_id).delete()
             if delete_neo4j:
                 self.delete_database(app_id)
             db.session.commit()
@@ -343,7 +343,7 @@ class Utils:
             tool_asset_type_df['AppID'] = neo4j_db
             
             self.save_dataframe_to_database(macm_df, Macm, replace=False)
-            self.save_dataframe_to_database(tool_asset_type_df, ToolAssetRel, replace=False)
+            self.save_dataframe_to_database(tool_asset_type_df, Attack, replace=False)
             self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
 
             AttackView.metadata.create_all(self.engine)
@@ -396,7 +396,7 @@ class Utils:
                     Macm.App_ID.label("AppID"),
                     PentestPhases.PhaseID.label("PhaseID"),
                     PentestPhases.PhaseName.label("PhaseName")
-                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
+                ).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
         compiled = query.compile(compile_kwargs={"literal_binds": True})
         response = {'query': str(compiled)}
         

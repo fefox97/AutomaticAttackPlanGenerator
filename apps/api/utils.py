@@ -1,5 +1,6 @@
+import os
 from apps import db
-from apps.databases.models import Capec, MacmUser, Macm, ToolAssetRel
+from apps.databases.models import Capec, MacmUser, Macm, Attack
 from flask import current_app as app
 from sqlalchemy import or_, and_
 import nmap as nm
@@ -52,4 +53,14 @@ class APIUtils:
 
     def allowed_file(self, filename, allowed_extensions):
         allowed_extensions = [x.replace('.', '') for x in allowed_extensions]
+        if '*' in allowed_extensions:
+            return True
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+    def delete_files(self, file_list):
+        for file in file_list:
+            try:
+                os.remove(file)
+            except:
+                app.logger.error(f"Error deleting file {file}", exc_info=True)
+                pass

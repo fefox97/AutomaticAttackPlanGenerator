@@ -15,7 +15,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="executeParserOutput">Execute</button>
-                <button type="button" class="btn btn-secondary" id="copyParserOutput">Copy</button>
+                <button type="button" class="btn btn-secondary" id="copyParserOutput" onclick="navigator.clipboard.writeText($(this).attr('data-clipboard-text'))">Copy</button>
                 <button type="button" class="btn btn-tertiary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

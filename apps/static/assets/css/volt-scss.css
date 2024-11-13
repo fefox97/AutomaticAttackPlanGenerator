@@ -19743,6 +19743,9 @@ div.dataTables_scrollBody {
 .badge-macm-detail {
   font-size: 0.8rem; }
 
+.attack-body-bg .accordion-body {
+  background-color: rgba(0, 0, 0, 0.15); }
+
 .accordion-options {
   width: 100%;
   clear: both;

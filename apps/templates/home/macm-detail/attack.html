@@ -19,11 +19,13 @@
         </div>
     </div>
     <div id="collapse{{attack.Attack_Number}}" class="accordion-collapse collapse show">
-        <div class="accordion-body">
-            {% include 'home/macm-detail/capec_description.html' %}
-            {% include 'home/macm-detail/threat_description.html' %}
-            {% include 'home/macm-detail/execution_flow.html' %}
-            {% include 'home/macm-detail/code.html' %}
+        <div class="accordion-body attack-body-bg">
+            <div class="accordion shadow" id="accordion{{attack.Attack_Number}}">
+                {% include 'home/macm-detail/capec_description.html' %}
+                {% include 'home/macm-detail/threat_description.html' %}
+                {% include 'home/macm-detail/execution_flow.html' %}
+                {% include 'home/macm-detail/code.html' %}
+            </div>
         </div>
     </div>
 </div>

@@ -4,8 +4,9 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import json
+import traceback
 from apps.api import blueprint
-from flask import render_template, request, redirect, url_for, make_response
+from flask import render_template, request, redirect, send_file, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
@@ -13,7 +14,7 @@ from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import AttackView, Macm, ToolCatalogue
+from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue
 from apps import db
 import hashlib
 
@@ -105,16 +106,84 @@ def clear_macm():
     macm.delete_macm(selected_macm)
     return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
     
-@blueprint.route('/nmap/<string:parser>', methods=['POST'])
-def nmap_classic(parser):
-    if 'outputFile' in request.files and request.files['outputFile'].filename != '':
-        file = request.files['outputFile']
-        allowed_extensions = ToolCatalogue.query.filter_by(OutputParser=f'nmap/{parser}').first().AllowedOutputExtensions
+@blueprint.route('/upload_report', methods=['POST'])
+def upload_report():
+    if 'reportFile' in request.files and request.files['reportFile'].filename != '':
+        file = request.files['reportFile']
+        macmID = request.form.get('macmID')
+        componentID = request.form.get('componentID')
+        toolID = request.form.get('toolID')
+        filename = f"{current_user.id}_{componentID}_{toolID}_{file.filename}"
+        path = f'{app.config["UPLOAD_FOLDER"]}'
+        allowed_extensions = ToolCatalogue.query.filter_by(ToolID=toolID).first().AllowedReportExtensions
         if not APIUtils().allowed_file(file.filename, allowed_extensions):
             return make_response(jsonify({'message': 'File type not allowed'}), 400)
-        content = file.read().decode('utf-8')
-        # Parse the output
-        output = getattr(NmapParser(), f'nmap_{parser}')(request.form.get('macmID'), request.form.get('componentID'), content)
-        return jsonify({'message': 'Nmap output parsed successfully', 'output': output})
+
+        try:
+            currentReport = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first()
+            if currentReport is not None and currentReport.ReportFiles is not None and currentReport.ReportFiles != '':
+                oldPath = currentReport.ReportFiles['path']
+                APIUtils().delete_files([oldPath])
+            currentReport.ReportFiles = {
+                'filename': filename,
+                'path': path
+            }
+            file.save(f'{path}/{filename}')
+            db.session.commit()
+            return jsonify({'message': 'File uploaded successfully'})
+        except Exception as error:
+                traceback.print_exc()
+                return make_response(jsonify({'message': error.args}), 400)
     else:
+        app.logger.error('No file provided')
         return make_response(jsonify({'message': 'No file provided'}), 400)
+    
+@blueprint.route('/delete_report', methods=['POST'])
+def delete_report():
+    macmID = request.form.get('macmID')
+    componentID = request.form.get('componentID')
+    toolID = request.form.get('toolID')
+    try:
+        currentReport = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first()
+        if currentReport is not None and currentReport.ReportFiles is not None and currentReport.ReportFiles != '':
+            oldPath = currentReport.ReportFiles['path']
+            filename = currentReport.ReportFiles['filename']
+            APIUtils().delete_files([f'{oldPath}/{filename}'])
+            currentReport.ReportFiles = None
+            db.session.commit()
+            return jsonify({'message': 'File deleted successfully'})
+        else:
+            return jsonify({'message': 'No file to delete'})
+    except Exception as error:
+        traceback.print_exc()
+        return make_response(jsonify({'message': error.args}), 400)
+
+@blueprint.route('/download_report', methods=['POST'])
+def download_report():
+    macmID = request.form.get('macmID')
+    componentID = request.form.get('componentID')
+    toolID = request.form.get('toolID')
+    try:
+        path = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['path']
+        filename = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['filename']
+        return send_file(f'../{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
+    except Exception as error:
+        traceback.print_exc()
+        return make_response(jsonify({'message': error.args}), 400)
+
+@blueprint.route('/nmap/<string:parser>', methods=['POST'])
+def nmap(parser):
+    macmID = request.form.get('macmID')
+    componentID = request.form.get('componentID')
+    toolID = request.form.get('toolID')
+    path = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['path']
+    filename = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['filename']
+    try:
+        with open(f'{path}/{filename}', 'rb') as file:
+            content = file.read().decode('utf-8')
+            # Parse the output
+            output = getattr(NmapParser(), f'nmap_{parser}')(request.form.get('macmID'), request.form.get('componentID'), content)
+            return jsonify({'message': 'Nmap output parsed successfully', 'output': output})
+    except Exception as error:
+        traceback.print_exc()
+        return make_response(jsonify({'message': error.args}), 400)

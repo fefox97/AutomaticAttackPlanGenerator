@@ -180,8 +180,8 @@ class ToolCatalogue(db.Model):
     Description = db.Column(db.Text)
     PhaseID     = db.Column(db.JSON)
     IsExecutable = db.Column(db.Boolean)
-    OutputParser = db.Column(db.Text)
-    AllowedOutputExtensions = db.Column(db.JSON)
+    ReportParser = db.Column(db.Text)
+    AllowedReportExtensions = db.Column(db.JSON)
     
     hasPhase       = db.relationship("PentestPhases", secondary='ToolPhaseRel', backref='hasTool', lazy='dynamic')
     hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool', lazy='dynamic')
@@ -273,22 +273,17 @@ class MacmUser(db.Model):
     def __repr__(self):
         return str(self.UserID)
     
-class ToolAssetRel(db.Model):
+class Attack(db.Model):
 
-    __tablename__ = 'ToolAssetRel'
+    __tablename__ = 'Attack'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
     ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
     AppID        = db.Column(db.String(100), ForeignKey("Macm.App_ID"))
+    ReportFiles  = db.Column(db.JSON)
+    
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
-
-    def __init__(self, **kwargs):
-        for property, value in kwargs.items():
-            if hasattr(value, '__iter__') and not isinstance(value, str):
-                value = value[0]
-
-            setattr(self, property, value)
 
     def __repr__(self):
         return str(f'{self.ToolID}-{self.AssetType}')
@@ -350,8 +345,8 @@ class AttackView(db.Model):
                     ToolCatalogue.Command,
                     ToolCatalogue.Description.label("Tool_Description"),
                     ToolCatalogue.IsExecutable.label("Is_Executable"),
-                    ToolCatalogue.OutputParser.label("Output_Parser"),
-                    ToolCatalogue.AllowedOutputExtensions.label("Allowed_Output_Extensions"),
+                    ToolCatalogue.ReportParser.label("Report_Parser"),
+                    ToolCatalogue.AllowedReportExtensions.label("Allowed_Report_Extensions"),
                     Capec.Capec_ID,
                     Capec.Name.label("Attack_Pattern"), 
                     Capec.Execution_Flow, 
@@ -365,7 +360,8 @@ class AttackView(db.Model):
                     Macm.Parameters,
                     Macm.App_ID.label("AppID"),
                     PentestPhases.PhaseID.label("PhaseID"),
-                    PentestPhases.PhaseName.label("PhaseName")
+                    PentestPhases.PhaseName.label("PhaseName"),
+                    Attack.ReportFiles
                 )
                 .select_from(Macm)
                 .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
@@ -373,7 +369,7 @@ class AttackView(db.Model):
                 .join(Capec)
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
-                .join(ToolAssetRel, and_(Macm.Component_ID==ToolAssetRel.ComponentID, ToolAssetRel.ToolID==ToolCatalogue.ToolID, Macm.App_ID==ToolAssetRel.AppID))
+                .join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID))
                 .join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID)
                 .join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID)
                 .add_columns(row_number_column),

@@ -18,7 +18,7 @@ function showModal(title, response, autohide = false, large = false){
     if (autohide) {
         setTimeout(function() {
             $("#modal-upload").modal("hide");
-        }, 2000);
+        }, 5000);
     }
 }
 
