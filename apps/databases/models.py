@@ -260,7 +260,7 @@ class MacmUser(db.Model):
     __tablename__ = 'MacmUser'
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
-    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID"), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(100), ForeignKey("Macm.App_ID", ondelete='NO ACTION'), primary_key=True, nullable=False)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
