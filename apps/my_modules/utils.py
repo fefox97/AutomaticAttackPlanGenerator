@@ -344,9 +344,9 @@ class Utils:
                     tool_asset_type_df = tool_asset_type_df[tool_asset_type_df['ComponentID'] != component_id]
                     macm_user_df = macm_user_df[macm_user_df['AppID'] != neo4j_db]
 
+            self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
             self.save_dataframe_to_database(macm_df, Macm, replace=False)
             self.save_dataframe_to_database(tool_asset_type_df, Attack, replace=False)
-            self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
 
             AttackView.metadata.create_all(self.engine)
             ThreatModel.metadata.create_all(self.engine)
