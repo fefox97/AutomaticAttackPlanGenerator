@@ -94,6 +94,7 @@ def route_template(template):
         elif template == 'macm.html':
             try:
                 selected_macm = request.args.get('app_id')
+                reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None), AttackView.ReportFiles!='null').distinct().all()
                 table = Macm.query.filter_by(App_ID=selected_macm).all()
                 if len(table) == 0:
                     table = None
@@ -110,7 +111,7 @@ def route_template(template):
                 app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
                 attack_for_each_component = None
                 attack_number = None
-            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number)
+            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports)
         
         elif template == 'macm-detail.html':
             selected_macm = request.args.get('app_id')

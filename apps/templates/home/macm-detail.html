@@ -120,13 +120,13 @@
 
         {% include 'home/macm-detail/all_commands.html' %}
     </div>
-</div>
 
-{% include 'home/macm-detail/parser_modal.html' %}
+    {% include 'home/macm-detail/modals.html' %}
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm-detail.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
 {% endblock javascripts %}

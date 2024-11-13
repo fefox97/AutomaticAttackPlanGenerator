@@ -195,39 +195,35 @@ $(window).on('load', function() {
             }
         })
     });
+});
 
-    // Delete MACM component
-    $('#deleteComponentModal').on('show.bs.modal', function (event) {
-        let ComponentName = event.relatedTarget.getAttribute('data-bs-ComponentName');
-        let ComponentID = event.relatedTarget.getAttribute('data-bs-ComponentID');
-        this.querySelector('#deleteComponentID').value = ComponentID;
-        this.querySelector('#deleteComponentName').textContent = ComponentName;
-    });
-    $('#deleteComponentConfirm').click(function() {
-        let ComponentID = $('#deleteComponentID').val();
+function deleteComponent(App_ID, ComponentID, ComponentName) {
+    $('#deleteName').text(ComponentName);
+    $('#deleteConfirm').click(function() {
         $.ajax({
             url: '/api/delete_macm_component',
             type: 'POST',
             data: {
-                AppID: app_id,
+                AppID: App_ID,
                 ComponentID: ComponentID,
             },
             success: function(response) {
                 location.reload();
             },
             error: function(response) {
-                $('#deleteComponentModal').modal('hide');
+                $('#deleteModal').modal('hide');
                 showModal("Delete failed", JSON.parse(response.responseText));
             }
         })
     });
-});
+    $('#deleteModal').modal('show');
+}
 
 function drawNeo4j(database) {
     const configGraph = {
         containerId: "graph",
         serverDatabase: database,
-        consoleDebug: true,
+        consoleDebug: false,
         neo4j: {
             serverUrl: "neo4j://192.168.40.4:7787",
             serverUser: "neovis",

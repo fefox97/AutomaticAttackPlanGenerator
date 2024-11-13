@@ -281,7 +281,7 @@ class Attack(db.Model):
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID"))
     ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID"))
     AppID        = db.Column(db.String(100), ForeignKey("Macm.App_ID"))
-    ReportFiles  = db.Column(db.JSON)
+    ReportFiles  = db.Column(db.JSON, none_as_null=True)
     
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 

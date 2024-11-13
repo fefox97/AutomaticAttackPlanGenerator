@@ -100,7 +100,7 @@
                                         </td>
                                         <td>
                                             <div class="text-center">
-                                                <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteComponentModal" data-bs-ComponentID="{{row['Component_ID']}}" data-bs-AppID="{{row['App_ID']}}" data-bs-ComponentName="{{row['Name']}}">
+                                                <button type="button" class="btn btn-danger btn-sm align-items-center" onclick="deleteComponent('{{row.App_ID}}', '{{row.Component_ID}}', '{{row.Name}}')">
                                                 <i class="fas fa-trash mr-auto"></i>
                                                 Delete
                                                 </button>
@@ -134,7 +134,7 @@
         </div>
         
         {% if table is not none %}
-        <div class="card border-0 shadow">
+        <div class="card border-0 shadow mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">MACM Graph</h2>
                 <ul class="nav nav-pills mb-3" id="graph-tabs" role="tablist">
@@ -167,51 +167,21 @@
             </div>
         </div>
         {% endif %}
-    </div>
 
-    <!-- Edit Modal -->
-    <div class="modal modal-lg fade" id="editMacmModal" tabindex="-1" aria-labelledby="editMacmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editMacmModalLabel">Edit {{ table[0].Application if table is not none }} MACM</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <span class="h6">Insert the Cypher query</span>
-                    </div>
-                    <textarea class="form-control" id="edit-query-cypher" name="edit-query-cypher" rows="6" placeholder="Cypher Query"></textarea>
-                </div>
-        
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="edit-submit" class="btn btn-primary">Save</button>
-                </div>
+        <div class="card border-0 shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Reports</h2>
+            </div>
+            
+            <div class="card-body">
+                {% include 'home/macm/reports.html' %}
             </div>
         </div>
+
     </div>
 
-    <!-- Delete Component Modal -->
-    <div class="modal fade" id="deleteComponentModal" tabindex="-1" aria-labelledby="deleteComponentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteComponentModalLabel">Delete Component</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete the component <span id="deleteComponentName"></span>?</p>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" id="deleteComponentID" name="deleteComponentID" value="">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" id="deleteComponentConfirm">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'home/macm/modals.html' %}
+    {% include 'home/macm-detail/modals.html' %}
 
 {% endblock content %}
 
@@ -220,5 +190,6 @@
     <script type="text/javascript">
         var app_id = "{{table[0].App_ID if table is not none | tojson }}";
     </script>
-    <script type="module" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
 {% endblock javascripts %}

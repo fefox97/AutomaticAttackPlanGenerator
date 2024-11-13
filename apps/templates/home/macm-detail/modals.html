@@ -1,4 +1,4 @@
-<!-- Modal -->
+<!-- Parser Modal -->
 <div class="modal fade" id="modalParserOutput" tabindex="-1" aria-labelledby="modalParserOutputLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -17,6 +17,26 @@
                 <button type="button" class="btn btn-primary" id="executeParserOutput">Execute</button>
                 <button type="button" class="btn btn-secondary" id="copyParserOutput" onclick="navigator.clipboard.writeText($(this).attr('data-clipboard-text'))">Copy</button>
                 <button type="button" class="btn btn-tertiary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <span id="deleteName"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="deleteID" name="deleteID" value="">
+                <button type="button" class="btn btn-danger" id="deleteConfirm">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

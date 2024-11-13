@@ -121,7 +121,7 @@ def upload_report():
 
         try:
             currentReport = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first()
-            if currentReport is not None and currentReport.ReportFiles is not None and currentReport.ReportFiles != '':
+            if currentReport is not None and currentReport.ReportFiles is not None and 'path' in currentReport.ReportFiles:
                 oldPath = currentReport.ReportFiles['path']
                 APIUtils().delete_files([oldPath])
             currentReport.ReportFiles = {
@@ -145,10 +145,11 @@ def delete_report():
     toolID = request.form.get('toolID')
     try:
         currentReport = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first()
-        if currentReport is not None and currentReport.ReportFiles is not None and currentReport.ReportFiles != '':
+        if currentReport is not None and currentReport.ReportFiles is not None and 'path' in currentReport.ReportFiles:
             oldPath = currentReport.ReportFiles['path']
             filename = currentReport.ReportFiles['filename']
             APIUtils().delete_files([f'{oldPath}/{filename}'])
+            # null the report files
             currentReport.ReportFiles = None
             db.session.commit()
             return jsonify({'message': 'File deleted successfully'})

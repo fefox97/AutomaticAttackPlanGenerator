@@ -50,7 +50,7 @@
                                 <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}', '{{ attack.Report_Parser }}')">Parse</button>
                             {% endif %}
                             <button type="button" class="btn btn-secondary" id="downloadReportFile" onclick="downloadReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}')"><i class="fas fa-download"></i></button>
-                            <button type="button" class="btn btn-danger" id="deleteReportFile" onclick="deleteReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}')"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-danger" id="deleteReportFile" onclick="confirmDeleteReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}', '{{ attack.ReportFiles.filename }}')"><i class="fas fa-trash"></i></button>
                         {% endif %}
                     </div>
                 </div>
