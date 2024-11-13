@@ -198,12 +198,13 @@ class MacmUtils:
 
     def delete_macm_component(self, database, component_id):
         try:
-            self.driver.execute_query(f"MATCH (asset {{component_id: '{component_id}'}}) DETACH DELETE asset", database_=database)
             Macm.query.filter_by(Component_ID=component_id).delete()
+            self.driver.execute_query(f"MATCH (asset {{component_id: '{component_id}'}}) DETACH DELETE asset", database_=database)
             db.session.commit()
             return True
-        except:
-            print(f"Error deleting component {component_id} from MACM {database}", exc_info=True)
+        except Exception as error:
+            print(f"Error deleting component {component_id} from MACM {database}")
+            print(error)
             return False
 
     def delete_macm(self, app_id, delete_neo4j=True):
