@@ -102,8 +102,7 @@ function executeParser(query, macmID) {
         processData: false,
         data: formData,
         success: function(data) {
-            $('#modalParserOutput').modal('hide');
-            showModal("MACM Update", data, autohide = true,)
+            location.reload();
         },
         error: function(data) {
             console.log(data);

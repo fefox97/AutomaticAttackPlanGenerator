@@ -128,11 +128,6 @@ class MacmUtils:
     converter = Converter()
 
     def __init__(self):
-        # neo4j setup
-        # self.URI_NEO4J = Config.URI_NEO4J
-        # self.USER_NEO4J = Config.USER_NEO4J
-        # self.PASS_NEO4J = Config.PASS_NEO4J
-
         self.URI_NEO4J  = os.getenv('URI_NEO4J'     , None)
         self.USER_NEO4J = os.getenv('USER_NEO4J'    , None)
         self.PASS_NEO4J = os.getenv('PASS_NEO4J'    , None)
@@ -195,7 +190,7 @@ class MacmUtils:
                         transaction.run(query)
                     transaction.commit()
                     transaction.close()
-            self.delete_macm(database, delete_neo4j=False)
+            # self.delete_macm(database, delete_neo4j=False)
             Utils().upload_databases('Macm', neo4j_db=database)
         except Exception as error:
             print(f"Error updating MACM: {error}")
@@ -204,8 +199,8 @@ class MacmUtils:
     def delete_macm_component(self, database, component_id):
         try:
             self.driver.execute_query(f"MATCH (asset {{component_id: '{component_id}'}}) DETACH DELETE asset", database_=database)
-            self.delete_macm(database, delete_neo4j=False)
-            Utils().upload_databases('Macm', neo4j_db=database)
+            Macm.query.filter_by(Component_ID=component_id).delete()
+            db.session.commit()
             return True
         except:
             print(f"Error deleting component {component_id} from MACM {database}", exc_info=True)
@@ -305,7 +300,6 @@ class Utils:
             for methodology in threat['Methodology']:
                 if methodology is not None and methodology != 'None':
                     relations_df.loc[len(relations_df)] = {'MID': methodology, 'TID': threat['TID']}
-        print(relations_df)
         relations_df.drop_duplicates(inplace=True)
         relations_df.index.name = 'Id'
         return relations_df
@@ -341,7 +335,14 @@ class Utils:
             
             macm_df['App_ID'] = neo4j_db
             tool_asset_type_df['AppID'] = neo4j_db
-            
+
+            # check if components already exist in database
+            for component_id in macm_df['Component_ID']:
+                if Macm.query.filter_by(App_ID=neo4j_db, Component_ID=component_id).first() is not None:
+                    macm_df = macm_df[macm_df['Component_ID'] != component_id]
+                    tool_asset_type_df = tool_asset_type_df[tool_asset_type_df['ComponentID'] != component_id]
+                    macm_user_df = macm_user_df[macm_user_df['AppID'] != neo4j_db]
+
             self.save_dataframe_to_database(macm_df, Macm, replace=False)
             self.save_dataframe_to_database(tool_asset_type_df, Attack, replace=False)
             self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
