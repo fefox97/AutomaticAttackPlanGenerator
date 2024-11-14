@@ -22,6 +22,10 @@ def register_extensions(app):
     login_manager.init_app(app)
     modal.init_app(app)
 
+def clear_tmp(path):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            os.remove(os.path.join(root, file))
 
 def register_assets(app):
     assets = Environment(app)
@@ -91,6 +95,8 @@ def create_app(config):
     app.register_blueprint(github_blueprint, url_prefix="/login") 
     
     configure_database(app)
+
+    clear_tmp(app.config['TMP_FOLDER'])
     return app
 
 class MyDict(dict):
