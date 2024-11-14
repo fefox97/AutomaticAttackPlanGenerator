@@ -111,7 +111,7 @@ def route_template(template):
                 app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
                 attack_for_each_component = None
                 attack_number = None
-            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports)
+            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm)
         
         elif template == 'macm-detail.html':
             selected_macm = request.args.get('app_id')

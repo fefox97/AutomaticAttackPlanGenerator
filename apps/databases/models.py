@@ -286,7 +286,7 @@ class Attack(db.Model):
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __repr__(self):
-        return str(f'{self.ToolID}-{self.AssetType}')
+        return str(f'{self.AppID}-{self.ComponentID}-{self.ToolID}')
     
 class ToolPhaseRel(db.Model):
 

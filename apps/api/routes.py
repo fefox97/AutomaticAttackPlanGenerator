@@ -173,6 +173,22 @@ def download_report():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
+@blueprint.route('/download_all_reports', methods=['POST'])
+def download_all_reports():
+    macmID = request.form.get('macmID')
+    try:
+        reports = Attack.query.filter_by(AppID=macmID).where(Attack.ReportFiles.isnot(None)).distinct().all()
+        destinationPath = app.config["TMP_FOLDER"]
+        filenames = [f"{report.ReportFiles['path']}/{report.ReportFiles['filename']}" for report in reports]
+        if len(filenames) == 0:
+            return make_response(jsonify({'message': 'No reports to download'}), 400)
+        zip_filename = f'{macmID}_reports.zip'
+        zip_filename = APIUtils().zip_files(filenames, destinationPath, zip_filename)
+        return send_file(zip_filename, as_attachment=True, mimetype='application/octet-stream', attachment_filename=f'{macmID}_reports.zip', download_name=f'{macmID}_reports.zip')
+    except Exception as error:
+        traceback.print_exc()
+        return make_response(jsonify({'message': error.args}), 400)
+
 @blueprint.route('/nmap/<string:parser>', methods=['POST'])
 def nmap(parser):
     macmID = request.form.get('macmID')

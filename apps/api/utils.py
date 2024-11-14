@@ -4,6 +4,7 @@ from apps.databases.models import Capec, MacmUser, Macm, Attack
 from flask import current_app as app
 from sqlalchemy import or_, and_
 import nmap as nm
+import zipfile
 
 from apps.my_modules.converter import Converter
 
@@ -64,3 +65,9 @@ class APIUtils:
             except:
                 app.logger.error(f"Error deleting file {file}", exc_info=True)
                 pass
+
+    def zip_files(self, file_list, destinationpPath, zip_name):
+        with zipfile.ZipFile(os.path.join(destinationpPath, zip_name), 'w') as zipf:
+            for file in file_list:
+                zipf.write(file, os.path.basename(file))
+        return f"{destinationpPath}/{zip_name}"

@@ -60,8 +60,17 @@ function downloadReportFile(macmID, componentID, toolID) {
     formData.append('macmID', macmID);
     formData.append('componentID', componentID);
     formData.append('toolID', toolID);
+    downloadFiles(formData, '/api/download_report');
+}
 
-    fetch('/api/download_report', {
+function downloadAllReportFiles(macmID) {
+    let formData = new FormData();
+    formData.append('macmID', macmID);
+    downloadFiles(formData, '/api/download_all_reports');
+}
+
+function downloadFiles(formData, api) {
+    fetch(api, {
         method: 'POST',
         body: formData
     }).then(response => {
@@ -83,11 +92,11 @@ function downloadReportFile(macmID, componentID, toolID) {
         link.click();
         link.parentNode.removeChild(link);
     })
-    .then(data => {
+    .then(_ => {
         showModal("Report Download", "Report " + filename + " downloaded successfully", autohide = true)
     })
     .catch(error => {
-        showModal("Report Download", JSON.parse(error.responseText), autohide = true)
+        showModal("Report Download", "Error downloading the file!", autohide = true)
     });
 }
 

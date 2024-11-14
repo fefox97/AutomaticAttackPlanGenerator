@@ -1,46 +1,58 @@
-{% if reports %}
+<div class="card border-0 shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0">Reports</h2>
+        <div>
+            <button type="button" class="btn btn-primary" id="downloadReports" onclick="downloadAllReportFiles('{{ selected_macm }}')" {%if not reports%} disabled {%endif%}><i class="fas fa-download"></i> Download all reports</button>
+        </div>
+    </div>
     
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Attack</th>
-                <th>Report</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for report in reports %}
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <h6 class="me-2 mt-2"><span class="badge bg-secondary"><span class="material-symbols-outlined">swords</span> Attack {{ report.Attack_Number }}</span></h6>
-                            <span class="h8">
-                                <a class="badge bg-macm" href="/macm-detail?id={{report.Component_ID}}&app_id={{report.AppID}}"> <span class="material-symbols-outlined">target</span> {{ report.Asset }}</a>
-                                <i class="fas fa-chevron-right"></i>
-                                <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{report.Threat_ID}}-{{ report.Threat }}</span>
-                                <i class="fas fa-chevron-right"></i>
-                                <a class="badge bg-capec" href="/capec-detail?id={{report.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{report.Capec_ID}}-{{report.Attack_Pattern}}</a>
-                                <i class="fas fa-chevron-right"></i>
-                                <span class="badge bg-tool"> <span class="material-symbols-outlined">construction</span> {{ report.Tool_Name }}</span>
-                            </span>
-                        </div>
-                    </td>
-                    <td>{{ report.ReportFiles.filename }}</td>
-                    <td>
-                        <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}', '{{ report.Report_Parser }}')">Parse</button>
-                        <button type="button" class="btn btn-secondary" id="downloadReportFile" onclick="downloadReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}')"><i class="fas fa-download"></i></button>
-                        <button type="button" class="btn btn-danger" id="deleteReportFile" onclick="confirmDeleteReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}', '{{ report.ReportFiles.filename }}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card-body">
+        {% if reports %}
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Attack</th>
+                        <th>Report</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <h6 class="me-2 mt-2"><span class="badge bg-secondary"><span class="material-symbols-outlined">swords</span> Attack {{ report.Attack_Number }}</span></h6>
+                                    <span class="h8">
+                                        <a class="badge bg-macm" href="/macm-detail?id={{report.Component_ID}}&app_id={{report.AppID}}"> <span class="material-symbols-outlined">target</span> {{ report.Asset }}</a>
+                                        <i class="fas fa-chevron-right"></i>
+                                        <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{report.Threat_ID}}-{{ report.Threat }}</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                        <a class="badge bg-capec" href="/capec-detail?id={{report.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{report.Capec_ID}}-{{report.Attack_Pattern}}</a>
+                                        <i class="fas fa-chevron-right"></i>
+                                        <span class="badge bg-tool"> <span class="material-symbols-outlined">construction</span> {{ report.Tool_Name }}</span>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>{{ report.ReportFiles.filename }}</td>
+                            <td>
+                                {% if report.Report_Parser %}
+                                    <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}', '{{ report.Report_Parser }}')">Parse</button>
+                                {% endif %}
+                                <button type="button" class="btn btn-secondary" id="downloadReportFile" onclick="downloadReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}')"><i class="fas fa-download"></i></button>
+                                <button type="button" class="btn btn-danger" id="deleteReportFile" onclick="confirmDeleteReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}', '{{ report.ReportFiles.filename }}')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-{% else %}
+        {% else %}
 
-<div class="alert alert-warning" role="alert">
-    <h4 class="alert-heading">No Reports</h4>
-    <p>No reports available, please upload reports in the dedicated page of each asset.</p>
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">No Reports</h4>
+            <p>No reports available, please upload reports in the dedicated page of each asset.</p>
+        </div>
+
+        {% endif %}
+    </div>
 </div>
-
-{% endif %}

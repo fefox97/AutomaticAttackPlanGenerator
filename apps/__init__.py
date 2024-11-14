@@ -87,7 +87,7 @@ def create_app(config):
     register_blueprints(app)
     register_assets(app)
     register_custom_filters(app)
-    
+
     app.register_blueprint(github_blueprint, url_prefix="/login") 
     
     configure_database(app)

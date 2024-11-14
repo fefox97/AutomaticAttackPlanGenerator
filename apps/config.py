@@ -16,6 +16,7 @@ class Config(object):
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', f'{basedir}/static/uploads')
+    TMP_FOLDER = os.getenv('TMP_FOLDER', f'{basedir}/static/.tmp')
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
     
     # Set up the App SECRET_KEY
