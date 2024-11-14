@@ -16,6 +16,7 @@ from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
 from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue
 from apps import db
+from sqlalchemy.sql.expression import null
 import hashlib
 
 @blueprint.route('/search_capec_by_id', methods=['POST'])
@@ -150,7 +151,7 @@ def delete_report():
             filename = currentReport.ReportFiles['filename']
             APIUtils().delete_files([f'{oldPath}/{filename}'])
             # null the report files
-            currentReport.ReportFiles = None
+            currentReport.ReportFiles = null()
             db.session.commit()
             return jsonify({'message': 'File deleted successfully'})
         else:
