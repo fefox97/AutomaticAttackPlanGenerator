@@ -50,7 +50,7 @@ function parseReportFile(macmID, componentID, toolID, parser) {
             $('#modalParserOutput').modal('show');
         },
         error: function(data) {
-            console.log(data);
+            showModal("Report Upload", "Error parsing the report.", autohide = true)
         }
     });
 }
