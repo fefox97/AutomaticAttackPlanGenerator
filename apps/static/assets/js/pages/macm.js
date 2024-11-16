@@ -122,6 +122,7 @@ $(window).on('load', function() {
                 className: 'btn-primary',
                 text: 'Edit MACM',
                 action: function (e, dt, node, config) {
+                    $('#editAppName').text(app_name);
                     $('#editMacmModal').modal('show');
                 }
             }
@@ -177,23 +178,9 @@ $(window).on('load', function() {
     });
     
     // Edit MACM
-    $('#edit-submit').click(function() {
-        const QueryCypher = $('#edit-query-cypher').val();
-        $.ajax({
-            url: '/api/update_macm',
-            type: 'POST',
-            data: {
-                AppID: app_id,
-                QueryCypher: QueryCypher,
-            },
-            success: function(response) {
-                location.reload();
-            },
-            error: function(response) {
-                $('#editMacmModal').modal('hide');
-                showModal("Update failed", JSON.parse(response.responseText));
-            }
-        })
+    $('#editMacmSubmit').click(function() {
+        const QueryCypher = $('#editQueryCypher').val();
+        editMacm(app_id, QueryCypher);
     });
 });
 

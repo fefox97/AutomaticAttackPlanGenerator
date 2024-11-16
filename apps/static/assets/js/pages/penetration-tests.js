@@ -31,31 +31,66 @@ $(document).ready(function() {
         this.querySelector('#editAppName').textContent = AppName;
     });
 
-    $('#edit-submit').click(function() {
+    $('#editMacmSubmit').click(function() {
         const AppID = $('#editAppID').val();
         const QueryCypher = $('#editQueryCypher').val();
-        $.ajax({
-            url: '/api/update_macm',
-            type: 'POST',
-            data: {
-                AppID: AppID,
-                QueryCypher: QueryCypher,
-            },
-            success: function(response) {
-                location.reload();
-            },
-            error: function(response) {
-                $('#editMacmModal').modal('hide');
-                showModal("Update failed", JSON.parse(response.responseText));
-            }
-        })
+        editMacm(AppID, QueryCypher);
     });
 
-    $('#deleteMacmModal').on('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const AppID = button.getAttribute('data-bs-AppID');
-        const AppName = button.getAttribute('data-bs-AppName');
-        $('#appNameBody').text(AppName);
-        this.querySelector('#deleteAppID').value = AppID;
+    $('#deleteModal').on('show.bs.modal', function(event) {
+        const AppID = event.relatedTarget.dataset.bsAppid;
+        const AppName = event.relatedTarget.dataset.bsAppname;
+        $('#deleteName').text(AppName);
+        $('#deleteConfirm').click(function() { deleteMacm(AppID); });
+        this.querySelector('#deleteID').value = AppID;
+    });
+
+    $('#shareMacmModal').on('show.bs.modal', function(event) {
+        $('#shareAppName').text(event.relatedTarget.dataset.bsAppname);
+        $('#shareSubmit').click(function() { shareMacm(event.relatedTarget.dataset.bsAppid); });
+        event.currentTarget.querySelectorAll('[type="checkbox"]').forEach(checkbox => {
+            if (usersPerApp[event.relatedTarget.dataset.bsAppid].includes(parseInt(checkbox.value))) {
+                checkbox.checked = true;
+            }
+        });
     });
 });
+
+function shareMacm(AppID) {
+    var Users = [];
+    document.querySelectorAll('#shareMacmModal input[type="checkbox"]:checked').forEach(checkbox => {
+        Users.push(checkbox.value);
+    });
+    var formData = new FormData();
+    formData.append('AppID', AppID);
+    formData.append('Users', Users);
+    $.ajax({
+        url: '/api/share_macm',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false
+    }).done(function(response) {
+        location.reload();
+    }).fail(function(response) {
+        $('#shareMacmModal').modal('hide');
+        showModal("Share failed", JSON.parse(response.responseText), autohide = true);
+    });
+}
+
+function deleteMacm(AppID) {
+    var formData = new FormData();
+    formData.append('AppID', AppID);
+    $.ajax({
+        url: '/api/delete_macm',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false
+    }).done(function(response) {
+        location.reload();
+    }).fail(function(response) {
+        $('#deleteModal').modal('hide');
+        showModal("Delete failed", JSON.parse(response.responseText), autohide = true);
+    });
+}

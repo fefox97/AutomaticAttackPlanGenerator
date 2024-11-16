@@ -209,6 +209,9 @@ class MacmUtils:
 
     def delete_macm(self, app_id, delete_neo4j=True):
         try:
+            app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+            if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
+                raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
             Macm.query.filter_by(App_ID=app_id).delete()
             MacmUser.query.filter_by(AppID=app_id).delete()
             Attack.query.filter_by(AppID=app_id).delete()
@@ -218,7 +221,32 @@ class MacmUtils:
             return True
         except Exception as error:
             print(f"Error deleting MACM {app_id}:\n {error}")
-            return False
+            raise error
+    
+    def share_macm(self, app_id, users):
+        try:
+            owner = MacmUser.query.filter_by(AppID=app_id, IsOwner=True).with_entities(MacmUser.UserID).first()[0]
+            app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+            if owner is not current_user.id:
+                raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
+            current_users = MacmUser.query.filter_by(AppID=app_id).where(MacmUser.UserID != current_user.id).all()
+            print(users)
+            if users is None or users == '':
+                users = []
+            else:
+                users = self.converter.string_to_int_list(users)
+            for user in current_users:
+                if user.UserID not in users:
+                    MacmUser.query.filter_by(AppID=app_id, UserID=user.UserID).delete()
+            for user in users:
+                if MacmUser.query.filter_by(AppID=app_id, UserID=user).first() is None:
+                    macm_user = MacmUser(AppID=app_id, AppName=app_name, UserID=user, IsOwner=False)
+                    db.session.add(macm_user)
+            db.session.commit()
+            return True
+        except Exception as error:
+            print(f"Error sharing MACM {app_id} with users {users}:\n {error}")
+            raise error
 
     def tool_asset_type_rel(self, database='macm'):
         queries = ToolCatalogue.query.with_entities(ToolCatalogue.ToolID, ToolCatalogue.CypherQuery).all()
@@ -332,7 +360,7 @@ class Utils:
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
             app_name = macm_df['Application'].iloc[0]
-            macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'AppName': app_name}, index=[0])
+            macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'AppName': app_name, 'IsOwner': True}, index=[0])
             
             macm_df['App_ID'] = neo4j_db
             tool_asset_type_df['AppID'] = neo4j_db

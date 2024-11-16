@@ -94,9 +94,16 @@ $color-mode-type: data;
     div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
         background-color: red !important;
     }
-
-    .modal-content {
-        background-color: $modal-bg-dark !important;
+    .modal {
+        .modal-header {
+            border-bottom-color: $modal-header-border-color-dark !important;
+        }
+        .modal-footer {
+            border-top-color: $modal-footer-border-color-dark !important;
+        }
+        .modal-content {
+            background-color: $modal-bg-dark !important;
+        }
     }
 
     .pagination {

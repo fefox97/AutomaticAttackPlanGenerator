@@ -172,8 +172,9 @@
 
     </div>
 
-    {% include 'home/macm/modals.html' %}
-    {% include 'home/macm-detail/modals.html' %}
+    {% include 'home/modals/edit_macm_modal.html' %}
+    {% include 'home/modals/parser_modal.html' %}
+    {% include 'home/modals/delete_modal.html' %}
 
 {% endblock content %}
 
@@ -181,7 +182,9 @@
 {% block javascripts %}
     <script type="text/javascript">
         var app_id = "{{table[0].App_ID if table is not none | tojson }}";
+        var app_name = "{{table[0].Application if table is not none | tojson }}";
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
 {% endblock javascripts %}

@@ -4,10 +4,12 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 
+import json
 from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
@@ -26,6 +28,21 @@ from sqlalchemy import UniqueConstraint
 #         cursor = dbapi_connection.cursor()
 #         cursor.execute("PRAGMA foreign_keys=ON;")
 #         cursor.close()
+
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # Convert SQLAlchemy model to dictionary
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data)
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            return fields
+        return json.JSONEncoder.default(self, obj)
 
 class PentestPhases(db.Model):
 
@@ -261,6 +278,7 @@ class MacmUser(db.Model):
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
     AppID          = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    IsOwner        = db.Column(db.Boolean)
     AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
@@ -273,6 +291,15 @@ class MacmUser(db.Model):
     def __repr__(self):
         return str(self.UserID)
     
+    @classmethod
+    def usersPerApp(self):
+        result = self.query.with_entities(self.AppID, func.group_concat(self.UserID)).group_by(self.AppID).all()
+        return {app_id: [int(x) for x in user_ids.split(',')] for app_id, user_ids in result}
+    
+    @classmethod
+    def ownerPerApp(self):
+        result = self.query.with_entities(self.AppID, self.UserID).filter_by(IsOwner=True).all()
+        return {app_id: user_id for app_id, user_id in result}
 class Attack(db.Model):
 
     __tablename__ = 'Attack'

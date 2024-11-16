@@ -140,6 +140,11 @@ div.dataTables_scrollBody {
     background-color: $bg-network-background !important;
 }
 
+.bg-shared{
+    background-color: $bg-shared-background !important;
+    border: 2px solid rgba(0, 0, 0, 0.332) !important;
+}
+
 .badge-macm-detail{
     font-size: 0.8rem;
 }

@@ -72,6 +72,16 @@ def update_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
+@blueprint.route('/delete_macm', methods=['POST'])
+def clear_macm():
+    selected_macm = request.form.get('AppID')
+    app.logger.info(f"Deleting MACM {selected_macm}")
+    try:
+        macm.delete_macm(selected_macm)
+        return make_response(jsonify({'message': 'MACM deleted successfully'}), 200)
+    except Exception as error:
+        return make_response(jsonify({'message': error.args}), 400)
+
 @blueprint.route('/delete_macm_component', methods=['POST'])
 def delete_macm_component():
     app_id = request.form.get('AppID')
@@ -86,6 +96,20 @@ def delete_macm_component():
     else:
         return make_response(jsonify({'message': 'No MACM or component provided'}), 400)
 
+@blueprint.route('/share_macm', methods=['POST'])
+def share_macm():
+    app_id = request.form.get('AppID')
+    users = request.form.get('Users')
+    if app_id:
+        try:
+            app.logger.info(f"Sharing MACM {app_id} with user {users}")
+            macm.share_macm(app_id, users)
+            return make_response(jsonify({'message': 'MACM shared successfully'}), 200)
+        except Exception as error:
+            return make_response(jsonify({'message': error.args}), 400)
+    else:
+        return make_response(jsonify({'message': 'No MACM provided'}), 400)
+
 @blueprint.route('/reload_databases', methods=['POST'])
 def reload_databases():
     database = request.form.get('database')
@@ -99,13 +123,6 @@ def reload_databases():
 def test():
     response = utils.test_function()
     return make_response(jsonify(response), 200)
-
-@blueprint.route('/clear_macm', methods=['POST'])
-def clear_macm():
-    selected_macm = request.form.get('deleteAppID')
-    app.logger.info(f"Deleting MACM {selected_macm}")
-    macm.delete_macm(selected_macm)
-    return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
     
 @blueprint.route('/upload_report', methods=['POST'])
 def upload_report():

@@ -137,8 +137,10 @@ $dropdown-box-shadow-dark       : 0 .5rem 1rem rgba($black, .625) !default;
 
 // Modal
 
-$modal-color-dark               : $gray-100 !default;
-$modal-bg-dark                  : $gray-700 !default;
+$modal-color-dark                   : $gray-100 !default;
+$modal-bg-dark                      : $gray-700 !default;
+$modal-header-border-color-dark     : $gray-600 !default;
+$modal-footer-border-color-dark     : $gray-600 !default;
 
 // Pagination
 

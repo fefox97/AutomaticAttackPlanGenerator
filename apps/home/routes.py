@@ -3,12 +3,14 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import json
+from apps.authentication.models import Users
 from apps.home import blueprint
 from flask import redirect, render_template, request, url_for, make_response
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
+from apps.databases.models import AlchemyEncoder, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
 from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
@@ -84,12 +86,16 @@ def route_template(template):
 
         elif template == 'penetration-tests.html':
             try:
+                users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
+                usersPerApp = MacmUser.usersPerApp()
+                owners = MacmUser.ownerPerApp()
                 pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
                 if len(pentests) == 0:
                     pentests = None
-            except:
+            except Exception as error:
                 pentests = None
-            return render_template(f"home/{template}", segment=segment, pentests=pentests)
+                raise error
+            return render_template(f"home/{template}", segment=segment, pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners)
 
         elif template == 'macm.html':
             try:

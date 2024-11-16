@@ -19743,6 +19743,10 @@ div.dataTables_scrollBody {
 .bg-network {
   background-color: #9e3926 !important; }
 
+.bg-shared {
+  background-color: #3c6e42 !important;
+  border: 2px solid rgba(0, 0, 0, 0.332) !important; }
+
 .badge-macm-detail {
   font-size: 0.8rem; }
 
@@ -19859,7 +19863,13 @@ pre[class*=language-] {
 [data-bs-theme="dark"] div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
   background-color: red !important; }
 
-[data-bs-theme="dark"] .modal-content {
+[data-bs-theme="dark"] .modal .modal-header {
+  border-bottom-color: #4B5563 !important; }
+
+[data-bs-theme="dark"] .modal .modal-footer {
+  border-top-color: #4B5563 !important; }
+
+[data-bs-theme="dark"] .modal .modal-content {
   background-color: #374151 !important; }
 
 [data-bs-theme="dark"] .pagination .page-item.active .page-link {
