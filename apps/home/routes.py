@@ -87,6 +87,7 @@ def route_template(template):
         elif template == 'penetration-tests.html':
             try:
                 users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
+                users_dict = converter.tuple_list_to_dict(users)
                 usersPerApp = MacmUser.usersPerApp()
                 owners = MacmUser.ownerPerApp()
                 pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
@@ -95,7 +96,7 @@ def route_template(template):
             except Exception as error:
                 pentests = None
                 raise error
-            return render_template(f"home/{template}", segment=segment, pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners)
+            return render_template(f"home/{template}", segment=segment, pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
         elif template == 'macm.html':
             try:
