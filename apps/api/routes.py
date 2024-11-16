@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import json
 import traceback
+import uuid
 from apps.api import blueprint
 from flask import render_template, request, redirect, send_file, url_for, make_response
 from flask_login import login_required, current_user
@@ -51,7 +52,7 @@ def upload_macm():
     else:
         return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
     try:
-        macm_db = f'db.{current_user.id}.{hashlib.sha1(query_str.encode("utf-8")).hexdigest()}'
+        macm_db = f'db.{current_user.id}.{uuid.uuid4()}'
         macm.upload_macm(query_str, database=macm_db)
         utils.upload_databases('Macm', neo4j_db=macm_db)
         return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
