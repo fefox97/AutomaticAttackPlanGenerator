@@ -14,6 +14,8 @@ from apps.databases.models import AlchemyEncoder, AttackView, Capec, MacmUser, M
 from sqlalchemy import func, distinct
 from sqlalchemy.dialects import mysql
 from apps.my_modules import converter
+import os
+import time
 
 @blueprint.route('/index')
 @login_required
@@ -130,6 +132,17 @@ def route_template(template):
             pentest_phases = PentestPhases.query.all()
             av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
             return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
+
+        elif template == 'settings.html':
+            excel_file = app.config['THREAT_CATALOG_FILE_NAME']
+            path = app.config['DBS_PATH']
+            if not os.path.exists(f'{path}/{excel_file}'):
+                excel_file = None
+            try:
+                last_modified = time.ctime(os.path.getmtime(f'{path}/{excel_file}'))
+            except:
+                last_modified = None
+            return render_template(f"home/{template}", segment=segment, excel_file=excel_file, last_modified=last_modified)
 
         # Serve the file (if exists) from app/templates/home/FILE.html
         return render_template(f"home/{template}", segment=segment)

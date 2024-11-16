@@ -39,3 +39,4 @@ migrations
 
 apps/static/.webassets-cache/
 apps/static/uploads/
+apps/static/assets/dbs/ThreatCatalogComplete.xlsx

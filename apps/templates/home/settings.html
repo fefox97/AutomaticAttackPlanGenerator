@@ -21,7 +21,30 @@
                             <p class="small pe-4">Reload Capec Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadCapec">Reload</button>
+                            <button class="btn btn-secondary btn-sm" id="ReloadCapec" onclick="reloadDatabases('Capec')">Reload</button>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0 border-bottom">
+                        <div>
+                            <h3 class="h6 mb-1">Upload/Download Excel</h3>
+                            <p class="small pe-4">Upload/Download the Excel file containing the threats, the methodologies and the tools.</p>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-text">Uploaded File</div>
+                            <input type="text" class="form-control" id="uploadedExcel" placeholder="No file uploaded" readonly value="{{ excel_file }}">
+                            <div class="input-group-text">Last Modified</div>
+                            <input type="text" class="form-control" id="lastModifyExcel" placeholder="No file uploaded" readonly value="{{ last_modified }}">
+                            <button class="btn btn-secondary" type="button" id="downloadExcel" onclick="downloadExcel()">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="excelFile" aria-describedby="uploadExcel" aria-label="Upload">
+                            <button class="btn btn-secondary" type="button" id="uploadExcel" onclick="uploadExcel()">
+                                <i class="fas fa-upload"></i>
+                                Upload
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -30,7 +53,7 @@
                             <p class="small pe-4">Reload Threat Catalogue Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadThreatCatalog">Reload</button>
+                            <button class="btn btn-secondary btn-sm" id="ReloadThreatCatalog" onclick="reloadDatabases('ThreatCatalog')">Reload</button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -39,7 +62,7 @@
                             <p class="small pe-4">Reload Tool Catalog Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadToolCatalog">Reload</button>
+                            <button class="btn btn-secondary btn-sm" id="ReloadToolCatalog" onclick="reloadDatabases('ToolCatalog')">Reload</button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -48,7 +71,7 @@
                             <p class="small pe-4">Reload Methodology Catalog Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadMethodologyCatalog">Reload</button>
+                            <button class="btn btn-secondary btn-sm" id="ReloadMethodologyCatalog" onclick="reloadDatabases('MethodologyCatalog')">Reload</button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0">
@@ -57,7 +80,7 @@
                             <p class="small pe-4">Trigger function</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="TestButton">Test</button>
+                            <button class="btn btn-secondary btn-sm" id="TestButton" onclick="test()">Test</button>
                         </div>
                     </li>
                 </ul>
@@ -70,5 +93,5 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script type="module" src="{{ config.ASSETS_ROOT }}/js/pages/settings.js"></script>
+<script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/settings.js"></script> 
 {% endblock javascripts %}

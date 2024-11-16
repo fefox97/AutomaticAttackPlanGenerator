@@ -138,7 +138,30 @@ def reload_databases():
 def test():
     response = utils.test_function()
     return make_response(jsonify(response), 200)
-    
+
+@blueprint.route('/upload_excel', methods=['POST'])
+def upload_excel():
+    if 'file' in request.files and request.files['file'].filename != '':
+        file = request.files['file']
+        app.logger.info(f"Uploading Excel from file {file.filename}")
+        if not APIUtils().allowed_file(file.filename, ['xlsx', 'xls']):
+            return make_response(jsonify({'message': 'File type not allowed'}), 400)
+        try:
+            filename = app.config['THREAT_CATALOG_FILE_NAME']
+            path = app.config["DBS_PATH"]
+            file.save(f'{path}/{filename}')
+            return make_response(jsonify({'message': 'Excel uploaded successfully', 'filename': filename}), 200)
+        except Exception as error:
+            return make_response(jsonify({'message': error.args}), 400)
+    else:
+        return make_response(jsonify({'message': 'No file provided'}), 400)
+
+@blueprint.route('/download_excel', methods=['POST'])
+def download_excel():
+    filename = app.config['THREAT_CATALOG_FILE_NAME']
+    path = app.config["DBS_PATH"]
+    return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
+
 @blueprint.route('/upload_report', methods=['POST'])
 def upload_report():
     if 'reportFile' in request.files and request.files['reportFile'].filename != '':
