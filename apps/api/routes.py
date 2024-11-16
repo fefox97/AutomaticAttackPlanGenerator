@@ -110,6 +110,20 @@ def share_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
+@blueprint.route('/unshare_macm', methods=['POST'])
+def unshare_macm():
+    app_id = request.form.get('AppID')
+    user_id = request.form.get('UserID')
+    if app_id:
+        try:
+            app.logger.info(f"Unsharing MACM {app_id} for user {user_id}")
+            macm.unshare_macm(app_id, user_id)
+            return make_response(jsonify({'message': 'MACM unshared successfully'}), 200)
+        except Exception as error:
+            return make_response(jsonify({'message': error.args}), 400)
+    else:
+        return make_response(jsonify({'message': 'No MACM provided'}), 400)
+
 @blueprint.route('/reload_databases', methods=['POST'])
 def reload_databases():
     database = request.form.get('database')

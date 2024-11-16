@@ -248,6 +248,19 @@ class MacmUtils:
             print(f"Error sharing MACM {app_id} with users {users}:\n {error}")
             raise error
 
+    def unshare_macm(self, app_id, user_id):
+        try:
+            owner = MacmUser.query.filter_by(AppID=app_id, IsOwner=True).with_entities(MacmUser.UserID).first()[0]
+            app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+            if owner is current_user.id:
+                raise Exception(f"User {current_user.username} is the owner of MACM {app_name}")
+            MacmUser.query.filter_by(AppID=app_id, UserID=user_id).delete()
+            db.session.commit()
+            return True
+        except Exception as error:
+            print(f"Error unsharing MACM {app_id} with user {user_id}:\n {error}")
+            raise error
+
     def tool_asset_type_rel(self, database='macm'):
         queries = ToolCatalogue.query.with_entities(ToolCatalogue.ToolID, ToolCatalogue.CypherQuery).all()
         tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID'])
