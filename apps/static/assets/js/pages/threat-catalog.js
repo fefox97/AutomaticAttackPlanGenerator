@@ -33,8 +33,9 @@ $(window).on('load', function() {
                 render: function (data, type, row) {
                     if ( type === 'sort' || type === 'type' ){
                         var data = data.replace('T', '');
-                        data = parseInt(data);
+                        // data = parseInt(data);
                     }
+
                     return data;
                 },
             },
