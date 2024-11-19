@@ -7,6 +7,7 @@ import os
 import re
 
 from flask import Flask
+from flask_admin import Admin
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
@@ -16,11 +17,13 @@ from flask_assets import Environment, Bundle
 db = SQLAlchemy()
 login_manager = LoginManager()
 modal = Modal()
+myAdmin = Admin()
 
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
     modal.init_app(app)
+    myAdmin.init_app(app)
 
 def clear_tmp(path):
     for root, dirs, files in os.walk(path):
@@ -39,11 +42,15 @@ def register_assets(app):
     assets.register(bundles)
     scss.build()
 
-
 def register_blueprints(app):
     for module_name in ('authentication', 'home', 'api'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
+
+def register_error_handlers(app):
+    module = import_module('apps.errors.routes')
+    app.register_error_handler(404, module.page_not_found)
+    app.register_error_handler(500, module.internal_server_error)
 
 def register_custom_filters(app):
     @app.template_filter('regex_replace')
@@ -60,6 +67,18 @@ def register_custom_filters(app):
             in_dict = {}
         out_dict = MyDict(in_dict)
         return s.format_map(out_dict)
+
+from apps.authentication.models import Users
+from apps.databases.models import Macm
+from apps.admin.views import MyModelView
+from flask_admin.contrib.sqla import ModelView
+
+def configure_admin(app):
+    myAdmin.url = '/admin'
+    myAdmin.base_template = 'admin/index.html'
+    myAdmin.add_view(ModelView(Users, db.session, name='Users'))
+    myAdmin.add_view(ModelView(Macm, db.session, name='MACM'))
+
 
 def configure_database(app):
 
@@ -89,13 +108,15 @@ def create_app(config):
     app.config.from_object(config)
     register_extensions(app)
     register_blueprints(app)
+    register_error_handlers(app)
     register_assets(app)
     register_custom_filters(app)
 
     app.register_blueprint(github_blueprint, url_prefix="/login") 
     
     configure_database(app)
-
+    # configure_admin(app)
+    
     clear_tmp(app.config['TMP_FOLDER'])
     return app
 

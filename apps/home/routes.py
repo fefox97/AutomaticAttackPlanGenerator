@@ -3,16 +3,13 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import json
 from apps.authentication.models import Users
 from apps.home import blueprint
-from flask import redirect, render_template, request, url_for, make_response
+from flask import redirect, render_template, request, url_for
 from flask_login import login_required, current_user
-from jinja2 import TemplateNotFound
 from flask import current_app as app
-from apps.databases.models import AlchemyEncoder, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
-from sqlalchemy import func, distinct
-from sqlalchemy.dialects import mysql
+from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
+from sqlalchemy import func
 from apps.my_modules import converter
 import os
 import time
@@ -20,139 +17,133 @@ import time
 @blueprint.route('/index')
 @login_required
 def index():
-    return redirect(url_for('home_blueprint.route_template', template='penetration-tests.html'))
+    return redirect(url_for('home_blueprint.penetration_tests'))
 
-@blueprint.route('/<template>', methods=['GET'])
+@blueprint.route('/capec', methods=['GET'])
 @login_required
-def route_template(template):
-
+def capec():
     try:
+        table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
+        meta_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Meta').count()
+        standard_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Standard').count()
+        detailed_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Detailed').count()
+        if len(table) == 0:
+            table = None
+            meta_attack_pattern_number = None
+            standard_attack_pattern_number = None
+            detailed_attack_pattern_number = None
+    except:
+        table = None
+        meta_attack_pattern_number = None
+        standard_attack_pattern_number = None
+        detailed_attack_pattern_number = None
+    return render_template(f"home/capec.html", segment=get_segment(request), table=table, meta_attack_pattern_number=meta_attack_pattern_number, standard_attack_pattern_number=standard_attack_pattern_number, detailed_attack_pattern_number=detailed_attack_pattern_number)
 
-        if not template.endswith('.html'):
-            template += '.html'
+@blueprint.route('/capec-detail', methods=['GET'])
+@login_required
+def capec_detail():
+    selected_id = request.args.get('id')
+    selected_attack_pattern = Capec.query.filter_by(Capec_ID=selected_id).first()
+    return render_template(f"home/capec-detail.html", segment=get_segment(request), data=selected_attack_pattern)
 
-        # Detect the current page
-        segment = get_segment(request)
-        app.logger.info('Serving ' + template)
+@blueprint.route('/threat-catalog', methods=['GET'])
+@login_required
+def threat_catalog():
+    try:
+        table = ThreatCatalogue.query.all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    return render_template(f"home/threat-catalog.html", segment=get_segment(request), table=table)
 
-        # Serve the file (if exists) from app/templates/home/FILE.html
-        if template == 'capec.html':
-            try:
-                table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
-                meta_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Meta').count()
-                standard_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Standard').count()
-                detailed_attack_pattern_number = Capec.query.filter(Capec.Abstraction=='Detailed').count()
-                if len(table) == 0:
-                    table = None
-                    meta_attack_pattern_number = None
-                    standard_attack_pattern_number = None
-                    detailed_attack_pattern_number = None
-            except:
-                table = None
-                meta_attack_pattern_number = None
-                standard_attack_pattern_number = None
-                detailed_attack_pattern_number = None
-            return render_template(f"home/{template}", segment=segment, table=table, meta_attack_pattern_number=meta_attack_pattern_number, standard_attack_pattern_number=standard_attack_pattern_number, detailed_attack_pattern_number=detailed_attack_pattern_number)
+@blueprint.route('/tools', methods=['GET'])
+@login_required
+def tools():
+    try:
+        table = ToolCatalogue.query.all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    return render_template(f"home/tools.html", segment=get_segment(request), table=table)
 
-        elif template == 'capec-detail.html':
-            selected_id = request.args.get('id')
-            selected_attack_pattern = Capec.query.filter_by(Capec_ID=selected_id).first()
-            return render_template(f"home/{template}", segment=segment, data=selected_attack_pattern)
-        
-        elif template == 'threat-catalog.html':
-            try:
-                table = ThreatCatalogue.query.all()
-                if len(table) == 0:
-                    table = None
-            except:
-                table = None
-            return render_template(f"home/{template}", segment=segment, table=table)
-        
-        elif template == 'tools.html':
-            try:
-                table = ToolCatalogue.query.all()
-                if len(table) == 0:
-                    table = None
-            except:
-                table = None
-            return render_template(f"home/{template}", segment=segment, table=table)
-        
-        elif template == 'methodologies.html':
-            try:
-                table = MethodologyCatalogue.query.all()
-                if len(table) == 0:
-                    table = None
-            except:
-                table = None
-            return render_template(f"home/{template}", segment=segment, table=table)
+@blueprint.route('/methodologies', methods=['GET'])
+@login_required
+def methodologies():
+    try:
+        table = MethodologyCatalogue.query.all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    return render_template(f"home/methodologies.html", segment=get_segment(request), table=table)
 
-        elif template == 'penetration-tests.html':
-            try:
-                users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
-                users_dict = converter.tuple_list_to_dict(users)
-                usersPerApp = MacmUser.usersPerApp()
-                owners = MacmUser.ownerPerApp()
-                pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
-                if len(pentests) == 0:
-                    pentests = None
-            except Exception as error:
-                pentests = None
-                raise error
-            return render_template(f"home/{template}", segment=segment, pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
+@blueprint.route('/penetration-tests', methods=['GET'])
+@login_required
+def penetration_tests():
+    try:
+        users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
+        users_dict = converter.tuple_list_to_dict(users)
+        usersPerApp = MacmUser.usersPerApp()
+        owners = MacmUser.ownerPerApp()
+        pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
+        if len(pentests) == 0:
+            pentests = None
+    except Exception as error:
+        pentests = None
+        raise error
+    return render_template(f"home/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
-        elif template == 'macm.html':
-            try:
-                selected_macm = request.args.get('app_id')
-                reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None)).distinct().all()
-                table = Macm.query.filter_by(App_ID=selected_macm).all()
-                if len(table) == 0:
-                    table = None
-            except:
-                table = None
-            try:
-                attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
-                attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
-                attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
-                threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
-                threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
-                threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
-            except:
-                app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
-                attack_for_each_component = None
-                attack_number = None
-            return render_template(f"home/{template}", segment=segment, table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm)
-        
-        elif template == 'macm-detail.html':
-            selected_macm = request.args.get('app_id')
-            selected_id = request.args.get('id')
-            macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
-            threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-            methodologies_data = MethodologyView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-            attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-            pentest_phases = PentestPhases.query.all()
-            av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
-            return render_template(f"home/{template}", segment=segment, macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
-
-        elif template == 'settings.html':
-            excel_file = app.config['THREAT_CATALOG_FILE_NAME']
-            path = app.config['DBS_PATH']
-            if not os.path.exists(f'{path}/{excel_file}'):
-                excel_file = None
-            try:
-                last_modified = time.ctime(os.path.getmtime(f'{path}/{excel_file}'))
-            except:
-                last_modified = None
-            return render_template(f"home/{template}", segment=segment, excel_file=excel_file, last_modified=last_modified)
-
-        # Serve the file (if exists) from app/templates/home/FILE.html
-        return render_template(f"home/{template}", segment=segment)
-
-    except TemplateNotFound:
-        return render_template('errors/page-404.html'), 404
-
+@blueprint.route('/macm', methods=['GET'])
+@login_required
+def macm():
+    try:
+        selected_macm = request.args.get('app_id')
+        reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None)).distinct().all()
+        table = Macm.query.filter_by(App_ID=selected_macm).all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    try:
+        attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
+        attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
+        attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
+        threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+        threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+        threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
     except:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
-        return render_template('errors/page-404.html'), 500
+        attack_for_each_component = None
+        attack_number = None
+    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm)
+
+@blueprint.route('/macm-detail', methods=['GET'])
+@login_required
+def macm_detail():
+    selected_macm = request.args.get('app_id')
+    selected_id = request.args.get('id')
+    macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
+    threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+    methodologies_data = MethodologyView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+    attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+    pentest_phases = PentestPhases.query.all()
+    av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
+    return render_template(f"home/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
+
+@blueprint.route('/settings', methods=['GET'])
+@login_required
+def settings():
+    excel_file = app.config['THREAT_CATALOG_FILE_NAME']
+    path = app.config['DBS_PATH']
+    if not os.path.exists(f'{path}/{excel_file}'):
+        excel_file = None
+    try:
+        last_modified = time.ctime(os.path.getmtime(f'{path}/{excel_file}'))
+    except:
+        last_modified = None
+    return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified)
 
 # Helper - Extract current page name from request
 def get_segment(request):

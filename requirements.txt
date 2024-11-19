@@ -20,6 +20,7 @@ Flask-Dance==5.1.0
 blinker==1.4
 pyOpenSSL
 
+flask_admin
 
 stix2
 pandas
