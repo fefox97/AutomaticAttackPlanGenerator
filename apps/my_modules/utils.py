@@ -263,13 +263,29 @@ class MacmUtils:
 
     def tool_asset_type_rel(self, database='macm'):
         queries = ToolCatalogue.query.with_entities(ToolCatalogue.ToolID, ToolCatalogue.CypherQuery).all()
-        tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID'])
+        tool_asset_type_df = pd.DataFrame(columns=['ToolID', 'ComponentID', 'Parameters'])
         for query in queries:
             if query.CypherQuery is not None:
-                component_id = [element['component_id'] for element in self.driver.execute_query(query.CypherQuery, database_=database).records]
-                tool_asset_type_df = pd.concat([tool_asset_type_df, pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component_id})], ignore_index=True)
-        tool_asset_type_df.drop_duplicates(inplace=True)
+                components = self.driver.execute_query(query.CypherQuery, database_=database).records
+                for component in components:
+                    if 'parameters' in component.keys():
+                        parameters = component['parameters']
+                    else:
+                        parameters = None
+                    components_to_add = pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component['component_id'], 'Parameters': parameters}, index=[0])
+                    tool_asset_type_df = pd.concat([tool_asset_type_df, components_to_add], ignore_index=True)
+        tool_asset_type_df['Parameters'] = tool_asset_type_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
+        # tool_asset_type_df.drop_duplicates(inplace=True)
         return tool_asset_type_df
+
+    def add_extra_components(self, database='macm'):
+        try:
+            query = "MATCH (asset:JetRacer) RETURN asset.component_id AS component_id"
+            output = self.make_query(query, database)
+            return output
+        except Exception as error:
+            print(f"Error adding extra components to MACM {database}:\n {error}")
+            raise error
 
 class Utils:
 

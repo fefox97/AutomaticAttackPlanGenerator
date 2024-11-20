@@ -57,6 +57,7 @@ def upload_macm():
         utils.upload_databases('Macm', neo4j_db=macm_db)
         return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
     except Exception as error:
+        app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
 @blueprint.route('/update_macm', methods=['POST'])

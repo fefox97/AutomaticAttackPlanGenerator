@@ -308,6 +308,7 @@ class Attack(db.Model):
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
     ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID", ondelete='CASCADE'))
     AppID        = db.Column(db.String(100), ForeignKey("MacmUser.AppID", ondelete='CASCADE'))
+    Parameters   = db.Column(db.JSON)
     ReportFiles  = db.Column(db.JSON)
     
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
@@ -384,7 +385,7 @@ class AttackView(db.Model):
                     ThreatCatalogue.Description.label("Threat_Description"), 
                     Macm.Component_ID, 
                     Macm.Name.label("Asset"), 
-                    Macm.Parameters,
+                    Attack.Parameters,
                     Macm.App_ID.label("AppID"),
                     PentestPhases.PhaseID.label("PhaseID"),
                     PentestPhases.PhaseName.label("PhaseName"),
