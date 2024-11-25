@@ -311,7 +311,7 @@ class Attack(db.Model):
     Parameters   = db.Column(db.JSON)
     ReportFiles  = db.Column(db.JSON)
     
-    __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', 'Parameters', name='uix_1'),)
+    __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __repr__(self):
         return str(f'{self.AppID}-{self.ComponentID}-{self.ToolID}')
