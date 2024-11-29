@@ -137,7 +137,6 @@ class ThreatCatalogue(db.Model):
     Commento            = db.Column(db.Text)
     
     hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat', lazy='dynamic')
-    hasMethodology      = db.relationship('MethodologyCatalogue', secondary='MethodologyThreatRel', backref='hasThreat', lazy='dynamic')
 
     @hybrid_property
     def hasCapecMeta(self):
@@ -168,14 +167,6 @@ class ThreatCatalogue(db.Model):
 
     def __repr__(self):
         return str(self.TID)
-    
-class MethodologyThreatRel(db.Model):
-    
-        __tablename__ = 'MethodologyThreatRel'
-    
-        Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-        MID          = db.Column(db.Integer, ForeignKey("MethodologyCatalogue.MID", ondelete='CASCADE'))
-        TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
 
 class CapecThreatRel(db.Model):
 
@@ -229,6 +220,7 @@ class MethodologyCatalogue(db.Model):
 
     MID = db.Column(db.Integer, primary_key=True, nullable=False)
     Name = db.Column(db.Text)
+    AssetType = db.Column(db.Text)
     Description = db.Column(db.Text)
     Link = db.Column(db.Text)
 
@@ -409,7 +401,6 @@ class AttackView(db.Model):
         return str(f'{self.Component_ID}-{self.Capec_ID}')
 
 class MethodologyView(db.Model):
-    # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
     
     __table__ = create_view(
@@ -418,14 +409,12 @@ class MethodologyView(db.Model):
                     MethodologyCatalogue.MID, 
                     MethodologyCatalogue.Name, 
                     MethodologyCatalogue.Description,
+                    MethodologyCatalogue.AssetType,
                     MethodologyCatalogue.Link,
-                    ThreatModel.Threat_ID,
                     Macm.Component_ID,
                     Macm.App_ID.label("AppID")
                 ).select_from(Macm)
-                .join(ThreatModel, and_(Macm.Component_ID==ThreatModel.Component_ID, Macm.App_ID==ThreatModel.AppID))
-                .join(MethodologyThreatRel, ThreatModel.Threat_ID==MethodologyThreatRel.TID)
-                .join(MethodologyCatalogue, MethodologyThreatRel.MID==MethodologyCatalogue.MID)
+                .join(MethodologyCatalogue, Macm.Type==MethodologyCatalogue.AssetType)
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True

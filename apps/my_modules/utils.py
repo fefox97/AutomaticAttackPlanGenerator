@@ -12,7 +12,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyThreatRel, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -76,7 +76,7 @@ class ThreatCatalogUtils:
         df.replace(np.nan, None, inplace=True) # replace NaN with None
         # df.set_index('TID', inplace=True)
         df = df.astype('str')
-        columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed', 'Methodology']
+        columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
         return df
@@ -351,17 +351,6 @@ class Utils:
         relations_df.index.name = 'Id'
         return relations_df
     
-    def load_methodology_threat_relations(self, df: pd.DataFrame):
-        print("\nExtracting Methodology-ThreatCatalog relations to database...\n")
-        relations_df = pd.DataFrame(columns=['MID', 'TID'])
-        for _, threat in df.iterrows():
-            for methodology in threat['Methodology']:
-                if methodology is not None and methodology != 'None':
-                    relations_df.loc[len(relations_df)] = {'MID': methodology, 'TID': threat['TID']}
-        relations_df.drop_duplicates(inplace=True)
-        relations_df.index.name = 'Id'
-        return relations_df
-    
     def upload_databases(self, database, neo4j_db='macm'):
         if database == 'Capec':
             attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
@@ -369,10 +358,8 @@ class Utils:
         elif database == 'ThreatCatalog':
             threat_catalog_df = self.threat_catalog_utils.load_threat_catalog()
             threat_capec_relations = self.load_capec_threat_relations(threat_catalog_df)
-            threat_methodology_relations = self.load_methodology_threat_relations(threat_catalog_df)
             self.save_dataframe_to_database(threat_catalog_df, ThreatCatalogue)
             self.save_dataframe_to_database(threat_capec_relations, CapecThreatRel)
-            self.save_dataframe_to_database(threat_methodology_relations, MethodologyThreatRel)
         elif database == 'ToolCatalog':
             tool_catalog_df = self.tool_catalog_utils.load_tools_catalog()
             pentest_phases_df = self.tool_catalog_utils.load_pentest_phases()

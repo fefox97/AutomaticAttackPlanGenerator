@@ -3,9 +3,12 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import datetime
 import json
 import traceback
 import uuid
+
+from atlassian import Jira
 from apps.api import blueprint
 from flask import render_template, request, redirect, send_file, url_for, make_response
 from flask_login import login_required, current_user
@@ -18,7 +21,6 @@ from apps.api.parser import NmapParser
 from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue
 from apps import db
 from sqlalchemy.sql.expression import null
-import hashlib
 
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
@@ -261,3 +263,28 @@ def nmap(parser):
     except Exception as error:
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
+
+@blueprint.route('/issue', methods=['POST'])
+def issue():
+    jira = Jira(url=app.config['JIRA_URL'], username=app.config['JIRA_USERNAME'], password=app.config['JIRA_API_KEY'], cloud=True)
+    issue = request.form.get('issue')
+    subject = request.form.get('subject')
+    email = request.form.get('email')
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    app.logger.info(f"Creating Jira issue with subject {subject} and issue {issue}")
+    try:
+        new_issue = jira.issue_create(
+            fields={
+                'project': {'key': app.config['JIRA_PROJECT']},
+                'summary': subject,
+                'description': issue,
+                'customfield_10037': email,
+                'customfield_10038': date,
+                'issuetype': {'name': app.config['JIRA_TICKET_TYPE']}
+            }
+        )
+        app.logger.info(f"Jira issue created with ID {new_issue['key']}")
+    except Exception as error:
+        app.logger.error(f"Error creating Jira issue: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+    return make_response(jsonify({'message': 'Report created successfully with ID ' + new_issue['key']}), 200)

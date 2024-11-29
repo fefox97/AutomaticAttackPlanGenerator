@@ -5,7 +5,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('methodologies_catalog_columns') === null) {    
-        default_shown_columns = ['Methodology ID', 'Name', 'Description', 'Link'];
+        default_shown_columns = ['Methodology ID', 'Name', 'Asset Type', 'Description', 'Link'];
         localStorage.setItem('methodologies_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('methodologies_catalog_columns'));
@@ -32,13 +32,13 @@ $(window).on('load', function() {
                 width: '120px',
             },
             {
-                targets: [0, 2, 3],
+                targets: [0, 1, 3, 4],
                 searchPanes: {
                     show: false,
                 },
             },
             {
-                targets: [1],
+                targets: [2],
                 searchPanes: {
                     show: true,
                 },

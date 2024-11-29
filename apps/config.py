@@ -27,6 +27,7 @@ class Config(object):
     # Set up the App JIRA
     JIRA_URL  = os.getenv('JIRA_URL', None)
     JIRA_PROJECT  = os.getenv('JIRA_PROJECT', None)
+    JIRA_TICKET_TYPE  = os.getenv('JIRA_TICKET_TYPE', None)
     JIRA_USERNAME  = os.getenv('JIRA_USERNAME', None)
     JIRA_API_KEY  = os.getenv('JIRA_API_KEY', None)
 

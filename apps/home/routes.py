@@ -13,6 +13,9 @@ from sqlalchemy import func
 from apps.my_modules import converter
 import os
 import time
+from werkzeug.exceptions import NotFound
+
+from apps.my_modules.utils import MacmUtils
 
 @blueprint.route('/index')
 @login_required
@@ -100,24 +103,25 @@ def penetration_tests():
 def macm():
     try:
         selected_macm = request.args.get('app_id')
+        if selected_macm is None or MacmUser.query.filter_by(AppID=selected_macm).count() == 0:
+            raise NotFound('MACM not found')
         reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None)).distinct().all()
+        extra_components = MacmUtils().add_extra_components(selected_macm)
         table = Macm.query.filter_by(App_ID=selected_macm).all()
         if len(table) == 0:
             table = None
-    except:
-        table = None
-    try:
         attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
         attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
         attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
         threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
         threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
         threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
-    except:
+    except NotFound as error:
+        raise error
+    except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
-        attack_for_each_component = None
-        attack_number = None
-    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm)
+        raise Exception('Exception occurred while trying to serve ' + request.path)
+    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @login_required
@@ -144,6 +148,11 @@ def settings():
     except:
         last_modified = None
     return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified)
+
+@blueprint.route('/support', methods=['GET'])
+@login_required
+def support():
+    return render_template(f"home/support.html", segment=get_segment(request))
 
 # Helper - Extract current page name from request
 def get_segment(request):

@@ -68,7 +68,7 @@ function sendSupportRequest() {
         },
         success: function(response) {
             $('#supportModal').modal('hide');
-            showModal('Support Request', response, true);
+            showModal('Support Request', response);
         },
         error: function(response) {
             $('#supportModal').modal('hide');
