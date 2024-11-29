@@ -47,3 +47,5 @@ python-nmap
 
 # flask_mysqldb
 # psycopg2-binary
+
+atlassian-python-api

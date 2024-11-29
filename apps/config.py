@@ -24,6 +24,12 @@ class Config(object):
     if not SECRET_KEY:
         SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
 
+    # Set up the App JIRA
+    JIRA_URL  = os.getenv('JIRA_URL', None)
+    JIRA_PROJECT  = os.getenv('JIRA_PROJECT', None)
+    JIRA_USERNAME  = os.getenv('JIRA_USERNAME', None)
+    JIRA_API_KEY  = os.getenv('JIRA_API_KEY', None)
+
     # Social AUTH context
     SOCIAL_AUTH_GITHUB  = False
 

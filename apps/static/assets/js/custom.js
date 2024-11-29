@@ -54,6 +54,32 @@ function enableTab() {
     }
 }
 
+function sendSupportRequest() {
+    let issue = $('#issue').val();
+    let subject = $('#subject').val();
+    let email = $('#email').val();
+    $.ajax({
+        url: '/api/issue',
+        type: 'POST',
+        data: {
+            issue: issue,
+            subject: subject,
+            email: email
+        },
+        success: function(response) {
+            $('#supportModal').modal('hide');
+            showModal('Support Request', response, true);
+        },
+        error: function(response) {
+            $('#supportModal').modal('hide');
+            showModal('Support Request', response);
+        }
+    });
+    $('#issue').val('');
+    $('#subject').val('');
+    $('#email').val('');
+}
+
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     enableTab();
