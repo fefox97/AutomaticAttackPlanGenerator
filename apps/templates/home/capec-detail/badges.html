@@ -1,10 +1,12 @@
 <h3>
     <span class="badge bg-{{data['Abstraction']}}">{{data['Abstraction']}}</span>
-    {% for domain in data['Domains'] %}
-        <span class="badge bg-domains">
-            {{ domain }}
-        </span>
-    {% endfor %}
+    {% if data['Domains'] is not none %}
+        {% for domain in data['Domains'] %}
+            <span class="badge bg-domains">
+                {{ domain }}
+            </span>
+        {% endfor %}
+    {% endif %}
     {% if data['Likelihood_Of_Attack'] is not none %}
         <span class="badge bg-{{data['Likelihood_Of_Attack']}}">Likelihood: {{data['Likelihood_Of_Attack']}}</span>
     {% endif %}
