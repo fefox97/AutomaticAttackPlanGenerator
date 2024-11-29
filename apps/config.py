@@ -43,7 +43,7 @@ class Config(object):
     DB_PORT     = os.getenv('DB_PORT'     , None)
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
-    DATABASE_URL = os.getenv('DATABASE_URL', None)
+    DATABASE_URL = os.getenv('https://192.168.40.5:9444/index.php?route=/database/structure&db=WebApp', None)
 
     USE_SQLITE  = True
 

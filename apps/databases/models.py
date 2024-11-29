@@ -435,14 +435,12 @@ class MethodologyView(db.Model):
         return str(f'{self.Component_ID}-{self.Methodology_ID}')
 
 class ThreatAgentReply(db.Model):
-
     __tablename__ = 'ThreatAgentReply'
 
-    Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    attribute = db.Column(db.Text)
-    attribute_value = db.Column(db.Text)
-    description = db.Column(db.Text,nullable=True)
-    score = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)  # Unique identifier
+    reply = db.Column(db.Text, nullable=False)  # Reply text (e.g., "Yes", "No")
+    multiple = db.Column(db.Integer, nullable=False, default=0)  # Multiple indicator (0 or 1)
+
 
 class ThreatAgentAttribute(db.Model):
 
@@ -491,3 +489,26 @@ class ThreatAgentQuestion(db.Model):
         ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
         return [id[0] for id in ids]
     Attributes       = db.Column(db.Text)
+
+
+class ThreatAgentAttributesCategory(db.Model):
+    __tablename__ = 'ThreatAgentAttributesCategories'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    attribute_id = db.Column(db.Integer, nullable=False)
+    category_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentAttributesCategory(id={self.id}, attribute_id={self.attribute_id}, category_id={self.category_id})>"
+
+
+class ThreatAgentQuestionsReplies(db.Model):
+    __tablename__ = 'ThreatAgentQuestionsReplies'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    question_id = db.Column(db.Integer, nullable=False)
+    reply_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentQuestionsReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
+

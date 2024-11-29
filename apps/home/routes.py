@@ -154,3 +154,20 @@ def get_segment(request):
         return segment
     except:
         return None
+
+
+@blueprint.route('/risk_analysis', methods=['GET'])
+@login_required
+def risk_analysis():
+    try:
+        users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
+        users_dict = converter.tuple_list_to_dict(users)
+        usersPerApp = MacmUser.usersPerApp()
+        owners = MacmUser.ownerPerApp()
+        risk_analyses = MacmUser.query.filter_by(UserID=current_user.id).all()
+        if len(risk_analyses) == 0:
+            risk_analyses = None
+    except Exception as error:
+        risk_analyses = None
+        raise error
+    return render_template(f"home/risk_analysis.html", segment=get_segment(request), risk_analyses=risk_analyses, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
