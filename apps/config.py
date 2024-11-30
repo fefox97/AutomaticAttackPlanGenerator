@@ -59,6 +59,7 @@ class Config(object):
     URI_NEO4J                   = os.getenv('URI_NEO4J'    , None)
     USER_NEO4J                  = os.getenv('USER_NEO4J'    , None)
     PASS_NEO4J                  = os.getenv('PASS_NEO4J'    , None)
+    TLS_NEO4J                   = os.getenv('TLS_NEO4J'    , None)
 
     # try to set up a Relational DBMS
     # if DB_ENGINE and DB_NAME and DB_USERNAME:

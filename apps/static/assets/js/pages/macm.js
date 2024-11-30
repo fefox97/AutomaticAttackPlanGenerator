@@ -212,11 +212,11 @@ function drawNeo4j(database) {
         serverDatabase: database,
         consoleDebug: false,
         neo4j: {
-            serverUrl: "neo4j://192.168.40.4:7787",
-            serverUser: "neovis",
-            serverPassword: "neovis#123",
+            serverUrl: neo4j_params.uri,
+            serverUser: neo4j_params.user,
+            serverPassword: neo4j_params.password,
             driverConfig: {
-                encrypted: "ENCRYPTION_ON",
+                encrypted: neo4j_params.encrypted,
                 trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
             },
         },
@@ -279,11 +279,11 @@ function drawNeo4j(database) {
         containerId: "schema",
         serverDatabase: database,
         neo4j: {
-            serverUrl: "neo4j://192.168.40.4:7787",
-            serverUser: "neovis",
-            serverPassword: "neovis#123",
+            serverUrl: neo4j_params.uri,
+            serverUser: neo4j_params.user,
+            serverPassword: neo4j_params.password,
             driverConfig: {
-                encrypted: "ENCRYPTION_ON",
+                encrypted: neo4j_params.encrypted,
                 trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
             },
         },

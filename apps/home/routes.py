@@ -116,12 +116,19 @@ def macm():
         threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
         threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
         threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
+        neo4j_params = {
+            "uri": app.config['URI_NEO4J'],
+            "user": app.config['USER_NEO4J'],
+            "password": app.config['PASS_NEO4J'],
+            "encrypted": app.config['TLS_NEO4J']
+        }
+        app.logger.info(neo4j_params)
     except NotFound as error:
         raise error
     except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         raise Exception('Exception occurred while trying to serve ' + request.path)
-    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components)
+    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @login_required
