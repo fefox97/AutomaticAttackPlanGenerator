@@ -15,7 +15,8 @@ from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue
+from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue, ThreatAgentReply, \
+    ThreatAgentQuestionsReplies, ThreatAgentQuestion
 from apps import db
 from sqlalchemy.sql.expression import null
 import hashlib
@@ -261,3 +262,6 @@ def nmap(parser):
     except Exception as error:
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
+
+
+

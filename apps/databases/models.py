@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 
 import json
+from datetime import datetime
 from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
@@ -492,7 +493,7 @@ class ThreatAgentQuestion(db.Model):
 
 
 class ThreatAgentAttributesCategory(db.Model):
-    __tablename__ = 'ThreatAgentAttributesCategories'
+    __tablename__ = 'ThreatAgentAttributesCategory'
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     attribute_id = db.Column(db.Integer, nullable=False)
@@ -512,3 +513,24 @@ class ThreatAgentQuestionsReplies(db.Model):
     def __repr__(self):
         return f"<ThreatAgentQuestionsReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
 
+class ThreatAgentReplyCategory(db.Model):
+    __tablename__ = 'ThreatAgentReplyCategory'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    reply_id = db.Column(db.Integer, nullable=False)
+    category_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentReplyCategory(id={self.id}, reply_id={self.reply_id}, category_id={self.category_id})>"
+
+
+class ThreatAgentRiskScores(db.Model):
+    __tablename__ = 'ThreatAgentRiskScores'
+
+    appID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    skill = db.Column(db.Integer, nullable=False)
+    size = db.Column(db.Integer, nullable=False)
+    motive = db.Column(db.Integer, nullable=False)
+    opportunity = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
