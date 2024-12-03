@@ -12,7 +12,7 @@ from flask import current_app as app
 from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
     Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionsReplies, ThreatAgentQuestion, ThreatAgentReply, \
     ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, \
-    ThreatAgentRiskScores
+    ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
 from apps.my_modules import converter
 import os
@@ -101,7 +101,6 @@ def penetration_tests():
     return render_template(f"home/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
 @blueprint.route('/macm', methods=['GET','POST'])
-@login_required
 def macm():
     try:
         selected_macm = request.args.get('app_id')
@@ -124,21 +123,16 @@ def macm():
         attack_for_each_component = None
         attack_number = None
 
-    # Check if the ThreatAgentRiskScore exists for the application
-    wizard_completed = False
-    threat_agent_score = ThreatAgentRiskScores.query.filter_by(appID=selected_macm).first()
-    if threat_agent_score:
-        wizard_completed = True
     template = f"home/macm_riskRating.html" if objective == "riskanalysis" else f"home/macm.html"
     return render_template(template, segment=get_segment(request), table=table,
                            attack_for_each_component=attack_for_each_component,
                            attack_number=attack_number,
                            threat_for_each_component=threat_for_each_component,
                            threat_number=threat_number, reports=reports,
-                           selected_macm=selected_macm,wizard_completed=wizard_completed)
+                           selected_macm=selected_macm,wizard_completed=wizard_completed(selected_macm),
+                           stride_impact_completed=stride_impact_completed(selected_macm))
 
 @blueprint.route('/macm-detail', methods=['GET'])
-@login_required
 def macm_detail():
     selected_macm = request.args.get('app_id')
     selected_id = request.args.get('id')
@@ -151,7 +145,6 @@ def macm_detail():
     return render_template(f"home/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
 
 @blueprint.route('/settings', methods=['GET'])
-@login_required
 def settings():
     excel_file = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config['DBS_PATH']
@@ -175,7 +168,6 @@ def get_segment(request):
 
 
 @blueprint.route('/risk_analysis', methods=['GET'])
-@login_required
 def risk_analysis():
     try:
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
@@ -198,7 +190,6 @@ def risk_analysis():
 
 
 @blueprint.route('/threat-agent-wizard', methods=['GET'])
-@login_required
 def threat_agent_wizard():
     context = {}
     appId = request.args.get('app_id')
@@ -260,7 +251,6 @@ def threat_agent_wizard():
     )
 
 @blueprint.route('/submit-questionnaire', methods=['POST'])
-@login_required
 def submit_questionnaire():
     if request.method == 'POST':
         # Initialize a dictionary to store the user's responses
@@ -344,7 +334,6 @@ def submit_questionnaire():
 
 
 @blueprint.route('/threat_agent_evaluation', methods=['POST'])
-@login_required
 def threat_agent_evaluation():
     """
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
@@ -539,14 +528,13 @@ def threat_agent_evaluation():
 
 
 @blueprint.route('/stride-impact-rating', methods=['GET'])
-@login_required
 def stride_impact_rating():
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
     # Extract `appId` and `objective` from the form
     objective = request.args.get('objective', 'riskanalysis')
-    appId = request.args.get('appId')
+    appId = request.args.get('app_id')
 
     template = "home/stride_impact_risk.html" if objective == "riskanalysis" else "home/macm.html"
     return render_template(
@@ -554,23 +542,126 @@ def stride_impact_rating():
         segment=get_segment(request),appId=appId, objective=objective
     )
 
-@blueprint.route('/stride_impact_evaluation', methods=['GET'])
-@login_required
+@blueprint.route('/stride_impact_evaluation', methods=['POST'])
 def stride_impact_evaluation():
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
-    # Extract `appId` and `objective` from the form
-    objective = request.args.get('objective', 'riskanalysis')
-    appId = request.args.get('appId')
+    objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
+    appId = request.form.get('appId')
+    print(f"applicazione: {appId}")
+
+    # Initialize variables for reports and data analysis
+    reports = []
+    table = None
+    attack_for_each_component = None
+    attack_number = 0
+    threat_for_each_component = None
+    threat_number = 0
+
+    try:
+        # Fetch distinct reports for the given `appId`
+        reports = (
+            AttackView.query.filter_by(AppID=appId)
+            .with_entities(
+                AttackView.Attack_Number,
+                AttackView.Tool_ID,
+                AttackView.Tool_Name,
+                AttackView.Attack_Pattern,
+                AttackView.Capec_ID,
+                AttackView.Threat_ID,
+                AttackView.Asset_Type,
+                AttackView.Threat,
+                AttackView.Component_ID,
+                AttackView.Asset,
+                AttackView.AppID,
+                AttackView.ReportFiles,
+                AttackView.Report_Parser
+            )
+            .where(AttackView.ReportFiles.isnot(None))
+            .distinct()
+            .all()
+        )
+
+        # Fetch table data for the given `appId`
+        table = Macm.query.filter_by(App_ID=appId).all()
+        if not table:
+            table = None
+    except Exception as e:
+        app.logger.error(f"Error fetching reports or table for appId {appId}: {e}", exc_info=True)
+
+    try:
+        # Count attacks and threats for each component
+        attack_for_each_component = AttackView.query.filter_by(AppID=appId).with_entities(
+            AttackView.Component_ID, func.count(AttackView.Component_ID)
+        ).group_by(AttackView.Component_ID).all()
+        attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
+
+        attack_number = AttackView.query.filter_by(AppID=appId).count()
+
+        threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
+            ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)
+        ).group_by(ThreatModel.Component_ID).all()
+        threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+
+        threat_number = ThreatModel.query.filter_by(AppID=appId).count()
+    except Exception as e:
+        app.logger.error(f"Error fetching attacks or threats for appId {appId}: {e}", exc_info=True)
 
 
+    # STRIDE categories
+    strides = ['spoofing', 'tampering', 'reputation', 'information_disclosure', 'dos', 'elevationofprivileges']
+    stride_data = {}
 
+    # Manually mapping specific strides to the correct readable format
+    mapping = {
+        'spoofing': 'Spoofing',
+        'tampering': 'Tampering',
+        'reputation': 'Reputation',
+        'information_disclosure': 'Information Disclosure',
+        'dos': 'Denial of Service',
+        'elevationofprivileges': 'Elevation of Privileges'
+    }
 
-    template = "home/macm.html"
+    for stride in strides:
+        stride_data[stride] = {
+            "financialdamage": int(request.form.get(f"{stride}_financialdamage", 0)),
+            "reputationdamage": int(request.form.get(f"{stride}_reputationdamage", 0)),
+            "noncompliance": int(request.form.get(f"{stride}_noncompliance", 0)),
+            "privacyviolation": int(request.form.get(f"{stride}_privacyviolation", 0)),
+        }
+
+    for stride, impacts in stride_data.items():
+        print(f"Processing STRIDE category: {stride}")
+        print(f"Financial Damage: {impacts['financialdamage']}")
+        print(f"Reputation Damage: {impacts['reputationdamage']}")
+        print(f"Non-compliance: {impacts['noncompliance']}")
+        print(f"Privacy Violation: {impacts['privacyviolation']}")
+
+        # Usa il metodo per aggiornare o creare il record
+        StrideImpactRecord.update_or_create(
+            app_id=appId,
+            stride=stride,
+            financialdamage=impacts['financialdamage'],
+            reputationdamage=impacts['reputationdamage'],
+            noncompliance=impacts['noncompliance'],
+            privacyviolation=impacts['privacyviolation']
+        )
+
+    template = "home/macm_riskRating.html" if objective == "riskanalysis" else "home/macm.html"
     return render_template(
         template,
-        segment=get_segment(request)
+        segment=get_segment(request),
+        table=table,
+        attack_for_each_component=attack_for_each_component,
+        attack_number=attack_number,
+        threat_for_each_component=threat_for_each_component,
+        threat_number=threat_number,
+        reports=reports,
+        appId=appId,
+        objective=objective,
+        wizard_completed=wizard_completed(appId),
+        stride_impact_completed=stride_impact_completed(appId)
     )
 
 
@@ -631,3 +722,17 @@ def remove_duplicates_by_category_id(threat_agent_set):
 
     # Ritorna i valori unici come un set
     return set(unique_categories.values())
+
+def wizard_completed(appId):
+
+    # Check if the ThreatAgentRiskScore exists for the application
+    completed= False
+    threat_agent_score = ThreatAgentRiskScores.query.filter_by(appID=appId).first()
+    if threat_agent_score:
+        completed= True
+    return completed
+
+def stride_impact_completed(appId):
+    # Check if the STRIDE impact records exist for the application
+    stride_impact_records = StrideImpactRecord.query.filter_by(appID=appId).all()
+    return len(stride_impact_records) > 5

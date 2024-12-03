@@ -3,474 +3,280 @@
 {% block title %} MACM {% endblock %}
 
 <!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/css/custom_stride.css">
+{% endblock %}
 
 {% block content %}
-    <form method="POST" action="{% url 'stride_impact_evaluation'%}">
+
+<style>
+    a.tip {
+        text-decoration: none
+    }
+
+    a.tip:hover {
+        cursor: help;
+        position: relative
+    }
+
+    a.tip span {
+        display: none
+    }
+
+    a.tip:hover span {
+        border: #c0c0c0 1px dotted;
+        padding: 5px 20px 5px 5px;
+        display: block;
+        z-index: 100;
+        background: #f0f0f0 no-repeat 100% 5%;
+        left: 0px;
+        margin: 10px;
+        width: 250px;
+        position: absolute;
+        top: 10px;
+        text-decoration: none
+    }
+</style>
+
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        text-align: left;
+        padding: 8px;
+    }
+</style>
+
+    <form id="questionnaire-form" method="POST" action="/stride_impact_evaluation">
+    <div class="container">
         <input type="hidden" name="appId" value="{{ appId }}">
-<div class=container>
-    <!-- IMPACT DEFAULT EVALUATION-->
-    <div class="panel panel-default">
-        <div>
-            <table border="1" style="width: 100%">
-                <tr style="border-bottom: 1px solid #ddd">
+        <!-- IMPACT DEFAULT EVALUATION-->
+        <div class="panel panel-default">
+            <div>
+                <table border="1" style="width: 100%">
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>SPOOFING</p>
+                                <b>Description: </b>
+                                <p>Threats related to the interception of data in transit</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does a Spoofing threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="spoofing_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="spoofing_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="spoofing_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="spoofing_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
 
-                    <td style="padding: 10px;" width="25%">
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>TAMPERING</p>
+                                <b>Description: </b>
+                                <p>Threats related to data manipulation</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does a Tampering threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="tampering_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="tampering_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="tampering_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="tampering_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
 
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>SPOOFING</p>
-                            <b>Description: </b>
-                            <p>Threats related to the interception of data in transit</p>
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>REPUTATION</p>
+                                <b>Description: </b>
+                                <p>Threats that impact reputation</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does a Reputation threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="reputation_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="reputation_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="reputation_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="reputation_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
 
-                        </div>
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>INFORMATION DISCLOSURE</p>
+                                <b>Description: </b>
+                                <p>Threats related to exposure of confidential information</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does an Information Disclosure threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="information_disclosure_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="information_disclosure_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="information_disclosure_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="information_disclosure_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>Denial Of Service</p>
+                                <b>Description: </b>
+                                <p>Threats related that compromise the availability of the asset</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does an Denial of Services threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="dos_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="dos_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="dos_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="dos_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
 
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-                            <p>How much impact does a Spoofing threat have on application?</p>
-                            <br>
-                            <table border="1" style="width: 100%">
-                                <tr style="border-bottom: 1px solid #ddd">
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="spoofing_financialdamage"></td>
-                                </tr>
-
-
-
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="spoofing_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5"  name="spoofing_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="spoofing_privacyviolation" ></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-
-
-                            </table>
-
-                        </div>
-                    </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #ddd">
+                        <td style="padding: 10px;" width="25%">
+                            <div style="padding: 3px;">
+                                <b>Stride: </b>
+                                <p>Elevation of Privileges</p>
+                                <b>Description: </b>
+                                <p>Threats related that compromise the privileges the user has</p>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" width="75%">
+                            <div style="padding: 3px; font-size: 120%;">
+                                <p>How much impact does an Elevation of Privileges threat have on application?</p>
+                                <br>
+                                <table border="1" style="width: 100%">
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="elevationofprivileges_financialdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="elevationofprivileges_reputationdamage"></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #ddd">
+                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="elevationofprivileges_noncompliance"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
+                                        <td><input type="number" min="0" max="9" value="5" name="elevationofprivileges_privacyviolation"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
                 </tr>
-
-
-                <tr style="border-bottom: 1px solid #ddd">
-
-                    <td style="padding: 10px;" width="25%">
-
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>TAMPERING</p>
-
-                            <b>Description: </b>
-                            <p>Threats related to data manipulation</p>
-
-                        </div>
-
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-                            <p>How much impact does a Tampering threat have on application?</p>
-                            <br>
-                            <table border="1" style="width: 100%">
-                                <tr style="border-bottom: 1px solid #ddd">
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="tampering_financialdamage"></td>
-                                </tr>
-
-
-
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="tampering_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="tampering_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="tampering_privacyviolation"></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-
-
-                            </table>
-
-                        </div>
-                    </td>
-                </tr>
-
-                <tr style="border-bottom: 1px solid #ddd">
-
-                    <td style="padding: 10px;" width="25%">
-
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>REPUTATION</p>
-
-
-                            <b>Description: </b>
-                            <p>Threats that impact reputation</p>
-
-                        </div>
-
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-                            <p>How much impact does a Reputation threat have on application?</p>
-                            <table border="1" style="width: 100%">
-                                <tr style="border-bottom: 1px solid #ddd">
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="reputation_financialdamage"></td>
-                                </tr>
-
-
-
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="reputation_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="reputation_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="reputation_privacyviolation"></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr style="border-bottom: 1px solid #ddd">
-
-                    <td style="padding: 10px;" width="25%">
-
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>INFORMATION DISCLOSURE</p>
-                            <b>Description: </b>
-                            <p>Threats related to access to confidential information</p>
-
-                        </div>
-
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-                            <p>How much impact does a Information Disclosure threat have on application?</p>
-                            <table border="1" style="width: 100%">
-                                <tr style="border-bottom: 1px solid #ddd">
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="informationdisclosure_financialdamage"></td>
-                                </tr>
-
-
-
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="informationdisclosure_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="informationdisclosure_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="informationdisclosure_privacyviolation"></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-
-
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr style="border-bottom: 1px solid #ddd">
-
-                    <td style="padding: 10px;" width="25%">
-
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>DENIAL OF SERVICES</p>
-                            <b>Description: </b>
-                            <p>Attacks on availability</p>
-
-
-
-                        </div>
-
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-
-                            <p>How much impact does a Denial of services threat have on application?</p>
-                            <table border="1" style="width: 100%" >
-                                <tr style="border-bottom: 1px solid #ddd" >
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="dos_financialdamage"></td>
-                                </tr>
-
-
-
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number" min="0" max="9"
-                                               value="5" name="dos_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number"min="0"
-                                               max="9" value="5" name="dos_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="dos_privacyviolation"></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-
-
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr style="border-bottom: 1px solid #ddd">
-
-                    <td style="padding: 10px;" width="25%">
-
-                        <div style="padding: 3px;">
-                            <b>Stride: </b>
-                            <p>ELEVATION OF PRIVILEGES</p>
-                            <b>Description: </b>
-                            <p>Access to resources with privileges other than their own</p>
-
-
-                        </div>
-
-                    </td>
-                    <td style="padding: 10px;" width="75%"><div
-                                style="padding: 3px; font-size: 120%;">
-                            <p>How much impact does a Elevation of privileges threat have on application?</p>
-                            <table border="1" style="width: 100%">
-                                <tr style="border-bottom: 1px solid #ddd">
-                                    <td><a class="tip">Financial damage<span>How
-															much financial damage will result from an exploit? Less
-															than the cost to fix the vulnerability (1), minor effect
-															on annual profit (3), significant effect on annual profit
-															(7), bankruptcy (9)</span></a></td>
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="elevationofprivileges_financialdamage"></td>
-                                </tr>
-
-
-                                <tr style="border-bottom: 1px solid #ddd ">
-
-
-                                    <td><a class="tip">Reputation damage<span>Would
-															an exploit result in reputation damage that would harm
-															the business? Minimal damage (1), Loss of major accounts
-															(4), loss of goodwill (5), brand damage (9)</span></a></td>
-
-                                    <td><input type="number"
-                                               min="0" max="9" value="5" name="elevationofprivileges_reputationdamage"></td>
-                                </tr>
-
-                                <tr style="border-bottom: 1px solid #ddd">
-
-
-                                    <td><a class="tip">Non-compliance<span>How
-															much exposure does non-compliance introduce? Minor
-															violation (2), clear violation (5), high profile
-															violation (7)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="elevationofprivileges_noncompliance"></td>
-
-                                <tr>
-                                    <td><a class="tip">Privacy violation<span>How
-															much personally identifiable information could be
-															disclosed? One individual (3), hundreds of people (5),
-															thousands of people (7), millions of people (9)</span></a></td>
-
-                                    <td><input type="number" min="0"
-                                               max="9" value="5" name="elevationofprivileges_privacyviolation"></td>
-                                </tr>
-                                </tr>
-                                </tr>
-
-
-
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
+                </table>
+            </div>
         </div>
-
-
-
+        <div style="text-align: center;">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </div>
-<br><br>
-    <div style="text-align: center;">
-        <button style="text-align: center;" class="btn btn-primary">Save Impact Evaluation</button>
-    </div>
-
-</div>
-    </form>
-{% endblock content %}
+</form>
+{% endblock %}
 
 <!-- Specific Page JS goes HERE -->
 {% block javascripts %}
-
 <script src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
 <script src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
 <script src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>

@@ -1,0 +1,105 @@
+/* styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.panel {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.section-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.section-description {
+    font-size: 1.1em;
+    line-height: 1.5;
+    color: #555;
+}
+
+.impact-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.impact-details-table th, .impact-details-table td {
+    padding: 10px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.tip {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.tip:hover {
+    color: #0056b3;
+}
+
+.tip span {
+    visibility: hidden;
+    background-color: #f9f9f9;
+    color: #333;
+    padding: 5px;
+    border-radius: 5px;
+    position: absolute;
+    z-index: 1;
+    margin-left: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tip:hover span {
+    visibility: visible;
+}
+
+.submit-button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn:focus {
+    outline: none;
+}

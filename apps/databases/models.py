@@ -548,3 +548,61 @@ class ThreatAgentRiskScores(db.Model):
         except Exception as e:
             db.session.rollback()  # Annulla le modifiche se c'è un errore
             print(f"Error saving data: {e}")
+
+
+class StrideImpactRecord(db.Model):
+    _tablename_ = 'StrideImpactRecord'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # ID come primary key, auto incrementale
+    appID = db.Column(db.String(100), nullable=False)
+    stride = db.Column(db.String(100), nullable=False)
+    financialdamage = db.Column(db.Integer, nullable=False)
+    reputationdamage = db.Column(db.Integer, nullable=False)
+    noncompliance = db.Column(db.Integer, nullable=False)
+    privacyviolation = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+
+    def save(self):
+        try:
+            db.session.add(self)  # Aggiungi l'oggetto alla sessione
+            db.session.commit()  # Commetti le modifiche
+        except Exception as e:
+            db.session.rollback()  # Annulla le modifiche se c'è un errore
+            print(f"Error saving data: {e}")
+
+    @staticmethod
+    def update_or_create(app_id, stride, financialdamage, reputationdamage, noncompliance, privacyviolation):
+        # Cerca se esiste già un record con lo stesso appID e stride
+        existing_record = StrideImpactRecord.query.filter_by(appID=app_id, stride=stride).first()
+
+        if existing_record:
+            # Se il record esiste, aggiorna
+            existing_record.financialdamage = financialdamage
+            existing_record.reputationdamage = reputationdamage
+            existing_record.noncompliance = noncompliance
+            existing_record.privacyviolation = privacyviolation
+            existing_record.updated_at = datetime.utcnow()  # aggiorna la data di modifica
+            print(f"Updated record for STRIDE category: {stride}")
+        else:
+            # Se il record non esiste, inserisci un nuovo record
+            new_record = StrideImpactRecord(
+                appID=app_id,
+                stride=stride,
+                financialdamage=financialdamage,
+                reputationdamage=reputationdamage,
+                noncompliance=noncompliance,
+                privacyviolation=privacyviolation,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            db.session.add(new_record)
+            db.session.commit()  # Commit del nuovo record
+            print(f"Inserted new record for STRIDE category: {stride}")
