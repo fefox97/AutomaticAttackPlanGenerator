@@ -1,4 +1,5 @@
 import json
+import traceback
 from stix2 import FileSystemStore, FileSystemSource
 import os
 import pandas as pd
@@ -209,8 +210,8 @@ class MacmUtils:
 
     def delete_macm(self, app_id, delete_neo4j=True):
         try:
-            app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
             if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
+                app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
                 raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
             Macm.query.filter_by(App_ID=app_id).delete()
             MacmUser.query.filter_by(AppID=app_id).delete()
@@ -221,6 +222,7 @@ class MacmUtils:
             return True
         except Exception as error:
             print(f"Error deleting MACM {app_id}:\n {error}")
+            traceback.print_exc()
             raise error
     
     def share_macm(self, app_id, users):
