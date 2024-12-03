@@ -169,11 +169,11 @@
                                 <p class="text-muted mb-4">Evaluate the STRIDE impact on your application and components.</p>
                                 <div class="d-flex justify-content-center">
                                     {% if stride_impact_completed %}
-                                        <a href="/stride-impact-evaluation?app_id={{ table[0].App_ID }}" class="btn btn-success">
+                                        <a href="/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-success">
                                             <i class="fas fa-check-circle"></i> StrideImpact Evaluation Completed
                                         </a>
                                     {% else %}
-                                        <a href="/stride-impact-evaluation?app_id={{ table[0].App_ID }}" class="btn btn-warning">
+                                        <a href="/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-warning">
                                             <i class="fas fa-exclamation-circle"></i> Start StrideImpact Evaluation
                                         </a>
                                     {% endif %}

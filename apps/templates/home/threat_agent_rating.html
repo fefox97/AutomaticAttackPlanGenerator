@@ -159,35 +159,41 @@
         </div>
 
         <div class="category-list">
-            {% for Category in ThreatAgents %}
-                <!-- Hidden category ID -->
-                <input type="hidden" name="categoryId_{{ Category.category.Category }}" value="{{ Category.category.id }}">
+    {% for Category in ThreatAgents %}
+        <!-- Hidden category ID -->
+        <input type="hidden" name="categoryId_{{ Category.category.Category }}" value="{{ Category.category.Id }}">
 
-                <div class="category-card">
-                    <div class="details">
-                        <h4><b>{{ Category.category.Category }}</b></h4>
-                        <p><b>Description: </b> {{ Category.category.Description }}</p>
-                        <p><b>Threat Agent Common Actions:</b> {{ Category.category.CommonAction }}</p>
+        <div class="category-card">
+            <div class="details">
+                <h4><b>{{ Category.category.Category }}</b></h4>
+                <p><b>Description: </b> {{ Category.category.Description }}</p>
+                <p><b>Threat Agent Common Actions:</b> {{ Category.category.CommonAction }}</p>
 
-                        <h4><b>Attributes</b></h4>
-                        <ul class="attributes-list">
-                            {% for attribute in Category.attributes %}
-                                <li>{{ attribute.attribute }}: {{ attribute.attribute_value }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                <h4><b>Attributes</b></h4>
+                <ul class="attributes-list">
+                    {% for attribute in Category.attributes %}
+                        <li>
+                            <!-- Display attribute name and value -->
+                            {{ attribute.attribute }}: {{ attribute.attribute_value }}
+                            <!-- Hidden input to pass the attribute ID -->
+                            <input type="hidden" name="attributeId_{{ Category.category.Category }}_{{ attribute.attribute }}" value="{{ attribute.Id }}">
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-                    <div class="rating-section">
-                        <label for="rating_{{ Category.category.Category }}">How do you rate the category?</label>
-                        <select class="rating-select" name="rating_{{ Category.category.Category }}" aria-label="How do you rate the category?">
-                            <option value="L">Low</option>
-                            <option value="M" selected>Medium</option>
-                            <option value="H">High</option>
-                        </select>
-                    </div>
-                </div>
-            {% endfor %}
+            <div class="rating-section">
+                <label for="rating_{{ Category.category.Category }}">How do you rate the category?</label>
+                <select class="rating-select" name="rating_{{ Category.category.Category }}" aria-label="How do you rate the category?">
+                    <option value="L">Low</option>
+                    <option value="M" selected>Medium</option>
+                    <option value="H">High</option>
+                </select>
+            </div>
         </div>
+    {% endfor %}
+</div>
+
     </div>
 
     <div class="text-center">

@@ -2,6 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+from datetime import datetime
 
 from apps.authentication.models import Users
 from apps.home import blueprint
@@ -16,6 +17,7 @@ from sqlalchemy import func
 from apps.my_modules import converter
 import os
 import time
+
 
 @blueprint.route('/index')
 @login_required
@@ -99,7 +101,7 @@ def penetration_tests():
     return render_template(f"home/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
 @blueprint.route('/macm', methods=['GET','POST'])
-# ricordati di aggiungere login_required
+@login_required
 def macm():
     try:
         selected_macm = request.args.get('app_id')
@@ -121,11 +123,22 @@ def macm():
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         attack_for_each_component = None
         attack_number = None
+
+    # Check if the ThreatAgentRiskScore exists for the application
+    wizard_completed = False
+    threat_agent_score = ThreatAgentRiskScores.query.filter_by(appID=selected_macm).first()
+    if threat_agent_score:
+        wizard_completed = True
     template = f"home/macm_riskRating.html" if objective == "riskanalysis" else f"home/macm.html"
-    return render_template(template, segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm)
+    return render_template(template, segment=get_segment(request), table=table,
+                           attack_for_each_component=attack_for_each_component,
+                           attack_number=attack_number,
+                           threat_for_each_component=threat_for_each_component,
+                           threat_number=threat_number, reports=reports,
+                           selected_macm=selected_macm,wizard_completed=wizard_completed)
 
 @blueprint.route('/macm-detail', methods=['GET'])
-# ricordati di aggiungere login_required
+@login_required
 def macm_detail():
     selected_macm = request.args.get('app_id')
     selected_id = request.args.get('id')
@@ -138,7 +151,7 @@ def macm_detail():
     return render_template(f"home/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
 
 @blueprint.route('/settings', methods=['GET'])
-# ricordati di aggiungere login_required
+@login_required
 def settings():
     excel_file = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config['DBS_PATH']
@@ -162,7 +175,7 @@ def get_segment(request):
 
 
 @blueprint.route('/risk_analysis', methods=['GET'])
-# ricordati di aggiungere login_required
+@login_required
 def risk_analysis():
     try:
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
@@ -172,14 +185,20 @@ def risk_analysis():
         risk_analyses = MacmUser.query.filter_by(UserID=current_user.id).all()
         if len(risk_analyses) == 0:
             risk_analyses = None
+
+
     except Exception as error:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         risk_analyses = None
         raise error
-    return render_template(f"home/risk_analysis.html", segment=get_segment(request), risk_analyses=risk_analyses, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
+    return render_template(f"home/risk_analysis.html",
+                           segment=get_segment(request),
+                           risk_analyses=risk_analyses,
+                           users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
 
 @blueprint.route('/threat-agent-wizard', methods=['GET'])
-# ricordati di aggiungere login_required
+@login_required
 def threat_agent_wizard():
     context = {}
     appId = request.args.get('app_id')
@@ -241,7 +260,7 @@ def threat_agent_wizard():
     )
 
 @blueprint.route('/submit-questionnaire', methods=['POST'])
-# ricordati di aggiungere login_required
+@login_required
 def submit_questionnaire():
     if request.method == 'POST':
         # Initialize a dictionary to store the user's responses
@@ -323,57 +342,236 @@ def submit_questionnaire():
             appId=appId
         )
 
+
 @blueprint.route('/threat_agent_evaluation', methods=['POST'])
-# ricordati di aggiungere login_required
+@login_required
 def threat_agent_evaluation():
-    # Initialize a dictionary to store the user's responses
-    objective="riskanalysis"
+    """
+    Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
+    """
+    # Extract `appId` and `objective` from the form
+    objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
+
+    # Initialize variables for reports and data analysis
+    reports = []
+    table = None
+    attack_for_each_component = None
+    attack_number = 0
+    threat_for_each_component = None
+    threat_number = 0
+
     try:
-        reports = AttackView.query.filter_by(AppID=appId).with_entities(AttackView.Attack_Number,
-                                                                                AttackView.Tool_ID,
-                                                                                AttackView.Tool_Name,
-                                                                                AttackView.Attack_Pattern,
-                                                                                AttackView.Capec_ID,
-                                                                                AttackView.Threat_ID,
-                                                                                AttackView.Asset_Type,
-                                                                                AttackView.Threat,
-                                                                                AttackView.Component_ID,
-                                                                                AttackView.Asset, AttackView.AppID,
-                                                                                AttackView.ReportFiles,
-                                                                                AttackView.Report_Parser).where(
-            AttackView.ReportFiles.isnot(None)).distinct().all()
+        # Fetch distinct reports for the given `appId`
+        reports = (
+            AttackView.query.filter_by(AppID=appId)
+            .with_entities(
+                AttackView.Attack_Number,
+                AttackView.Tool_ID,
+                AttackView.Tool_Name,
+                AttackView.Attack_Pattern,
+                AttackView.Capec_ID,
+                AttackView.Threat_ID,
+                AttackView.Asset_Type,
+                AttackView.Threat,
+                AttackView.Component_ID,
+                AttackView.Asset,
+                AttackView.AppID,
+                AttackView.ReportFiles,
+                AttackView.Report_Parser
+            )
+            .where(AttackView.ReportFiles.isnot(None))
+            .distinct()
+            .all()
+        )
+
+        # Fetch table data for the given `appId`
         table = Macm.query.filter_by(App_ID=appId).all()
-        if len(table) == 0:
+        if not table:
             table = None
-    except:
-        table = None
+    except Exception as e:
+        app.logger.error(f"Error fetching reports or table for appId {appId}: {e}", exc_info=True)
+
     try:
+        # Count attacks and threats for each component
         attack_for_each_component = AttackView.query.filter_by(AppID=appId).with_entities(
-            AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
+            AttackView.Component_ID, func.count(AttackView.Component_ID)
+        ).group_by(AttackView.Component_ID).all()
         attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
+
         attack_number = AttackView.query.filter_by(AppID=appId).count()
+
         threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
-            ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+            ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)
+        ).group_by(ThreatModel.Component_ID).all()
         threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+
         threat_number = ThreatModel.query.filter_by(AppID=appId).count()
-    except:
-        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
-        attack_for_each_component = None
-        attack_number = None
+    except Exception as e:
+        app.logger.error(f"Error fetching attacks or threats for appId {appId}: {e}", exc_info=True)
+
+    # OWASP scoring variables
+    OWASP_Motive_Total = 0
+    OWASP_Size_Total = 0
+    OWASP_Opportunity_Total = 0
+    OWASP_Skill_Total = 0
+    total_weights = 0
+    category_details_list = []
+
+    try:
+        # Dictionaries to store category, attribute, and rating data
+        category_ids = {}
+        attribute_ids = {}
+        ratings = {}
+        rating_map = {'L': 1, 'M': 2, 'H': 3}  # Risk level mapping
+
+        # Parse category, attribute, and rating information from the form
+        for key in request.form.keys():
+            if key.startswith("categoryId_"):
+                category_name = key.split("categoryId_")[1]
+                category_ids[category_name] = request.form.get(key)
+            elif key.startswith("attributeId_"):
+                parts = key.split("_")
+                category_name = parts[1]
+                attribute_name = "_".join(parts[2:])
+                if category_name not in attribute_ids:
+                    attribute_ids[category_name] = {}
+                attribute_ids[category_name][attribute_name] = request.form.get(key)
+            elif key.startswith("rating_"):
+                category_name = key.split("rating_")[1]
+                ratings[category_name] = request.form.get(key)
+
+        # Process each category and calculate OWASP risk scores
+        for category_name, category_id in category_ids.items():
+            category_details = {}
+
+            # Fetch the category and its attributes from the database
+            category = ThreatAgentCategory.query.filter_by(Id=category_id).first()
+            if not category:
+                continue  # Skip invalid categories
+
+            category_attributes = ThreatAgentAttributesCategory.query.filter_by(category_id=category.Id).all()
+            attributes = [
+                ThreatAgentAttribute.query.filter_by(Id=attr.attribute_id).first()
+                for attr in category_attributes
+            ]
+
+            # Calculate OWASP parameters based on attribute scores
+            rating = ratings.get(category_name)
+            rating_score = rating_map.get(rating, 0)
+            motive = size = opportunity = skill = 0
+            limits = intent = access = resources = visibility = skills = 0
+
+            for attribute in attributes:
+                if attribute.attribute == 'Skills':
+                    skills = attribute.score
+                elif attribute.attribute == 'Resources':
+                    resources = attribute.score
+                elif attribute.attribute == 'Visibility':
+                    visibility = attribute.score
+                elif attribute.attribute == 'Limits':
+                    limits = attribute.score
+                elif attribute.attribute == 'Intent':
+                    intent = attribute.score
+                elif attribute.attribute == 'Access':
+                    access = attribute.score
+
+            # Compute individual OWASP parameters
+            motive = ((((intent / 2) + (limits / 4)) / 2) * 10)
+            opportunity = ((((access / 2) + (resources / 6) + (visibility / 4)) / 3) * 10)
+            size = (resources / 6) * 10
+            skill = (skills / 4) * 10
+
+            # Accumulate weighted totals
+            OWASP_Motive_Total += motive * rating_score
+            OWASP_Opportunity_Total += opportunity * rating_score
+            OWASP_Size_Total += size * rating_score
+            OWASP_Skill_Total += skill * rating_score
+            total_weights += rating_score
+
+        # Normalize scores based on total weights
+        if total_weights > 0:
+            OWASP_Motive_Total = int(round(OWASP_Motive_Total / total_weights))
+            OWASP_Opportunity_Total = int(round(OWASP_Opportunity_Total / total_weights))
+            OWASP_Size_Total = int(round(OWASP_Size_Total / total_weights))
+            OWASP_Skill_Total = int(round(OWASP_Skill_Total / total_weights))
+        else:
+            OWASP_Motive_Total = OWASP_Opportunity_Total = OWASP_Size_Total = OWASP_Skill_Total = 0
+
+        # Save calculated scores to the database
+        risk_score = ThreatAgentRiskScores.query.filter_by(appID=appId).first()
+        if risk_score:
+            risk_score.motive = OWASP_Motive_Total
+            risk_score.opportunity = OWASP_Opportunity_Total
+            risk_score.size = OWASP_Size_Total
+            risk_score.skill = OWASP_Skill_Total
+        else:
+            risk_score = ThreatAgentRiskScores(
+                appID=appId,
+                motive=OWASP_Motive_Total,
+                opportunity=OWASP_Opportunity_Total,
+                size=OWASP_Size_Total,
+                skill=OWASP_Skill_Total,
+                created_at=datetime.utcnow(),
+                uploaded_at=datetime.utcnow()
+            )
+
+            risk_score.save()
+
+    except Exception as e:
+        app.logger.error(f"Error processing threat agent evaluation: {e}", exc_info=True)
+
+    # Render the appropriate template
+    template = "home/macm_riskRating.html" if objective == "riskanalysis" else "home/macm.html"
+    return render_template(
+        template,
+        segment=get_segment(request),
+        table=table,
+        attack_for_each_component=attack_for_each_component,
+        attack_number=attack_number,
+        threat_for_each_component=threat_for_each_component,
+        threat_number=threat_number,
+        reports=reports,
+        appId=appId,
+        objective=objective,
+        wizard_completed=True
+    )
 
 
-    #QUI
+@blueprint.route('/stride-impact-rating', methods=['GET'])
+@login_required
+def stride_impact_rating():
+    """
+    Endpoint to evaluate STRIDE impact for a given application.
+    """
+    # Extract `appId` and `objective` from the form
+    objective = request.args.get('objective', 'riskanalysis')
+    appId = request.args.get('appId')
+
+    template = "home/stride_impact_risk.html" if objective == "riskanalysis" else "home/macm.html"
+    return render_template(
+        template,
+        segment=get_segment(request),appId=appId, objective=objective
+    )
+
+@blueprint.route('/stride_impact_evaluation', methods=['GET'])
+@login_required
+def stride_impact_evaluation():
+    """
+    Endpoint to evaluate STRIDE impact for a given application.
+    """
+    # Extract `appId` and `objective` from the form
+    objective = request.args.get('objective', 'riskanalysis')
+    appId = request.args.get('appId')
 
 
 
 
-
-    template = f"home/macm_riskRating.html" if objective == "riskanalysis" else f"home/macm.html"
-    return render_template(template, segment=get_segment(request), table=table,
-                           attack_for_each_component=attack_for_each_component, attack_number=attack_number,
-                           threat_for_each_component=threat_for_each_component, threat_number=threat_number,
-                           reports=reports, appId=appId,objective=objective)
+    template = "home/macm.html"
+    return render_template(
+        template,
+        segment=get_segment(request)
+    )
 
 
 def merge_threat_agent_reply_categories(sets):

@@ -534,3 +534,17 @@ class ThreatAgentRiskScores(db.Model):
     opportunity = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+
+    def save(self):
+        try:
+            db.session.add(self)  # Aggiungi l'oggetto alla sessione
+            db.session.commit()  # Commetti le modifiche
+        except Exception as e:
+            db.session.rollback()  # Annulla le modifiche se c'è un errore
+            print(f"Error saving data: {e}")
