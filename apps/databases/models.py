@@ -346,7 +346,15 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.TID.label("Threat_ID"), 
                     ThreatCatalogue.Asset.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
-                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    ThreatCatalogue.Description,
+                    ThreatCatalogue.Compromised,
+                    ThreatCatalogue.PreC,
+                    ThreatCatalogue.PreI,
+                    ThreatCatalogue.PreA,
+                    ThreatCatalogue.PostC,
+                    ThreatCatalogue.PostI,
+                    ThreatCatalogue.PostA,
+                    ThreatCatalogue.STRIDE.label("STRIDE"),
                     Macm.Component_ID,
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
@@ -412,7 +420,6 @@ class AttackView(db.Model):
 class MethodologyView(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
-    
     __table__ = create_view(
                 "MethodologyView",
                 select(

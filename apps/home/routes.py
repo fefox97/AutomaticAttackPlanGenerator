@@ -736,3 +736,177 @@ def stride_impact_completed(appId):
     # Check if the STRIDE impact records exist for the application
     stride_impact_records = StrideImpactRecord.query.filter_by(appID=appId).all()
     return len(stride_impact_records) > 5
+
+@blueprint.route('/macm-risk', methods=['GET'])
+def macm_risk():
+    try:
+        selected_macm = request.args.get('app_id')
+        objective = request.args.get('objective')
+        reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None)).distinct().all()
+        table = Macm.query.filter_by(App_ID=selected_macm).all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    try:
+        attack_for_each_component = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Component_ID, func.count(AttackView.Component_ID)).group_by(AttackView.Component_ID).all()
+        attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
+        attack_number = AttackView.query.filter_by(AppID=selected_macm).count()
+        threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+        threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+        threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
+    except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
+        attack_for_each_component = None
+        attack_number = None
+
+    template = f"home/macm_riskRating.html"
+    return render_template(template, segment=get_segment(request), table=table,
+                           attack_for_each_component=attack_for_each_component,
+                           attack_number=attack_number,
+                           threat_for_each_component=threat_for_each_component,
+                           threat_number=threat_number, reports=reports,
+                           selected_macm=selected_macm,wizard_completed=wizard_completed(selected_macm),
+                           stride_impact_completed=stride_impact_completed(selected_macm))
+
+@blueprint.route('/macm-detailRisk', methods=['GET'])
+def macm_riskDetailed():
+    try:
+        selected_macm = request.args.get('app_id')
+        selected_id = request.args.get('id')
+        macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
+        threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+        methodologies_data = MethodologyView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+        attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
+        pentest_phases = PentestPhases.query.all()
+        av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
+    except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
+
+    ThreatAgentParameters= ThreatAgentRiskScores.query.filter_by(appID=selected_macm).first()
+    #calcolo stride impct
+    form_data = {}
+    form_data['size']=ThreatAgentParameters.size
+    form_data['motive']=ThreatAgentParameters.motive
+    form_data['opportunity']=ThreatAgentParameters.opportunity
+    form_data['skill']=ThreatAgentParameters.skill
+
+    # Iterate through each threat
+    for threat in threat_data:
+
+        # Initialize a dictionary to track maximum values and corresponding details for each category
+        category_max = {
+            "financialdamage": {"max_value": 0, "stride": None, "record": None},
+            "reputationdamage": {"max_value": 0, "stride": None, "record": None},
+            "noncompliance": {"max_value": 0, "stride": None, "record": None},
+            "privacyviolation": {"max_value": 0, "stride": None, "record": None},
+        }
+
+        # Iterate over each STRIDE element for the threat
+        for stride in reverse_map_stride(threat.STRIDE):
+            stride_impact = StrideImpactRecord.query.filter_by(appID=selected_macm, stride=stride).first()
+
+            if stride_impact:
+                # Update maximums and store details for each category
+                for category in category_max.keys():
+                    current_value = getattr(stride_impact, category)
+                    if current_value > category_max[category]["max_value"]:
+                        category_max[category] = {
+                            "max_value": current_value,
+                            "stride": stride,
+                            "record": stride_impact,
+                        }
+
+        # Store detailed results for the threat
+        form_data[threat.Threat] = {
+            "threat": threat.Threat,
+            "description": threat.Description,
+            "stride": map_stride(threat.STRIDE),
+            "financialdamage": category_max["financialdamage"]["max_value"],
+            "reputationdamage": category_max["reputationdamage"]["max_value"],
+            "noncompliance": category_max["noncompliance"]["max_value"],
+            "privacyviolation": category_max["privacyviolation"]["max_value"],
+        }
+
+        print(form_data,"\n\n\n")
+
+
+    return render_template(f"home/macm-detailRisk.html", segment=get_segment(request),
+                           macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases,
+                           av_pentest_phases=av_pentest_phases, threat_data=threat_data,
+                           methodologies_data=methodologies_data, ThreatAgentParameters=ThreatAgentParameters, form_data=form_data)
+
+@blueprint.route('/save_risk_evaluation', methods=['GET'])
+def save_risk_evaluation():
+
+
+    return render_template(f"home/macmRisk.html", segment=get_segment(request))
+
+
+def reverse_map_stride(input_data):
+    # Reverse mapping dictionary
+    reverse_stride_mapping = {
+        "S": "spoofing",
+        "T": "tampering",
+        "R": "reputation",
+        "I": "informationdisclosure",
+        "D": "dos",
+        "E": "elevationofprivileges",
+        "STRIDE": ["spoofing", "tampering", "reputation", "informationdisclosure", "dos", "elevationofprivileges"],
+        "NONE": "None",
+    }
+
+    # Normalize input: Handle both single and comma-separated inputs
+    if isinstance(input_data, str):
+        abbreviations = input_data.strip().upper().split(",")
+    else:
+        return ["Unknown"]  # If input is not a string
+
+    # Initialize an empty list for the mapped terms
+    mapped_terms = []
+
+    for abbr in abbreviations:
+        # Handle the "STRIDE" case by extending the list with all STRIDE elements
+        term = reverse_stride_mapping.get(abbr.strip(), "Unknown")
+        if abbr.strip() == "STRIDE" and isinstance(term, list):
+            mapped_terms.extend(term)  # Add all STRIDE elements
+        elif term != "Unknown":
+            mapped_terms.append(term)  # Add regular mappings
+
+    return mapped_terms
+
+def map_stride(input_data):
+    # Reverse mapping dictionary for STRIDE
+    reverse_stride_mapping = {
+        "S": "Spoofing",
+        "T": "Tampering",
+        "R": "Repudiation",
+        "I": "Information Disclosure",
+        "D": "Denial of Service (DoS)",
+        "E": "Elevation of Privileges",
+        "STRIDE": ["Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service (DoS)", "Elevation of Privileges"],
+        "NONE": "None",
+    }
+
+    # Normalize input: Handle both single and comma-separated inputs
+    if isinstance(input_data, str):
+        abbreviations = input_data.strip().upper().split(",")
+    else:
+        return "Unknown"  # If input is not a string, return "Unknown"
+
+    # Initialize an empty list for the mapped terms
+    mapped_terms = []
+
+    for abbr in abbreviations:
+        # Handle the "STRIDE" case by extending the list with all STRIDE elements
+        term = reverse_stride_mapping.get(abbr.strip(), "Unknown")
+        if abbr.strip() == "STRIDE" and isinstance(term, list):
+            mapped_terms.extend(term)  # Add all STRIDE elements
+        elif term != "Unknown":
+            mapped_terms.append(term)  # Add regular mappings
+
+    # Join the terms into a single string
+    return ", ".join(mapped_terms)
+
+
+

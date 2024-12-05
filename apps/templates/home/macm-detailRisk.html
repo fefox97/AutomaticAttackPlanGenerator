@@ -1,0 +1,295 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} MACM-{{ macm_data.Component_ID }} {% endblock %}
+
+{% block stylesheets %}
+    <style>
+        /* Aggiungi questa regola per migliorare l'aspetto delle tabelle */
+        table {
+            width: 100%; /* Imposta la larghezza al 100% per adattarsi al contenitore */
+            table-layout: fixed; /* Imposta il layout a "fisso" per celle di larghezza uniforme */
+        }
+        td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;  /* Permette che il testo vada a capo, ma evita che vada a capo inutilmente */
+        }
+        table th, table td {
+            width: 120px; /* Imposta una larghezza standard per le celle */
+            text-align: center;
+            padding: 10px; /* Aumenta leggermente il padding per un aspetto più pulito */
+            vertical-align: middle; /* Centra verticalmente il contenuto */
+            word-wrap: break-word; /* Permette di andare a capo nei contenuti troppo lunghi */
+            white-space: normal; /* Permette di andare a capo per il testo lungo */
+
+        }
+
+        /* Colorazione delle celle in base ai valori con toni pastello */
+        .low {
+            background-color: #a8d08d; /* Verde pastello */
+            color: black;
+        }
+
+        .medium {
+            background-color: #fff2b3; /* Giallo pastello */
+            color: black;
+        }
+
+        .high {
+            background-color: #f8c7c7; /* Rosso pastello */
+            color: black;
+        }
+
+                /* Stile per il contenitore del risultato */
+        .impact-result {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        /* Stile per le singole voci di impatto */
+        .impact-item {
+            width: 48%;  /* Imposta ciascuna colonna a metà della larghezza disponibile */
+            word-wrap: break-word;
+            text-align: center; /* Assicura che il testo sia centrato */
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        /* Miglioramento visivo delle tabelle */
+        table.table-bordered {
+            border-collapse: collapse; /* Combina i bordi delle celle */
+        }
+
+        table.table-bordered th, table.table-bordered td {
+            border: 1px solid #ddd; /* Imposta un bordo chiaro per le celle */
+        }
+
+        .container {
+    max-width: 95%;  /* Imposta la larghezza massima al 100% */
+    padding-left: 10px;  /* Se vuoi mantenere il padding laterale */
+    padding-right: 10px; /* Se vuoi mantenere il padding laterale */
+}
+
+    </style>
+{% endblock stylesheets %}
+
+
+{% block content %}
+<div class="container">
+    <form id="save_evaluation" method="POST" action="/save_evaluation">
+        {% for threat in threat_data %}
+            <div class="section-container">
+                <div class="threat-details-header bg-primary text-white p-3 rounded">
+                    <h3 class="mb-0">{{ threat.Threat_ID }}: <strong>{{ threat.Threat }}</strong></h3>
+                </div>
+
+                <div class="threat-info mt-4 p-3 border rounded bg-light">
+                    <div class="mb-3">
+                        <strong class="d-block">STRIDE Classification:</strong>
+                        <span class="badge bg-secondary">{{ form_data[threat.Threat].stride }}</span>
+                    </div>
+
+                    <div>
+                        <strong>Description:</strong>
+                        <p class="text-muted">{{ threat.Description }}</p>
+                    </div>
+                </div>
+                <!-- Combined Likelihood Table -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th><i class="fas fa-user"></i> Skill <br> Level</th>
+                            <th><i class="fas fa-bullseye"></i> Motive</th>
+                            <th><i class="fas fa-clock"></i> Opportunity</th>
+                            <th><i class="fas fa-layer-group"></i> Size</th>
+                            <th><i class="fas fa-search"></i> Ease of <br> Discovery</th>
+                            <th><i class="fas fa-tools"></i> Ease of <br> Exploit</th>
+                            <th><i class="fas fa-lightbulb"></i> Awareness</th>
+                            <th><i class="fas fa-shield-alt"></i> Intrusion <br> Detection</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Likelihood Row -->
+                        <tr>
+                            <td><strong>Likelihood</strong></td>
+                            {% for param in ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
+                                <td>
+                                    <input
+                                        type="number"
+                                        id="{{ param }}_{{ threat.Threat_ID }}"
+                                        value="{{ form_data[param] or 5 }}"
+                                        min="1"
+                                        max="9"
+                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')"
+                                        class="likelihood-input">
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="result-box">
+                    <strong>Overall Likelihood: </strong>
+                    <input type="text" id="likelihood_{{ threat.Threat_ID }}" readonly>
+                </div>
+
+                <!-- Impact Table -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th><i class="fas fa-user-secret"></i> Loss of <br> Confidentiality</th>
+                            <th><i class="fas fa-cogs"></i> Loss of <br> Integrity</th>
+                            <th><i class="fas fa-plug"></i> Loss of <br> Availability</th>
+                            <th><i class="fas fa-balance-scale"></i> Loss of <br> Accountability</th>
+                            <th><i class="fas fa-money-bill-wave"></i> Financial <br> Damage</th>
+                            <th><i class="fas fa-users"></i> Reputation <br> Damage</th>
+                            <th><i class="fas fa-gavel"></i> Non-Compliance</th>
+                            <th><i class="fas fa-id-card"></i> Privacy <br> Violation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Impact Row -->
+                        <tr>
+                            <td><strong>Impact</strong></td>
+                            {% for param in ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability', 'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'] %}
+                                <td>
+                                    <input
+                                        type="number"
+                                        id="{{ param }}_{{ threat.Threat_ID }}"
+                                        value="{{ form_data[threat.Threat][param] or 5 }}"
+                                        min="1"
+                                        max="9"
+                                        onchange="calculateImpact('{{ threat.Threat_ID }}')"
+                                        class="impact-input">
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="result-box">
+                    <div id="impact_{{ threat.Threat_ID }}" class="impact-result"></div>
+                </div>
+
+                <div class="clear"></div>
+            </div>
+        {% endfor %}
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Save Evaluation</button>
+        </div>
+    </form>
+</div>
+
+{% block javascripts %}
+    <script type="text/javascript">
+        // Funzione per calcolare la probabilità di ciascuna minaccia
+        function calculateLikelihood(threatID) {
+            var params = ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'];
+            var sum = 0;
+            var count = 0;
+
+            params.forEach(function(param) {
+                var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+                sum += value;
+                count++;
+
+                // Aggiungi il colore alla cella in base al valore
+                setColor(param + "_" + threatID, value);
+            });
+
+            var likelihood = sum / count;
+            var likelihoodCategory = getCategory(likelihood);
+            document.getElementById("likelihood_" + threatID).value = likelihood.toFixed(2) + " (" + likelihoodCategory + ")";
+
+            // Aggiungi il colore al risultato globale
+            setColor("likelihood_" + threatID, likelihoodCategory);
+        }
+
+        // Funzione per calcolare l'impatto di ciascuna minaccia
+        function calculateImpact(threatID) {
+            var technicalParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability'];
+            var businessParams = ['financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
+
+            // Calcolare l'impatto tecnico
+            var techSum = 0;
+            technicalParams.forEach(function(param) {
+                var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+                techSum += value;
+
+                // Aggiungi il colore alla cella in base al valore
+                setColor(param + "_" + threatID, value);
+            });
+
+            var technicalImpact = techSum / technicalParams.length;
+            var technicalImpactCategory = getCategory(technicalImpact);
+            var technicalImpactText = technicalImpact.toFixed(2) + " (" + technicalImpactCategory + ")";
+
+            // Calcolare l'impatto commerciale
+            var busSum = 0;
+            businessParams.forEach(function(param) {
+                var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+                busSum += value;
+
+                // Aggiungi il colore alla cella in base al valore
+                setColor(param + "_" + threatID, value);
+            });
+
+            var businessImpact = busSum / businessParams.length;
+            var businessImpactCategory = getCategory(businessImpact);
+            var businessImpactText = businessImpact.toFixed(2) + " (" + businessImpactCategory + ")";
+
+            // Mostrare i risultati
+            document.getElementById("impact_" + threatID).innerHTML =
+                "<strong>Technical Impact:</strong> " + technicalImpactText + " | " +
+                "<strong>Business Impact:</strong> " + businessImpactText;
+
+            // Aggiungi il colore al risultato globale
+            setColor("impact_" + threatID, technicalImpactCategory);
+        }
+
+        // Funzione per determinare la categoria di colore
+        function getCategory(value) {
+            if (value >= 6) {
+                return "high"; // Rosso
+            } else if (value >= 3) {
+                return "medium"; // Giallo
+            } else {
+                return "low"; // Verde
+            }
+        }
+
+        // Funzione per applicare il colore alla cella
+        function setColor(id, value) {
+            var element = document.getElementById(id);
+            var category = getCategory(value);
+            element.classList.remove("low", "medium", "high"); // Rimuove le classi precedenti
+            element.classList.add(category); // Aggiunge la classe corrispondente
+        }
+
+        // Calcolare all'avvio della pagina e applicare i colori iniziali
+        window.onload = function() {
+            {% for threat in threat_data %}
+                // Calcolare e applicare colori per ogni threat
+                calculateLikelihood("{{ threat.Threat_ID }}");
+                calculateImpact("{{ threat.Threat_ID }}");
+
+                // Applicare i colori iniziali per ogni input (inizializzazione)
+
+                {% for param in ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability', 'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation','skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
+                    setColor("{{ param }}_{{ threat.Threat_ID }}", document.getElementById("{{ param }}_{{ threat.Threat_ID }}").value || 5);
+                {% endfor %}
+            {% endfor %}
+        }
+    </script>
+{% endblock %}
+{% endblock %}
