@@ -1,5 +1,95 @@
 {% extends "layouts/base.html" %}
 
+<style>
+    /* Enhanced progress bar design */
+    .progress-step-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .progress-step {
+        width: 33%;
+        text-align: center;
+    }
+
+    .progress-step .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ddd;
+        position: relative;
+    }
+
+    .progress-step .step-circle::before {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: transparent;
+        border: 2px solid #ddd;
+    }
+
+    .progress-step.completed .step-circle {
+        background-color: #28a745; /* Green for completed */
+    }
+
+    .progress-step.completed .step-circle::before {
+        border-color: #28a745;
+    }
+
+    .progress-step.active .step-circle {
+        background-color: #ffc107; /* Yellow for active */
+    }
+
+    .progress-step.active .step-circle::before {
+        border-color: #ffc107;
+    }
+
+    .progress-step .step-label {
+        font-size: 14px;
+        margin-top: 5px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    /* Progress bar legend */
+    .progress-legend {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+
+    .legend-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .legend-completed {
+        background-color: #28a745; /* Green for completed */
+    }
+
+    .legend-active {
+        background-color: #ffc107; /* Yellow for active */
+    }
+
+    .legend-text {
+        font-size: 14px;
+        color: #343a40;
+    }
+</style>
+
+
 {% block title %} MACM {% endblock %}
 
 <!-- Specific Page CSS goes HERE -->
@@ -109,17 +199,28 @@
     <!-- Barra di progressione con le fasi -->
     <div class="progress-step-container">
         <div class="progress-step {% if wizard_completed %}completed{% else %}active{% endif %}">
-            <div class="step-circle">1</div>
+            <div class="step-circle"></div>
             <div class="step-label">Threat Agent Wizard</div>
         </div>
         <div class="progress-step {% if stride_impact_completed %}completed{% else %}active{% endif %}">
-            <div class="step-circle">2</div>
+            <div class="step-circle"></div>
             <div class="step-label">StrideImpact Evaluation</div>
         </div>
-        <div class="progress-step {% if final_step_completed %}completed{% else %}inactive{% endif %}">
-            <div class="step-circle">3</div>
-            <div class="step-label">Final Step</div>
-        </div>
+
+        <div class="progress-step {% if final_step_completed %}completed{% elif wizard_completed and stride_impact_completed %}active{% else %}inactive{% endif %}">
+            <div class="step-circle"></div>
+            <div class="step-label">
+        {% if wizard_completed and stride_impact_completed %}
+            <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
+                Final Step
+            </a>
+        {% else %}
+            Final Step
+        {% endif %}
+    </div>
+</div>
+
+
     </div>
 
     <!-- Legenda della barra di progressione -->
