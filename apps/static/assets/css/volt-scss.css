@@ -19942,3 +19942,53 @@ pre[class*=language-] {
   border-radius: 10px !important; }
   [data-bs-theme="dark"] pre[class*=language-] code {
     color: #ffffff !important; }
+
+[data-bs-theme="dark"] .admin .navbar .brand {
+  text-shadow: none !important; }
+
+[data-bs-theme="dark"] .admin .navbar .navbar-inner {
+  background-image: none !important;
+  background-color: #1F2937 !important;
+  border: none !important;
+  display: flex; }
+  [data-bs-theme="dark"] .admin .navbar .navbar-inner .nav {
+    display: flex; }
+
+[data-bs-theme="dark"] .admin .nav {
+  text-shadow: none !important; }
+  [data-bs-theme="dark"] .admin .nav .active a {
+    background-color: #374151 !important;
+    border: 2px solid #4B5563 !important; }
+  [data-bs-theme="dark"] .admin .nav a {
+    text-shadow: none !important; }
+    [data-bs-theme="dark"] .admin .nav a:hover {
+      border: 2px solid #4B5563 !important;
+      background-color: #6B7280 !important; }
+
+[data-bs-theme="dark"] .admin #no-more-tables .table-bordered {
+  border: 2px solid #4B5563 !important; }
+
+[data-bs-theme="dark"] .admin #no-more-tables tbody, [data-bs-theme="dark"] .admin #no-more-tables thead {
+  border: 2px solid #4B5563 !important; }
+
+[data-bs-theme="dark"] .admin #no-more-tables th, [data-bs-theme="dark"] .admin #no-more-tables td {
+  border-left: none !important; }
+
+[data-bs-theme="dark"] .admin .pagination a {
+  color: #ffffff !important;
+  background-color: #374151 !important;
+  border: 1px solid #4B5563 !important; }
+  [data-bs-theme="dark"] .admin .pagination a:hover {
+    background-color: #6B7280 !important; }
+
+[data-bs-theme="dark"] .admin .pagination .active a {
+  background-color: #1F2937 !important; }
+
+[data-bs-theme="dark"] .admin .admin-form .controls textarea, [data-bs-theme="dark"] .admin .admin-form .controls input[type="text"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="password"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="email"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="number"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="date"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="datetime-local"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="time"], [data-bs-theme="dark"] .admin .admin-form .controls input[type="url"] {
+  background-color: #1F2937 !important;
+  color: #ffffff !important;
+  border: 1px solid #4B5563 !important; }
+
+[data-bs-theme="dark"] .admin .admin-form .controls input[type="submit"] {
+  background-image: unset !important;
+  text-shadow: none !important; }

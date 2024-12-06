@@ -129,6 +129,16 @@
         </a>
       </li>
       <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+      {% if current_user.is_admin %}
+      <li class="nav-item">
+        <a href="/admin" class="nav-link">
+            <span class="sidebar-icon">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+            </span>
+            <span class="sidebar-text">Admin</span>
+        </a>
+      </li>
+      {% endif %}
       <li class="nav-item">
         <a href="{{ url_for('authentication_blueprint.logout') }}" class="nav-link">
             <span class="sidebar-icon">

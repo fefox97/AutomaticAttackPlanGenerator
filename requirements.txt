@@ -21,6 +21,7 @@ blinker==1.4
 pyOpenSSL
 
 flask_admin
+flask_security
 
 stix2
 pandas

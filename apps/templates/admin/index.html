@@ -27,8 +27,9 @@
     <!-- Settings Box + Dark Mode Script -->
     {% include 'includes/settings-box.html' %}
     <script src="{{ config.ASSETS_ROOT }}/js/dark-mode.js"></script>
-
-    {{ super() }}
+    <div class="admin">
+        {{ super() }}
+    </div>
 
 {% endblock page_body %}
 

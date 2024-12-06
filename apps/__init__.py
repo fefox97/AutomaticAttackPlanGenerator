@@ -69,15 +69,23 @@ def register_custom_filters(app):
         return s.format_map(out_dict)
 
 from apps.authentication.models import Users
-from apps.databases.models import Macm
-from apps.admin.views import MyModelView
-from flask_admin.contrib.sqla import ModelView
+from apps.databases.models import Macm, Capec, MacmUser, Attack, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
+from apps.admin.views import MyModelView, ToolCatalogueView
+from flask_admin.menu import MenuLink
 
 def configure_admin(app):
     myAdmin.url = '/admin'
     myAdmin.base_template = 'admin/index.html'
-    myAdmin.add_view(ModelView(Users, db.session, name='Users'))
-    myAdmin.add_view(ModelView(Macm, db.session, name='MACM'))
+    myAdmin.add_link(MenuLink(name='Back Home', url='/'))
+    myAdmin.add_view(MyModelView(Users, db.session, name='Users'))
+    myAdmin.add_view(MyModelView(Macm, db.session, name='MACM'))
+    myAdmin.add_view(MyModelView(Capec, db.session, name='CAPEC'))
+    myAdmin.add_view(MyModelView(MacmUser, db.session, name='MACM User'))
+    myAdmin.add_view(MyModelView(Attack, db.session, name='Attack'))
+    myAdmin.add_view(MyModelView(ToolCatalogue, db.session, name='Tool Catalogue'))
+    myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue'))
+    myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue'))
+    myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases'))
 
 
 def configure_database(app):
@@ -115,7 +123,7 @@ def create_app(config):
     app.register_blueprint(github_blueprint, url_prefix="/login") 
 
     configure_database(app)
-    # configure_admin(app)
+    configure_admin(app)
     
     clear_tmp(app.config['TMP_FOLDER'])
     return app

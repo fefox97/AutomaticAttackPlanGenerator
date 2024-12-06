@@ -13,7 +13,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
 from flask_login import (
     current_user
 )
@@ -297,6 +297,7 @@ class Utils:
         self.tool_catalog_utils = ToolCatalogUtils()
         self.macm_utils = MacmUtils()
         self.methodology_catalog_utils = MethodologyCatalogUtils()
+        self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
         self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -374,6 +375,17 @@ class Utils:
         elif database == 'MethodologyCatalog':
             methodology_catalog_df = self.methodology_catalog_utils.load_methodology_catalog()
             self.save_dataframe_to_database(methodology_catalog_df, MethodologyCatalogue)
+        elif database == 'RiskAnalysisCatalog':
+            threat_agent_category_df = self.risk_analysis_catalog_utils.load_threat_agent_category_df()
+            threat_agent_questions_df = self.risk_analysis_catalog_utils.load_threat_agent_questions()
+            threat_agent_replies_df = self.risk_analysis_catalog_utils.load_threat_agent_replies()
+            threat_agent_attributes_df = self.risk_analysis_catalog_utils.load_threat_agent_attributes()
+            threat_agent_reply_categories_df = self.risk_analysis_catalog_utils.load_threat_agent_reply_categories()
+            self.save_dataframe_to_database(threat_agent_category_df, ThreatAgentCategory)
+            self.save_dataframe_to_database(threat_agent_questions_df, ThreatAgentQuestion)
+            self.save_dataframe_to_database(threat_agent_replies_df, ThreatAgentReply)
+            self.save_dataframe_to_database(threat_agent_attributes_df, ThreatAgentAttribute)
+            self.save_dataframe_to_database(threat_agent_reply_categories_df, ThreatAgentReplyCategory)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
@@ -457,7 +469,7 @@ class Utils:
     #     response['output'] = str(attack_data)
     #     return response
 
-class ThreatAgentUtils():
+class RiskAnalysisCatalogUtils:
     converter = Converter()
 
     def __init__(self):
@@ -493,5 +505,11 @@ class ThreatAgentUtils():
     def load_threat_agent_attributes(self):
         print("\nLoading threat agent attributes info...\n")
         df = pd.read_excel(self.file_path, sheet_name="ThreatAgentAttribute", header=0)
+        df = df.astype('str')
+        return df
+    
+    def load_threat_agent_reply_categories(self):
+        print("\nLoading threat agent replies info...\n")
+        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReplyCategory", header=0)
         df = df.astype('str')
         return df

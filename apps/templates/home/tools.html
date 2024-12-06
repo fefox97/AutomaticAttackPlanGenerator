@@ -56,7 +56,7 @@
                                     <td><div class="id-badge"><h2><span class="badge bg-tool">{{ row.ToolID }}</span></h2></div></td>
                                     <td>{{ row.Name }}</td>
                                     <td class="text-nowrap">
-                                        {% if row.hasCapecIDs  is not none %}
+                                        {% if row.hasCapecIDs is not none %}
                                             <div class="d-flex flex-wrap">
                                                     {% for capec in row.hasCapecIDs  | sort %}
                                                     <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ capec }}">{{ capec }}</a>

@@ -49,15 +49,14 @@
                                 <th>PreC</th>
                                 <th>PreI</th>
                                 <th>PreA</th>
-                                <th>Precondition</th>
+                                <th>PreCondition</th>
                                 <th>PostC</th>
                                 <th>PostI</th>
                                 <th>PostA</th>
-                                <th>Postcondition</th>
+                                <th>PostCondition</th>
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
-                                <th>Methodology</th>
                                 <th>Commento</th>
                             </tr>
                         </thead>
@@ -73,7 +72,7 @@
                                     <td>{{ row['PreC'] }}</td>
                                     <td>{{ row['PreI'] }}</td>
                                     <td>{{ row['PreA'] }}</td>
-                                    <td>{{ row['Precondition'] }}</td>
+                                    <td>{{ row['PreCondition'] }}</td>
                                     <td>{{ row['PostC'] }}</td>
                                     <td>{{ row['PostI'] }}</td>
                                     <td>{{ row['PostA'] }}</td>
@@ -105,15 +104,6 @@
                                             </div>
                                         {% endif %}
                                     </td>
-                                    <td class="text-nowrap">
-                                        {% if row.hasMethodologyIDs is not none %}
-                                            <div class="d-flex flex-wrap">
-                                                    {% for methodology in row.hasMethodologyIDs | sort %}
-                                                    <span class="badge bg-methodology me-1 mb-1">{{ methodology }}</span>
-                                                    {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </td>
                                     <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}
@@ -129,15 +119,14 @@
                                 <th>PreC</th>
                                 <th>PreI</th>
                                 <th>PreA</th>
-                                <th>Precondition</th>
+                                <th>PreCondition</th>
                                 <th>PostC</th>
                                 <th>PostI</th>
                                 <th>PostA</th>
-                                <th>Postcondition</th>
+                                <th>PostCondition</th>
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
-                                <th>Methodology</th>
                                 <th>Commento</th>
                             </tr>
                         </tfoot>
