@@ -91,7 +91,7 @@
             <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
                 <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                     <li class="breadcrumb-item">
-                        <a href="/">
+                        <a href="/apps/static">
                             <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         </a>
                     </li>
@@ -101,7 +101,7 @@
             </nav>
             <h2 class="h4">MACM</h2>
             {% if table is not none %}
-                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats and {{ attack_number }} attacks found</p>
+                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats found</p>
             {% endif %}
         </div>
     </div>
@@ -152,11 +152,11 @@
                                 <p class="text-muted mb-4">Complete this important step to proceed with the risk analysis.</p>
                                 <div class="d-flex justify-content-center">
                                     {% if wizard_completed %}
-                                        <a href="/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-success">
+                                        <a href="/risk_analysis/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-success">
                                             <i class="fas fa-check-circle"></i> Threat Agent Wizard Completed
                                         </a>
                                     {% else %}
-                                        <a href="/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-danger">
+                                        <a href="/risk_analysis/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-danger">
                                             <i class="fas fa-exclamation-circle"></i> Start Threat Agent Wizard
                                         </a>
                                     {% endif %}
@@ -169,11 +169,11 @@
                                 <p class="text-muted mb-4">Evaluate the STRIDE impact on your application and components.</p>
                                 <div class="d-flex justify-content-center">
                                     {% if stride_impact_completed %}
-                                        <a href="/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-success">
+                                        <a href="/risk_analysis/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-success">
                                             <i class="fas fa-check-circle"></i> StrideImpact Evaluation Completed
                                         </a>
                                     {% else %}
-                                        <a href="/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-warning">
+                                        <a href="/risk_analysis/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-warning">
                                             <i class="fas fa-exclamation-circle"></i> Start StrideImpact Evaluation
                                         </a>
                                     {% endif %}
@@ -205,23 +205,14 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        {% if attack_for_each_component is not none%}
-                                            {% set attack_for_this_component = attack_for_each_component[row['Component_ID']] %}
-                                        {% endif %}
                                         {% if threat_for_each_component is not none%}
                                             {% set threat_for_this_component = threat_for_each_component[row['Component_ID']] %}
                                         {% endif %}
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
+                                                    <a class="badge bg-macm position-relative" href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
-                                                        {% if attack_for_this_component %}
-                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-capec badge-macm-detail">
-                                                                {{attack_for_each_component[row['Component_ID']]}}
-                                                                <span class="visually-hidden">Attacks available</span>
-                                                            </span>
-                                                        {% endif %}
                                                         {% if threat_for_this_component %}
                                                             <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-threat badge-macm-detail">
                                                                 {{threat_for_each_component[row['Component_ID']]}}
@@ -277,7 +268,7 @@
                 {% else %}
                     <div class="alert alert-warning" role="alert">
                         <h4 class="alert-heading">No MACM Data</h4>
-                        <p>No data available, please select or upload a MACM in the <a class="warning" href="/penetration-tests">dedicated page</a>.</p>
+                        <p>No data available, please select or upload a MACM in the <a class="warning" href="/risk-analysis">dedicated page</a>.</p>
                     </div>
                 {% endif %}
             </div>

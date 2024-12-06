@@ -61,7 +61,7 @@
 {% block content %}
 <div class="container">
     <h1>Threat Agent Questionnaire</h1>
-    <form id="questionnaire-form" method="POST" action="/submit-questionnaire">
+    <form id="questionnaire-form" method="POST" action="/risk_analysis/submit-questionnaire">
         <input type="hidden" name="appId" value="{{ appId }}">
 
         {% for question in questions_replies %}

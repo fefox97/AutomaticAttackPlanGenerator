@@ -147,10 +147,9 @@
 {% endblock stylesheets %}
 
 {% block content %}
-<form id="questionnaire-form" method="POST" action="/threat_agent_evaluation">
+<form id="questionnaire-form" method="POST" action="/risk_analysis/threat_agent_evaluation">
     <!-- Hidden appId input field -->
     <input type="hidden" name="appId" value="{{ appId }}">
-    <input type="hidden" name="objective" value="riskanalysis">
 
 
     <div class="panel panel-default">
@@ -174,9 +173,9 @@
                     {% for attribute in Category.attributes %}
                         <li>
                             <!-- Display attribute name and value -->
-                            {{ attribute.attribute }}: {{ attribute.attribute_value }}
+                            {{ attribute.Attribute }}: {{ attribute.Attribute_value }}
                             <!-- Hidden input to pass the attribute ID -->
-                            <input type="hidden" name="attributeId_{{ Category.category.Category }}_{{ attribute.attribute }}" value="{{ attribute.Id }}">
+                            <input type="hidden" name="attributeId_{{ Category.category.Category }}_{{ attribute.Attribute }}" value="{{ attribute.Id }}">
                         </li>
                     {% endfor %}
                 </ul>

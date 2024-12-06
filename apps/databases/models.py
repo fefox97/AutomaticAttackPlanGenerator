@@ -445,9 +445,9 @@ class MethodologyView(db.Model):
 class ThreatAgentReply(db.Model):
     __tablename__ = 'ThreatAgentReply'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)  # Unique identifier
-    reply = db.Column(db.Text, nullable=False)  # Reply text (e.g., "Yes", "No")
-    multiple = db.Column(db.Integer, nullable=False, default=0)  # Multiple indicator (0 or 1)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)  # Unique identifier
+    Reply = db.Column(db.Text, nullable=False)  # Reply text (e.g., "Yes", "No")
+    Multiple = db.Column(db.Integer, nullable=False, default=0)  # Multiple indicator (0 or 1)
 
 
 class ThreatAgentAttribute(db.Model):
@@ -455,10 +455,10 @@ class ThreatAgentAttribute(db.Model):
     __tablename__ = 'ThreatAgentAttribute'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    attribute = db.Column(db.Text)
-    attribute_value = db.Column(db.Text)
-    description = db.Column(db.Text,nullable=True)
-    score = db.Column(db.Integer)
+    Attribute = db.Column(db.Text)
+    Attribute_value = db.Column(db.Text)
+    Description = db.Column(db.Text,nullable=True)
+    Score = db.Column(db.Integer)
 
 class ThreatAgentCategory(db.Model):
 
@@ -502,9 +502,9 @@ class ThreatAgentQuestion(db.Model):
 class ThreatAgentAttributesCategory(db.Model):
     __tablename__ = 'ThreatAgentAttributesCategory'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    attribute_id = db.Column(db.Integer, nullable=False)
-    category_id = db.Column(db.Integer, nullable=False)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Attribute_id = db.Column(db.Integer, nullable=False)
+    Category_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return f"<ThreatAgentAttributesCategory(id={self.id}, attribute_id={self.attribute_id}, category_id={self.category_id})>"
@@ -513,9 +513,9 @@ class ThreatAgentAttributesCategory(db.Model):
 class ThreatAgentQuestionsReplies(db.Model):
     __tablename__ = 'ThreatAgentQuestionsReplies'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    question_id = db.Column(db.Integer, nullable=False)
-    reply_id = db.Column(db.Integer, nullable=False)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Question_id = db.Column(db.Integer, nullable=False)
+    Reply_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return f"<ThreatAgentQuestionsReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
@@ -523,9 +523,9 @@ class ThreatAgentQuestionsReplies(db.Model):
 class ThreatAgentReplyCategory(db.Model):
     __tablename__ = 'ThreatAgentReplyCategory'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    reply_id = db.Column(db.Integer, nullable=False)
-    category_id = db.Column(db.Integer, nullable=False)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Reply_id = db.Column(db.Integer, nullable=False)
+    Category_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return f"<ThreatAgentReplyCategory(id={self.id}, reply_id={self.reply_id}, category_id={self.category_id})>"
@@ -534,13 +534,13 @@ class ThreatAgentReplyCategory(db.Model):
 class ThreatAgentRiskScores(db.Model):
     __tablename__ = 'ThreatAgentRiskScores'
 
-    appID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
-    skill = db.Column(db.Integer, nullable=False)
-    size = db.Column(db.Integer, nullable=False)
-    motive = db.Column(db.Integer, nullable=False)
-    opportunity = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    Skill = db.Column(db.Integer, nullable=False)
+    Size = db.Column(db.Integer, nullable=False)
+    Motive = db.Column(db.Integer, nullable=False)
+    Opportunity = db.Column(db.Integer, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -560,16 +560,14 @@ class ThreatAgentRiskScores(db.Model):
 class StrideImpactRecord(db.Model):
     _tablename_ = 'StrideImpactRecord'
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # ID come primary key, auto incrementale
-    appID = db.Column(db.String(100), nullable=False)
-    stride = db.Column(db.String(100), nullable=False)
-    financialdamage = db.Column(db.Integer, nullable=False)
-    reputationdamage = db.Column(db.Integer, nullable=False)
-    noncompliance = db.Column(db.Integer, nullable=False)
-    privacyviolation = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
-
-
+    AppID = db.Column(db.String(100), nullable=False)
+    Stride = db.Column(db.String(100), nullable=False)
+    Financialdamage = db.Column(db.Integer, nullable=False)
+    Reputationdamage = db.Column(db.Integer, nullable=False)
+    Noncompliance = db.Column(db.Integer, nullable=False)
+    Privacyviolation = db.Column(db.Integer, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -588,7 +586,7 @@ class StrideImpactRecord(db.Model):
     @staticmethod
     def update_or_create(app_id, stride, financialdamage, reputationdamage, noncompliance, privacyviolation):
         # Cerca se esiste già un record con lo stesso appID e stride
-        existing_record = StrideImpactRecord.query.filter_by(appID=app_id, stride=stride).first()
+        existing_record = StrideImpactRecord.query.filter_by(AppID=app_id, Stride=stride).first()
 
         if existing_record:
             # Se il record esiste, aggiorna
@@ -601,14 +599,14 @@ class StrideImpactRecord(db.Model):
         else:
             # Se il record non esiste, inserisci un nuovo record
             new_record = StrideImpactRecord(
-                appID=app_id,
-                stride=stride,
-                financialdamage=financialdamage,
-                reputationdamage=reputationdamage,
-                noncompliance=noncompliance,
-                privacyviolation=privacyviolation,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                AppID=app_id,
+                Stride=stride,
+                Financialdamage=financialdamage,
+                Reputationdamage=reputationdamage,
+                Noncompliance=noncompliance,
+                Privacyviolation=privacyviolation,
+                Created_at=datetime.utcnow(),
+                Updated_at=datetime.utcnow()
             )
             db.session.add(new_record)
             db.session.commit()  # Commit del nuovo record
