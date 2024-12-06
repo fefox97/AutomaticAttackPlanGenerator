@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 
 import json
+from datetime import datetime
 from typing import List
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
@@ -333,7 +334,15 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.TID.label("Threat_ID"), 
                     ThreatCatalogue.Asset.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
-                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    ThreatCatalogue.Description,
+                    ThreatCatalogue.Compromised,
+                    ThreatCatalogue.PreC,
+                    ThreatCatalogue.PreI,
+                    ThreatCatalogue.PreA,
+                    ThreatCatalogue.PostC,
+                    ThreatCatalogue.PostI,
+                    ThreatCatalogue.PostA,
+                    ThreatCatalogue.STRIDE.label("STRIDE"),
                     Macm.Component_ID,
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
@@ -398,7 +407,6 @@ class AttackView(db.Model):
 
 class MethodologyView(db.Model):
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
-    
     __table__ = create_view(
                 "MethodologyView",
                 select(
@@ -420,18 +428,23 @@ class MethodologyView(db.Model):
         return str(f'{self.Component_ID}-{self.Methodology_ID}')
 
 class ThreatAgentReply(db.Model):
-
     __tablename__ = 'ThreatAgentReply'
 
-    Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    Reply = db.Column(db.Text)
-    Multiple = db.Column(db.Integer)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)  # Unique identifier
+    Reply = db.Column(db.Text, nullable=False)  # Reply text (e.g., "Yes", "No")
+    Details = db.Column(db.Text, nullable=True)  # Additional details (e.g., "Yes, because...")
+    Multiple = db.Column(db.Integer, nullable=False, default=0)  # Multiple indicator (0 or 1)
+
 
 class ThreatAgentAttribute(db.Model):
 
     __tablename__ = 'ThreatAgentAttribute'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Attribute = db.Column(db.Text)
+    Attribute_value = db.Column(db.Text)
+    Description = db.Column(db.Text,nullable=True)
+    Score = db.Column(db.Integer)
     Attribute = db.Column(db.Text)
     Attribute_value = db.Column(db.Text)
     Description = db.Column(db.Text,nullable=True)
@@ -474,6 +487,121 @@ class ThreatAgentQuestion(db.Model):
         ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
         return [id[0] for id in ids]
     Attributes       = db.Column(db.Text)
+
+
+class ThreatAgentAttributesCategory(db.Model):
+    __tablename__ = 'ThreatAgentAttributesCategory'
+
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Attribute_id = db.Column(db.Integer, nullable=False)
+    Category_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentAttributesCategory(id={self.id}, attribute_id={self.attribute_id}, category_id={self.category_id})>"
+
+
+class ThreatAgentQuestionsReplies(db.Model):
+    __tablename__ = 'ThreatAgentQuestionsReplies'
+
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Question_id = db.Column(db.Integer, nullable=False)
+    Reply_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentQuestionsReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
+
+class ThreatAgentReplyCategory(db.Model):
+    __tablename__ = 'ThreatAgentReplyCategory'
+
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Reply_id = db.Column(db.Integer, nullable=False)
+    Category_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<ThreatAgentReplyCategory(id={self.id}, reply_id={self.reply_id}, category_id={self.category_id})>"
+
+
+class ThreatAgentRiskScores(db.Model):
+    __tablename__ = 'ThreatAgentRiskScores'
+
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    Skill = db.Column(db.Integer, nullable=False)
+    Size = db.Column(db.Integer, nullable=False)
+    Motive = db.Column(db.Integer, nullable=False)
+    Opportunity = db.Column(db.Integer, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+
+    def save(self):
+        try:
+            db.session.add(self)  # Aggiungi l'oggetto alla sessione
+            db.session.commit()  # Commetti le modifiche
+        except Exception as e:
+            db.session.rollback()  # Annulla le modifiche se c'è un errore
+            print(f"Error saving data: {e}")
+
+
+class StrideImpactRecord(db.Model):
+    _tablename_ = 'StrideImpactRecord'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # ID come primary key, auto incrementale
+    AppID = db.Column(db.String(100), nullable=False)
+    Stride = db.Column(db.String(100), nullable=False)
+    Financialdamage = db.Column(db.Integer, nullable=False)
+    Reputationdamage = db.Column(db.Integer, nullable=False)
+    Noncompliance = db.Column(db.Integer, nullable=False)
+    Privacyviolation = db.Column(db.Integer, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+
+    def save(self):
+        try:
+            db.session.add(self)  # Aggiungi l'oggetto alla sessione
+            db.session.commit()  # Commetti le modifiche
+        except Exception as e:
+            db.session.rollback()  # Annulla le modifiche se c'è un errore
+            print(f"Error saving data: {e}")
+
+    @staticmethod
+    def update_or_create(app_id, stride, financialdamage, reputationdamage, noncompliance, privacyviolation):
+        # Cerca se esiste già un record con lo stesso appID e stride
+        existing_record = StrideImpactRecord.query.filter_by(AppID=app_id, Stride=stride).first()
+
+        if existing_record:
+            # Se il record esiste, aggiorna
+            existing_record.financialdamage = financialdamage
+            existing_record.reputationdamage = reputationdamage
+            existing_record.noncompliance = noncompliance
+            existing_record.privacyviolation = privacyviolation
+            existing_record.updated_at = datetime.utcnow()  # aggiorna la data di modifica
+            print(f"Updated record for STRIDE category: {stride}")
+        else:
+            # Se il record non esiste, inserisci un nuovo record
+            new_record = StrideImpactRecord(
+                AppID=app_id,
+                Stride=stride,
+                Financialdamage=financialdamage,
+                Reputationdamage=reputationdamage,
+                Noncompliance=noncompliance,
+                Privacyviolation=privacyviolation,
+                Created_at=datetime.utcnow(),
+                Updated_at=datetime.utcnow()
+            )
+            db.session.add(new_record)
+            db.session.commit()  # Commit del nuovo record
+            print(f"Inserted new record for STRIDE category: {stride}")
+
 
 class ThreatAgentReplyCategory(db.Model):
 

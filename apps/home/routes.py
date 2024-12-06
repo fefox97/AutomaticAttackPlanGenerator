@@ -2,15 +2,19 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+from datetime import datetime
 
 from apps.authentication.models import Users
 from apps.home import blueprint
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, Macm, ThreatModel, ToolCatalogue, PentestPhases
+from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
+    Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionsReplies, ThreatAgentQuestion, ThreatAgentReply, \
+    ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, \
+    ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
-from apps.my_modules import converter
+from apps.my_modules import converter,ThreatAgentUtils
 import os
 import time
 from werkzeug.exceptions import NotFound
@@ -98,7 +102,7 @@ def penetration_tests():
         raise error
     return render_template(f"home/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
-@blueprint.route('/macm', methods=['GET'])
+@blueprint.route('/macm', methods=['GET','POST'])
 @login_required
 def macm():
     try:
@@ -170,3 +174,6 @@ def get_segment(request):
         return segment
     except:
         return None
+
+
+

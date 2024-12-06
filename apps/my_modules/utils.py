@@ -13,7 +13,9 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel
+from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, \
+    ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, \
+    MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 from flask_login import (
     current_user
 )
@@ -513,3 +515,140 @@ class RiskAnalysisCatalogUtils:
         df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReplyCategory", header=0)
         df = df.astype('str')
         return df
+
+    def reverse_map_stride(self,input_data):
+        # Reverse mapping dictionary
+        reverse_stride_mapping = {
+            "S": "spoofing",
+            "T": "tampering",
+            "R": "reputation",
+            "I": "informationdisclosure",
+            "D": "dos",
+            "E": "elevationofprivileges",
+            "STRIDE": ["spoofing", "tampering", "reputation", "informationdisclosure", "dos", "elevationofprivileges"],
+            "NONE": "None",
+        }
+
+        # Normalize input: Handle both single and comma-separated inputs
+        if isinstance(input_data, str):
+            abbreviations = input_data.strip().upper().split(",")
+        else:
+            return ["Unknown"]  # If input is not a string
+
+        # Initialize an empty list for the mapped terms
+        mapped_terms = []
+
+        for abbr in abbreviations:
+            # Handle the "STRIDE" case by extending the list with all STRIDE elements
+            term = reverse_stride_mapping.get(abbr.strip(), "Unknown")
+            if abbr.strip() == "STRIDE" and isinstance(term, list):
+                mapped_terms.extend(term)  # Add all STRIDE elements
+            elif term != "Unknown":
+                mapped_terms.append(term)  # Add regular mappings
+
+        return mapped_terms
+
+    def map_stride(self,input_data):
+        # Reverse mapping dictionary for STRIDE
+        reverse_stride_mapping = {
+            "S": "Spoofing",
+            "T": "Tampering",
+            "R": "Repudiation",
+            "I": "Information Disclosure",
+            "D": "Denial of Service (DoS)",
+            "E": "Elevation of Privileges",
+            "STRIDE": ["Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service (DoS)",
+                       "Elevation of Privileges"],
+            "NONE": "None",
+        }
+
+        # Normalize input: Handle both single and comma-separated inputs
+        if isinstance(input_data, str):
+            abbreviations = input_data.strip().upper().split(",")
+        else:
+            return "Unknown"  # If input is not a string, return "Unknown"
+
+        # Initialize an empty list for the mapped terms
+        mapped_terms = []
+
+        for abbr in abbreviations:
+            # Handle the "STRIDE" case by extending the list with all STRIDE elements
+            term = reverse_stride_mapping.get(abbr.strip(), "Unknown")
+            if abbr.strip() == "STRIDE" and isinstance(term, list):
+                mapped_terms.extend(term)  # Add all STRIDE elements
+            elif term != "Unknown":
+                mapped_terms.append(term)  # Add regular mappings
+
+        # Join the terms into a single string
+        return ", ".join(mapped_terms)
+
+    def merge_threat_agent_reply_categories(self,sets):
+        """
+        Unisce insiemi di oggetti ThreatAgentReplyCategory evitando duplicati.
+
+        :param sets: Lista di liste di oggetti ThreatAgentReplyCategory
+        :return: Lista unita senza duplicati
+        """
+        unique_items = {}
+        result = []
+
+        for category_set in sets:
+            for category in category_set:
+                # Crea una chiave unica basata sugli attributi principali
+                unique_key = (category.id, category.reply_id, category.category_id)
+                if unique_key not in unique_items:
+                    unique_items[unique_key] = category
+                    result.append(category)
+
+        return result
+
+    def intersect_threat_agents(self,set1, set2):
+        """
+        Restituisce la lista di ThreatAgentReplyCategory comuni tra due insiemi,
+        basata esclusivamente sul campo 'category_id'.
+
+        :param set1: Primo insieme di ThreatAgentReplyCategory
+        :param set2: Secondo insieme di ThreatAgentReplyCategory
+        :return: Lista di ThreatAgentReplyCategory comuni per 'category_id'
+        """
+        # Crea un dizionario per il primo set basato su 'category_id'
+        set1_dict = {category.Category_id: category for category in set1}
+
+        # Trova le categorie comuni tra set1 e set2 in base a 'category_id'
+        common_categories = [
+            category for category in set2
+            if category.Category_id in set1_dict
+        ]
+
+        return common_categories
+
+    def remove_duplicates_by_category_id(self,threat_agent_set):
+        """
+        Rimuove duplicati da un set basandosi sul campo 'category_id'.
+
+        :param threat_agent_set: Insieme di ThreatAgentReplyCategory
+        :return: Set senza duplicati basato su 'category_id'
+        """
+        unique_categories = {}
+
+        # Itera sugli oggetti del set
+        for category in threat_agent_set:
+            # Usa 'category_id' come chiave per mantenere solo un'istanza per ID
+            unique_categories[category.Category_id] = category
+
+        # Ritorna i valori unici come un set
+        return set(unique_categories.values())
+
+    def wizard_completed(self,appId):
+
+        # Check if the ThreatAgentRiskScore exists for the application
+        completed = False
+        threat_agent_score = ThreatAgentRiskScores.query.filter_by(AppID=appId).first()
+        if threat_agent_score:
+            completed = True
+        return completed
+
+    def stride_impact_completed(self,appId):
+        # Check if the STRIDE impact records exist for the application
+        stride_impact_records = StrideImpactRecord.query.filter_by(AppID=appId).all()
+        return len(stride_impact_records) > 5

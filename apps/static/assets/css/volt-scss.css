@@ -19747,6 +19747,31 @@ div.dataTables_scrollBody {
   background-color: #3c6e42 !important;
   border: 2px solid rgba(0, 0, 0, 0.332) !important; }
 
+.note {
+  background-color: #a8d08d;
+  /* Verde pastello */
+  color: black; }
+
+.low {
+  background-color: #f9f06b;
+  /* Giallo pastello */
+  color: black; }
+
+.medium {
+  background-color: #f9c06b;
+  /* Arancione pastello */
+  color: black; }
+
+.high {
+  background-color: #f96b6b;
+  /* Rosso pastello */
+  color: black; }
+
+.critical {
+  background-color: #f83e3e;
+  /* Rosso pastello */
+  color: black; }
+
 .badge-macm-detail {
   font-size: 0.8rem; }
 

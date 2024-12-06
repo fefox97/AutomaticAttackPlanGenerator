@@ -1,0 +1,142 @@
+{% extends "layouts/base.html" %}
+{% block title %}Threat Agent Wizard{% endblock title %}
+
+{% block stylesheets %}
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #4a4a4a;
+    }
+    .question h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-top: 20px;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    li {
+        margin-bottom: 10px;
+    }
+    input[type="radio"], input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    label {
+        font-size: 1.1rem;
+        color: #34495e;
+    }
+    .btn-submit {
+        display: inline-block;
+        width: 100%;
+        padding: 10px 20px;
+        background-color: #3498db;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .btn-submit:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .text-center {
+        text-align: center;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="col-8">
+    <h1>Threat Agent Questionnaire</h1>
+    <form id="questionnaire-form" method="POST" action="/risk_analysis/submit-questionnaire">
+        <input type="hidden" name="appId" value="{{ appId }}">
+
+        {% for question in questions_replies %}
+        <div class="question">
+            <h3>{{ question.question }}</h3>
+            <ul>
+                {% for reply in question.replies %}
+                <li>
+                    {% if reply.multiple == 1 %}
+                    <input type="checkbox"
+                           class="question-input"
+                           name="question_{{ question.id }}[]"
+                           value="{{ reply.id }}"
+                           id="question_{{ question.id }}_{{ reply.id }}">
+                    {% else %}
+                    <input type="radio"
+                           class="question-input"
+                           name="question_{{ question.id }}"
+                           value="{{ reply.id }}"
+                           id="question_{{ question.id }}_{{ reply.id }}">
+                    {% endif %}
+                    <label for="question_{{ question.id }}_{{ reply.id }}">{{ reply.details }}</label>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+
+        <div class="text-center">
+            <button type="submit" class="btn-submit" disabled>Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('questionnaire-form');
+        const inputs = document.querySelectorAll('.question-input');
+        const submitButton = document.querySelector('.btn-submit');
+
+        function validateForm() {
+            const questionGroups = {};
+
+            // Group inputs by question name
+            inputs.forEach(input => {
+                const questionName = input.name;
+                if (!questionGroups[questionName]) {
+                    questionGroups[questionName] = [];
+                }
+                questionGroups[questionName].push(input);
+            });
+
+            // Check if at least one input is checked for each question group
+            let allAnswered = true;
+            for (const groupName in questionGroups) {
+                const group = questionGroups[groupName];
+                if (!group.some(input => input.checked)) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            // Enable or disable the submit button based on validation
+            submitButton.disabled = !allAnswered;
+        }
+
+        // Attach event listeners to inputs
+        inputs.forEach(input => {
+            input.addEventListener('change', validateForm);
+        });
+
+        // Initial validation
+        validateForm();
+    });
+</script>
+{% endblock javascripts %}

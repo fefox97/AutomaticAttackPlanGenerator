@@ -44,7 +44,7 @@
           <span class="mt-1 ms-1 sidebar-text">VSecLab</span>
         </a>
       </li>
-      <li class="nav-item {% if 'macm' in segment or 'penetration-tests' in segment %} active {% endif %}">
+      <li class="nav-item {% if 'macm' in segment or 'penetration-tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
         <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
           <span>
             <span class="sidebar-icon">
@@ -56,19 +56,27 @@
             <i class="fas fa-chevron-right"></i>
           </span>
         </span>
-        <div class="multi-level collapse"
-          role="list" id="submenu-app" aria-expanded="false">
-          <ul class="flex-column nav">
-            <li class="nav-item {% if 'macm' in segment or 'penetration-tests' in segment %} active {% endif %}">
-              <a href="/penetration-tests" class="nav-link">
-                <span class="sidebar-icon">
-                  <span class="material-symbols-outlined">network_node</span>
-                </span> 
-                <span class="sidebar-text">Penetration Tests</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+            <div class="multi-level collapse"
+              role="list" id="submenu-app" aria-expanded="false">
+              <ul class="flex-column nav">
+                <li class="nav-item {% if 'penetration-tests' in segment %} active {% endif %}">
+                  <a href="/penetration-tests" class="nav-link">
+                    <span class="sidebar-icon">
+                      <span class="material-symbols-outlined">network_node</span>
+                    </span>
+                    <span class="sidebar-text">Penetration Tests</span>
+                  </a>
+                </li>
+                        <li class="nav-item {% if 'risk_analysis' in segment %} active {% endif %}">
+                          <a href="/risk_analysis" class="nav-link">
+                            <span class="sidebar-icon">
+                              <span class="material-symbols-outlined">assessment</span>
+                            </span>
+                            <span class="sidebar-text">Risk Analysis</span>
+                          </a>
+                        </li>
+              </ul>
+            </div>
       </li>
       <li class="nav-item {% if 'threat-catalog' in segment or 'capec' in segment or 'tools' in segment or 'methodologies' in segment %} active {% endif %}">
         <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-catalog">
