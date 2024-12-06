@@ -447,6 +447,7 @@ class ThreatAgentReply(db.Model):
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)  # Unique identifier
     Reply = db.Column(db.Text, nullable=False)  # Reply text (e.g., "Yes", "No")
+    Details = db.Column(db.Text, nullable=True)  # Additional details (e.g., "Yes, because...")
     Multiple = db.Column(db.Integer, nullable=False, default=0)  # Multiple indicator (0 or 1)
 
 

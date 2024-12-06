@@ -59,7 +59,7 @@
 {% endblock stylesheets %}
 
 {% block content %}
-<div class="container">
+<div class="col-8">
     <h1>Threat Agent Questionnaire</h1>
     <form id="questionnaire-form" method="POST" action="/risk_analysis/submit-questionnaire">
         <input type="hidden" name="appId" value="{{ appId }}">
@@ -83,7 +83,7 @@
                            value="{{ reply.id }}"
                            id="question_{{ question.id }}_{{ reply.id }}">
                     {% endif %}
-                    <label for="question_{{ question.id }}_{{ reply.id }}">{{ reply.text }}</label>
+                    <label for="question_{{ question.id }}_{{ reply.id }}">{{ reply.details }}</label>
                 </li>
                 {% endfor %}
             </ul>

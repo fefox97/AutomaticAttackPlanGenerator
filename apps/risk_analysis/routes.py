@@ -106,7 +106,8 @@ def threat_agent_wizard():
                     replies.append({
                         'id': reply.Id,  # ID della risposta
                         'text': reply.Reply,  # Testo della risposta
-                        'multiple': reply.Multiple  # Indica se è multipla o no
+                        'multiple': reply.Multiple,  # Indica se è multipla o no
+                        'details': reply.Details  # Dettagli della risposta
                     })
 
             # Add question and corresponding replies to the list
@@ -119,6 +120,8 @@ def threat_agent_wizard():
         # Add the questions and replies to the context
         context['questions_replies'] = questions_replies_list
         context['appId'] = appId
+
+        print(questions_replies_list)
 
     except Exception as e:
         app.logger.error(f"Error occurred while fetching questions or replies: {e}", exc_info=True)
@@ -230,6 +233,7 @@ def threat_agent_evaluation():
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
     """
     # Extract `appId` and `objective` from the form
+    threatAgentUtils= ThreatAgentUtils()
     objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
 
@@ -414,7 +418,8 @@ def threat_agent_evaluation():
         reports=reports,
         appId=appId,
         objective=objective,
-        wizard_completed=True
+        wizard_completed=True,
+        stride_impact_completed=threatAgentUtils.stride_impact_completed(appId)
     )
 
 
