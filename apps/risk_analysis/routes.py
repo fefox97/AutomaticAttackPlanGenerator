@@ -9,13 +9,10 @@ from apps.risk_analysis import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, \
-    ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, \
-    ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
-import os
-import time
+from apps import db
 
 
 
@@ -331,7 +328,7 @@ def threat_agent_evaluation():
 
             category_attributes = ThreatAgentAttributesCategory.query.filter_by(Category_id=category.Id).all()
             attributes = [
-                ThreatAgentAttribute.query.filter_by(Id=attr.attribute_id).first()
+                ThreatAgentAttribute.query.filter_by(Id=attr.Attribute_id).first()
                 for attr in category_attributes
             ]
 
@@ -342,18 +339,18 @@ def threat_agent_evaluation():
             limits = intent = access = resources = visibility = skills = 0
 
             for attribute in attributes:
-                if attribute.attribute == 'Skills':
-                    skills = attribute.score
-                elif attribute.attribute == 'Resources':
-                    resources = attribute.score
-                elif attribute.attribute == 'Visibility':
-                    visibility = attribute.score
-                elif attribute.attribute == 'Limits':
-                    limits = attribute.score
-                elif attribute.attribute == 'Intent':
-                    intent = attribute.score
-                elif attribute.attribute == 'Access':
-                    access = attribute.score
+                if attribute.Attribute == 'Skills':
+                    skills = attribute.Score
+                elif attribute.Attribute == 'Resources':
+                    resources = attribute.Score
+                elif attribute.Attribute == 'Visibility':
+                    visibility = attribute.Score
+                elif attribute.Attribute == 'Limits':
+                    limits = attribute.Score
+                elif attribute.Attribute == 'Intent':
+                    intent = attribute.Score
+                elif attribute.Attribute == 'Access':
+                    access = attribute.Score
 
             # Compute individual OWASP parameters
             motive = ((((intent / 2) + (limits / 4)) / 2) * 10)
@@ -376,26 +373,34 @@ def threat_agent_evaluation():
             OWASP_Skill_Total = int(round(OWASP_Skill_Total / total_weights))
         else:
             OWASP_Motive_Total = OWASP_Opportunity_Total = OWASP_Size_Total = OWASP_Skill_Total = 0
-
-        # Save calculated scores to the database
-        risk_score = ThreatAgentRiskScores.query.filter_by(AppID=appId).first()
-        if risk_score:
-            risk_score.motive = OWASP_Motive_Total
-            risk_score.opportunity = OWASP_Opportunity_Total
-            risk_score.size = OWASP_Size_Total
-            risk_score.skill = OWASP_Skill_Total
-        else:
-            risk_score = ThreatAgentRiskScores(
-                AppID=appId,
-                Motive=OWASP_Motive_Total,
-                Opportunity=OWASP_Opportunity_Total,
-                Size=OWASP_Size_Total,
-                Skill=OWASP_Skill_Total,
-                Created_at=datetime.utcnow(),
-                Uploaded_at=datetime.utcnow()
-            )
-
-            risk_score.save()
+        
+        try:
+            # Save calculated scores to the database
+            risk_score = ThreatAgentRiskScores.query.filter_by(AppID=appId).first()
+            if risk_score:
+                app.logger.info("Updating existing ThreatAgentRiskScores record")
+                ThreatAgentRiskScores.query.filter_by(AppID=appId).update({
+                    'Motive': OWASP_Motive_Total,
+                    'Opportunity': OWASP_Opportunity_Total,
+                    'Size': OWASP_Size_Total,
+                    'Skill': OWASP_Skill_Total,
+                })
+            else:
+                app.logger.info("Creating new ThreatAgentRiskScores record")
+                risk_score = ThreatAgentRiskScores(
+                    AppID=appId,
+                    Motive=OWASP_Motive_Total,
+                    Opportunity=OWASP_Opportunity_Total,
+                    Size=OWASP_Size_Total,
+                    Skill=OWASP_Skill_Total,
+                    Created_at=datetime.utcnow(),
+                    Uploaded_at=datetime.utcnow()
+                )
+                db.session.add(risk_score)
+            db.session.commit()
+        except Exception as e:
+            app.logger.error(f"Error saving OWASP risk scores: {e}", exc_info=True)
+            db.session.rollback()
 
     except Exception as e:
         app.logger.error(f"Error processing threat agent evaluation: {e}", exc_info=True)
@@ -521,23 +526,45 @@ def stride_impact_evaluation():
             "noncompliance": int(request.form.get(f"{stride}_noncompliance", 0)),
             "privacyviolation": int(request.form.get(f"{stride}_privacyviolation", 0)),
         }
+    try:
+        for stride, impacts in stride_data.items():
+            # Usa il metodo per aggiornare o creare il record
+            StrideImpactRecord.update_or_create(
+                app_id=appId,
+                stride=stride,
+                financialdamage=impacts['financialdamage'],
+                reputationdamage=impacts['reputationdamage'],
+                noncompliance=impacts['noncompliance'],
+                privacyviolation=impacts['privacyviolation']
+            )
 
-    for stride, impacts in stride_data.items():
-        print(f"Processing STRIDE category: {stride}")
-        print(f"Financial Damage: {impacts['financialdamage']}")
-        print(f"Reputation Damage: {impacts['reputationdamage']}")
-        print(f"Non-compliance: {impacts['noncompliance']}")
-        print(f"Privacy Violation: {impacts['privacyviolation']}")
+            existing_record = StrideImpactRecord.query.filter_by(AppID=appId, Stride=stride).first()
 
-        # Usa il metodo per aggiornare o creare il record
-        StrideImpactRecord.update_or_create(
-            app_id=appId,
-            stride=stride,
-            financialdamage=impacts['financialdamage'],
-            reputationdamage=impacts['reputationdamage'],
-            noncompliance=impacts['noncompliance'],
-            privacyviolation=impacts['privacyviolation']
-        )
+            if existing_record:
+                StrideImpactRecord.query.filter_by(AppID=appId, Stride=stride).update({
+                    'Financialdamage': impacts['financialdamage'],
+                    'Reputationdamage': impacts['reputationdamage'],
+                    'Noncompliance': impacts['noncompliance'],
+                    'Privacyviolation': impacts['privacyviolation'],
+                })
+            else:
+                # Se il record non esiste, inserisci un nuovo record
+                new_record = StrideImpactRecord(
+                    AppID=appId,
+                    Stride=stride,
+                    Financialdamage=impacts['financialdamage'],
+                    Reputationdamage=impacts['reputationdamage'],
+                    Noncompliance=impacts['noncompliance'],
+                    Privacyviolation=impacts['privacyviolation'],
+                    Created_at=datetime.utcnow(),
+                    Uploaded_at=datetime.utcnow()
+                )
+                db.session.add(new_record)
+        db.session.commit()  # Commit del nuovo record
+        app.logger.info(f"Inserted new record for STRIDE category: {stride}")
+    except Exception as e:
+        app.logger.error(f"Error saving STRIDE impact scores: {e}", exc_info=True)
+        db.session.rollback()
 
     template = "risk-analysis/macm_riskRating.html"
     return render_template(
@@ -563,24 +590,25 @@ def macm_riskDetailed():
         selected_id = request.args.get('id')
         macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
         threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-        methodologies_data = MethodologyView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-        attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
-        pentest_phases = PentestPhases.query.all()
-        av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
     except:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
 
     ThreatAgentParameters= ThreatAgentRiskScores.query.filter_by(AppID=selected_macm).first()
     #calcolo stride impct
     form_data = {}
-    form_data['size']=ThreatAgentParameters.Size
-    form_data['motive']=ThreatAgentParameters.Motive
-    form_data['opportunity']=ThreatAgentParameters.Opportunity
-    form_data['skill']=ThreatAgentParameters.Skill
+    if ThreatAgentParameters:
+        form_data['size']=ThreatAgentParameters.Size
+        form_data['motive']=ThreatAgentParameters.Motive
+        form_data['opportunity']=ThreatAgentParameters.Opportunity
+        form_data['skill']=ThreatAgentParameters.Skill
+    else:
+        form_data['size']=5
+        form_data['motive']=5
+        form_data['opportunity']=5
+        form_data['skill']=5
 
     # Iterate through each threat
     for threat in threat_data:
-
         # Initialize a dictionary to track maximum values and corresponding details for each category
         category_max = {
             "Financialdamage": {"max_value": 0, "stride": None, "record": None},
@@ -592,7 +620,6 @@ def macm_riskDetailed():
         # Iterate over each STRIDE element for the threat
         for stride in riskAnalysisCatalogUtils.reverse_map_stride(threat.STRIDE):
             stride_impact = StrideImpactRecord.query.filter_by(AppID=selected_macm, Stride=stride).first()
-
             if stride_impact:
                 # Update maximums and store details for each category
                 for category in category_max.keys():
@@ -619,9 +646,7 @@ def macm_riskDetailed():
 
 
     return render_template(f"risk-analysis/macm-detailRisk.html", segment=get_segment(request),
-                           macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases,
-                           av_pentest_phases=av_pentest_phases, threat_data=threat_data,
-                           methodologies_data=methodologies_data, ThreatAgentParameters=ThreatAgentParameters, form_data=form_data)
+                            macm_data=macm_data, threat_data=threat_data, ThreatAgentParameters=ThreatAgentParameters, form_data=form_data)
 
 @blueprint.route('/save_risk_evaluation', methods=['GET'])
 def save_risk_evaluation():

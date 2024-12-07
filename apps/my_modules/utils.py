@@ -13,7 +13,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 from flask_login import (
     current_user
 )
@@ -354,6 +354,36 @@ class Utils:
         relations_df.index.name = 'Id'
         return relations_df
     
+    def load_threat_agent_quesions_replies(self, df: pd.DataFrame):
+        print("\nExtracting ThreatAgentQuestions-ThreatAgentReply relations to database...\n")
+        relations_df = pd.DataFrame(columns=['Question_id', 'Reply_id'])
+        for _, question in df.iterrows():
+            for reply in question['Replies']:
+                relations_df.loc[len(relations_df)] = {'Question_id': question['ID'], 'Reply_id': reply}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+    
+    def load_threat_agent_category_attributes(self, df: pd.DataFrame):
+        print("\nExtracting ThreatAgentCategory-ThreatAgentAttribute relations to database...\n")
+        relations_df = pd.DataFrame(columns=['Category_id', 'Attribute_id'])
+        for _, category in df.iterrows():
+            for attribute in category['Attribute']:
+                relations_df.loc[len(relations_df)] = {'Category_id': category['ID'], 'Attribute_id': attribute}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+    
+    def load_threat_agent_reply_categories(self, df: pd.DataFrame):
+        print("\nExtracting ThreatAgentReply-ThreatAgentCategory relations to database...\n")
+        relations_df = pd.DataFrame(columns=['Reply_id', 'Category_id'])
+        for _, category in df.iterrows():
+            for reply in category['Reply']:
+                relations_df.loc[len(relations_df)] = {'Reply_id': reply, 'Category_id': category['ID']}
+        relations_df.drop_duplicates(inplace=True)
+        relations_df.index.name = 'Id'
+        return relations_df
+
     def upload_databases(self, database, neo4j_db='macm'):
         if database == 'Capec':
             attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
@@ -378,14 +408,18 @@ class Utils:
         elif database == 'RiskAnalysisCatalog':
             threat_agent_category_df = self.risk_analysis_catalog_utils.load_threat_agent_category_df()
             threat_agent_questions_df = self.risk_analysis_catalog_utils.load_threat_agent_questions()
+            threat_agent_questions_replies = self.load_threat_agent_quesions_replies(threat_agent_questions_df)
             threat_agent_reply_df = self.risk_analysis_catalog_utils.load_threat_agent_reply()
             threat_agent_attributes_df = self.risk_analysis_catalog_utils.load_threat_agent_attributes()
-            threat_agent_reply_categories_df = self.risk_analysis_catalog_utils.load_threat_agent_reply_categories()
+            threat_agent_category_attributes = self.load_threat_agent_category_attributes(threat_agent_category_df)
+            threat_agent_reply_categories = self.load_threat_agent_reply_categories(threat_agent_category_df)
             self.save_dataframe_to_database(threat_agent_category_df, ThreatAgentCategory)
             self.save_dataframe_to_database(threat_agent_questions_df, ThreatAgentQuestion)
+            self.save_dataframe_to_database(threat_agent_questions_replies, ThreatAgentQuestionReplies)
             self.save_dataframe_to_database(threat_agent_reply_df, ThreatAgentReply)
             self.save_dataframe_to_database(threat_agent_attributes_df, ThreatAgentAttribute)
-            self.save_dataframe_to_database(threat_agent_reply_categories_df, ThreatAgentReplyCategory)
+            self.save_dataframe_to_database(threat_agent_category_attributes, ThreatAgentAttributesCategory)
+            self.save_dataframe_to_database(threat_agent_reply_categories, ThreatAgentReplyCategory)
         elif database == 'Macm':
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
@@ -505,12 +539,6 @@ class RiskAnalysisCatalogUtils:
     def load_threat_agent_attributes(self):
         print("\nLoading threat agent attributes info...\n")
         df = pd.read_excel(self.file_path, sheet_name="ThreatAgentAttribute", header=0)
-        df = df.astype('str')
-        return df
-    
-    def load_threat_agent_reply_categories(self):
-        print("\nLoading threat agent replies info...\n")
-        df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReplyCategory", header=0)
         df = df.astype('str')
         return df
 

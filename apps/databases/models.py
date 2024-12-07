@@ -134,6 +134,15 @@ class ThreatCatalogue(db.Model):
     PostCondition       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
     
+    EasyOfDiscovery     = db.Column(db.Integer, default=5)
+    EasyOfExploit       = db.Column(db.Integer, default=5)
+    Awareness           = db.Column(db.Integer, default=5)
+    IntrusionDetection  = db.Column(db.Integer, default=5)
+    LossOfConfidentiality = db.Column(db.Integer, default=5)
+    LossOfIntegrity     = db.Column(db.Integer, default=5)
+    LossOfAvailability  = db.Column(db.Integer, default=5)
+    LossOfAccountability = db.Column(db.Integer, default=5)
+    
     hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat')
 
     @hybrid_property
@@ -442,11 +451,10 @@ class ThreatAgentAttribute(db.Model):
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
     Attribute = db.Column(db.Text)
-    Attribute_value = db.Column(db.Text)
     Description = db.Column(db.Text,nullable=True)
     Score = db.Column(db.Integer)
     Attribute = db.Column(db.Text)
-    Attribute_value = db.Column(db.Text)
+    AttributeValue = db.Column(db.Text)
     Description = db.Column(db.Text,nullable=True)
     Score = db.Column(db.Integer)
 
@@ -458,14 +466,12 @@ class ThreatAgentCategory(db.Model):
     Category       = db.Column(db.Text)
     Description       = db.Column(db.Text)
     CommonAction       = db.Column(db.Text)
-    #Replies       = db.Column(db.Text)
     hasReply = db.relationship('Reply', secondary='CategoryThreatRel', backref='hasCategory', lazy='dynamic')
 
     @hybrid_property
     def hasReply(self):
         ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
         return [id[0] for id in ids]
-    Attributes       = db.Column(db.Text)
 
     @hybrid_property
     def hasAttribute(self):
@@ -486,15 +492,14 @@ class ThreatAgentQuestion(db.Model):
     def hasReply(self):
         ids = self.hasReply.filter().with_entities(ThreatAgentReply.Id).all()
         return [id[0] for id in ids]
-    Attributes       = db.Column(db.Text)
 
 
 class ThreatAgentAttributesCategory(db.Model):
     __tablename__ = 'ThreatAgentAttributesCategory'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    Attribute_id = db.Column(db.Integer, nullable=False)
-    Category_id = db.Column(db.Integer, nullable=False)
+    Attribute_id = db.Column(db.Integer, ForeignKey("ThreatAgentAttribute.Id", ondelete='CASCADE'))
+    Category_id = db.Column(db.Integer, ForeignKey("ThreatAgentCategory.Id", ondelete='CASCADE'))
 
     def __repr__(self):
         return f"<ThreatAgentAttributesCategory(id={self.id}, attribute_id={self.attribute_id}, category_id={self.category_id})>"
@@ -504,8 +509,8 @@ class ThreatAgentQuestionReplies(db.Model):
     __tablename__ = 'ThreatAgentQuestionReplies'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    Question_id = db.Column(db.Integer, nullable=False)
-    Reply_id = db.Column(db.Integer, nullable=False)
+    Question_id = db.Column(db.Integer, ForeignKey("ThreatAgentQuestion.Id", ondelete='CASCADE'))
+    Reply_id = db.Column(db.Integer, ForeignKey("ThreatAgentReply.Id", ondelete='CASCADE'))
 
     def __repr__(self):
         return f"<ThreatAgentQuestionReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
