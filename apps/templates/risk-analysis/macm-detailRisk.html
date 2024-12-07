@@ -5,24 +5,59 @@
 {% block stylesheets %}
 <style>
     table {
-        /*table-layout: fixed; /* Mantiene larghezze uniformi */
+        /* Mantiene larghezze uniformi */
     }
     td {
         word-wrap: break-word;
         overflow-wrap: break-word;
         white-space: normal;
     }
+
 </style>
 {% endblock stylesheets %}
 
 {% block content %}
-<div class=" col-12 my-4">
+<div class="col-12 my-4">
+<div class="alert alert-info p-3 rounded">
+    <strong class="d-block mb-2">Risk Levels Legend:</strong>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge critical me-2">Critical</span>
+        <span>- Very high risk level (8-9): Immediate action required!</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge high me-2">High</span>
+        <span>- High risk level (6-7): Significant attention needed.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge medium me-2">Medium</span>
+        <span>- Medium risk level (4-5): Moderate concern, monitor closely.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge low me-2">Low</span>
+        <span>- Low risk level (2-3): Low priority, no immediate action needed.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge note me-2">Note</span>
+        <span>- No significant risk (1): No action required.</span>
+    </div>
+</div>
+
+
     <form id="save_evaluation" method="POST" action="/save_evaluation">
         {% for threat in threat_data %}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">{{ threat.Threat_ID }}: <strong>{{ threat.Threat }}</strong></h3>
-                </div>
+                <h3 class="mb-0 d-flex align-items-center">
+                    {{ threat.Threat_ID }}:
+                    <strong>{{ threat.Threat }}</strong>
+                    <div class="ms-3">
+                        <span class="badge text-dark me-2 small small-badge" id="likelihood_{{ threat.Threat_ID }}">Likelihood: N/A</span>
+                        <span class="badge text-dark small small-badge" id="technical_impact_{{ threat.Threat_ID }}">Technical Impact: N/A</span>
+                        <span class="badge text-dark small small-badge" id="business_impact_{{ threat.Threat_ID }}">Business Impact: N/A</span>
+                        <span class="badge text-dark " id="overall_risk_{{ threat.Threat_ID }}">Overall Risk: N/A</span>
+                    </div>
+                </h3>
+            </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <strong class="d-block">STRIDE Classification:</strong>
@@ -33,7 +68,7 @@
                         <p class="text-muted">{{ threat.Description }}</p>
                     </div>
 
-                    <!-- Combined Likelihood Table -->
+                    <!-- Likelihood Table -->
                     <div class="table-responsive">
                         <table class="table table-bordered text-center">
                             <thead>
@@ -62,10 +97,6 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="alert alert-light mt-3">
-                        <strong>Overall Likelihood:</strong>
-                        <input type="text" id="likelihood_{{ threat.Threat_ID }}" class="form-control" readonly>
                     </div>
 
                     <!-- Impact Table -->
@@ -98,6 +129,7 @@
                             </tbody>
                         </table>
                     </div>
+
                     <div class="alert alert-light mt-3">
                         <div id="impact_{{ threat.Threat_ID }}" class="d-flex justify-content-between"></div>
                     </div>
@@ -122,64 +154,138 @@
         });
         var likelihood = sum / count;
         var likelihoodCategory = getCategory(likelihood);
-        document.getElementById("likelihood_" + threatID).value = likelihood.toFixed(2) + " (" + likelihoodCategory + ")";
+        document.getElementById("likelihood_" + threatID).innerText = "Likelihood: " + likelihood.toFixed(2);
         setColor("likelihood_" + threatID, likelihood);
+        calculateOverallRisk(threatID, likelihoodCategory);
+
     }
     function calculateImpact(threatID) {
         var techParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability'];
         var busParams = ['financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
         var techSum = 0, busSum = 0;
-        techParams.forEach(param => { techSum += parseInt(document.getElementById(param + "_" + threatID).value) || 5; });
-        busParams.forEach(param => { busSum += parseInt(document.getElementById(param + "_" + threatID).value) || 5; });
-        var technicalImpact = techSum / techParams.length;
-        var businessImpact = busSum / busParams.length;
-        var technicalImpactText = technicalImpact.toFixed(2) + " (" + getCategory(technicalImpact) + ")";
-        var businessImpactText = businessImpact.toFixed(2) + " (" + getCategory(businessImpact) + ")";
-        document.getElementById("impact_" + threatID).innerHTML = `<strong>Technical Impact:</strong> ${technicalImpactText} | <strong>Business Impact:</strong> ${businessImpactText}`;
-        setColor("impact_" + threatID, technicalImpact);
-        // Calcolare l'impatto tecnico
-        var techSum = 0;
-        techParams.forEach(function(param) {
+        techParams.forEach(param => {
             var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
             techSum += value;
-
-            // Aggiungi il colore alla cella in base al valore
             setColor(param + "_" + threatID, value);
         });
-        // Calcolare l'impatto commerciale
-        var busSum = 0;
-        busParams.forEach(function(param) {
+        busParams.forEach(param => {
             var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
             busSum += value;
-
-            // Aggiungi il colore alla cella in base al valore
             setColor(param + "_" + threatID, value);
         });
+        var technicalImpact = techSum / techParams.length;
+        var businessImpact = busSum / busParams.length;
+        document.getElementById("technical_impact_" + threatID).innerText = "Technical Impact: " + technicalImpact.toFixed(2);
+        document.getElementById("business_impact_" + threatID).innerText = "Business Impact: " + businessImpact.toFixed(2);
+        setColor("technical_impact_" + threatID, technicalImpact);
+        setColor("business_impact_" + threatID, businessImpact);
+        calculateOverallRisk(threatID, null, technicalImpact, businessImpact);
+
     }
+
+function calculateOverallRisk(threatID, likelihoodCategory = null, technicalImpact = null, businessImpact = null) {
+    // Fetch likelihood category from the badge if not provided
+    if (!likelihoodCategory) {
+        var likelihoodText = document.getElementById("likelihood_" + threatID).innerText;
+        likelihoodCategory = likelihoodText.match(/\((.*?)\)/)?.[1] || "Low"; // Extract category from text
+    }
+
+    // Extract technical and business impact values if not provided
+    if (!technicalImpact || !businessImpact) {
+        var technicalText = document.getElementById("technical_impact_" + threatID).innerText;
+        var businessText = document.getElementById("business_impact_" + threatID).innerText;
+
+        technicalImpact = parseFloat(technicalText.match(/: ([0-9.]+)/)?.[1] || "5");
+        businessImpact = parseFloat(businessText.match(/: ([0-9.]+)/)?.[1] || "5");
+    }
+
+    // Determine impact category from the max of technical and business impacts
+    var impactCategory = getCategory(Math.max(technicalImpact, businessImpact));
+
+    // Compute overall risk category from the likelihood and impact categories
+    var overallRiskCategory = calculateRiskCategory(likelihoodCategory, impactCategory);
+
+    // Log for debugging
+    console.log(`Threat ID: ${threatID}`);
+    console.log(`Likelihood Category: ${likelihoodCategory}`);
+    console.log(`Impact Category: ${impactCategory}`);
+    console.log(`Overall Risk Category: ${overallRiskCategory}`);
+
+    // Update the text and style of the overall risk badge
+    var overallRiskElement = document.getElementById("overall_risk_" + threatID);
+    overallRiskElement.innerText = "Overall Risk: " + overallRiskCategory;
+    setColor(overallRiskElement.id, overallRiskCategory);
+
+
+    var impactCategory = getCategory(Math.max(technicalImpact, businessImpact));
+    var overallRiskCategory = calculateRiskCategory(likelihoodCategory, impactCategory);
+
+    // Update the text and style of the overall risk badge
+    var overallRiskElement = document.getElementById("overall_risk_" + threatID);
+    overallRiskElement.innerText = "Overall Risk: " + overallRiskCategory;
+    setColor(overallRiskElement.id, overallRiskCategory);
+
+}
+
+    function calculateRiskCategory(likelihoodCategory, impactCategory) {
+    // Define the risk matrix based on the uploaded image
+    const riskMatrix = {
+        Low: {
+            Low: "Note",
+            Medium: "Low",
+            High: "Medium"
+        },
+        Medium: {
+            Low: "Low",
+            Medium: "Medium",
+            High: "High"
+        },
+        High: {
+            Low: "Medium",
+            Medium: "High",
+            High: "Critical"
+        },
+    };
+
+    // Return the overall risk severity based on the matrix
+    return riskMatrix[likelihoodCategory][impactCategory] || "Unknown";
+}
+
+function setColor(id, category) {
+    var element = document.getElementById(id);
+
+    // Ensure the element exists
+    if (!element) {
+        console.warn(`Element with ID "${id}" not found.`);
+        return;
+    }
+
+    // Remove all risk-related classes
+    element.classList.remove("critical", "high", "medium", "low", "note");
+
+    // If category is a numeric value, convert it to a string category
+    if (typeof category !== "string") {
+        category = getCategory(category); // Convert numeric value to category
+    }
+
+    // Add the appropriate category class
+    if (category && typeof category === "string") {
+        element.classList.add(category.toLowerCase());
+    } else {
+        console.warn(`Invalid category provided to setColor: ${category}`);
+    }
+}
     function getCategory(value) {
-        value = parseInt(value);
-        if (value >= 8) {
-            return "critical";
-        } else if (value >= 6) {
-            return "high";
-        } else if (value >= 4) {
-            return "medium";
-        } else if (value >= 2) {
-            return "low";
-        } else {
-            return "note";
-        }
-    }
-    function setColor(id, value) {
-        var element = document.getElementById(id);
-        element.classList.remove("critical", "high", "medium", "low", "note");
-        element.classList.add(getCategory(value));
+        if (value >= 7) return "High";
+        if (value >= 4) return "Medium";
+        return "Low";
     }
     window.onload = function() {
         {% for threat in threat_data %}
             calculateLikelihood("{{ threat.Threat_ID }}");
             calculateImpact("{{ threat.Threat_ID }}");
         {% endfor %}
+
     }
 </script>
 {% endblock %}
