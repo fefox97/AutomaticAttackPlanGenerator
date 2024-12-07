@@ -10,11 +10,9 @@ from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
 from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
-    Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionsReplies, ThreatAgentQuestion, ThreatAgentReply, \
-    ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, \
-    ThreatAgentRiskScores, StrideImpactRecord
+    Macm, ThreatModel, ToolCatalogue, PentestPhases
 from sqlalchemy import func
-from apps.my_modules import converter,ThreatAgentUtils
+from apps.my_modules import converter
 import os
 import time
 from werkzeug.exceptions import NotFound

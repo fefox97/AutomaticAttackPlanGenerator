@@ -42,7 +42,7 @@ glob2
 Flask-Modals
 Flask-Modals-markupsafe
 
-neo4j
+neo4j==5.14.0
 
 python-nmap
 

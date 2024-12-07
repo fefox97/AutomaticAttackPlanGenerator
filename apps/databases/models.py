@@ -500,26 +500,15 @@ class ThreatAgentAttributesCategory(db.Model):
         return f"<ThreatAgentAttributesCategory(id={self.id}, attribute_id={self.attribute_id}, category_id={self.category_id})>"
 
 
-class ThreatAgentQuestionsReplies(db.Model):
-    __tablename__ = 'ThreatAgentQuestionsReplies'
+class ThreatAgentQuestionReplies(db.Model):
+    __tablename__ = 'ThreatAgentQuestionReplies'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
     Question_id = db.Column(db.Integer, nullable=False)
     Reply_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"<ThreatAgentQuestionsReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
-
-class ThreatAgentReplyCategory(db.Model):
-    __tablename__ = 'ThreatAgentReplyCategory'
-
-    Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    Reply_id = db.Column(db.Integer, nullable=False)
-    Category_id = db.Column(db.Integer, nullable=False)
-
-    def __repr__(self):
-        return f"<ThreatAgentReplyCategory(id={self.id}, reply_id={self.reply_id}, category_id={self.category_id})>"
-
+        return f"<ThreatAgentQuestionReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
 
 class ThreatAgentRiskScores(db.Model):
     __tablename__ = 'ThreatAgentRiskScores'

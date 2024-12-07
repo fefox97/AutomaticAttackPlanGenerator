@@ -10,16 +10,14 @@ import uuid
 
 from atlassian import Jira
 from apps.api import blueprint
-from flask import render_template, request, redirect, send_file, url_for, make_response
-from flask_login import login_required, current_user
-from jinja2 import TemplateNotFound
+from flask import request, send_file, make_response
+from flask_login import current_user
 from flask import current_app as app
 from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, AttackView, Macm, ToolCatalogue, ThreatAgentReply, \
-    ThreatAgentQuestionsReplies, ThreatAgentQuestion
+from apps.databases.models import Attack, ToolCatalogue
 from apps import db
 from sqlalchemy.sql.expression import null
 

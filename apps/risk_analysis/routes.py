@@ -9,12 +9,11 @@ from apps.risk_analysis import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
-    Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionsReplies, ThreatAgentQuestion, ThreatAgentReply, \
+from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, \
     ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, \
     ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
-from apps.my_modules import converter,ThreatAgentUtils
+from apps.my_modules import converter, RiskAnalysisCatalogUtils
 import os
 import time
 
@@ -33,7 +32,7 @@ def get_segment(request):
 @blueprint.route('/macm_riskRating', methods=['GET'])
 @login_required
 def macm_riskRating():
-    threatAgentUtils= ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     try:
         selected_macm = request.args.get('app_id')
         table = Macm.query.filter_by(App_ID=selected_macm).all()
@@ -52,8 +51,8 @@ def macm_riskRating():
     return render_template(template, segment=get_segment(request), table=table,
                            threat_for_each_component=threat_for_each_component,
                            threat_number=threat_number,
-                           selected_macm=selected_macm,wizard_completed=threatAgentUtils.wizard_completed(selected_macm),
-                           stride_impact_completed=threatAgentUtils.stride_impact_completed(selected_macm))
+                           selected_macm=selected_macm,wizard_completed=riskAnalysisCatalogUtils.wizard_completed(selected_macm),
+                           stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm))
 
 @blueprint.route('/', methods=['GET'])
 @login_required
@@ -97,7 +96,7 @@ def threat_agent_wizard():
         for question in questions:
             replies = []
             # Fetch replies for the current question
-            question_replies = ThreatAgentQuestionsReplies.query.filter_by(Question_id=question.Id).all()
+            question_replies = ThreatAgentQuestionReplies.query.filter_by(Question_id=question.Id).all()
             for question_reply in question_replies:
                 reply_id = question_reply.Reply_id
                 # Fetch the ThreatAgentReply
@@ -144,7 +143,7 @@ def threat_agent_wizard():
 @login_required
 def submit_questionnaire():
     if request.method == 'POST':
-        threatAgentUtils= ThreatAgentUtils()
+        riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
         # Initialize a dictionary to store the user's responses
         user_responses = {}
         appId = request.form.get('appId')
@@ -196,10 +195,10 @@ def submit_questionnaire():
 
 
         ThreatAgents=Q1relatedCategories
-        ThreatAgents = threatAgentUtils.intersect_threat_agents(ThreatAgents, set(Q2relatedCategories))
-        ThreatAgents = threatAgentUtils.intersect_threat_agents(ThreatAgents, Q3Merged)
-        ThreatAgents = threatAgentUtils.intersect_threat_agents(ThreatAgents, Q4Merged)
-        ThreatAgents= threatAgentUtils.remove_duplicates_by_category_id(ThreatAgents)
+        ThreatAgents = riskAnalysisCatalogUtils.intersect_threat_agents(ThreatAgents, set(Q2relatedCategories))
+        ThreatAgents = riskAnalysisCatalogUtils.intersect_threat_agents(ThreatAgents, Q3Merged)
+        ThreatAgents = riskAnalysisCatalogUtils.intersect_threat_agents(ThreatAgents, Q4Merged)
+        ThreatAgents= riskAnalysisCatalogUtils.remove_duplicates_by_category_id(ThreatAgents)
         ThreatAgentsList=[]
         for threatAgent in ThreatAgents:
             category = ThreatAgentCategory.query.filter_by(Id=threatAgent.Category_id).first()
@@ -233,15 +232,13 @@ def threat_agent_evaluation():
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
     """
     # Extract `appId` and `objective` from the form
-    threatAgentUtils= ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
 
     # Initialize variables for reports and data analysis
     reports = []
     table = None
-    attack_for_each_component = None
-    attack_number = 0
     threat_for_each_component = None
     threat_number = 0
 
@@ -282,8 +279,6 @@ def threat_agent_evaluation():
             AttackView.Component_ID, func.count(AttackView.Component_ID)
         ).group_by(AttackView.Component_ID).all()
         attack_for_each_component = converter.tuple_list_to_dict(attack_for_each_component)
-
-        attack_number = AttackView.query.filter_by(AppID=appId).count()
 
         threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
             ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)
@@ -411,15 +406,12 @@ def threat_agent_evaluation():
         template,
         segment=get_segment(request),
         table=table,
-        attack_for_each_component=attack_for_each_component,
-        attack_number=attack_number,
         threat_for_each_component=threat_for_each_component,
         threat_number=threat_number,
         reports=reports,
         appId=appId,
-        objective=objective,
         wizard_completed=True,
-        stride_impact_completed=threatAgentUtils.stride_impact_completed(appId)
+        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(appId)
     )
 
 
@@ -442,7 +434,7 @@ def stride_impact_rating():
 @blueprint.route('/stride_impact_evaluation', methods=['POST'])
 @login_required
 def stride_impact_evaluation():
-    threatAgentUtils= ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
@@ -559,13 +551,13 @@ def stride_impact_evaluation():
         reports=reports,
         appId=appId,
         objective=objective,
-        wizard_completed=threatAgentUtils.wizard_completed(appId),
-        stride_impact_completed=threatAgentUtils.stride_impact_completed(appId)
+        wizard_completed=riskAnalysisCatalogUtils.wizard_completed(appId),
+        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(appId)
     )
 
 @blueprint.route('/macm-detailRisk', methods=['GET'])
 def macm_riskDetailed():
-    threatAgentUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     try:
         selected_macm = request.args.get('app_id')
         selected_id = request.args.get('id')
@@ -598,7 +590,7 @@ def macm_riskDetailed():
         }
 
         # Iterate over each STRIDE element for the threat
-        for stride in threatAgentUtils.reverse_map_stride(threat.STRIDE):
+        for stride in riskAnalysisCatalogUtils.reverse_map_stride(threat.STRIDE):
             stride_impact = StrideImpactRecord.query.filter_by(AppID=selected_macm, Stride=stride).first()
 
             if stride_impact:
@@ -616,7 +608,7 @@ def macm_riskDetailed():
         form_data[threat.Threat] = {
             "threat": threat.Threat,
             "description": threat.Description,
-            "stride": threatAgentUtils.map_stride(threat.STRIDE),
+            "stride": riskAnalysisCatalogUtils.map_stride(threat.STRIDE),
             "financialdamage": category_max["Financialdamage"]["max_value"],
             "reputationdamage": category_max["Reputationdamage"]["max_value"],
             "noncompliance": category_max["Noncompliance"]["max_value"],

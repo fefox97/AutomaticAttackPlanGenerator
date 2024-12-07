@@ -275,3 +275,13 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        var app_id = "{{table[0].App_ID if table is not none | tojson }}";
+        var app_name = "{{table[0].Application if table is not none | tojson }}";
+    </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/risk_analysis/macm_riskRating.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
+{% endblock javascripts %}

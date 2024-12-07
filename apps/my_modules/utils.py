@@ -13,9 +13,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, \
-    ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, \
-    MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 from flask_login import (
     current_user
 )
@@ -380,12 +378,12 @@ class Utils:
         elif database == 'RiskAnalysisCatalog':
             threat_agent_category_df = self.risk_analysis_catalog_utils.load_threat_agent_category_df()
             threat_agent_questions_df = self.risk_analysis_catalog_utils.load_threat_agent_questions()
-            threat_agent_replies_df = self.risk_analysis_catalog_utils.load_threat_agent_replies()
+            threat_agent_reply_df = self.risk_analysis_catalog_utils.load_threat_agent_reply()
             threat_agent_attributes_df = self.risk_analysis_catalog_utils.load_threat_agent_attributes()
             threat_agent_reply_categories_df = self.risk_analysis_catalog_utils.load_threat_agent_reply_categories()
             self.save_dataframe_to_database(threat_agent_category_df, ThreatAgentCategory)
             self.save_dataframe_to_database(threat_agent_questions_df, ThreatAgentQuestion)
-            self.save_dataframe_to_database(threat_agent_replies_df, ThreatAgentReply)
+            self.save_dataframe_to_database(threat_agent_reply_df, ThreatAgentReply)
             self.save_dataframe_to_database(threat_agent_attributes_df, ThreatAgentAttribute)
             self.save_dataframe_to_database(threat_agent_reply_categories_df, ThreatAgentReplyCategory)
         elif database == 'Macm':
@@ -498,7 +496,7 @@ class RiskAnalysisCatalogUtils:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
         return df
 
-    def load_threat_agent_replies(self):
+    def load_threat_agent_reply(self):
         print("\nLoading threat replies info...\n")
         df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReply", header=0)
         df = df.astype('str')
@@ -558,7 +556,7 @@ class RiskAnalysisCatalogUtils:
             "D": "Denial of Service (DoS)",
             "E": "Elevation of Privileges",
             "STRIDE": ["Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service (DoS)",
-                       "Elevation of Privileges"],
+                        "Elevation of Privileges"],
             "NONE": "None",
         }
 
