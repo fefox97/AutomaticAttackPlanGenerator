@@ -1,204 +1,89 @@
 {% extends "layouts/base.html" %}
 {% block title %}Threat Agent Wizard{% endblock title %}
 
-{% block stylesheets %}
-<style>
-    /* General container styling */
-    .container {
-        max-width: 900px;
-        margin: 30px auto;
-        padding: 40px;
-        background-color: #f9f9f9;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        font-family: 'Arial', sans-serif;
-    }
-
-    /* Header Styles */
-    h1 {
-        font-size: 2.8rem;
-        font-weight: 700;
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .panel-heading h2 {
-        font-size: 2rem;
-        color: #34495e;
-        margin-bottom: 30px;
-    }
-
-    /* Table Styling */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 40px;
-    }
-
-    th, td {
-        padding: 12px;
-        text-align: left;
-        vertical-align: top;
-    }
-
-    th {
-        background-color: #ecf0f1;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f4f6f7;
-    }
-
-    tr:hover {
-        background-color: #e0e0e0;
-    }
-
-    /* Category and attribute design */
-    .category-card {
-        padding: 20px;
-        border-radius: 10px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-    }
-
-    .category-card .details {
-        width: 70%;
-    }
-
-    .category-card h4 {
-        color: #2980b9;
-        font-size: 1.3rem;
-        margin-bottom: 10px;
-    }
-
-    .category-card p {
-        color: #7f8c8d;
-        font-size: 1.1rem;
-    }
-
-    .attributes-list {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-    .attributes-list li {
-        margin-bottom: 8px;
-        font-size: 1.1rem;
-        color: #34495e;
-    }
-
-    /* Rating section on the right */
-    .rating-section {
-        width: 25%;
-        text-align: center;
-    }
-
-    .rating-select {
-        width: 100%;
-        padding: 10px;
-        font-size: 1.1rem;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-    .btn-submit {
-        display: inline-block;
-        width: 200px;
-        padding: 12px;
-        background-color: #3498db;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        font-weight: 600;
-        border-radius: 6px;
-        cursor: pointer;
-        text-align: center;
-        transition: background-color 0.3s ease;
-        margin-top: 30px;
-    }
-
-    .btn-submit:hover {
-        background-color: #2980b9;
-    }
-
-    .btn-submit:disabled {
-        background-color: #95a5a6;
-        cursor: not-allowed;
-    }
-
-    /* Text Alignment for submit */
-    .text-center {
-        text-align: center;
-    }
-
-    .rating-section label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-</style>
-{% endblock stylesheets %}
-
 {% block content %}
-<form id="questionnaire-form" method="POST" action="/risk_analysis/threat_agent_evaluation">
-    <!-- Hidden appId input field -->
-    <input type="hidden" name="appId" value="{{ appId }}">
-
-
-    <div class="panel panel-default">
-        <div class="panel-heading text-center">
-            <h2>Categories Result</h2>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="d-block mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/apps/static">
+                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/risk_analysis">Risk Ratings</a></li>
+                    <li class="breadcrumb-item"><a href="/risk_analysis/macm_riskRating?app_id={{ appId }}">MACM</a></li>
+                    <li class="breadcrumb-item"><a href="/risk_analysis/threat-agent-wizard?app_id={{ appId }}">Threat Agent Wizard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Categories Result</li>
+                </ol>
+            </nav>
+            <h2 class="h4">Categories Result</h2>
         </div>
-
-        <div class="category-list">
-    {% for Category in ThreatAgents %}
-        <!-- Hidden category ID -->
-        <input type="hidden" name="categoryId_{{ Category.category.Category }}" value="{{ Category.category.Id }}">
-
-        <div class="category-card">
-            <div class="details">
-                <h4><b>{{ Category.category.Category }}</b></h4>
-                <p><b>Description: </b> {{ Category.category.Description }}</p>
-                <p><b>Threat Agent Common Actions:</b> {{ Category.category.CommonAction }}</p>
-
-                <h4><b>Attributes</b></h4>
-                <ul class="attributes-list">
-                    {% for attribute in Category.attributes %}
-                        <li>
-                            <!-- Display attribute name and value -->
-                            {{ attribute.Attribute }}: {{ attribute.Attribute_value }}
-                            <!-- Hidden input to pass the attribute ID -->
-                            <input type="hidden" name="attributeId_{{ Category.category.Category }}_{{ attribute.Attribute }}" value="{{ attribute.Id }}">
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="rating-section">
-                <label for="rating_{{ Category.category.Category }}">How do you rate the category?</label>
-                <select class="rating-select" name="rating_{{ Category.category.Category }}" aria-label="How do you rate the category?">
-                    <option value="L">Low</option>
-                    <option value="M" selected>Medium</option>
-                    <option value="H">High</option>
-                </select>
-            </div>
-        </div>
-    {% endfor %}
-</div>
-
     </div>
 
-    <div class="text-center">
-        <button type="submit" class="btn-submit">Submit Evaluation</button>
-    </div>
-</form>
+    <form id="questionnaire-form" method="POST" action="/risk_analysis/threat_agent_evaluation">
+        <!-- Hidden appId input field -->
+        <input type="hidden" name="appId" value="{{ appId }}">
+
+
+        <div class="panel panel-default">
+
+            <div class="category-list">
+                {% for Category in ThreatAgents %}
+                    <!-- Hidden category ID -->
+                    <input type="hidden" name="categoryId_{{ Category.category.Category }}" value="{{ Category.category.Id }}">
+<div class="col-12 my-3">
+                        <div class="card border-0 shadow mb-3">
+                            <div class="card-header">
+                                <h2 class="h4 mb-0">{{ Category.category.Category }}</h2>
+                                <b>Description: </b><em>{{ Category.category.Description }}</em><br>
+                                <b>Threat Agent Common Actions:</b> <em>{{ Category.category.CommonAction }}</em>
+                            </div>
+
+
+                            <div class="card-body">
+                                <div class="container">
+                                    <div class="row justify-content-md-start">
+                                    <div class="col col-lg">
+                                        <h4><b>Attributes</b></h4>
+                                        <ul class="attributes-list">
+                                            {% for attribute in Category.attributes %}
+                                                <li>
+                                                    <!-- Display attribute name and value -->
+                                                    {{ attribute.Attribute }}: {{ attribute.AttributeValue }}
+                                                    <!-- Hidden input to pass the attribute ID -->
+                                                    <input type="hidden" name="attributeId_{{ Category.category.Category }}_{{ attribute.Attribute }}" value="{{ attribute.Id }}">
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg">
+                                        <label for="rating_{{ Category.category.Category }}">How do you rate the category?</label>
+                                        <select class="rating-select" name="rating_{{ Category.category.Category }}" aria-label="How do you rate the category?">
+                                            <option value="L">Low</option>
+                                            <option value="M" selected>Medium</option>
+                                            <option value="H">High</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-card">
+
+
+
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn-submit">Submit Evaluation</button>
+        </div>
+    </form>
 {% endblock content %}
 
 {% block javascripts %}

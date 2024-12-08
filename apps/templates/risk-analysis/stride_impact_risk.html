@@ -9,47 +9,6 @@
 
 {% block content %}
 
-<style>
-    a.tip {
-        text-decoration: none
-    }
-
-    a.tip:hover {
-        cursor: help;
-        position: relative
-    }
-
-    a.tip span {
-        display: none
-    }
-
-    a.tip:hover span {
-        border: #c0c0c0 1px dotted;
-        padding: 5px 20px 5px 5px;
-        display: block;
-        z-index: 100;
-        background: #f0f0f0 no-repeat 100% 5%;
-        left: 0px;
-        margin: 10px;
-        width: 250px;
-        position: absolute;
-        top: 10px;
-        text-decoration: none
-    }
-</style>
-
-<style>
-    table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    td, th {
-        text-align: left;
-        padding: 8px;
-    }
-</style>
 
     <form id="questionnaire-form" method="POST" action="/risk_analysis/stride_impact_evaluation">
     <div class="container">
