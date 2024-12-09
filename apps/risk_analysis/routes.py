@@ -623,7 +623,16 @@ def macm_riskDetailed():
             "privacyviolation": category_max["Privacyviolation"]["max_value"],
         }
 
-        print(form_data,"\n\n\n")
+        #set catalogue-based parameters 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection']
+        form_data[threat.Threat]['ease_of_discovery']=threat.EasyOfDiscovery
+        form_data[threat.Threat]['ease_of_exploit']=threat.EasyOfExploit
+        form_data[threat.Threat]['awareness']=threat.Awareness
+        form_data[threat.Threat]['intrusion_detection']=threat.IntrusionDetection
+        form_data[threat.Threat]['loss_of_confidentiality']=threat.LossOfConfidentiality
+        form_data[threat.Threat]['loss_of_integrity']=threat.LossOfIntegrity
+        form_data[threat.Threat]['loss_of_availability']=threat.LossOfAvailability
+        form_data[threat.Threat]['loss_of_accountability']=threat.LossOfAccountability
+
 
 
     return render_template(f"risk-analysis/macm-detailRisk.html", segment=get_segment(request),
