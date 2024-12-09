@@ -605,6 +605,42 @@ class StrideImpactRecord(db.Model):
             print(f"Inserted new record for STRIDE category: {stride}")
 
 
+class RiskRecord(db.Model):
+    __tablename__ = 'RiskRecord'
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    ComponentID = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
+    Skill = db.Column(db.Integer, nullable=False)
+    Size = db.Column(db.Integer, nullable=False)
+    Motive = db.Column(db.Integer, nullable=False)
+    Opportunity = db.Column(db.Integer, nullable=False)
+    Easyofdiscovery = db.Column(db.Integer, nullable=False)
+    Easyofexploit = db.Column(db.Integer, nullable=False)
+    Awareness = db.Column(db.Integer, nullable=False)
+    Intrusiondetection = db.Column(db.Integer, nullable=False)
+    Lossconfidentiality = db.Column(db.Integer, nullable=False)
+    Lossintegrity = db.Column(db.Integer, nullable=False)
+    Lossavailability = db.Column(db.Integer, nullable=False)
+    Lossaccountability = db.Column(db.Integer, nullable=False)
+    Financialdamage = db.Column(db.Integer, nullable=False)
+    Reputationdamage = db.Column(db.Integer, nullable=False)
+    Noncompliance = db.Column(db.Integer, nullable=False)
+    Privacyviolation = db.Column(db.Integer, nullable=False)
+    Likelyhood = db.Column(db.Integer, nullable=False)
+    TecnicalImpact = db.Column(db.Integer, nullable=False)
+    BusinessImpact = db.Column(db.Integer, nullable=False)
+    OverallRisk = db.Column(db.Text, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+
+
+
+
+
+
+
+
+
 class ThreatAgentReplyCategory(db.Model):
 
     __tablename__ = 'ThreatAgentReplyCategory'

@@ -209,19 +209,21 @@
                         <div class="step-label">StrideImpact Evaluation</div>
                     </div>
 
-                    <div class="progress-step {% if final_step_completed %}completed{% elif wizard_completed and stride_impact_completed %}active{% else %}inactive{% endif %}">
-                        <div class="step-circle"></div>
-                        <div class="step-label">
-                            {% if wizard_completed and stride_impact_completed %}
-                                <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
-                                    Final Step
-                                </a>
-                            {% else %}
-                                Final Step
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+        <div class="progress-step {% if final_step_completed %}completed{% elif wizard_completed and stride_impact_completed %}active{% else %}inactive{% endif %}">
+            <div class="step-circle"></div>
+            <div class="step-label">
+        {% if wizard_completed and stride_impact_completed %}
+            <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
+                STRIDE Summary Assessment
+            </a>
+        {% else %}
+            STRIDE Summary Assessment
+        {% endif %}
+    </div>
+</div>
+
+
+    </div>
 
                 <!-- Legenda della barra di progressione -->
                 <div class="progress-legend">
