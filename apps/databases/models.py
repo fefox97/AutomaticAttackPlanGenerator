@@ -136,6 +136,15 @@ class ThreatCatalogue(db.Model):
     # CapecStandard       = db.Column(db.JSON)
     # CapecDetailed       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
+    EasyOfDiscovery     = db.Column(db.Text)
+    EasyOfExploit       = db.Column(db.Text)
+    Awareness           = db.Column(db.Text)
+    IntrusionDetection  = db.Column(db.Text)
+    LossOfConfidentiality = db.Column(db.Text)
+    LossOfIntegrity     = db.Column(db.Text)
+    LossOfAvailability  = db.Column(db.Text)
+    LossOfAccountability = db.Column(db.Text)
+
     
     hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat', lazy='dynamic')
     hasMethodology      = db.relationship('MethodologyCatalogue', secondary='MethodologyThreatRel', backref='hasThreat', lazy='dynamic')
