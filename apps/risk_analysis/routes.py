@@ -635,7 +635,7 @@ def macm_riskDetailed():
         # Store detailed results for the threat
         form_data[threat.Threat] = {
             "threat": threat.Threat,
-            "description": threat.Description,
+            "description": threat.Threat_Description,
             "stride": riskAnalysisCatalogUtils.map_stride(threat.STRIDE),
             "financialdamage": category_max["Financialdamage"]["max_value"],
             "reputationdamage": category_max["Reputationdamage"]["max_value"],

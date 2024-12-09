@@ -343,7 +343,7 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.TID.label("Threat_ID"), 
                     ThreatCatalogue.Asset.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
-                    ThreatCatalogue.Description,
+                    ThreatCatalogue.Description.label("Threat_Description"),
                     ThreatCatalogue.Compromised,
                     ThreatCatalogue.PreC,
                     ThreatCatalogue.PreI,
