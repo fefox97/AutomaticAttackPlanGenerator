@@ -84,6 +84,14 @@ div.dataTables_scrollBody {
     }
 }
 
+// div.dt-button-collection with brother button.buttons-colvis
+
+.buttons-colvis ~ .dt-button-collection {
+    overflow: scroll !important;
+    max-height: fill-available !important;
+    max-height: 80% !important;
+}
+
 .h8 {
     font-size: .7rem;
 }

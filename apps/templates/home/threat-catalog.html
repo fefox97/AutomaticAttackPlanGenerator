@@ -44,7 +44,7 @@
                                 <th>Asset</th>
                                 <th>Threat</th>
                                 <th>Description</th>
-                                <th> STRIDE</th>
+                                <th>STRIDE</th>
                                 <th>Compromised</th>
                                 <th>PreC</th>
                                 <th>PreI</th>
@@ -57,6 +57,14 @@
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
+                                <th>Easy of Discovery</th>
+                                <th>Easy of Exploit</th>
+                                <th>Awareness</th>
+                                <th>Intrusion Detection</th>
+                                <th>Loss of Confidentiality</th>
+                                <th>Loss of Integrity</th>
+                                <th>Loss of Availability</th>
+                                <th>Loss of Accountability</th>
                                 <th>Commento</th>
                             </tr>
                         </thead>
@@ -104,6 +112,14 @@
                                             </div>
                                         {% endif %}
                                     </td>
+                                    <td>{{ row['EasyOfDiscovery'] }}</td>
+                                    <td>{{ row['EasyOfExploit'] }}</td>
+                                    <td>{{ row['Awareness'] }}</td>
+                                    <td>{{ row['IntrusionDetection'] }}</td>
+                                    <td>{{ row['LossOfConfidentiality'] }}</td>
+                                    <td>{{ row['LossOfIntegrity'] }}</td>
+                                    <td>{{ row['LossOfAvailability'] }}</td>
+                                    <td>{{ row['LossOfAccountability'] }}</td>
                                     <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}
@@ -127,6 +143,14 @@
                                 <th>Capec Meta</th>
                                 <th>Capec Standard</th>
                                 <th>Capec Detailed</th>
+                                <th>Easy of Discovery</th>
+                                <th>Easy of Exploit</th>
+                                <th>Awareness</th>
+                                <th>Intrusion Detection</th>
+                                <th>Loss of Confidentiality</th>
+                                <th>Loss of Integrity</th>
+                                <th>Loss of Availability</th>
+                                <th>Loss of Accountability</th>
                                 <th>Commento</th>
                             </tr>
                         </tfoot>

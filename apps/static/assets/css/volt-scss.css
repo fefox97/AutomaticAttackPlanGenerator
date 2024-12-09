@@ -19692,6 +19692,11 @@ div.dataTables_scrollBody {
   word-wrap: break-word;
   white-space: pre-line; }
 
+.buttons-colvis ~ .dt-button-collection {
+  overflow: scroll !important;
+  max-height: fill-available !important;
+  max-height: 80% !important; }
+
 .h8 {
   font-size: .7rem; }
 
