@@ -133,6 +133,15 @@ class ThreatCatalogue(db.Model):
     PostA               = db.Column(db.JSON)
     PostCondition       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
+    EasyOfDiscovery     = db.Column(db.Text)
+    EasyOfExploit       = db.Column(db.Text)
+    Awareness           = db.Column(db.Text)
+    IntrusionDetection  = db.Column(db.Text)
+    LossOfConfidentiality = db.Column(db.Text)
+    LossOfIntegrity     = db.Column(db.Text)
+    LossOfAvailability  = db.Column(db.Text)
+    LossOfAccountability = db.Column(db.Text)
+
     
     EasyOfDiscovery     = db.Column(db.Integer, default=5)
     EasyOfExploit       = db.Column(db.Integer, default=5)
@@ -352,6 +361,14 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.PostI,
                     ThreatCatalogue.PostA,
                     ThreatCatalogue.STRIDE.label("STRIDE"),
+                    ThreatCatalogue.EasyOfDiscovery,
+                    ThreatCatalogue.EasyOfExploit,
+                    ThreatCatalogue.Awareness,
+                    ThreatCatalogue.IntrusionDetection,
+                    ThreatCatalogue.LossOfConfidentiality,
+                    ThreatCatalogue.LossOfIntegrity,
+                    ThreatCatalogue.LossOfAvailability,
+                    ThreatCatalogue.LossOfAccountability,
                     Macm.Component_ID,
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
