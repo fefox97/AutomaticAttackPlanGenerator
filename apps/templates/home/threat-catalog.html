@@ -112,14 +112,14 @@
                                             </div>
                                         {% endif %}
                                     </td>
-                                    <td>{{ row['EasyOfDiscovery'] }}</td>
-                                    <td>{{ row['EasyOfExploit'] }}</td>
-                                    <td>{{ row['Awareness'] }}</td>
-                                    <td>{{ row['IntrusionDetection'] }}</td>
-                                    <td>{{ row['LossOfConfidentiality'] }}</td>
-                                    <td>{{ row['LossOfIntegrity'] }}</td>
-                                    <td>{{ row['LossOfAvailability'] }}</td>
-                                    <td>{{ row['LossOfAccountability'] }}</td>
+                                    <td>{{ row['EasyOfDiscovery'] if row['EasyOfDiscovery'] is not none }}</td>
+                                    <td>{{ row['EasyOfExploit'] if row['EasyOfExploit'] is not none }}</td>
+                                    <td>{{ row['Awareness'] if row['Awareness'] is not none }}</td>
+                                    <td>{{ row['IntrusionDetection'] if row['IntrusionDetection'] is not none }}</td>
+                                    <td>{{ row['LossOfConfidentiality'] if row['LossOfConfidentiality'] is not none }}</td>
+                                    <td>{{ row['LossOfIntegrity'] if row['LossOfIntegrity'] is not none }}</td>
+                                    <td>{{ row['LossOfAvailability'] if row['LossOfAvailability'] is not none }}</td>
+                                    <td>{{ row['LossOfAccountability'] if row['LossOfAccountability'] is not none }}</td>
                                     <td>{{ row['Commento'] if row['Commento'] != 'None' }}</td>
                                 </tr>
                             {% endfor %}
