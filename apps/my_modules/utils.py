@@ -19,6 +19,7 @@ from flask_login import (
 )
 from apps.config import Config
 from sqlalchemy_schemadisplay import create_schema_graph
+from sqlalchemy.schema import DropTable
 from apps import db
 
 class AttackPatternUtils:
@@ -75,8 +76,12 @@ class ThreatCatalogUtils:
         print("\nLoading threat catalogue...\n")
         df = pd.read_excel(self.file_path, sheet_name="Threat Components", header=0)
         df.replace(np.nan, None, inplace=True) # replace NaN with None
-        # df.set_index('TID', inplace=True)
-        df = df.astype('str')
+        # df = df.astype('str')
+        columns_to_convert = ['EasyOfDiscovery', 'EasyOfExploit', 'Awareness', 'IntrusionDetection', 'LossOfConfidentiality', 'LossOfIntegrity', 'LossOfAvailability', 'LossOfAccountability']
+        # column as string except for colums_to_convert
+        for column in df.columns:
+            if column not in columns_to_convert:
+                df[column] = df[column].astype('str')
         columns_to_convert = ['CapecMeta', 'CapecStandard', 'CapecDetailed']
         for column in columns_to_convert:
             df[column] = df[column].apply(lambda x: self.converter.string_to_list(x))
@@ -309,7 +314,8 @@ class Utils:
                 if self.engine.name != 'sqlite':
                     session.execute('SET FOREIGN_KEY_CHECKS=0')
                     session.commit()
-                mapper.__table__.drop(self.engine)
+                # mapper.__table__.drop(self.engine)
+                DropTable(mapper.__table__).execute(self.engine)
                 session.commit()
                 if self.engine.name != 'sqlite':
                     session.execute('SET FOREIGN_KEY_CHECKS=1')
