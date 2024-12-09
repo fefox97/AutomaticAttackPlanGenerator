@@ -198,10 +198,10 @@ function calculateOverallRisk(threatID) {
     var technicalImpactElement = document.getElementById("technical_impact_" + threatID);
     var businessImpactElement = document.getElementById("business_impact_" + threatID);
     var likelihoodElement = document.getElementById("likelihood_"+threatID);
-    var technicalImpact = parseFloat(technicalImpactElement.innerText.split(':')[1]) || 5;
-    var businessImpact = parseFloat(businessImpactElement.innerText.split(':')[1]) || 5;
-    var likelihoodValue = parseFloat(likelihoodElement.innerText.split(':')[1]) || 5;
-    var impact=parseFloat(technicalImpact+businessImpact/2);
+    var technicalImpact = parseFloat(technicalImpactElement.innerText.split(':')[1]) ;
+    var businessImpact = parseFloat(businessImpactElement.innerText.split(':')[1]) ;
+    var likelihoodValue = parseFloat(likelihoodElement.innerText.split(':')[1]);
+    var impact=parseFloat((technicalImpact+businessImpact)/2);
     console.log("tecnical "+technicalImpact+" business "+businessImpact+" totale "+impact);
 
     // Determina la categoria di Impact
@@ -210,7 +210,7 @@ function calculateOverallRisk(threatID) {
 
     // Calcola la categoria di Overall Risk
     var overallRiskCategory = calculateRiskCategory(likelihoodCategory, impactCategory);
-    console.log("categoriaImpatto "+impactCategory.category + "categoriaLikelhood "+likelihoodCategory);
+    console.log("categoriaImpatto "+impactCategory + " impatto "+ impact+  " categoriaLikelhood "+likelihoodCategory, " categoriaRischio "+overallRiskCategory);
 
 
     // Aggiorna il badge di Overall Risk
@@ -243,21 +243,6 @@ function calculateOverallRisk(threatID) {
     return riskMatrix[likelihoodCategory][impactCategory] || "Unknown";
 }
 
-function getNLMHSCategory(score) {
-    if (score >= 8 && score <= 9) {
-        return { category: "Critical", description: "Very high risk level (8-9): Immediate action required!" };
-    } else if (score >= 6 && score <= 7) {
-        return { category: "High", description: "High risk level (6-7): Significant attention needed." };
-    } else if (score >= 4 && score <= 5) {
-        return { category: "Medium", description: "Medium risk level (4-5): Moderate concern, monitor closely." };
-    } else if (score >= 2 && score <= 3) {
-        return { category: "Low", description: "Low risk level (2-3): Low priority, no immediate action needed." };
-    } else if (score === 1) {
-        return { category: "Note", description: "No significant risk (1): No action required." };
-    } else {
-        return { category: "Invalid", description: "Invalid score. Please provide a score between 1 and 9." };
-    }
-}
 
 function setColor(id, category) {
     var element = document.getElementById(id);
@@ -284,10 +269,14 @@ function setColor(id, category) {
     }
 }
     function getCategory(value) {
-        if (value >= 7) return "High";
-        if (value >= 4) return "Medium";
-        return "Low";
+    if (value >= 7) {
+        return "High";
     }
+    if (value >= 4 && value < 7) {
+        return "Medium";
+    }
+    return "Low";
+}
     window.onload = function() {
         {% for threat in threat_data %}
             calculateLikelihood("{{ threat.Threat_ID }}");
