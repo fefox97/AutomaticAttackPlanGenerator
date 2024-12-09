@@ -102,9 +102,16 @@
                                     <tbody>
                                         <tr>
                                             <td><strong>Likelihood</strong></td>
-                                            {% for param in ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
+                                            {% for param in ['skill', 'motive', 'opportunity', 'size'] %}
                                                 <td>
                                                     <input type="number" id="{{ param }}_{{ threat.Threat_ID }}" value="{{ form_data[param] or 5 }}"
+                                                        min="1" max="9" class="form-control likelihood-input"
+                                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
+                                                </td>
+                                            {% endfor %}
+                                            {% for param in ['ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
+                                                <td>
+                                                    <input type="number" id="{{ param }}_{{ threat.Threat_ID }}" value="{{ form_data[threat.Threat][param] or 5 }}"
                                                         min="1" max="9" class="form-control likelihood-input"
                                                         onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
                                                 </td>

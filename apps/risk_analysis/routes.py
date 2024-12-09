@@ -597,6 +597,7 @@ def macm_riskDetailed():
     ThreatAgentParameters= ThreatAgentRiskScores.query.filter_by(AppID=selected_macm).first()
     #calcolo stride impct
     form_data = {}
+    app.logger.info(f"ThreatAgentParameters: {ThreatAgentParameters}")
     if ThreatAgentParameters:
         form_data['size']=ThreatAgentParameters.Size
         form_data['motive']=ThreatAgentParameters.Motive
