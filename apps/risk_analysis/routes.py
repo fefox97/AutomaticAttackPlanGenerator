@@ -2,6 +2,7 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
+import json
 from datetime import datetime
 
 from apps.authentication.models import Users
@@ -417,7 +418,6 @@ def threat_agent_evaluation():
         threat_number=threat_number,
         reports=reports,
         appId=appId,
-        objective=objective,
         wizard_completed=True,
         stride_impact_completed=threatAgentUtils.stride_impact_completed(appId)
     )
@@ -633,19 +633,50 @@ def macm_riskDetailed():
         form_data[threat.Threat]['loss_of_availability']=threat.LossOfAvailability
         form_data[threat.Threat]['loss_of_accountability']=threat.LossOfAccountability
 
-
-
     return render_template(f"risk-analysis/macm-detailRisk.html", segment=get_segment(request),
+                           selected_macm=selected_macm, component_id=selected_id,
                            macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases,
                            av_pentest_phases=av_pentest_phases, threat_data=threat_data,
                            methodologies_data=methodologies_data, ThreatAgentParameters=ThreatAgentParameters, form_data=form_data)
 
-@blueprint.route('/save_risk_evaluation', methods=['GET'])
+@blueprint.route('/save_risk_evaluation', methods=['POST'])
 def save_risk_evaluation():
-    return render_template(f"risk-analysis/macmRisk.html", segment=get_segment(request))
+    threatAgentUtils= ThreatAgentUtils()
+    try:
+        selected_macm = request.form.get('selected_macm')
+        table = Macm.query.filter_by(App_ID=selected_macm).all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    try:
+        threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+        threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+        threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
+    except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
+    try:
+        component_id = request.form.get('component_id')
+        selected_macm = request.form.get('selected_macm')
+        # Controllo se il campo 'evaluation_data' esiste nella richiesta
+        evaluation_data_json = request.form.get('evaluation_data', None)
+        if not evaluation_data_json:
+            raise ValueError("Il campo 'evaluation_data' non è stato fornito nella richiesta.")
+
+        # Verifica che il campo contenga JSON valido
+        try:
+            evaluation_data = json.loads(evaluation_data_json)
+            print("Dati evaluation_data decodificati:", evaluation_data)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Il campo 'evaluation_data' contiene JSON non valido: {e}")
+
+    except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
 
 
-
-
-
-
+    template = f"risk-analysis/macm_riskRating.html"
+    return render_template(template, segment=get_segment(request), table=table,
+                           threat_for_each_component=threat_for_each_component,
+                           threat_number=threat_number,
+                           selected_macm=selected_macm,wizard_completed=threatAgentUtils.wizard_completed(selected_macm),
+                           stride_impact_completed=threatAgentUtils.stride_impact_completed(selected_macm))

@@ -43,7 +43,14 @@
 </div>
 
 
-    <form id="save_evaluation" method="POST" action="/save_evaluation">
+    <form id="save_risk_evaluation" action="/risk_analysis/save_risk_evaluation" method="POST">
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Save Evaluation</button>
+        </div>
+        <br>
+         <input type="hidden" name="component_id" value="{{ component_id }}">
+         <input type="hidden" name="selected_macm" value="{{ selected_macm }}">
+        <input type="hidden" name="evaluation_data" id="evaluation_data" value="">
         {% for threat in threat_data %}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
@@ -120,7 +127,7 @@
                                     <td><strong>Impact</strong></td>
                                     {% for param in ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability', 'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'] %}
                                         <td>
-                                            <input type="number" id="{{ param }}_{{ threat.Threat_ID }}" value="{{ form_data[threat.Threat][param] or 5 }}"
+                                            <input type="number" id="{{ param }}_{{ threat.Threat_ID }}"  value="{{ form_data[threat.Threat][param] or 5 }}"
                                                 min="1" max="9" class="form-control impact-input"
                                                 onchange="calculateImpact('{{ threat.Threat_ID }}')">
                                         </td>
@@ -136,95 +143,80 @@
                 </div>
             </div>
         {% endfor %}
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Save Evaluation</button>
-        </div>
+
     </form>
 </div>
 
 {% block javascripts %}
 <script type="text/javascript">
-    function calculateLikelihood(threatID) {
-        var params = ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'];
-        var sum = 0, count = 0;
-        params.forEach(function(param) {
-            var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
-            sum += value; count++;
-            setColor(param + "_" + threatID, value);
-        });
-        var likelihood = sum / count;
-        var likelihoodCategory = getCategory(likelihood);
-        document.getElementById("likelihood_" + threatID).innerText = "Likelihood: " + likelihood.toFixed(2);
-        setColor("likelihood_" + threatID, likelihood);
-        calculateOverallRisk(threatID, likelihoodCategory);
+function calculateLikelihood(threatID) {
+    var params = ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'];
+    var sum = 0, count = 0;
+    params.forEach(function(param) {
+        var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+        sum += value;
+        count++;
+        setColor(param + "_" + threatID, value);
+    });
+    var likelihood = sum / count;
+    var likelihoodCategory = getCategory(likelihood);
+    // Includi la categoria nel testo del badge
+    document.getElementById("likelihood_" + threatID).innerText = "Likelihood: " + likelihood.toFixed(2) + " (" + likelihoodCategory + ")";
+    setColor("likelihood_" + threatID, likelihood);
+    calculateOverallRisk(threatID);
+}
+function calculateImpact(threatID) {
+    var techParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability'];
+    var busParams = ['financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
+    var techSum = 0, busSum = 0;
+    techParams.forEach(param => {
+        var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+        techSum += value;
+        setColor(param + "_" + threatID, value);
+    });
+    busParams.forEach(param => {
+        var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
+        busSum += value;
+        setColor(param + "_" + threatID, value);
+    });
+    var technicalImpact = techSum / techParams.length;
+    var businessImpact = busSum / busParams.length;
+    var techCategory = getCategory(technicalImpact);
+    var busCategory = getCategory(businessImpact);
+    // Includi le categorie nel testo dei badge
+    document.getElementById("technical_impact_" + threatID).innerText = "Technical Impact: " + technicalImpact.toFixed(2) + " (" + techCategory + ")";
+    document.getElementById("business_impact_" + threatID).innerText = "Business Impact: " + businessImpact.toFixed(2) + " (" + busCategory + ")";
+    setColor("technical_impact_" + threatID, technicalImpact);
+    setColor("business_impact_" + threatID, businessImpact);
+    calculateOverallRisk(threatID);
+}
 
-    }
-    function calculateImpact(threatID) {
-        var techParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability'];
-        var busParams = ['financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
-        var techSum = 0, busSum = 0;
-        techParams.forEach(param => {
-            var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
-            techSum += value;
-            setColor(param + "_" + threatID, value);
-        });
-        busParams.forEach(param => {
-            var value = parseInt(document.getElementById(param + "_" + threatID).value) || 5;
-            busSum += value;
-            setColor(param + "_" + threatID, value);
-        });
-        var technicalImpact = techSum / techParams.length;
-        var businessImpact = busSum / busParams.length;
-        document.getElementById("technical_impact_" + threatID).innerText = "Technical Impact: " + technicalImpact.toFixed(2);
-        document.getElementById("business_impact_" + threatID).innerText = "Business Impact: " + businessImpact.toFixed(2);
-        setColor("technical_impact_" + threatID, technicalImpact);
-        setColor("business_impact_" + threatID, businessImpact);
-        calculateOverallRisk(threatID, null, technicalImpact, businessImpact);
+function calculateOverallRisk(threatID) {
+    // Leggi la categoria di Likelihood dal data attribute
 
-    }
+    // Leggi le categorie di Technical e Business Impact dai data attributes
+    var technicalImpactElement = document.getElementById("technical_impact_" + threatID);
+    var businessImpactElement = document.getElementById("business_impact_" + threatID);
+    var likelihoodElement = document.getElementById("likelihood_"+threatID);
+    var technicalImpact = parseFloat(technicalImpactElement.innerText.split(':')[1]) || 5;
+    var businessImpact = parseFloat(businessImpactElement.innerText.split(':')[1]) || 5;
+    var likelihoodValue = parseFloat(likelihoodElement.innerText.split(':')[1]) || 5;
+    var impact=parseFloat(technicalImpact+businessImpact/2);
+    console.log("tecnical "+technicalImpact+" business "+businessImpact+" totale "+impact);
 
-function calculateOverallRisk(threatID, likelihoodCategory = null, technicalImpact = null, businessImpact = null) {
-    // Fetch likelihood category from the badge if not provided
-    if (!likelihoodCategory) {
-        var likelihoodText = document.getElementById("likelihood_" + threatID).innerText;
-        likelihoodCategory = likelihoodText.match(/\((.*?)\)/)?.[1] || "Low"; // Extract category from text
-    }
+    // Determina la categoria di Impact
+    var impactCategory = getCategory(impact);
+    var likelihoodCategory = getCategory(likelihoodValue);
 
-    // Extract technical and business impact values if not provided
-    if (!technicalImpact || !businessImpact) {
-        var technicalText = document.getElementById("technical_impact_" + threatID).innerText;
-        var businessText = document.getElementById("business_impact_" + threatID).innerText;
-
-        technicalImpact = parseFloat(technicalText.match(/: ([0-9.]+)/)?.[1] || "5");
-        businessImpact = parseFloat(businessText.match(/: ([0-9.]+)/)?.[1] || "5");
-    }
-
-    // Determine impact category from the max of technical and business impacts
-    var impactCategory = getCategory(Math.max(technicalImpact, businessImpact));
-
-    // Compute overall risk category from the likelihood and impact categories
+    // Calcola la categoria di Overall Risk
     var overallRiskCategory = calculateRiskCategory(likelihoodCategory, impactCategory);
+    console.log("categoriaImpatto "+impactCategory.category + "categoriaLikelhood "+likelihoodCategory);
 
-    // Log for debugging
-    console.log(`Threat ID: ${threatID}`);
-    console.log(`Likelihood Category: ${likelihoodCategory}`);
-    console.log(`Impact Category: ${impactCategory}`);
-    console.log(`Overall Risk Category: ${overallRiskCategory}`);
 
-    // Update the text and style of the overall risk badge
+    // Aggiorna il badge di Overall Risk
     var overallRiskElement = document.getElementById("overall_risk_" + threatID);
     overallRiskElement.innerText = "Overall Risk: " + overallRiskCategory;
     setColor(overallRiskElement.id, overallRiskCategory);
-
-
-    var impactCategory = getCategory(Math.max(technicalImpact, businessImpact));
-    var overallRiskCategory = calculateRiskCategory(likelihoodCategory, impactCategory);
-
-    // Update the text and style of the overall risk badge
-    var overallRiskElement = document.getElementById("overall_risk_" + threatID);
-    overallRiskElement.innerText = "Overall Risk: " + overallRiskCategory;
-    setColor(overallRiskElement.id, overallRiskCategory);
-
 }
 
     function calculateRiskCategory(likelihoodCategory, impactCategory) {
@@ -249,6 +241,22 @@ function calculateOverallRisk(threatID, likelihoodCategory = null, technicalImpa
 
     // Return the overall risk severity based on the matrix
     return riskMatrix[likelihoodCategory][impactCategory] || "Unknown";
+}
+
+function getNLMHSCategory(score) {
+    if (score >= 8 && score <= 9) {
+        return { category: "Critical", description: "Very high risk level (8-9): Immediate action required!" };
+    } else if (score >= 6 && score <= 7) {
+        return { category: "High", description: "High risk level (6-7): Significant attention needed." };
+    } else if (score >= 4 && score <= 5) {
+        return { category: "Medium", description: "Medium risk level (4-5): Moderate concern, monitor closely." };
+    } else if (score >= 2 && score <= 3) {
+        return { category: "Low", description: "Low risk level (2-3): Low priority, no immediate action needed." };
+    } else if (score === 1) {
+        return { category: "Note", description: "No significant risk (1): No action required." };
+    } else {
+        return { category: "Invalid", description: "Invalid score. Please provide a score between 1 and 9." };
+    }
 }
 
 function setColor(id, category) {
@@ -284,9 +292,86 @@ function setColor(id, category) {
         {% for threat in threat_data %}
             calculateLikelihood("{{ threat.Threat_ID }}");
             calculateImpact("{{ threat.Threat_ID }}");
+            calculateOverallRisk("{{ threat.Threat_ID }}");
         {% endfor %}
 
     }
+
 </script>
+<script type="text/javascript">
+    document.getElementById('save_risk_evaluation').addEventListener('submit', function (event) {
+        event.preventDefault();  // Impedisce il comportamento di submit predefinito
+
+        const evaluationData = [];  // Array per raccogliere i dati delle minacce
+
+        {% for threat in threat_data %}
+        const threatID = "{{ threat.Threat_ID }}";
+
+        // Raccogliere i valori dei parametri di likelihood
+        const likelihoodParams = ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'];
+        const likelihoodData = {};
+        likelihoodParams.forEach(param => {
+            likelihoodData[param] = parseFloat(document.getElementById(`${param}_${threatID}`).value) || 5;
+        });
+
+        // Raccogliere i valori dei parametri di impact
+        const impactParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability',
+                              'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
+        const impactData = {};
+        impactParams.forEach(param => {
+            impactData[param] = parseFloat(document.getElementById(`${param}_${threatID}`).value) || 5;
+        });
+
+        // Raccogliere i valori calcolati
+        const likelihood = parseFloat(document.getElementById(`likelihood_${threatID}`).innerText.split(':')[1]) || 0;
+        const technicalImpact = parseFloat(document.getElementById(`technical_impact_${threatID}`).innerText.split(':')[1]) || 0;
+        const businessImpact = parseFloat(document.getElementById(`business_impact_${threatID}`).innerText.split(':')[1]) || 0;
+        const overallRisk = document.getElementById(`overall_risk_${threatID}`).innerText.split(':')[1]?.trim() || "Unknown";
+
+        // Costruire l'oggetto dei dati da inviare
+        evaluationData.push({
+            Threat_ID: threatID,
+            Likelihood: likelihood,
+            Technical_Impact: technicalImpact,
+            Business_Impact: businessImpact,
+            Overall_Risk: overallRisk,
+            Likelihood_Params: likelihoodData,
+            Impact_Params: impactData,
+        });
+        {% endfor %}
+
+        // Preparare il payload da inviare
+        const payload = {
+            component_id: "{{ component_id }}",
+            selected_macm: "{{ selected_macm }}",
+            evaluation_data: evaluationData
+        };
+
+        // Inviare i dati al server tramite fetch
+        fetch('/risk_analysis/save_risk_evaluation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta al server');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Risposta dal server:', data);
+            alert('Dati salvati con successo!');
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Errore durante il salvataggio dei dati.');
+        });
+    });
+</script>
+
+
 {% endblock %}
 {% endblock %}

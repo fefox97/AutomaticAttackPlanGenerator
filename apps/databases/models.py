@@ -136,14 +136,14 @@ class ThreatCatalogue(db.Model):
     # CapecStandard       = db.Column(db.JSON)
     # CapecDetailed       = db.Column(db.JSON)
     Commento            = db.Column(db.Text)
-    EasyOfDiscovery     = db.Column(db.Text)
-    EasyOfExploit       = db.Column(db.Text)
-    Awareness           = db.Column(db.Text)
-    IntrusionDetection  = db.Column(db.Text)
-    LossOfConfidentiality = db.Column(db.Text)
-    LossOfIntegrity     = db.Column(db.Text)
-    LossOfAvailability  = db.Column(db.Text)
-    LossOfAccountability = db.Column(db.Text)
+    EasyOfDiscovery     = db.Column(db.Integer, default=5)
+    EasyOfExploit       = db.Column(db.Integer, default=5)
+    Awareness           = db.Column(db.Integer, default=5)
+    IntrusionDetection  = db.Column(db.Integer, default=5)
+    LossOfConfidentiality = db.Column(db.Integer, default=5)
+    LossOfIntegrity     = db.Column(db.Integer, default=5)
+    LossOfAvailability  = db.Column(db.Integer, default=5)
+    LossOfAccountability = db.Column(db.Integer, default=5)
 
     
     hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat', lazy='dynamic')
@@ -629,3 +629,39 @@ class StrideImpactRecord(db.Model):
             db.session.add(new_record)
             db.session.commit()  # Commit del nuovo record
             print(f"Inserted new record for STRIDE category: {stride}")
+
+
+class RiskRecord(db.Model):
+    __tablename__ = 'RiskRecord'
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    ComponentID = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
+    Skill = db.Column(db.Integer, nullable=False)
+    Size = db.Column(db.Integer, nullable=False)
+    Motive = db.Column(db.Integer, nullable=False)
+    Opportunity = db.Column(db.Integer, nullable=False)
+    Easyofdiscovery = db.Column(db.Integer, nullable=False)
+    Easyofexploit = db.Column(db.Integer, nullable=False)
+    Awareness = db.Column(db.Integer, nullable=False)
+    Intrusiondetection = db.Column(db.Integer, nullable=False)
+    Lossconfidentiality = db.Column(db.Integer, nullable=False)
+    Lossintegrity = db.Column(db.Integer, nullable=False)
+    Lossavailability = db.Column(db.Integer, nullable=False)
+    Lossaccountability = db.Column(db.Integer, nullable=False)
+    Financialdamage = db.Column(db.Integer, nullable=False)
+    Reputationdamage = db.Column(db.Integer, nullable=False)
+    Noncompliance = db.Column(db.Integer, nullable=False)
+    Privacyviolation = db.Column(db.Integer, nullable=False)
+    Likelyhood = db.Column(db.Integer, nullable=False)
+    TecnicalImpact = db.Column(db.Integer, nullable=False)
+    BusinessImpact = db.Column(db.Integer, nullable=False)
+    OverallRisk = db.Column(db.Text, nullable=False)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+
+
+
+
+
+
+
