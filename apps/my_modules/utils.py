@@ -13,7 +13,9 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import (MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion,
+                                   ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel,
+                                   ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord)
 from flask_login import (
     current_user
 )
@@ -302,7 +304,7 @@ class Utils:
         self.tool_catalog_utils = ToolCatalogUtils()
         self.macm_utils = MacmUtils()
         self.methodology_catalog_utils = MethodologyCatalogUtils()
-        self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
+        self.risk_analysis_catalog_utils = ThreatAgentUtils()
         self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
     def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -509,8 +511,9 @@ class Utils:
     #     response['output'] = str(attack_data)
     #     return response
 
-class RiskAnalysisCatalogUtils:
+class ThreatAgentUtils:
     converter = Converter()
+
 
     def __init__(self):
         self.base_path = Config.DBS_PATH

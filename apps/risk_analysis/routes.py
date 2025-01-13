@@ -10,10 +10,16 @@ from apps.risk_analysis import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import (AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm,
+                                   ThreatModel, ToolCatalogue, PentestPhases,
+                                   ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply,
+                                   ThreatAgentReplyCategory, ThreatAgentCategory,
+                                   ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores,
+                                   StrideImpactRecord, ThreatAgentQuestionReplies)
 from sqlalchemy import func
-from apps.my_modules import converter, RiskAnalysisCatalogUtils
+from apps.my_modules import converter, ThreatAgentUtils
 from apps import db
+
 
 
 
@@ -30,7 +36,7 @@ def get_segment(request):
 @blueprint.route('/macm_riskRating', methods=['GET'])
 @login_required
 def macm_riskRating():
-    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
+    riskAnalysisCatalogUtils = ThreatAgentUtils()
     try:
         selected_macm = request.args.get('app_id')
         table = Macm.query.filter_by(App_ID=selected_macm).all()
@@ -71,7 +77,6 @@ def risk_analysis():
                            risk_analyses=risk_analyses,
                            users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
-
 @blueprint.route('/threat-agent-wizard', methods=['GET'])
 @login_required
 def threat_agent_wizard():
@@ -95,10 +100,12 @@ def threat_agent_wizard():
             replies = []
             # Fetch replies for the current question
             question_replies = ThreatAgentQuestionReplies.query.filter_by(Question_id=question.Id).all()
+            print(question_replies,question.Id)
             for question_reply in question_replies:
                 reply_id = question_reply.Reply_id
                 # Fetch the ThreatAgentReply
                 reply = ThreatAgentReply.query.filter_by(Id=reply_id).first()
+                print(reply)
                 if reply:
                     replies.append({
                         'id': reply.Id,  # ID della risposta
@@ -117,13 +124,11 @@ def threat_agent_wizard():
         # Add the questions and replies to the context
         context['questions_replies'] = questions_replies_list
         context['appId'] = appId
-
         print(questions_replies_list)
 
     except Exception as e:
         app.logger.error(f"Error occurred while fetching questions or replies: {e}", exc_info=True)
         context['questions_replies'] = None
-
     # Render the template with the context data
     return render_template(
         "risk-analysis/threat_agent_wizard.html",
@@ -141,7 +146,7 @@ def threat_agent_wizard():
 @login_required
 def submit_questionnaire():
     if request.method == 'POST':
-        riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
+        riskAnalysisCatalogUtils = ThreatAgentUtils()
         # Initialize a dictionary to store the user's responses
         user_responses = {}
         appId = request.form.get('appId')
@@ -230,7 +235,7 @@ def threat_agent_evaluation():
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
     """
     # Extract `appId` and `objective` from the form
-    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
+    riskAnalysisCatalogUtils = ThreatAgentUtils()
     objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
 
@@ -422,29 +427,54 @@ def threat_agent_evaluation():
 
 
 @blueprint.route('/stride-impact-rating', methods=['GET'])
-@login_required
 def stride_impact_rating():
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
     # Extract `appId` and `objective` from the form
-    objective = request.args.get('objective', 'riskanalysis')
     appId = request.args.get('app_id')
+
+    stride_impact_evaluation_list=StrideImpactRecord.query.filter_by(AppID=appId).all()
+
+    stride_impact_previous_results={}
+
+    strides = ['spoofing', 'tampering', 'reputation', 'information_disclosure', 'dos', 'elevationofprivileges']
+    for stride in strides:
+        impact_per_stride = []
+        impact_per_stride.append(5)
+        impact_per_stride.append(5)
+        impact_per_stride.append(5)
+        impact_per_stride.append(5)
+        stride_impact_previous_results[stride] = impact_per_stride
+        stride_impact_previous_results["Created_at"] = None
+        stride_impact_previous_results["Updated_at"] = None
+
+
+    for stride_impact_evaluation in stride_impact_evaluation_list:
+        impact_per_stride = []
+        impact_per_stride.append(stride_impact_evaluation.Financialdamage)
+        impact_per_stride.append(stride_impact_evaluation.Reputationdamage)
+        impact_per_stride.append(stride_impact_evaluation.Noncompliance)
+        impact_per_stride.append(stride_impact_evaluation.Privacyviolation)
+        stride_impact_previous_results[stride_impact_evaluation.Stride]=impact_per_stride
+        stride_impact_previous_results["Created_at"]=stride_impact_evaluation.Created_at
+        stride_impact_previous_results["Updated_at"]=stride_impact_evaluation.Updated_at
 
     template = "risk-analysis/stride_impact_risk.html"
     return render_template(
         template,
-        segment=get_segment(request),appId=appId, objective=objective
+        segment=get_segment(request),appId=appId,
+        stride_impact_previous_results=stride_impact_previous_results
     )
+
 
 @blueprint.route('/stride_impact_evaluation', methods=['POST'])
 @login_required
 def stride_impact_evaluation():
-    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
+    threatAgentUtils= ThreatAgentUtils()
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
-    objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
     print(f"applicazione: {appId}")
 
@@ -527,45 +557,23 @@ def stride_impact_evaluation():
             "noncompliance": int(request.form.get(f"{stride}_noncompliance", 0)),
             "privacyviolation": int(request.form.get(f"{stride}_privacyviolation", 0)),
         }
-    try:
-        for stride, impacts in stride_data.items():
-            # Usa il metodo per aggiornare o creare il record
-            StrideImpactRecord.update_or_create(
-                app_id=appId,
-                stride=stride,
-                financialdamage=impacts['financialdamage'],
-                reputationdamage=impacts['reputationdamage'],
-                noncompliance=impacts['noncompliance'],
-                privacyviolation=impacts['privacyviolation']
-            )
 
-            existing_record = StrideImpactRecord.query.filter_by(AppID=appId, Stride=stride).first()
+    for stride, impacts in stride_data.items():
+        print(f"Processing STRIDE category: {stride}")
+        print(f"Financial Damage: {impacts['financialdamage']}")
+        print(f"Reputation Damage: {impacts['reputationdamage']}")
+        print(f"Non-compliance: {impacts['noncompliance']}")
+        print(f"Privacy Violation: {impacts['privacyviolation']}")
 
-            if existing_record:
-                StrideImpactRecord.query.filter_by(AppID=appId, Stride=stride).update({
-                    'Financialdamage': impacts['financialdamage'],
-                    'Reputationdamage': impacts['reputationdamage'],
-                    'Noncompliance': impacts['noncompliance'],
-                    'Privacyviolation': impacts['privacyviolation'],
-                })
-            else:
-                # Se il record non esiste, inserisci un nuovo record
-                new_record = StrideImpactRecord(
-                    AppID=appId,
-                    Stride=stride,
-                    Financialdamage=impacts['financialdamage'],
-                    Reputationdamage=impacts['reputationdamage'],
-                    Noncompliance=impacts['noncompliance'],
-                    Privacyviolation=impacts['privacyviolation'],
-                    Created_at=datetime.utcnow(),
-                    Uploaded_at=datetime.utcnow()
-                )
-                db.session.add(new_record)
-        db.session.commit()  # Commit del nuovo record
-        app.logger.info(f"Inserted new record for STRIDE category: {stride}")
-    except Exception as e:
-        app.logger.error(f"Error saving STRIDE impact scores: {e}", exc_info=True)
-        db.session.rollback()
+        # Usa il metodo per aggiornare o creare il record
+        StrideImpactRecord.update_or_create(
+            app_id=appId,
+            stride=stride,
+            financialdamage=impacts['financialdamage'],
+            reputationdamage=impacts['reputationdamage'],
+            noncompliance=impacts['noncompliance'],
+            privacyviolation=impacts['privacyviolation']
+        )
 
     template = "risk-analysis/macm_riskRating.html"
     return render_template(
@@ -578,14 +586,13 @@ def stride_impact_evaluation():
         threat_number=threat_number,
         reports=reports,
         appId=appId,
-        objective=objective,
-        wizard_completed=riskAnalysisCatalogUtils.wizard_completed(appId),
-        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(appId)
+        wizard_completed=threatAgentUtils.wizard_completed(appId),
+        stride_impact_completed=threatAgentUtils.stride_impact_completed(appId)
     )
 
 @blueprint.route('/macm-detailRisk', methods=['GET'])
 def macm_riskDetailed():
-    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
+    riskAnalysisCatalogUtils = ThreatAgentUtils()
     try:
         selected_macm = request.args.get('app_id')
         selected_id = request.args.get('id')
@@ -661,7 +668,7 @@ def macm_riskDetailed():
 
 @blueprint.route('/save_risk_evaluation', methods=['POST'])
 def save_risk_evaluation():
-    threatAgentUtils = RiskAnalysisCatalogUtils()
+    threatAgentUtils = ThreatAgentUtils()
     try:
         selected_macm = request.form.get('selected_macm')
         table = Macm.query.filter_by(App_ID=selected_macm).all()
