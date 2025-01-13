@@ -31,15 +31,15 @@ github_blueprint = make_github_blueprint(
 @oauth_authorized.connect_via(github_blueprint)
 def github_logged_in(blueprint, token):
     info = github.get("/user")
+    account_info = info.json()
 
     if info.ok:
 
-        account_info = info.json()
         username     = account_info["login"]
 
         query = Users.query.filter_by(oauth_github=username)
-        try:
 
+        try:
             user = query.one()
             login_user(user)
 
@@ -49,10 +49,14 @@ def github_logged_in(blueprint, token):
             user              = Users()
             user.username     = '(gh)' + username
             user.oauth_github = username
+            user.email        = account_info["email"]
 
             # Save current user
             db.session.add(user)
             db.session.commit()
 
             login_user(user)
+        
+        if user.email == None:
+            return redirect(url_for('authentication_blueprint.register_github'))
 

@@ -3,6 +3,8 @@ $(document).ready(function() {
 });
 
 function reloadDatabases(database) {
+    let button = '#Reload'+database;
+    $(button).find('.button-spinner').removeClass('d-none');
     $.ajax({
         url: '/api/reload_databases',
         type: 'POST',
@@ -11,8 +13,10 @@ function reloadDatabases(database) {
         }
     }).done(function(response) {
         showModal("Success", response, true);
+        $(button).find('.button-spinner').addClass('d-none');
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));
+        $(button).find('.button-spinner').addClass('d-none');
     });
 }
 

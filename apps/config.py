@@ -57,6 +57,7 @@ class Config(object):
     DBS_PATH                    = os.getenv('DBS_PATH'    , None)
     THREAT_CATALOG_FILE_NAME    = os.getenv('THREAT_CATALOG_FILE_NAME'    , None)
     URI_NEO4J                   = os.getenv('URI_NEO4J'    , None)
+    URI_NEO4J_WSS               = os.getenv('URI_NEO4J_WSS'    , None)
     USER_NEO4J                  = os.getenv('USER_NEO4J'    , None)
     PASS_NEO4J                  = os.getenv('PASS_NEO4J'    , None)
     TLS_NEO4J                   = os.getenv('TLS_NEO4J'    , None)

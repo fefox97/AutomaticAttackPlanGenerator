@@ -1,5 +1,6 @@
 import json
 import traceback
+from flask import app
 from stix2 import FileSystemStore, FileSystemSource
 import os
 import pandas as pd
@@ -13,7 +14,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import App, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 from flask_login import (
     current_user
 )
@@ -138,7 +139,7 @@ class MacmUtils:
         self.USER_NEO4J = os.getenv('USER_NEO4J'    , None)
         self.PASS_NEO4J = os.getenv('PASS_NEO4J'    , None)
 
-        self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J))
+        self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J), initial_retry_delay=10)
         self.driver.verify_connectivity()
 
     def clear_database(self, database):
@@ -204,7 +205,8 @@ class MacmUtils:
 
     def delete_macm_component(self, database, component_id):
         try:
-            Macm.query.filter_by(Component_ID=component_id).delete()
+            Macm.query.filter_by(App_ID=database, Component_ID=component_id).delete()
+            Attack.query.filter_by(AppID=database, ComponentID=component_id).delete()
             self.driver.execute_query(f"MATCH (asset {{component_id: '{component_id}'}}) DETACH DELETE asset", database_=database)
             db.session.commit()
             return True
@@ -218,6 +220,7 @@ class MacmUtils:
             if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
                 app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
                 raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
+            App.query.filter_by(AppID=app_id).delete()
             Macm.query.filter_by(App_ID=app_id).delete()
             MacmUser.query.filter_by(AppID=app_id).delete()
             Attack.query.filter_by(AppID=app_id).delete()
@@ -430,8 +433,8 @@ class Utils:
             macm_df = self.macm_utils.read_macm(database=neo4j_db)
             tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
             app_name = macm_df['Application'].iloc[0]
-            macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'AppName': app_name, 'IsOwner': True}, index=[0])
-            
+            macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'IsOwner': True}, index=[0])
+            app_df = pd.DataFrame({'AppID': neo4j_db, 'Name': app_name}, index=[0])
             macm_df['App_ID'] = neo4j_db
             tool_asset_type_df['AppID'] = neo4j_db
 
@@ -441,7 +444,9 @@ class Utils:
                     macm_df = macm_df[macm_df['Component_ID'] != component_id]
                     tool_asset_type_df = tool_asset_type_df[tool_asset_type_df['ComponentID'] != component_id]
                     macm_user_df = macm_user_df[macm_user_df['AppID'] != neo4j_db]
-
+            
+            if App.query.filter_by(AppID=neo4j_db).first() is None:
+                self.save_dataframe_to_database(app_df, App, replace=False)
             self.save_dataframe_to_database(macm_user_df, MacmUser, replace=False)
             self.save_dataframe_to_database(macm_df, Macm, replace=False)
             self.save_dataframe_to_database(tool_asset_type_df, Attack, replace=False)

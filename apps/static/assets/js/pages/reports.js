@@ -24,11 +24,12 @@ function deleteReportFile(macmID, componentID, toolID) {
     });
 }
 
-function parseReportFile(macmID, componentID, toolID, parser) {
+function parseReportFile(element, macmID, componentID, toolID, parser) {
     let formData = new FormData();
     formData.append('macmID', macmID);
     formData.append('componentID', componentID);
     formData.append('toolID', toolID);
+    $(element).find('.button-spinner').removeClass('d-none');
     $.ajax({
         url: '/api/' + parser,
         type: 'POST',
@@ -47,9 +48,11 @@ function parseReportFile(macmID, componentID, toolID, parser) {
                 $('#copyParserOutput').hide();
                 $('#executeParserOutput').hide();
             }
+            $(element).find('.button-spinner').addClass('d-none');
             $('#modalParserOutput').modal('show');
         },
         error: function(data) {
+            $(element).find('.button-spinner').addClass('d-none');
             showModal("Report Upload", "Error parsing the report.", autohide = true)
         }
     });

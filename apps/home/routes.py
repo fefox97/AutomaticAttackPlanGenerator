@@ -9,7 +9,7 @@ from apps.home import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
+from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
     Macm, ThreatModel, ToolCatalogue, PentestPhases
 from sqlalchemy import func
 from apps.my_modules import converter
@@ -92,7 +92,8 @@ def penetration_tests():
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
-        pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
+        # pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
+        pentests = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), MacmUser.IsOwner).all()
         if len(pentests) == 0:
             pentests = None
     except Exception as error:
@@ -107,6 +108,7 @@ def macm():
         selected_macm = request.args.get('app_id')
         if selected_macm is None or MacmUser.query.filter_by(AppID=selected_macm).count() == 0:
             raise NotFound('MACM not found')
+        app_info = App.query.filter_by(AppID=selected_macm).first()
         reports = AttackView.query.filter_by(AppID=selected_macm).with_entities(AttackView.Attack_Number, AttackView.Tool_ID, AttackView.Tool_Name, AttackView.Attack_Pattern, AttackView.Capec_ID, AttackView.Threat_ID, AttackView.Asset_Type, AttackView.Threat, AttackView.Component_ID, AttackView.Asset, AttackView.AppID, AttackView.ReportFiles, AttackView.Report_Parser).where(AttackView.ReportFiles.isnot(None)).distinct().all()
         extra_components = MacmUtils().add_extra_components(selected_macm)
         table = Macm.query.filter_by(App_ID=selected_macm).all()
@@ -119,7 +121,7 @@ def macm():
         threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
         threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
         neo4j_params = {
-            "uri": app.config['URI_NEO4J'],
+            "uri": app.config['URI_NEO4J_WSS'],
             "user": app.config['USER_NEO4J'],
             "password": app.config['PASS_NEO4J'],
             "encrypted": app.config['TLS_NEO4J']
@@ -130,7 +132,7 @@ def macm():
     except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         raise Exception('Exception occurred while trying to serve ' + request.path)
-    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params)
+    return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @login_required

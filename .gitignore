@@ -42,3 +42,11 @@ apps/static/uploads/
 apps/static/assets/dbs/ThreatCatalogComplete.xlsx
 
 *.sql
+neo4j/*
+docker-compose.yml
+.docker-env
+
+# nginx certificates to be generated
+certs/*
+# nginx dhparam file to be generated
+nginx/dhparam.pem

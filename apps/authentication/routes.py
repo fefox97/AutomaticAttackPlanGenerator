@@ -9,13 +9,15 @@ from flask_login import (
     login_user,
     logout_user
 )
+from flask import current_app as app
 
 from flask_dance.contrib.github import github
 
 from apps import db, login_manager
 from apps.authentication import blueprint
-from apps.authentication.forms import LoginForm, CreateAccountForm
+from apps.authentication.forms import LoginForm, CreateAccountForm, GithubForm
 from apps.authentication.models import Users
+
 
 from apps.authentication.util import verify_pass
 
@@ -33,6 +35,20 @@ def login_github():
 
     res = github.get("/user")
     return redirect(url_for('home_blueprint.index'))
+
+@blueprint.route("/register-github", methods=['GET', 'POST'])
+def register_github():
+    github_register_form = GithubForm(request.form)
+    if 'add_email' in request.form:
+
+        email = request.form['email']
+        user = Users.query.filter_by(username=current_user.username).first()
+        user.email = email
+        db.session.commit()
+        
+        return redirect(url_for('home_blueprint.index'))
+
+    return render_template('accounts/add-email.html', form=github_register_form)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():

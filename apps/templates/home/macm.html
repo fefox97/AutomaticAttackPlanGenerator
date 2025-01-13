@@ -30,8 +30,9 @@
     <div class="col-12">
 
         <div class="card border-0 shadow mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h4 mb-0">{{ table[0].Application if table is not none }} Penetration Test Plan</h2>
+            <div class="card-header">
+                <h4 class="mb-0">{{ app_info.Name if table is not none }} Penetration Test Plan</h2>
+                <span class="display-7 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
             </div>
             
             
@@ -50,7 +51,6 @@
                                     <th>Name</th>
                                     <th>Labels</th>
                                     <th>Type</th>
-                                    <th>App ID</th>
                                     <th>Parameters</th>
                                     <th>Action</th>
                                 </tr>
@@ -93,7 +93,6 @@
                                             {% endfor %}
                                         </td>
                                         <td>{{ row['Type'] }}</td>
-                                        <td>{{ row['App_ID'] }}</td>
                                         <td class="text-nowrap">
                                             {% if row['Parameters'] is not none %}
                                                 {% for key, parameter in row['Parameters'].items() %}
@@ -119,7 +118,6 @@
                                     <th>Name</th>
                                     <th>Labels</th>
                                     <th>Type</th>
-                                    <th>App ID</th>
                                     <th>Parameters</th>
                                     <th>Action</th>
                                 </tr>
@@ -184,8 +182,8 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script type="text/javascript">
-        var app_id = "{{table[0].App_ID if table is not none | tojson }}";
-        var app_name = "{{table[0].Application if table is not none | tojson }}";
+        var app_id = "{{app_info.AppID if app_info is not none | tojson }}";
+        var app_name = "{{app_info.Name if app_info is not none | tojson }}";
         var neo4j_params = JSON.parse('{{neo4j_params |tojson|safe }}');
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>

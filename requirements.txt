@@ -28,6 +28,7 @@ pandas
 numpy
 neo4j
 PyMySQL
+mysql-connector-python
 html2text
 openpyxl
 Flask-WTF

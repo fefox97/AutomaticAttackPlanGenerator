@@ -60,7 +60,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('macm_columns') === null) {    
-        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID', 'Action'];
+        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'Action'];
         localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('macm_columns'));
@@ -96,7 +96,7 @@ $(window).on('load', function() {
                 }
             },
             {
-                targets: [0, 1, 4, 5],
+                targets: [0, 1, 4],
                 searchPanes: {
                     show: false,
                 },
@@ -210,7 +210,7 @@ function drawNeo4j(database) {
     const configGraph = {
         containerId: "graph",
         serverDatabase: database,
-        consoleDebug: false,
+        consoleDebug: true,
         neo4j: {
             serverUrl: neo4j_params.uri,
             serverUser: neo4j_params.user,

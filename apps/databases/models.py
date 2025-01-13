@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint
+from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy.dialects import mysql
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
@@ -247,13 +247,16 @@ class Macm(db.Model):
 
     __tablename__ = 'Macm'
 
-    Component_ID    = db.Column(db.Integer, primary_key=True, nullable=False)
+    Id              = db.Column(db.Integer, primary_key=True, nullable=False)
+    Component_ID    = db.Column(db.Integer, nullable=False, index=True)
     Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
-    App_ID          = db.Column(db.String(100), ForeignKey("MacmUser.AppID", ondelete='CASCADE'), primary_key=True, nullable=False, index=True)
+    App_ID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), nullable=False, index=True)
     Labels          = db.Column(db.JSON)
     Parameters      = db.Column(db.JSON)
+
+    __table_args__ =  (UniqueConstraint('Component_ID', 'App_ID', name='uix_1'),)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -266,14 +269,33 @@ class Macm(db.Model):
         return str(self.Name)
     
 
+class App(db.Model):
+    
+    __tablename__ = 'App'
+
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False)
+    Name = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.Name)
+
 class MacmUser(db.Model):
 
     __tablename__ = 'MacmUser'
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
-    AppID          = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
+    AppID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), primary_key=True, nullable=False, index=True)
     IsOwner        = db.Column(db.Boolean)
-    AppName        = db.Column(db.Text)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -294,20 +316,19 @@ class MacmUser(db.Model):
     def ownerPerApp(self):
         result = self.query.with_entities(self.AppID, self.UserID).filter_by(IsOwner=True).all()
         return {app_id: user_id for app_id, user_id in result}
+    
 class Attack(db.Model):
 
     __tablename__ = 'Attack'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
     ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
-    ComponentID  = db.Column(db.Integer, ForeignKey("Macm.Component_ID", ondelete='CASCADE'))
-    AppID        = db.Column(db.String(100), ForeignKey("MacmUser.AppID", ondelete='CASCADE'))
+    ComponentID  = db.Column(db.Integer, nullable=False)
+    AppID        = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), nullable=False)
     Parameters   = db.Column(db.JSON)
     ReportFiles  = db.Column(db.JSON)
     
-    Component = db.relationship("Macm", backref="Attack")
     Tool = db.relationship("ToolCatalogue", backref="Attack")
-    App = db.relationship("MacmUser", backref="Attack")
 
     __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
@@ -363,9 +384,10 @@ class ThreatModel(db.Model):
                     Macm.Component_ID,
                     Macm.Name.label("Asset"), 
                     Macm.Parameters,
-                    Macm.App_ID.label("AppID")
+                    App.AppID
                 )
                 .select_from(Macm)
+                .join(App, Macm.App_ID==App.AppID)
                 .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
                 .add_columns(row_number_column),
                 db.metadata,
@@ -400,7 +422,7 @@ class AttackView(db.Model):
                     Macm.Component_ID, 
                     Macm.Name.label("Asset"), 
                     Attack.Parameters,
-                    Macm.App_ID.label("AppID"),
+                    App.AppID,
                     PentestPhases.PhaseID.label("PhaseID"),
                     PentestPhases.PhaseName.label("PhaseName"),
                     Attack.ReportFiles
@@ -411,6 +433,7 @@ class AttackView(db.Model):
                 .join(Capec)
                 .join(CapecToolRel)
                 .join(ToolCatalogue)
+                .join(App, Macm.App_ID==App.AppID)
                 .join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID))
                 .join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID)
                 .join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID)
@@ -433,8 +456,9 @@ class MethodologyView(db.Model):
                     MethodologyCatalogue.AssetType,
                     MethodologyCatalogue.Link,
                     Macm.Component_ID,
-                    Macm.App_ID.label("AppID")
+                    App.AppID
                 ).select_from(Macm)
+                .join(App, Macm.App_ID==App.AppID)
                 .join(MethodologyCatalogue, Macm.Type==MethodologyCatalogue.AssetType)
                 .add_columns(row_number_column),
                 db.metadata,

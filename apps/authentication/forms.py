@@ -29,3 +29,8 @@ class CreateAccountForm(FlaskForm):
     password = PasswordField('Password',
                                 id='pwd_create',
                                 validators=[DataRequired()])
+
+class GithubForm(FlaskForm):
+    email = StringField('Email',
+                        id='email_create',
+                        validators=[DataRequired(), Email()])

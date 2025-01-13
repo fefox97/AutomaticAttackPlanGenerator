@@ -48,7 +48,10 @@
                         <input type="text" class="form-control" id="uploadedReport" placeholder="No file uploaded" readonly value="{{ attack.ReportFiles.filename if attack.ReportFiles }}">
                         {% if attack.ReportFiles %}    
                             {% if attack.Report_Parser %}
-                                <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}', '{{ attack.Report_Parser }}')">Parse</button>
+                                <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile(this, '{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}', '{{ attack.Report_Parser }}')">
+                                    Parse
+                                    <span class="button-spinner d-none" role="status" aria-hidden="true"><span class="spinner-border spinner-border-sm" ></span></span>
+                                </button>
                             {% endif %}
                             <button type="button" class="btn btn-secondary" id="downloadReportFile" onclick="downloadReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}')"><i class="fas fa-download"></i> Download</button>
                             <button type="button" class="btn btn-danger" id="deleteReportFile" onclick="confirmDeleteReportFile('{{ attack.AppID }}', '{{ attack.Component_ID }}', '{{ attack.Tool_ID }}', '{{ attack.ReportFiles.filename }}')"><i class="fas fa-trash"></i> Delete</button>
