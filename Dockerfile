@@ -9,6 +9,7 @@ ENV DEBUG=True
 RUN mkdir /uploads
 
 RUN apt update
+RUN apt upgrade -y
 RUN apt install -y nmap
 
 COPY . .
