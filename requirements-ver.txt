@@ -1,23 +1,23 @@
-flask
-flask_login
-flask_migrate
-WTForms
-flask_wtf
+flask==2.0.2
+flask_login==0.5.0
+flask_migrate==3.1.0
+WTForms==3.0.1
+flask_wtf==1.0.0
 
-flask_sqlalchemy
-sqlalchemy
+flask_sqlalchemy==2.5.1
+sqlalchemy==1.4.36
 sqlalchemy_utils
 sqlalchemy_schemadisplay
 
-email_validator
+email_validator==1.1.3
 gunicorn
-jinja2
-flask-restx
-Werkzeug
-python-dotenv
-Flask-Minify
+jinja2==3.0.3
+flask-restx==0.5.1
+Werkzeug==2.0.3
+python-dotenv==0.19.2
+Flask-Minify==0.37
 Flask-Dance
-blinker
+blinker==1.4
 pyOpenSSL
 
 flask_admin
@@ -40,6 +40,8 @@ Flask-Assets
 libsass
 glob2
 
+Flask-Modals
+Flask-Modals-markupsafe
 
 neo4j==5.14.0
 

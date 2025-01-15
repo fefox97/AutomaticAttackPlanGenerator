@@ -11,19 +11,16 @@ from flask_admin import Admin
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
-from flask_modals import Modal
 from flask_assets import Environment, Bundle
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-modal = Modal()
 myAdmin = Admin()
 
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
-    modal.init_app(app)
     myAdmin.init_app(app)
 
 def clear_tmp(path):

@@ -6,15 +6,13 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 from flask import current_app as app 
 from flask_login import current_user, login_user
-from flask_dance.consumer import oauth_authorized
+from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.github import github, make_github_blueprint
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
-from flask_dance.contrib.twitter import twitter, make_twitter_blueprint
 from sqlalchemy.orm.exc import NoResultFound
 from apps.config import Config
 from .models import Users, db, OAuth
 from flask import redirect, url_for
-from flask import flash
 
 github_blueprint = make_github_blueprint(
     client_id=Config.GITHUB_ID,
@@ -25,7 +23,7 @@ github_blueprint = make_github_blueprint(
         db.session,
         user=current_user,
         user_required=False,        
-    ),   
+    ),
 )
 
 @oauth_authorized.connect_via(github_blueprint)
@@ -60,3 +58,6 @@ def github_logged_in(blueprint, token):
         if user.email == None:
             return redirect(url_for('authentication_blueprint.register_github'))
 
+@oauth_error.connect_via(github_blueprint)
+def github_error(blueprint, error, error_description=None, error_uri=None):
+    return "Error: {0}".format(error_description)
