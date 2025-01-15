@@ -38,6 +38,7 @@ def capec():
             standard_attack_pattern_number = None
             detailed_attack_pattern_number = None
     except:
+        app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         table = None
         meta_attack_pattern_number = None
         standard_attack_pattern_number = None

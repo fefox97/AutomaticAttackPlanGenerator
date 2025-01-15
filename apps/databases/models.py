@@ -109,10 +109,12 @@ class Capec(db.Model):
     @hybrid_property
     def abstraction_order(self):
         table_ordering = case(
-                whens={"Meta":1, "Standard":2, "Detailed": 3},
-                value=Capec.Abstraction
+            (Capec.Abstraction == "Meta", 1),
+            (Capec.Abstraction == "Standard", 2),
+            (Capec.Abstraction == "Detailed", 3),
+            else_=None
         )
-        return (table_ordering)
+        return table_ordering
     
 class ThreatCatalogue(db.Model):
 
