@@ -12,7 +12,7 @@ from apps.api.utils import APIUtils
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import inspect, select, func, and_
+from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import App, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 from flask_login import (
@@ -315,13 +315,13 @@ class Utils:
         if inspect(self.engine).has_table(mapper.__tablename__):
             if replace:
                 if self.engine.name != 'sqlite':
-                    session.execute('SET FOREIGN_KEY_CHECKS=0')
+                    session.execute(text(f"SET FOREIGN_KEY_CHECKS=0"))
                     session.commit()
                 # mapper.__table__.drop(self.engine)
-                DropTable(mapper.__table__).execute(self.engine)
+                session.query(mapper).delete()
                 session.commit()
                 if self.engine.name != 'sqlite':
-                    session.execute('SET FOREIGN_KEY_CHECKS=1')
+                    session.execute(text(f"SET FOREIGN_KEY_CHECKS=1"))
                     session.commit()
         mapper.metadata.create_all(self.engine)
         session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=False)
