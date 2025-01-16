@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import time
 from flask import render_template, redirect, request, url_for
 from flask_login import (
     current_user,
@@ -15,11 +16,11 @@ from flask_dance.contrib.github import github
 
 from apps import db, login_manager
 from apps.authentication import blueprint
-from apps.authentication.forms import LoginForm, CreateAccountForm, GithubForm
+from apps.authentication.forms import LoginForm, CreateAccountForm, GithubForm, ResetPasswordForm, ResetPasswordRequestForm
 from apps.authentication.models import Users
 
 
-from apps.authentication.util import verify_pass
+from apps.authentication.util import send_reset_password_email, verify_pass
 
 @blueprint.route('/')
 def route_default():
@@ -125,6 +126,61 @@ def logout():
     logout_user()
     return redirect(url_for('authentication_blueprint.login'))
 
+
+@blueprint.route('/reset-password-request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('home_blueprint.index'))
+    
+    reset_password_form = ResetPasswordRequestForm(request.form)
+    if 'reset' in request.form:
+
+        email = request.form['email']
+        user = Users.query.filter_by(email=email).first()
+
+        if user:
+            app.logger.info(time.time())
+            app.logger.info(user.updated_on.timestamp())
+            time_since_last_reset = time.time() - user.updated_on.timestamp()
+            reset_password_limit = int(app.config['RESET_PASSWORD_LIMIT'])
+            if time_since_last_reset < reset_password_limit:
+                delta_time = int((reset_password_limit - time_since_last_reset) / 60)+1
+                return render_template('accounts/reset-password-request.html',
+                                        msg=f'Please wait {delta_time} minutes before requesting another password reset',
+                                        success=False,
+                                        form=reset_password_form)
+            # send email
+            app.logger.info('Reset password for user %s', user.username)
+            send_reset_password_email(user)
+        else:
+            app.logger.info('Email does not exist %s', email)
+        
+        return render_template('accounts/reset-password-request.html',
+                                msg='Password reset link was sent to your email address if it exists',
+                                success=True,
+                                form=reset_password_form)
+
+    return render_template('accounts/reset-password-request.html', form=reset_password_form)
+
+@blueprint.route('/reset-password/<token>/<int:user_id>', methods=['GET', 'POST'])
+def reset_password(token, user_id):
+    if current_user.is_authenticated:
+        return redirect(url_for('home_blueprint.index'))
+
+    user = Users.validate_reset_password_token(token, user_id)
+    if not user:
+        return render_template('accounts/reset-password.html', msg='Invalid or expired token', form=None)
+    
+    reset_password_form = ResetPasswordForm(request.form)
+    if 'reset' in request.form and reset_password_form.validate_on_submit():
+
+        password = request.form['password']
+        user.update_password(password)
+        db.session.commit()
+
+        return render_template('accounts/reset-password.html', msg='Password updated successfully', form=None)
+    
+    return render_template('accounts/reset-password.html', form=reset_password_form)
 
 # Errors
 

@@ -49,3 +49,5 @@ python-nmap
 # psycopg2-binary
 
 atlassian-python-api
+
+Flask-Mailman

@@ -24,6 +24,17 @@ class Config(object):
     if not SECRET_KEY:
         SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
 
+    # Set up the Mail Server
+    MAIL_SERVER   = os.getenv('MAIL_SERVER', None)
+    MAIL_PORT     = os.getenv('MAIL_PORT', None)
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', None)
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', None)
+    MAIL_USE_TLS  = os.getenv('MAIL_USE_TLS', None)
+    MAIL_USE_SSL  = os.getenv('MAIL_USE_SSL', None)
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', None)
+    MAIL_BACKEND = os.getenv('MAIL_BACKEND', None)
+    RESET_PASSWORD_LIMIT = os.getenv('RESET_PASSWORD_LIMIT', 350)
+
     # Set up the App JIRA
     JIRA_URL  = os.getenv('JIRA_URL', None)
     JIRA_PROJECT  = os.getenv('JIRA_PROJECT', None)

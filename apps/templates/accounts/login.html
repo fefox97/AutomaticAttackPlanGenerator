@@ -64,11 +64,11 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="remember">
                                             <label class="form-check-label mb-0" for="remember">
-                                              Remember me
+                                                Remember me
                                             </label>
                                         </div>
                                         <div>
-                                            <a href="{{ url_for('authentication_blueprint.register') }}" class="fw-bold text-right">Register</a>
+                                            <a href="{{ url_for('authentication_blueprint.reset_password_request') }}" class="">Forgot Password?</a>
                                         </div>
                                     </div>
                                 </div>
@@ -76,7 +76,7 @@
                                     <button type="submit" name="login" class="btn btn-gray-800">Sign IN</button>
                                 </div>
                             </form>
-                            <br />
+                            <br/>
                             
                             {% if config.SOCIAL_AUTH_GITHUB %}
                                 <div class="mt-3 mb-4 text-center">
@@ -91,7 +91,9 @@
                                     </a>
                                 </div>
                             {% endif %}    
-
+                            <div class="text-center mt-2">
+                                Don't have an account? <a href="{{ url_for('authentication_blueprint.register') }}" class="fw-bold text-right">Register</a>
+                            </div>
                         </div>
                     </div>
                 </div>

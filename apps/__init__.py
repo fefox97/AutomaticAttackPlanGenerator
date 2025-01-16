@@ -13,15 +13,18 @@ from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from flask_assets import Environment, Bundle
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_mailman import Mail
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 myAdmin = Admin()
+mail = Mail()
 
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
     myAdmin.init_app(app)
+    mail.init_app(app)
 
 def clear_tmp(path):
     for root, dirs, files in os.walk(path):
