@@ -19,7 +19,7 @@ class Users(db.Model, UserMixin):
     id            = db.Column(db.Integer, primary_key=True)
     username      = db.Column(db.String(64), unique=True)
     email         = db.Column(db.String(64), unique=True)
-    password      = db.Column(db.String(255), nullable=False)
+    password      = db.Column(db.String(255))
     active        = db.Column(db.Boolean, default=True, nullable=False)
     created_on    = db.Column(db.DateTime, default=db.func.now())
     updated_on    = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
