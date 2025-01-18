@@ -3,6 +3,9 @@ flask_login
 flask_migrate
 WTForms
 flask_wtf
+Flask-Security-Too
+argon2_cffi
+Authlib
 
 flask_sqlalchemy
 sqlalchemy

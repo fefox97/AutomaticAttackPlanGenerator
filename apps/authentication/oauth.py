@@ -3,20 +3,21 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import os
+from datetime import datetime
 from flask import current_app as app 
-from flask_login import current_user, login_user
+from flask_security import current_user, login_user
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.github import github, make_github_blueprint
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import or_
 from apps.config import Config
 from .models import Users, db, OAuth
 from flask import redirect, url_for
 
 github_blueprint = make_github_blueprint(
-    client_id=Config.GITHUB_ID,
-    client_secret=Config.GITHUB_SECRET,
+    client_id=Config.GITHUB_CLIENT_ID,
+    client_secret=Config.GITHUB_CLIENT_SECRET,
     scope = 'user',
     storage=SQLAlchemyStorage(
         OAuth,
@@ -29,33 +30,31 @@ github_blueprint = make_github_blueprint(
 @oauth_authorized.connect_via(github_blueprint)
 def github_logged_in(blueprint, token):
     info = github.get("/user")
+    email_info = github.get("/user/emails")
     account_info = info.json()
 
     if info.ok:
 
-        username     = account_info["login"]
+        username = account_info["login"]
+        email = email_info.json()[0]["email"]
 
-        query = Users.query.filter_by(oauth_github=username)
+        query = Users.query.filter_by(email=email)
 
         try:
             user = query.one()
             login_user(user)
 
         except NoResultFound:
-
-            # Save to db
-            user              = Users()
-            user.username     = '(gh)' + username
-            user.oauth_github = username
-            user.email        = account_info["email"]
-
-            # Save current user
-            db.session.add(user)
-            db.session.commit()
-
+            user = app.user_datastore.create_user(
+                username=username,
+                email=email,
+                confirmed_at=datetime.now(),
+                password=None
+            )
+            app.user_datastore.commit()
             login_user(user)
-        
-        if user.email == None:
+
+        if email is None:
             return redirect(url_for('authentication_blueprint.register_github'))
 
 @oauth_error.connect_via(github_blueprint)

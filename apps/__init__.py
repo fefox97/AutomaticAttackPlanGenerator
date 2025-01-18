@@ -8,21 +8,22 @@ import re
 
 from flask import Flask
 from flask_admin import Admin
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from flask_assets import Environment, Bundle
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mailman import Mail
+from flask_security import Security, SQLAlchemyUserDatastore, user_registered
 
 db = SQLAlchemy()
-login_manager = LoginManager()
+security = Security()
 myAdmin = Admin()
 mail = Mail()
+user_datastore = None
 
-def register_extensions(app):
+def register_extensions(app, user_datastore):
     db.init_app(app)
-    login_manager.init_app(app)
+    security.init_app(app, datastore=user_datastore)
     myAdmin.init_app(app)
     mail.init_app(app)
 
@@ -47,11 +48,13 @@ def register_blueprints(app):
     for module_name in ('authentication', 'home', 'api', 'risk_analysis'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
+    app.register_blueprint(github_blueprint, url_prefix="/login")
 
 def register_error_handlers(app):
     module = import_module('apps.errors.routes')
     app.register_error_handler(404, module.page_not_found)
     app.register_error_handler(500, module.internal_server_error)
+    app.register_error_handler(403, module.access_forbidden)
 
 def register_custom_filters(app):
     @app.template_filter('regex_replace')
@@ -69,7 +72,7 @@ def register_custom_filters(app):
         out_dict = MyDict(in_dict)
         return s.format_map(out_dict)
 
-from apps.authentication.models import Users
+from apps.authentication.models import Roles, Users
 from apps.databases.models import App, Macm, Capec, MacmUser, Attack, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
 from apps.admin.views import MyModelView, ToolCatalogueView
 from flask_admin.menu import MenuLink
@@ -79,6 +82,7 @@ def configure_admin(app):
     myAdmin.base_template = 'admin/index.html'
     myAdmin.add_link(MenuLink(name='Back Home', url='/'))
     myAdmin.add_view(MyModelView(Users, db.session, name='Users'))
+    myAdmin.add_view(MyModelView(Roles, db.session, name='Roles'))
     myAdmin.add_view(MyModelView(App, db.session, name='App'))
     myAdmin.add_view(MyModelView(Macm, db.session, name='MACM'))
     myAdmin.add_view(MyModelView(Capec, db.session, name='CAPEC'))
@@ -88,6 +92,20 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue'))
     myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases'))
+
+def configure_roles(app):
+    @app.before_request
+    def create_roles():
+        app.user_datastore.find_or_create_role(name='admin', description='Administrator')
+        app.user_datastore.find_or_create_role(name='end-user', description='User')
+        app.user_datastore.find_or_create_role(name='editor', description='Editor')
+        db.session.commit()
+        user_registered.connect_via(app)(user_registered_sighandler)
+    
+    def user_registered_sighandler(app, user, **extra):
+        default_role = app.user_datastore.find_role("end-user")
+        app.user_datastore.add_role_to_user(user, default_role)
+        app.user_datastore.commit()
 
 def configure_database(app):
 
@@ -115,18 +133,21 @@ from apps.authentication.oauth import github_blueprint
 def create_app(config):
     app = Flask(__name__)
     app.config.from_object(config)
-    register_extensions(app)
+
+    user_datastore = SQLAlchemyUserDatastore(db, Users, Roles)
+    app.user_datastore = user_datastore
+    
+    register_extensions(app, user_datastore)
     register_blueprints(app)
     register_error_handlers(app)
     register_assets(app)
     register_custom_filters(app)
-
-    app.register_blueprint(github_blueprint, url_prefix="/login") 
-
+    
     configure_database(app)
     configure_admin(app)
-    
-    app.wsgi_app = ProxyFix(app.wsgi_app)    
+    configure_roles(app)
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=3)    
     
     clear_tmp(app.config['TMP_FOLDER'])
     return app
