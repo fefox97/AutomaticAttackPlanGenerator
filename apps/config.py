@@ -13,6 +13,33 @@ class Config(object):
     # Load .env file
     load_dotenv()
 
+    # Flask Security
+    USERS_ROLES  = {
+        'USER': {
+            'name': 'User',
+            'permissions': { 'user-read', 'user-write' }
+        },
+        'ADMIN': {
+            'name': 'Admin',
+            'permissions': { 'admin-read', 'admin-write' }
+        },
+    }
+
+    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT", '146585145368132386173505678016728509634')
+    SECURITY_EMAIL_VALIDATOR_ARGS = {"check_deliverability": False}
+    SECURITY_REGISTERABLE = os.getenv('SECURITY_REGISTERABLE', True)
+    SECURITY_CONFIRMABLE = os.getenv('SECURITY_CONFIRMABLE', True)
+    SECURITY_RECOVERABLE = os.getenv('SECURITY_RECOVERABLE', True)
+    SECURITY_CHANGEABLE = os.getenv('SECURITY_CHANGEABLE', True)
+    SECURITY_SEND_REGISTER_EMAIL = os.getenv('SECURITY_SEND_REGISTER_EMAIL', True)
+    SECURITY_DEFAULT_REMEMBER_ME = os.getenv('SECURITY_DEFAULT_REMEMBER_ME', True)
+    SECURITY_POST_LOGIN_VIEW = os.getenv('SECURITY_POST_LOGIN_VIEW', 'index')
+    SECURITY_POST_REGISTER_VIEW = os.getenv('SECURITY_POST_REGISTER_VIEW', 'login')
+    SECURITY_POST_LOGOUT_VIEW = os.getenv('SECURITY_POST_LOGOUT_VIEW', 'login')
+    SECURITY_USERNAME_ENABLE = os.getenv('SECURITY_USERNAME_ENABLE', True)
+    SECURITY_USERNAME_REQUIRED = os.getenv('SECURITY_USERNAME_REQUIRED', True)
+    SECURITY_TRACKABLE = os.getenv('SECURITY_TRACKABLE', True)
+
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', f'{basedir}/static/uploads')
@@ -45,11 +72,11 @@ class Config(object):
     # Social AUTH context
     SOCIAL_AUTH_GITHUB  = False
 
-    GITHUB_ID      = os.getenv('GITHUB_ID'    , None)
-    GITHUB_SECRET  = os.getenv('GITHUB_SECRET', None)
+    GITHUB_CLIENT_ID      = os.getenv('GITHUB_ID'    , None)
+    GITHUB_CLIENT_SECRET  = os.getenv('GITHUB_SECRET', None)
 
     # Enable/Disable Github Social Login    
-    if GITHUB_ID and GITHUB_SECRET:
+    if GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET:
         SOCIAL_AUTH_GITHUB  = True        
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

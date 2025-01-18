@@ -8,14 +8,17 @@ from datetime import datetime
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
-from flask_login import login_required, current_user
+
+# from flask_login import login_required, current_user
+from flask_security import auth_required, current_user
+
 from flask import current_app as app
 from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
 from apps import db
 
-
+from flask_security import auth_required
 
 # Helper - Extract current page name from request
 def get_segment(request):
@@ -28,7 +31,7 @@ def get_segment(request):
         return None
 
 @blueprint.route('/macm_riskRating', methods=['GET'])
-@login_required
+@auth_required()
 def macm_riskRating():
     riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     try:
@@ -53,7 +56,7 @@ def macm_riskRating():
                             stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm))
 
 @blueprint.route('/', methods=['GET'])
-@login_required
+@auth_required()
 def risk_analysis():
     try:
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
@@ -73,7 +76,7 @@ def risk_analysis():
 
 
 @blueprint.route('/threat-agent-wizard', methods=['GET'])
-@login_required
+@auth_required()
 def threat_agent_wizard():
     context = {}
     appId = request.args.get('app_id')
@@ -138,7 +141,7 @@ def threat_agent_wizard():
     )
 
 @blueprint.route('/submit-questionnaire', methods=['POST'])
-@login_required
+@auth_required()
 def submit_questionnaire():
     if request.method == 'POST':
         riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
@@ -224,7 +227,7 @@ def submit_questionnaire():
 
 
 @blueprint.route('/threat_agent_evaluation', methods=['POST'])
-@login_required
+@auth_required()
 def threat_agent_evaluation():
     """
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
@@ -422,7 +425,7 @@ def threat_agent_evaluation():
 
 
 @blueprint.route('/stride-impact-rating', methods=['GET'])
-@login_required
+@auth_required()
 def stride_impact_rating():
     """
     Endpoint to evaluate STRIDE impact for a given application.
@@ -438,7 +441,7 @@ def stride_impact_rating():
     )
 
 @blueprint.route('/stride_impact_evaluation', methods=['POST'])
-@login_required
+@auth_required()
 def stride_impact_evaluation():
     riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     """

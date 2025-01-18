@@ -7,7 +7,7 @@ from datetime import datetime
 from apps.authentication.models import Users
 from apps.home import blueprint
 from flask import redirect, render_template, request, url_for, jsonify
-from flask_login import login_required, current_user
+# from flask_login import login_required, current_user
 from flask import current_app as app
 from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
     Macm, ThreatModel, ToolCatalogue, PentestPhases
@@ -17,15 +17,17 @@ import os
 import time
 from werkzeug.exceptions import NotFound
 
+from flask_security import auth_required, current_user, roles_required
+
 from apps.my_modules.utils import MacmUtils
 
 @blueprint.route('/index')
-@login_required
+@auth_required()
 def index():
     return redirect(url_for('home_blueprint.penetration_tests'))
 
 @blueprint.route('/capec', methods=['GET'])
-@login_required
+@auth_required()
 def capec():
     try:
         table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
@@ -46,14 +48,14 @@ def capec():
     return render_template(f"home/capec.html", segment=get_segment(request), table=table, meta_attack_pattern_number=meta_attack_pattern_number, standard_attack_pattern_number=standard_attack_pattern_number, detailed_attack_pattern_number=detailed_attack_pattern_number)
 
 @blueprint.route('/capec-detail', methods=['GET'])
-@login_required
+@auth_required()
 def capec_detail():
     selected_id = request.args.get('id')
     selected_attack_pattern = Capec.query.filter_by(Capec_ID=selected_id).first()
     return render_template(f"home/capec-detail.html", segment=get_segment(request), data=selected_attack_pattern)
 
 @blueprint.route('/threat-catalog', methods=['GET'])
-@login_required
+@auth_required()
 def threat_catalog():
     try:
         table = ThreatCatalogue.query.all()
@@ -64,7 +66,7 @@ def threat_catalog():
     return render_template(f"home/threat-catalog.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/tools', methods=['GET'])
-@login_required
+@auth_required()
 def tools():
     try:
         table = ToolCatalogue.query.all()
@@ -75,7 +77,7 @@ def tools():
     return render_template(f"home/tools.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/methodologies', methods=['GET'])
-@login_required
+@auth_required()
 def methodologies():
     try:
         table = MethodologyCatalogue.query.all()
@@ -86,7 +88,7 @@ def methodologies():
     return render_template(f"home/methodologies.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/penetration-tests', methods=['GET'])
-@login_required
+@auth_required()
 def penetration_tests():
     try:
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
@@ -103,7 +105,7 @@ def penetration_tests():
     return render_template(f"home/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
 @blueprint.route('/macm', methods=['GET','POST'])
-@login_required
+@auth_required()
 def macm():
     try:
         selected_macm = request.args.get('app_id')
@@ -136,7 +138,7 @@ def macm():
     return render_template(f"home/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info)
 
 @blueprint.route('/macm-detail', methods=['GET'])
-@login_required
+@auth_required()
 def macm_detail():
     selected_macm = request.args.get('app_id')
     selected_id = request.args.get('id')
@@ -149,7 +151,8 @@ def macm_detail():
     return render_template(f"home/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
 
 @blueprint.route('/settings', methods=['GET'])
-@login_required
+@auth_required()
+@roles_required('editor')
 def settings():
     excel_file = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config['DBS_PATH']
@@ -160,11 +163,6 @@ def settings():
     except:
         last_modified = None
     return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified)
-
-@blueprint.route('/support', methods=['GET'])
-@login_required
-def support():
-    return render_template(f"home/support.html", segment=get_segment(request))
 
 # Helper - Extract current page name from request
 def get_segment(request):

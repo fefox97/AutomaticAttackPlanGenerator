@@ -55,9 +55,9 @@ function enableTab() {
 }
 
 function sendSupportRequest() {
-    let issue = $('#issue').val();
-    let subject = $('#subject').val();
-    let email = $('#email').val();
+    let issue = $('#supportIssue').val();
+    let subject = $('#supportSubject').val();
+    let email = $('#supportEmail').val();
     $.ajax({
         url: '/api/issue',
         type: 'POST',
@@ -75,9 +75,35 @@ function sendSupportRequest() {
             showModal('Support Request', response);
         }
     });
-    $('#issue').val('');
-    $('#subject').val('');
-    $('#email').val('');
+    $('#supportIssue').val('');
+    $('#supportSubject').val('');
+    $('#supportEmail').val('');
+}
+
+function sendTicket() {
+    let issue = $('#ticketIssue').val();
+    let subject = $('#ticketSubject').val();
+    let email = $('#ticketEmail').val();
+    $.ajax({
+        url: '/api/ticket',
+        type: 'POST',
+        data: {
+            issue: issue,
+            subject: subject,
+            email: email
+        },
+        success: function(response) {
+            $('#ticketModal').modal('hide');
+            showModal('Ticket', response);
+        },
+        error: function(response) {
+            $('#ticketModal').modal('hide');
+            showModal('Ticket', response);
+        }
+    });
+    $('#ticketIssue').val('');
+    $('#ticketSubject').val('');
+    $('#ticketEmail').val('');
 }
 
 $(document).ready(function() {

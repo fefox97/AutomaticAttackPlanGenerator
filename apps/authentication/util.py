@@ -14,7 +14,6 @@ from apps import mail
 
 from flask import current_app as app
 
-from flask_mailman import EmailMessage
 
 # Inspiration -> https://www.vitoshacademy.com/hashing-passwords-in-python/
 
