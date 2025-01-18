@@ -15,9 +15,10 @@ import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import App, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
-from flask_login import (
-    current_user
-)
+
+# from flask_login import current_user
+from flask_security import current_user
+
 from apps.config import Config
 from sqlalchemy_schemadisplay import create_schema_graph
 from sqlalchemy.schema import DropTable

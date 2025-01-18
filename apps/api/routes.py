@@ -10,17 +10,20 @@ import uuid
 
 from atlassian import Jira
 from apps.api import blueprint
-from flask import request, send_file, make_response
-from flask_login import current_user
+from flask import render_template_string, request, send_file, make_response
+from flask_security import auth_required, current_user, roles_required
 from flask import current_app as app
 from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
 from apps.databases.models import Attack, ToolCatalogue
-from apps import db
+from apps import db, mail
 from sqlalchemy.sql.expression import null
 
+from apps.templates.mail.report_issue import report_issue_html_content
+
+@auth_required
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
     search_id = request.form.get("SearchID") or ''
@@ -29,6 +32,7 @@ def search_capec_by_id():
     children = AttackPatternAPIUtils().get_child_attack_patterns(search_id_conv, show_tree=showTree)
     return jsonify({'children': children})
 
+@auth_required
 @blueprint.route('/search_capec_by_keyword', methods=['POST'])
 def search_capec_by_keyword():
     search_keys = request.form.get("SearchKeyword")
@@ -40,6 +44,7 @@ def search_capec_by_keyword():
     result = AttackPatternAPIUtils().search_capec_by_keyword(search_keys, search_type)
     return jsonify({'ids': result})
 
+@auth_required
 @blueprint.route('/upload_macm', methods=['POST'])
 def upload_macm():
     if 'macmFile' in request.files and request.files['macmFile'].filename != '':
@@ -61,6 +66,7 @@ def upload_macm():
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
+@auth_required
 @blueprint.route('/update_macm', methods=['POST'])
 def update_macm():
     app_id = request.form.get('AppID')
@@ -75,6 +81,7 @@ def update_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
+@auth_required
 @blueprint.route('/delete_macm', methods=['POST'])
 def clear_macm():
     selected_macm = request.form.get('AppID')
@@ -85,6 +92,7 @@ def clear_macm():
     except Exception as error:
         return make_response(jsonify({'message': error.args}), 400)
 
+@auth_required
 @blueprint.route('/delete_macm_component', methods=['POST'])
 def delete_macm_component():
     app_id = request.form.get('AppID')
@@ -99,6 +107,7 @@ def delete_macm_component():
     else:
         return make_response(jsonify({'message': 'No MACM or component provided'}), 400)
 
+@auth_required
 @blueprint.route('/share_macm', methods=['POST'])
 def share_macm():
     app_id = request.form.get('AppID')
@@ -113,6 +122,7 @@ def share_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
+@auth_required
 @blueprint.route('/unshare_macm', methods=['POST'])
 def unshare_macm():
     app_id = request.form.get('AppID')
@@ -127,6 +137,7 @@ def unshare_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
+@auth_required
 @blueprint.route('/reload_databases', methods=['POST'])
 def reload_databases():
     database = request.form.get('database')
@@ -136,11 +147,13 @@ def reload_databases():
     else:
         return make_response(jsonify({'message': 'No database provided'}), 400)
 
+@auth_required
 @blueprint.route('/test', methods=['GET', 'POST'])
 def test():
     response = utils.test_function()
     return make_response(jsonify(response), 200)
 
+@auth_required
 @blueprint.route('/upload_excel', methods=['POST'])
 def upload_excel():
     if 'file' in request.files and request.files['file'].filename != '':
@@ -158,12 +171,14 @@ def upload_excel():
     else:
         return make_response(jsonify({'message': 'No file provided'}), 400)
 
+@auth_required
 @blueprint.route('/download_excel', methods=['POST'])
 def download_excel():
     filename = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config["DBS_PATH"]
     return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
 
+@auth_required
 @blueprint.route('/upload_report', methods=['POST'])
 def upload_report():
     if 'reportFile' in request.files and request.files['reportFile'].filename != '':
@@ -195,7 +210,8 @@ def upload_report():
     else:
         app.logger.error('No file provided')
         return make_response(jsonify({'message': 'No file provided'}), 400)
-    
+
+@auth_required
 @blueprint.route('/delete_report', methods=['POST'])
 def delete_report():
     macmID = request.form.get('macmID')
@@ -217,6 +233,7 @@ def delete_report():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
+@auth_required
 @blueprint.route('/download_report', methods=['POST'])
 def download_report():
     macmID = request.form.get('macmID')
@@ -230,6 +247,7 @@ def download_report():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
+@auth_required
 @blueprint.route('/download_all_reports', methods=['POST'])
 def download_all_reports():
     macmID = request.form.get('macmID')
@@ -246,6 +264,7 @@ def download_all_reports():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
+@auth_required
 @blueprint.route('/nmap/<string:parser>', methods=['POST'])
 def nmap(parser):
     macmID = request.form.get('macmID')
@@ -263,8 +282,10 @@ def nmap(parser):
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
-@blueprint.route('/issue', methods=['POST'])
-def issue():
+@auth_required
+@roles_required('admin')
+@blueprint.route('/ticket', methods=['POST'])
+def ticket():
     jira = Jira(url=app.config['JIRA_URL'], username=app.config['JIRA_USERNAME'], password=app.config['JIRA_API_KEY'], cloud=True)
     issue = request.form.get('issue')
     subject = request.form.get('subject')
@@ -287,3 +308,23 @@ def issue():
         app.logger.error(f"Error creating Jira issue: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
     return make_response(jsonify({'message': 'Report created successfully with ID ' + new_issue['key']}), 200)
+
+@auth_required
+@blueprint.route('/issue', methods=['POST'])
+def issue():
+    try:
+        issue = request.form.get('issue')
+        subject = request.form.get('subject')
+        email = request.form.get('email')
+        email_body = render_template_string(report_issue_html_content, subject=subject, user_email=email, issue=issue)
+        mail.send_mail(
+            from_email=app.config["MAIL_DEFAULT_SENDER"],
+            subject=f"Issue from {email}",
+            recipient_list=['issues@vseclab.it'],
+            message=email_body,
+            html_message=email_body,
+        )
+    except Exception as error:
+        app.logger.error(f"Error sending issue: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+    return make_response(jsonify({'message': 'Report created successfully'}), 200)

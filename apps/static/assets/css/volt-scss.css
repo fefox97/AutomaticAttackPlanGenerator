@@ -16286,13 +16286,16 @@ a.badge:hover {
     width: 2rem;
     height: 2rem; }
 
-.btn-upgrade-pro {
+.sidebar-support-btn {
+  width: 190px; }
+
+.sidebar-support {
   position: fixed;
   bottom: 15px;
   right: 15px;
   width: 190px; }
   @media (min-width: 768px) {
-    .btn-upgrade-pro {
+    .sidebar-support {
       left: 35px; } }
 .btn-primary:hover {
   background-color: #161d27;
