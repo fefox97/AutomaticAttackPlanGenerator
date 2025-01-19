@@ -7,6 +7,8 @@ from apps.account.forms import DeleteAccountForm
 from apps import db
 from flask import current_app as app
 
+from apps.authentication.util import send_account_deleted_email
+
 @blueprint.route('/profile', methods=['GET'])
 @auth_required()
 def profile():
@@ -19,6 +21,7 @@ def delete_account():
     if delete_account_form.validate_on_submit():
         # Check if the password is correct
         if verify_password(delete_account_form.password.data, current_user.password):
+            send_account_deleted_email(current_user)
             app.user_datastore.delete_user(current_user)
             app.user_datastore.commit()
             return redirect(url_for('security.logout'))

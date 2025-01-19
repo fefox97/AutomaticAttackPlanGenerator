@@ -20,3 +20,15 @@ def send_welcome_email(user):
         message=render_template('security/email/welcome_github.html', user=user),
         html_message=render_template('security/email/welcome_github.html', user=user)
     )
+
+def send_account_deleted_email(user):
+    """
+    Send account delete email to the user
+    """
+    mail.send_mail(
+        from_email=app.config["MAIL_DEFAULT_SENDER"],
+        subject="Account Deleted",
+        recipient_list=[user.email],
+        message=render_template('security/email/account_deleted.html', user=user),
+        html_message=render_template('security/email/account_deleted.html', user=user)
+    )
