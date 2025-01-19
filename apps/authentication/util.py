@@ -9,7 +9,6 @@ import binascii
 
 from flask import render_template_string, url_for
 
-from apps.templates.accounts.reset_password_email_content import reset_password_email_html_content
 from apps import mail
 
 from flask import current_app as app
@@ -41,33 +40,3 @@ def verify_pass(provided_password, stored_password):
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_password
 
-def send_reset_password_email(user):
-    reset_password_url = url_for(
-        "authentication_blueprint.reset_password",
-        token=user.generate_reset_password_token(),
-        user_id=user.id,
-        _external=True,
-    )
-
-    app.logger.info(f"User email: {user.email}")
-
-    email_body = render_template_string(
-        reset_password_email_html_content, reset_password_url=reset_password_url
-    )
-
-    mail.send_mail(
-        from_email=app.config["MAIL_DEFAULT_SENDER"],
-        subject="Reset your password",
-        recipient_list=[user.email],
-        message=email_body,
-        html_message=email_body,
-    )
-
-    # message = EmailMessage(
-    #     subject="Reset your password",
-    #     body=email_body,
-    #     to=[user.email],
-    # )
-    # message.content_subtype = "html"
-
-    # message.send()

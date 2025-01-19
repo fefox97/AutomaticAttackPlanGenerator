@@ -2,12 +2,10 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-from datetime import datetime
 
 from apps.authentication.models import Users
 from apps.home import blueprint
-from flask import redirect, render_template, request, url_for, jsonify
-# from flask_login import login_required, current_user
+from flask import redirect, render_template, request, url_for
 from flask import current_app as app
 from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
     Macm, ThreatModel, ToolCatalogue, PentestPhases
