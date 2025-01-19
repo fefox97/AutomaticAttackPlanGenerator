@@ -4,13 +4,12 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from datetime import datetime
-from flask import current_app as app 
+from flask import current_app as app, abort
 from flask_security import current_user, login_user
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.github import github, make_github_blueprint
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import or_
 from apps.config import Config
 from .models import Users, db, OAuth
 from flask import redirect, url_for
@@ -38,12 +37,11 @@ def github_logged_in(blueprint, token):
         username = account_info["login"]
         email = email_info.json()[0]["email"]
 
-        query = Users.query.filter_by(email=email)
+        query = Users.query.filter_by(username=username)
 
         try:
             user = query.one()
             login_user(user)
-
         except NoResultFound:
             user = app.user_datastore.create_user(
                 username=username,

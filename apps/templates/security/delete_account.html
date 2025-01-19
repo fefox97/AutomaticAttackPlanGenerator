@@ -1,6 +1,6 @@
 {% extends "layouts/base-fullscreen.html" %}
 
-{% block title %} Add Email {% endblock %} 
+{% block title %} Delete Account {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,36 +19,49 @@
                         <div class="bg-gradient shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">
-                                    VSecLab - Add Email
+                                    VSecLab - Delete Account
                                 </h1>
-                                <br />
-                                <p>
-                                    {% if msg %}
-                                        <span class="text-danger">{{ msg | safe }}</span>
+                                <br/>
+                                <!-- print flask-security messages -->
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        {% for category, message in messages %}
+                                            <div class="alert alert-{{ category }}">
+                                                {{ message }}
+                                            </div>
+                                        {% endfor %}
                                     {% else %}
-                                        Please enter your email address
+                                    <p>
+                                        Are you sure you want to delete your account?
+                                    </p>
                                     {% endif %}                                     
-                                </p> 
+                                {% endwith %}
                             </div>
                             <form method="post" action="" class="mt-4">
                                 
-                                {{ form.hidden_tag() }}
+                                {{ delete_account_form.hidden_tag() }}
 
                                 <!-- Form -->
                                 <div class="form-group mb-4">
-                                    <label for="email">Email Address</label>
+                                    <label for="password">Password</label>
                                     <div class="input-group">
                                         <span class="input-group-text" id="basic-addon1">
-                                            <span class="fas fa-envelope"></span>
+                                            <span class="fas fa-lock"></span>
                                         </span>
-                                        {{ form.email(placeholder="Email Address", class="form-control") }}
-                                    </div>  
+                                        {{ delete_account_form.password(placeholder="Password", class="form-control") }}
+                                    </div>
+                                    {% for error in delete_account_form.password.errors %}
+                                        <li class="p-1 small font-weight-bold text-danger">{{ error }}</li>
+                                    {% endfor %}
                                 </div>
                                 <!-- End of Form -->
                                 <div class="d-grid">
-                                    <button type="submit" name="add_email" class="btn btn-gray-800">Add Email</button>
+                                    <button type="submit" class="btn btn-danger btn-dark">Delete Account</button>
                                 </div>
                             </form>
+                            <div class="text-center mt-2">
+                                <a href="{{ url_for('home_blueprint.index') }}" class="fw-bold text-right">Back</a>
+                            </div>
                         </div>
                     </div>
                 </div>

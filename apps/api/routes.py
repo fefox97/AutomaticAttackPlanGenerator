@@ -21,7 +21,7 @@ from apps.databases.models import Attack, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 
-from apps.templates.mail.report_issue import report_issue_html_content
+from apps.templates.security.email.report_issue import report_issue_html_content
 
 @auth_required
 @blueprint.route('/search_capec_by_id', methods=['POST'])

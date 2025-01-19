@@ -1,6 +1,6 @@
 {% extends "layouts/base-fullscreen.html" %}
 
-{% block title %} Reset Password {% endblock %} 
+{% block title %} Change Email {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,20 +19,27 @@
                         <div class="bg-gradient shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">
-                                    VSecLab - Reset Password
+                                    VSecLab - Change Email
                                 </h1>
-                                <br />
-                                <p>
-                                    {% if msg %}
-                                        <span class="text-danger">{{ msg | safe }}</span>
+                                <br/>
+                                <!-- print flask-security messages -->
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                    {% if messages %}
+                                        {% for category, message in messages %}
+                                            <div class="alert alert-{{ category }}">
+                                                {{ message }}
+                                            </div>
+                                        {% endfor %}
                                     {% else %}
-                                        Please enter your email address
+                                    <p>
+                                        Add your new email address
+                                    </p>
                                     {% endif %}                                     
-                                </p> 
+                                {% endwith %}
                             </div>
                             <form method="post" action="" class="mt-4">
                                 
-                                {{ form.hidden_tag() }}
+                                {{ change_email_form.hidden_tag() }}
 
                                 <!-- Form -->
                                 <div class="form-group mb-4">
@@ -41,16 +48,19 @@
                                         <span class="input-group-text" id="basic-addon1">
                                             <span class="fas fa-envelope"></span>
                                         </span>
-                                        {{ form.email(placeholder="Email Address", class="form-control") }}
-                                    </div>  
+                                        {{ change_email_form.email(placeholder="Email Address", class="form-control") }}
+                                    </div>
+                                    {% for error in change_email_form.email.errors %}
+                                        <li class="p-1 small font-weight-bold text-danger">{{ error }}</li>
+                                    {% endfor %}
                                 </div>
                                 <!-- End of Form -->
                                 <div class="d-grid">
-                                    <button type="submit" name="reset" class="btn btn-gray-800">Reset Password</button>
+                                    <button type="submit" name="add_email" class="btn btn-gray-800">Change Email</button>
                                 </div>
                             </form>
                             <div class="text-center mt-2">
-                                Return to <a href="{{ url_for('authentication_blueprint.login') }}" class="fw-bold text-right">login</a>
+                                <a href="{{ url_for('home_blueprint.index') }}" class="fw-bold text-right">Back</a>
                             </div>
                         </div>
                     </div>

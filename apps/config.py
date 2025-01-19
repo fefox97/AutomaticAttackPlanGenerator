@@ -39,6 +39,8 @@ class Config(object):
     SECURITY_USERNAME_ENABLE = os.getenv('SECURITY_USERNAME_ENABLE', True)
     SECURITY_USERNAME_REQUIRED = os.getenv('SECURITY_USERNAME_REQUIRED', True)
     SECURITY_TRACKABLE = os.getenv('SECURITY_TRACKABLE', True)
+    SECURITY_CHANGE_EMAIL = os.getenv('SECURITY_CHANGE_EMAIL', True)
+    SECURITY_POST_CHANGE_VIEW = os.getenv('SECURITY_POST_CHANGE_VIEW', 'change')
 
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')

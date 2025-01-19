@@ -1,0 +1,53 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Profile {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <h1 class="h2">Profile</h1>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <p id="username">{{ current_user.username }}</p>
+                </div>
+                <div class="mb-3 d-flex justify-content-between">
+                    <div>
+                        <label for="email" class="form-label">Email</label>
+                        <p id="email">{{ current_user.email }}</p>
+                    </div>
+                    <div>
+                        <a href="{{url_for_security('change_email')}}" class="btn btn-primary">Edit Email</a>
+                    </div>
+                </div>
+                <div class="mb-3 d-flex justify-content-between">
+                    <div>
+                        <label for="password" class="form-label">Password</label>
+                        <p>********</p>
+                    </div>
+                    <div>
+                        <a href="{{url_for_security('change_password')}}" class="btn btn-primary">Change Password</a>
+                    </div>
+                </div>
+                <div class="mb-3 d-flex justify-content-between">
+                    <div>
+                        <label for="delete-account" class="form-label">Delete Account</label>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('account_blueprint.delete_account') }}" class="btn btn-danger">Delete Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
