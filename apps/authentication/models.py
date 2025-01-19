@@ -10,8 +10,6 @@ from flask import current_app as app
 from apps import db
 from flask_security import RoleMixin, UserMixin
 
-from apps.authentication.util import hash_pass
-
 class Users(db.Model, UserMixin):
 
     __tablename__ = 'Users'
