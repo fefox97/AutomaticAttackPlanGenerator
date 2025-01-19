@@ -10,6 +10,7 @@ from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.github import github, make_github_blueprint
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from sqlalchemy.orm.exc import NoResultFound
+from apps.authentication.util import send_welcome_email
 from apps.config import Config
 from .models import Users, db, OAuth
 from flask import redirect, url_for
@@ -54,6 +55,8 @@ def github_logged_in(blueprint, token):
 
         if email is None:
             return redirect(url_for('authentication_blueprint.register_github'))
+        else:
+            send_welcome_email(user)
 
 @oauth_error.connect_via(github_blueprint)
 def github_error(blueprint, error, error_description=None, error_uri=None):
