@@ -1,0 +1,14 @@
+{% if not cookies_check() %}
+    {# show a cookie consent banner #}
+    <div id="cookie-consent-container" class="fixed-bottom p-3 text-center shadow-sm mx-auto rounded-top bg-body-secondary" style="max-width: 600px;">
+        <p class="mb-0 small">We use cookies to ensure you get the best experience on our website.</p>
+        <button id="cookie-consent" class="btn btn-primary mt-2">I Consent</button>
+    </div>
+    <script>
+        var fn = function () {
+            document.cookie = "cookie_consent=true; path=/";
+            document.getElementById('cookie-consent-container').hidden = true;
+        };
+        document.getElementById('cookie-consent').onclick = fn;
+    </script>
+{% endif %}
