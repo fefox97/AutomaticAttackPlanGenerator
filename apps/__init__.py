@@ -147,7 +147,7 @@ def create_app(config):
     configure_admin(app)
     configure_roles(app)
 
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=3)    
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)    
     
     clear_tmp(app.config['TMP_FOLDER'])
     return app
