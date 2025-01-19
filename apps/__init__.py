@@ -6,7 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 import re
 
-from flask import Flask
+from flask import Flask, request
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
@@ -71,6 +71,17 @@ def register_custom_filters(app):
             in_dict = {}
         out_dict = MyDict(in_dict)
         return s.format_map(out_dict)
+    
+    @app.context_processor
+    def inject_template_scope():
+        injections = dict()
+
+        def cookies_check():
+            value = request.cookies.get('cookie_consent')
+            return value == 'true'
+        injections.update(cookies_check=cookies_check)
+
+        return injections
 
 from apps.authentication.models import Roles, Users
 from apps.databases.models import App, Macm, Capec, MacmUser, Attack, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
