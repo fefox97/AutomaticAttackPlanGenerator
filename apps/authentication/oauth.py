@@ -52,11 +52,10 @@ def github_logged_in(blueprint, token):
             )
             app.user_datastore.commit()
             login_user(user)
+            send_welcome_email(user)
 
         if email is None:
             return redirect(url_for('authentication_blueprint.register_github'))
-        else:
-            send_welcome_email(user)
 
 @oauth_error.connect_via(github_blueprint)
 def github_error(blueprint, error, error_description=None, error_uri=None):
