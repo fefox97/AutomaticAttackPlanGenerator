@@ -113,10 +113,12 @@ def configure_roles(app):
         db.session.commit()
         user_registered.connect_via(app)(user_registered_sighandler)
     
+    from apps.authentication.util import notify_admins
     def user_registered_sighandler(app, user, **extra):
         default_role = app.user_datastore.find_role("end-user")
         app.user_datastore.add_role_to_user(user, default_role)
         app.user_datastore.commit()
+        notify_admins(user)
 
 def configure_database(app):
 

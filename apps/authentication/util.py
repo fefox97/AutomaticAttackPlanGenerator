@@ -32,3 +32,15 @@ def send_account_deleted_email(user):
         message=render_template('security/email/account_deleted.html', user=user),
         html_message=render_template('security/email/account_deleted.html', user=user)
     )
+
+def notify_admins(user):
+    """
+    Notify admins about new user registration
+    """
+    mail.send_mail(
+        from_email=app.config["MAIL_DEFAULT_SENDER"],
+        subject="New User Registration",
+        recipient_list=[app.config["MAIL_DEFAULT_SENDER"]],
+        message=render_template('security/email/new_user.html', user=user),
+        html_message=render_template('security/email/new_user.html', user=user)
+    )
