@@ -2,6 +2,10 @@ $color-mode-type: data;
 
 @include color-mode(dark) {
 
+    .inverted {
+        filter: invert(1) hue-rotate(180deg);
+    }
+
     .card {
         background-color: $card-bg-dark !important;
         color: $card-color-dark !important;

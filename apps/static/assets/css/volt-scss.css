@@ -19832,6 +19832,9 @@ pre[class*=language-] {
 .button-spinner {
   padding-left: 10px; }
 
+[data-bs-theme="dark"] .inverted {
+  filter: invert(1) hue-rotate(180deg); }
+
 [data-bs-theme="dark"] .card {
   background-color: #374151 !important;
   color: #F2F4F6 !important; }
