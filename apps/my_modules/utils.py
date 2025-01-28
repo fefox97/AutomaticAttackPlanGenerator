@@ -285,8 +285,8 @@ class MacmUtils:
                         parameters = None
                     components_to_add = pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component['component_id'], 'Parameters': parameters}, index=[0])
                     tool_asset_type_df = pd.concat([tool_asset_type_df, components_to_add], ignore_index=True)
+        tool_asset_type_df.drop_duplicates(inplace=True)
         tool_asset_type_df['Parameters'] = tool_asset_type_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
-        # tool_asset_type_df.drop_duplicates(inplace=True)
         return tool_asset_type_df
 
     def add_extra_components(self, database='macm'):
