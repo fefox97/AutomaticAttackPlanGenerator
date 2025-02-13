@@ -1,3 +1,4 @@
+import io
 import os
 from apps import db
 from apps.databases.models import Capec, MacmUser, Macm, Attack
@@ -5,6 +6,7 @@ from flask import current_app as app
 from sqlalchemy import or_, and_
 import nmap as nm
 import zipfile
+import pandas as pd
 
 from apps.my_modules.converter import Converter
 
@@ -71,3 +73,35 @@ class APIUtils:
             for file in file_list:
                 zipf.write(file, os.path.basename(file))
         return f"{destinationpPath}/{zip_name}"
+    
+    def query_to_excel(self, query_output, sheet_name):
+        try:
+
+            # Create a DataFrame using pd.DataFrame
+            df = pd.DataFrame(query_output)
+
+            file_bytes = io.BytesIO()
+            with pd.ExcelWriter(file_bytes, engine='xlsxwriter') as writer:
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+                
+                # Get the xlsxwriter workbook and worksheet objects.
+                workbook  = writer.book
+                worksheet = writer.sheets[sheet_name]
+
+                # Set the format for the columns
+                wrap_format = workbook.add_format({'text_wrap': True})
+                worksheet.set_column('A:B', 20, wrap_format) 
+                worksheet.set_column('C:C', 10, wrap_format) 
+                worksheet.set_column('D:D', 20, wrap_format) 
+                worksheet.set_column('E:E', 40, wrap_format) 
+                worksheet.set_column('F:F', 20, wrap_format)
+
+                worksheet.freeze_panes(1, 0)
+
+                writer.close()
+            file_bytes.seek(0)
+            return file_bytes
+        
+        except:
+            app.logger.error(f"Error saving query to excel", exc_info=True)
+            return None
