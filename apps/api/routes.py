@@ -17,9 +17,10 @@ from flask import jsonify
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, ToolCatalogue
+from apps.databases.models import Attack, Macm, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
+import pandas as pd
 
 from apps.templates.security.email.report_issue import report_issue_html_content
 
@@ -176,7 +177,36 @@ def upload_excel():
 def download_excel():
     filename = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config["DBS_PATH"]
-    return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
+    return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
+
+@auth_required
+@blueprint.route('/download_threat_model', methods=['POST'])
+def download_threat_model():
+    app_id = request.form.get('AppID')
+    try:
+        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        threat_model = ThreatModel.query.filter_by(AppID=app_id).with_entities(
+            ThreatModel.Asset,
+            ThreatModel.Asset_Type.label('Asset Type'),
+            ThreatModel.Threat_ID.label('Threat ID'),
+            ThreatModel.Threat,
+            ThreatModel.Threat_Description.label('Threat Description'),
+            ThreatModel.Compromised,
+            ThreatModel.PreC,
+            ThreatModel.PreI,
+            ThreatModel.PreA,
+            ThreatModel.PostC,
+            ThreatModel.PostI,
+            ThreatModel.PostA,
+            ThreatModel.STRIDE).all()
+        if threat_model is None:
+            raise Exception(f"Threat model not found for MACM {app_name}")
+        
+        excel_file = APIUtils().query_to_excel(threat_model, 'Threat Model')
+        return send_file(excel_file, as_attachment=True, mimetype='application/octet-stream', download_name=f"{app_name}_threat_model.xlsx")
+    except Exception as error:
+        app.logger.info(f"Error downloading threat model for MACM {app_id}:\n {error}")
+        return make_response(jsonify({'message': error.args}), 400)
 
 @auth_required
 @blueprint.route('/upload_report', methods=['POST'])
@@ -242,7 +272,7 @@ def download_report():
     try:
         path = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['path']
         filename = Attack.query.filter_by(AppID=macmID, ComponentID=componentID, ToolID=toolID).first().ReportFiles['filename']
-        return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', attachment_filename=filename, download_name=filename)
+        return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
     except Exception as error:
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
@@ -259,7 +289,7 @@ def download_all_reports():
             return make_response(jsonify({'message': 'No reports to download'}), 400)
         zip_filename = f'{macmID}_reports.zip'
         zip_filename = APIUtils().zip_files(filenames, destinationPath, zip_filename)
-        return send_file(zip_filename, as_attachment=True, mimetype='application/octet-stream', attachment_filename=f'{macmID}_reports.zip', download_name=f'{macmID}_reports.zip')
+        return send_file(zip_filename, as_attachment=True, mimetype='application/octet-stream', download_name=f'{macmID}_reports.zip')
     except Exception as error:
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)

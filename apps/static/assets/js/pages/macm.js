@@ -47,6 +47,15 @@ $(window).on('load', function() {
         });
     });
 
+    $("#editMacmModal").on('click', function () {
+        $('#editAppName').text(app_name);
+        $('#editMacmModal').modal('show');
+    });
+
+    $("#exportThreatModel").on('click', function () {
+        downloadThreatModel(app_id);
+    });
+
     $("#centerNetwork").click(() => {
         if (activeTab === 'graph-tab') {
             neoVizGraph.stabilize();
@@ -117,14 +126,6 @@ $(window).on('load', function() {
             {
                 className: 'btn-secondary',
                 extend: 'searchPanes'
-            },
-            {   
-                className: 'btn-primary',
-                text: 'Edit MACM',
-                action: function (e, dt, node, config) {
-                    $('#editAppName').text(app_name);
-                    $('#editMacmModal').modal('show');
-                }
             }
         ],
         initComplete: function () {
@@ -352,4 +353,37 @@ function saveImage(neoViz, filename) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function downloadThreatModel() {
+    let formData = new FormData();
+    formData.append('AppID', app_id);
+    fetch('/api/download_threat_model', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        const header = response.headers.get('Content-Disposition');
+        const parts = header.split(';');
+        filename = parts[1].split('=')[1];
+        return response;
+    }
+    )
+    .then(response => 
+        response.blob()
+    )
+    .then(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+    })
+    .then(_ => {
+        showModal("Threat Model Download", filename + " downloaded successfully", autohide = true)
+    })
+    .catch(error => {
+        showModal("Threat Model Download", "Error downloading the file!", autohide = true)
+    });
 }
