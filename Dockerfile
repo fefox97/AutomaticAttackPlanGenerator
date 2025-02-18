@@ -10,7 +10,7 @@ RUN mkdir /uploads
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y nmap
+RUN apt install -y nmap wkhtmltopdf
 
 COPY . .
 
