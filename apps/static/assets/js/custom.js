@@ -1,7 +1,13 @@
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
 
-function showModal(title, response, autohide = false, large = false){
+function showModal(title, response, icon=null, autohide = false, large = false, badge = null) {
     $("#modal-title").text(title);
+    if (icon) {
+        $("#modal-title").prepend(icon);
+    }
+    if (badge) {
+        $("#modal-title").append(badge);
+    }
     let messages = "";
     if (typeof response === "string") {
         messages = response;
@@ -106,7 +112,165 @@ function sendTicket() {
     $('#ticketEmail').val('');
 }
 
+var old_tasks = [];
+
+function getPendingTasks() {
+    $.ajax({
+        url: '/api/get_pending_tasks',
+        type: 'GET',
+        success: function(response) {
+            current_tasks = response.tasks;
+            for (let i = 0; i < current_tasks.length; i++) {
+                let task = current_tasks[i];
+                if (old_tasks.indexOf(task.task_id) === -1) {
+                    getTaskStatus(task);
+                }
+            }
+            old_tasks = current_tasks.map(task => task.task_id);
+            setTimeout(function() {
+                getPendingTasks();
+            }, 5000);
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+function getTaskStatus(task) {
+    $.ajax({
+        url: '/api/get_task_status',
+        type: 'POST',
+        data: {
+            task_id: task.task_id
+        },
+        success: function(response) {
+            if (response.task_status == 'PENDING') {
+                setTimeout(function() {
+                    getTaskStatus(task);
+                }, 5000);
+            } else {
+                buttons = [];
+                if (response.task_status === 'SUCCESS') {
+                    buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Download Report</button>');
+                }
+                buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Delete Task</button>');
+                addNotification(task.task_id, "Task status", task.task_name + " for the app " + task.app_name + " is " + response.task_status, buttons, task.created_on);
+            }
+        },
+        error: function(response) {
+            console.log(response.responseJSON);
+        }
+    });
+}
+
+function deleteTask(task_id) {
+    $.ajax({
+        url: '/api/delete_task',
+        type: 'POST',
+        data: {
+            task_id: task_id
+        },
+        success: function(response) {
+            console.log(response);
+            removeNotification(task_id);
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+function downloadReport(app_id, task_id, button) {
+    let formData = new FormData();
+    formData.append('AppID', app_id);
+    formData.append('TaskID', task_id);
+    downloadFiles(formData, '/api/download_ai_report', button);
+}
+
+function addNotification(id, title, message, buttons, time) {
+    let notification = document.createElement('div');
+    notification.className = "dropdown-item d-flex align-items-center justify-content-between";
+    notification.id = id + '_notification';
+    let formattedTime = new Date(time).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <div class="icon icon-shape bg-primary text-white rounded-circle">
+                    <i class="fas fa-info"></i>
+                </div>
+            </div>
+            <div>
+                <span class="h6">`+ title +`</span>
+                <span class="text-sm text-muted ms-2">`+ formattedTime +`</span>
+                <p class="text-sm text-muted mb-0">`+ message +`</p>
+            </div>
+        </div>`;
+    if (buttons) {
+        for (let i = 0; i < buttons.length; i++) {
+            notification.innerHTML += buttons[i];
+        }
+    }
+    $('#notification_container').append(notification);
+    if ($('#notification_counter').hasClass('d-none')) {
+        $('#notification_counter').removeClass('d-none');
+    }
+    $('#notification_counter').text(parseInt($('#notification_counter').text()) + 1);
+}
+
+function removeNotification(id) {
+    document.getElementById(id + '_notification').remove();
+    $('#notification_counter').text(parseInt($('#notification_counter').text()) - 1);
+    if ($('#notification_counter').text() === '0') {
+        $('#notification_counter').addClass('d-none');
+    }
+}
+
+function clearNotifications() {
+    for (let i = 0; i < old_tasks.length; i++) {
+        deleteTask(old_tasks[i]);
+    }
+}
+
+function downloadFiles(formData, api, button) {
+    $(button).find('.button-spinner').removeClass('d-none');
+    $.ajax({
+        url: api,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function(response, status, xhr) {
+            const header = xhr.getResponseHeader('Content-Disposition');
+            if (!header) {
+                throw new Error("Intestazione Content-Disposition mancante");
+            }
+            const parts = header.split(';');
+            const filename = parts[1].split('=')[1].replace(/"/g, '');
+
+            const url = window.URL.createObjectURL(new Blob([response]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+
+            showModal("File Download", filename + " downloaded successfully", autohide = true);
+            $(button).find('.button-spinner').addClass('d-none');
+        },
+        error: function(error) {
+            showModal("File Download", "Error downloading the file!", autohide = true);
+            $(button).find('.button-spinner').addClass('d-none');
+        }
+    });
+}
+
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     enableTab();
+    getPendingTasks();
 });
