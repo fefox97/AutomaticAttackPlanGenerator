@@ -1,0 +1,173 @@
+services:
+  neo4j:
+    container_name: neo4j
+    restart: always
+    image: "neo4j:5.11.0-enterprise"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: ${USER_NEO4J}/${PASS_NEO4J}
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: ${NEO4J_ACCEPT_LICENSE_AGREEMENT}
+      NEO4J_PLUGINS: ${NEO4J_PLUGINS}
+      # NEO4J_dbms_ssl_policy_https_enabled: 'true'
+      # NEO4J_dbms_ssl_policy_https_trust_all: 'true'
+      # NEO4J_dbms_ssl_policy_https_base__directory: /ssl
+    volumes:
+      - ./neo4j/data:/data
+      - ./neo4j/logs:/logs
+      # - ./neo4j/ssl:/ssl
+    networks:
+      - db_network
+      - web_network
+  db:
+    container_name: db
+    restart: always
+    image: "mysql"
+    ports:
+      - "3306:3306"
+    volumes:
+      - my-db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - db_network
+  pennet:
+    container_name: pennet
+    restart: always
+    build: .
+    volumes:
+      - ./apps:/apps
+      - uploads_volume:/uploads
+    environment:
+      - URL=${URL}
+      - SITE_NAME=${SITE_NAME}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL}
+      - DATABASE_URL=mysql+mysqlconnector://${MYSQL_USER}:${MYSQL_PASSWORD}@db/WebApp
+      - DEBUG=${DEBUG}
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_ENV=${FLASK_ENV}
+      - ASSETS_ROOT=${ASSETS_ROOT}
+      - UPLOAD_FOLDER=${UPLOAD_FOLDER}
+      - DBS_PATH=${DBS_PATH}
+      - THREAT_CATALOG_FILE_NAME=${THREAT_CATALOG_FILE_NAME}
+      - URI_NEO4J=neo4j://neo4j:7687
+      - URI_NEO4J_WSS=${URI_NEO4J_WSS}
+      - USER_NEO4J=${USER_NEO4J}
+      - PASS_NEO4J=${PASS_NEO4J}
+      - TLS_NEO4J=${TLS_NEO4J}
+      - JIRA_URL=${JIRA_URL}
+      - JIRA_PROJECT=${JIRA_PROJECT}
+      - JIRA_TICKET_TYPE=${JIRA_TICKET_TYPE}
+      - JIRA_USERNAME=${JIRA_USERNAME}
+      - JIRA_API_KEY=${JIRA_API_KEY}
+      - GITHUB_ID=${GITHUB_ID}
+      - GITHUB_SECRET=${GITHUB_SECRET}
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USE_SSL=${MAIL_USE_SSL}
+      - MAIL_DEFAULT_SENDER=${MAIL_DEFAULT_SENDER}
+      - MAIL_BACKEND=${MAIL_BACKEND}
+      - RESET_PASSWORD_LIMIT=${RESET_PASSWORD_LIMIT}
+      - USER_REGISTERABLE=${USER_REGISTERABLE}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - db_network
+      - web_network
+      - celery_network
+    depends_on:
+      - neo4j
+      - db
+      - redis
+
+  celery_worker:
+    container_name: celery_worker
+    restart: always
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info --include=apps.celery_module.tasks
+    volumes:
+      - ./apps:/apps
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - pennet
+    networks:
+      - celery_network
+
+  flower:
+    container_name: flower
+    restart: always
+    build: .
+    command: celery -A celery_worker.celery --broker=redis://redis:6379/0 flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - pennet
+    networks:
+      - celery_network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_volume:/data
+    networks:
+      - celery_network
+
+  nginx:
+    container_name: nginx
+    restart: always
+    image: "nginx:latest"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "7787:7787"
+    volumes:
+      - type: bind
+        source: ./nginx/reverse-proxy-docker.conf
+        target: /etc/nginx/conf.d/default.conf
+      - type: bind
+        source: ./certs/webapp.crt
+        target: /etc/ssl/certs/webapp.crt
+      - type: bind
+        source: ./certs/webapp.key
+        target: /etc/ssl/private/webapp.key
+      - type: bind
+        source: ./certs/dhparam.pem
+        target: /etc/nginx/dhparam.pem
+      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - web_network
+    depends_on: 
+      - pennet
+  cloudflare:
+    container_name: cloudflare
+    restart: always
+    image: "cloudflare/cloudflared:latest"
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
+    networks:
+      - web_network
+      - db_network
+networks:
+  db_network:
+    driver: bridge
+  web_network:
+    driver: bridge
+  celery_network:
+    driver: bridge
+
+volumes:
+  my-db:
+  uploads_volume:
+  redis_volume:

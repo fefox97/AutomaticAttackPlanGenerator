@@ -14,15 +14,55 @@ from flask import render_template_string, request, send_file, make_response
 from flask_security import auth_required, current_user, roles_required
 from flask import current_app as app
 from flask import jsonify
+from apps.authentication.models import Tasks
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, Macm, ThreatModel, ToolCatalogue
+from apps.databases.models import Attack, AttackView, Macm, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 import pandas as pd
+from celery.result import AsyncResult
 
 from apps.templates.security.email.report_issue import report_issue_html_content
+
+@auth_required
+@blueprint.route('/get_pending_tasks', methods=['GET'])
+def get_pending_tasks():
+    tasks = Tasks.query.filter_by(user_id=current_user.id,).all()
+    return jsonify({'tasks': [{
+            'task_id': task.id,
+            'task_name': task.name,
+            'app_id': task.app_id,
+            'app_name': task.app_name,
+            'created_on': task.created_on,
+        } for task in tasks]})
+
+@auth_required
+@blueprint.route('/get_task_status', methods=['POST'])
+def get_task_status():
+    task_id = request.form.get("task_id")
+    task_result = AsyncResult(task_id)
+    result = {
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "task_result": task_result.result
+    }
+    if type(task_result.result) is Exception:
+        result['task_result'] = task_result.result.args
+    return jsonify(result)
+
+@auth_required
+@blueprint.route('/delete_task', methods=['POST'])
+def delete_task():
+    task_id = request.form.get("task_id")
+    task = Tasks.query.filter_by(id=task_id).first()
+    if task is not None:
+        db.session.delete(task)
+        db.session.commit()
+        return jsonify({'message': 'Task deleted'})
+    else:
+        return jsonify({'message': 'Task not found'}), 404
 
 @auth_required
 @blueprint.route('/search_capec_by_id', methods=['POST'])
@@ -201,11 +241,110 @@ def download_threat_model():
             ThreatModel.STRIDE).all()
         if threat_model is None:
             raise Exception(f"Threat model not found for MACM {app_name}")
-        
-        excel_file = APIUtils().query_to_excel(threat_model, 'Threat Model')
+        column_format = {
+            1: {'columns': 'A:B', 'width': 20},
+            2: {'columns': 'C:C', 'width': 10},
+            3: {'columns': 'D:D', 'width': 20},
+            4: {'columns': 'E:E', 'width': 40},
+            5: {'columns': 'F:F', 'width': 20}
+        }
+        excel_file = APIUtils().query_to_excel(threat_model, 'Threat Model', column_format)
         return send_file(excel_file, as_attachment=True, mimetype='application/octet-stream', download_name=f"{app_name}_threat_model.xlsx")
     except Exception as error:
         app.logger.info(f"Error downloading threat model for MACM {app_id}:\n {error}")
+        return make_response(jsonify({'message': error.args}), 400)
+
+@auth_required
+@blueprint.route('/download_attack_plan', methods=['POST'])
+def download_attack_plan():
+    app_id = request.form.get('AppID')
+    try:
+        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
+            AttackView.Attack_Number.label('Attack Number'),
+            AttackView.Component_ID.label('Component ID'),
+            AttackView.Asset,
+            AttackView.Asset_Type.label('Asset Type'),
+            AttackView.Threat_ID.label('Threat ID'),
+            AttackView.Threat,
+            AttackView.Threat_Description.label('Threat Description'),
+            AttackView.Capec_ID.label('CAPEC ID'),
+            AttackView.Attack_Pattern.label('Attack Pattern'),
+            AttackView.Capec_Description.label('CAPEC Description'),
+            AttackView.Execution_Flow.label('Execution Flow'),
+            AttackView.Tool_ID.label('Tool ID'),
+            AttackView.Tool_Name.label('Tool Name'),
+            AttackView.Tool_Description.label('Tool Description'),
+            AttackView.Command,
+            ).all()
+        if attack_plan is None:
+            raise Exception(f"Attack Plan not found for MACM {app_name}")
+        
+        column_format = {
+            1: {'columns': 'A:B', 'width': 12},
+            2: {'columns': 'C:C', 'width': 15},
+            3: {'columns': 'D:D', 'width': 20},
+            4: {'columns': 'F:F', 'width': 20},
+            5: {'columns': 'G:G', 'width': 40},
+            6: {'columns': 'I:I', 'width': 20},
+            7: {'columns': 'J:J', 'width': 40},
+            8: {'columns': 'K:K', 'width': 120},
+            9: {'columns': 'M:M', 'width': 10},
+            10: {'columns': 'N:O', 'width': 40},
+        }
+
+        excel_file = APIUtils().query_to_excel(attack_plan, 'Attack Plan', column_format, ['Execution Flow'])
+        return send_file(excel_file, as_attachment=True, mimetype='application/octet-stream', download_name=f"{app_name}_attack_plan.xlsx")
+    except Exception as error:
+        app.logger.info(f"Error downloading the Attack Plan for MACM {app_id}:\n {error}")
+        return make_response(jsonify({'message': error.args}), 400)
+
+@auth_required
+@blueprint.route('/generate_ai_report', methods=['POST'])
+def generate_ai_report():
+    app_id = request.form.get('AppID')
+    try:
+        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
+            AttackView.Attack_Number.label('Attack Number'),
+            AttackView.Component_ID.label('Component ID'),
+            AttackView.Asset,
+            AttackView.Asset_Type.label('Asset Type'),
+            AttackView.Threat_ID.label('Threat ID'),
+            AttackView.Threat,
+            AttackView.Threat_Description.label('Threat Description'),
+            AttackView.Capec_ID.label('CAPEC ID'),
+            AttackView.Attack_Pattern.label('Attack Pattern'),
+            AttackView.Capec_Description.label('CAPEC Description'),
+            AttackView.Execution_Flow.label('Execution Flow'),
+            AttackView.Tool_ID.label('Tool ID'),
+            AttackView.Tool_Name.label('Tool Name'),
+            AttackView.Tool_Description.label('Tool Description'),
+            AttackView.Command,
+            ).all()
+        if attack_plan is None:
+            raise Exception(f"Attack Plan not found for MACM {app_name}")
+
+        APIUtils().generate_pentest_report(app_id, app_name, attack_plan, ['Execution Flow'])
+        return jsonify({'message': 'Report generation started'})
+    except Exception as error:
+        app.logger.info(f"Error generating the report for MACM {app_id}:\n {error}")
+        return make_response(jsonify({'message': error.args}), 400)
+
+@auth_required
+@blueprint.route('/download_ai_report', methods=['POST'])
+def download_ai_report():
+    app_id = request.form.get('AppID')
+    task_id = request.form.get('TaskID')
+    try:
+        task_result = AsyncResult(task_id)
+        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        if task_result is None or task_result.status != 'SUCCESS':
+            return jsonify({'message': 'Task not found'}), 404
+        report_file = APIUtils().download_pentest_report(app_name, task_result.result)
+        return send_file(report_file, as_attachment=True, mimetype='application/octet-stream', download_name=f"{app_name}_report.pdf")
+    except Exception as error:
+        app.logger.info(f"Error downloading the report for MACM {app_id}:\n {error}")
         return make_response(jsonify({'message': error.args}), 400)
 
 @auth_required

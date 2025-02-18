@@ -6,6 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 import re
 
+from celery import Celery
 from flask import Flask, request
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
@@ -20,6 +21,7 @@ security = Security()
 myAdmin = Admin()
 mail = Mail()
 user_datastore = None
+celery = Celery()
 
 def register_extensions(app, user_datastore):
     db.init_app(app)
@@ -83,7 +85,7 @@ def register_custom_filters(app):
 
         return injections
 
-from apps.authentication.models import Roles, Users
+from apps.authentication.models import Roles, Users, Tasks
 from apps.databases.models import App, Macm, Capec, MacmUser, Attack, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
 from apps.admin.views import MyModelView, ToolCatalogueView
 from flask_admin.menu import MenuLink
@@ -103,6 +105,14 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue'))
     myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases'))
+
+def clean_tasks(app):
+    @app.before_request
+    def clean_tasks():
+        tasks = Tasks.query.all()
+        for task in tasks:
+            db.session.delete(task)
+        db.session.commit()
 
 def configure_roles(app):
     @app.before_request
@@ -159,10 +169,13 @@ def create_app(config):
     configure_database(app)
     configure_admin(app)
     configure_roles(app)
+    
+    celery.conf.update(app.config, namespace='CELERY')
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)    
-    
+
     clear_tmp(app.config['TMP_FOLDER'])
+    # clean_tasks(app)
     return app
 
 class MyDict(dict):

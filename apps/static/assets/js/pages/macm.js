@@ -52,10 +52,6 @@ $(window).on('load', function() {
         $('#editMacmModal').modal('show');
     });
 
-    $("#exportThreatModel").on('click', function () {
-        downloadThreatModel(app_id);
-    });
-
     $("#centerNetwork").click(() => {
         if (activeTab === 'graph-tab') {
             neoVizGraph.stabilize();
@@ -183,6 +179,39 @@ $(window).on('load', function() {
         const QueryCypher = $('#editQueryCypher').val();
         editMacm(app_id, QueryCypher);
     });
+
+    $("#exportThreatModel").on('click', function () {
+        let formData = new FormData();
+        formData.append('AppID', app_id);
+        downloadFiles(formData, '/api/download_threat_model', this);
+    });
+
+    $("#exportAttackPlan").on('click', function () {
+        let formData = new FormData();
+        formData.append('AppID', app_id);
+        downloadFiles(formData, '/api/download_attack_plan', this);
+    });
+    
+    $("#generateAIReport").on('click', function () {
+        generateAIReport(app_id);
+    });
+
+    function generateAIReport(app_id) {
+        $.ajax({
+            url: '/api/generate_ai_report',
+            type: 'POST',
+            data: {
+                AppID: app_id,
+            },
+            success: function(response) {
+                showModal("AI Report", "AI Report generation started successfully. You will be notified when it is ready. Remeber that this process may take a while and the feature is still in beta.", icon="<i class='bi bi-stars me-2'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
+            },
+            error: function(response) {
+                showModal("AI Report", "Error generating the AI Report!", autohide = true);
+            }
+        });
+    }
+
 });
 
 function deleteComponent(App_ID, ComponentID, ComponentName) {
@@ -211,7 +240,7 @@ function drawNeo4j(database) {
     const configGraph = {
         containerId: "graph",
         serverDatabase: database,
-        consoleDebug: true,
+        consoleDebug: false,
         neo4j: {
             serverUrl: neo4j_params.uri,
             serverUser: neo4j_params.user,
@@ -353,37 +382,4 @@ function saveImage(neoViz, filename) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-}
-
-function downloadThreatModel() {
-    let formData = new FormData();
-    formData.append('AppID', app_id);
-    fetch('/api/download_threat_model', {
-        method: 'POST',
-        body: formData
-    }).then(response => {
-        const header = response.headers.get('Content-Disposition');
-        const parts = header.split(';');
-        filename = parts[1].split('=')[1];
-        return response;
-    }
-    )
-    .then(response => 
-        response.blob()
-    )
-    .then(blob => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-    })
-    .then(_ => {
-        showModal("Threat Model Download", filename + " downloaded successfully", autohide = true)
-    })
-    .catch(error => {
-        showModal("Threat Model Download", "Error downloading the file!", autohide = true)
-    });
 }

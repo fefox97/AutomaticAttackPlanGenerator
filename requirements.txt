@@ -56,3 +56,9 @@ atlassian-python-api
 Flask-Mailman
 
 xlsxwriter
+bs4
+
+celery
+redis
+flower
+pdfkit

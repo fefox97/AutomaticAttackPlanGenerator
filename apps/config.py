@@ -42,6 +42,18 @@ class Config(object):
     SECURITY_CHANGE_EMAIL = os.getenv('SECURITY_CHANGE_EMAIL', True)
     SECURITY_POST_CHANGE_VIEW = os.getenv('SECURITY_POST_CHANGE_VIEW', 'change')
 
+    # Site info
+    URL = os.getenv('URL', 'https://localhost')
+    SITE_NAME = os.getenv('SITE_NAME', 'VSecLab')
+
+    # OpenRouter Management
+    OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', None)
+    OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', None)
+
+    # Celery
+    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+    CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+    
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', f'{basedir}/static/uploads')
