@@ -23,7 +23,7 @@
                           <img class="avatar rounded-circle bg-secondary inverted" alt="Image placeholder" src="{{ config.ASSETS_ROOT }}/img/illustrations/user-profile.svg">
                           <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
                             <span class="mb-0 font-small fw-bold text-primary">
-                              Current User: <strong>{{ current_user.username }}</strong>
+                              <strong>{{ current_user.username }}</strong>
                             </span>
                           </div>
                         </div>
@@ -40,6 +40,24 @@
                           </svg>                
                           Logout
                         </a>
+                      </div>
+                    </li>
+                    <!-- add notification dropdown -->
+                    <li class="nav-item dropdown" id="notifications">
+                      <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell" style="font-size: 1em;"></i>
+                        <span class="badge bg-danger d-none" id="notification_counter">0</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-end mt-2 py-1" >
+                        <div class="d-flex justify-content-between p-3">
+                          <h4 class="h4">Notifications</h4>
+                          <button class="btn btn-danger" id="clear_notifications" onclick="clearNotifications()">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                          </button>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div id="notification_container"></div>
                       </div>
                     </li>
                   </ul>
