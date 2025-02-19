@@ -151,11 +151,13 @@ function getTaskStatus(task) {
                 }, 5000);
             } else {
                 buttons = [];
+                icon = '<i class="fas fa-info"></i>';
                 if (response.task_status === 'SUCCESS') {
                     buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Download Report</button>');
+                    icon = '<i class="fas fa-check"></i>';
                 }
                 buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Delete Task</button>');
-                addNotification(task.task_id, "Task status", task.task_name + " for the app " + task.app_name + " is " + response.task_status, buttons, task.created_on);
+                addNotification(task.task_id, "Task status", task.task_name + " for the app " + task.app_name + " is " + response.task_status, buttons, task.created_on, icon);
             }
         },
         error: function(response) {
@@ -188,7 +190,7 @@ function downloadReport(app_id, task_id, button) {
     downloadFiles(formData, '/api/download_ai_report', button);
 }
 
-function addNotification(id, title, message, buttons, time) {
+function addNotification(id, title, message, buttons, time, icon='<i class="fas fa-info"></i>') {
     let notification = document.createElement('div');
     notification.className = "dropdown-item d-flex align-items-center justify-content-between";
     notification.id = id + '_notification';
@@ -197,7 +199,7 @@ function addNotification(id, title, message, buttons, time) {
         <div class="d-flex align-items-center">
             <div class="me-3">
                 <div class="icon icon-shape bg-primary text-white rounded-circle">
-                    <i class="fas fa-info"></i>
+                    `+ icon +`
                 </div>
             </div>
             <div>
