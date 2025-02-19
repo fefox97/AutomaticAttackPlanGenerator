@@ -50,3 +50,5 @@ certs/*
 # nginx dhparam file to be generated
 nginx/dhparam.pem
 old.env
+
+docker-compose.yml

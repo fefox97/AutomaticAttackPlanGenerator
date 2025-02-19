@@ -304,6 +304,9 @@ def download_attack_plan():
 def generate_ai_report():
     app_id = request.form.get('AppID')
     try:
+        if Tasks.query.filter_by(app_id=app_id, user_id=current_user.id).first() is not None:
+                return make_response(jsonify({'message': 'Report already in progress or completed. Check the notifications to download the report.'}), 400)
+
         app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
         attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
             AttackView.Attack_Number.label('Attack Number'),
