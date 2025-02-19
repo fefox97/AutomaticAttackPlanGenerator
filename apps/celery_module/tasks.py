@@ -1,7 +1,6 @@
 from flask import current_app as app
 import requests
 import json
-import io
 from apps import celery
 
 @celery.task
@@ -30,8 +29,8 @@ def query_llm(prompt):
             # check if the response has choices
             if 'error' in response.json():
                 raise Exception(response.json()['error'])
-            report_md = response.json()['choices'][0]['message']['content']
-            return report_md
+            response_text = response.json()['choices'][0]['message']['content']
+            return response_text
         
         except:
             raise Exception("Error making the request to LLM")
