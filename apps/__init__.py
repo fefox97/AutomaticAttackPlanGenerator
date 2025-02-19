@@ -96,6 +96,7 @@ def configure_admin(app):
     myAdmin.add_link(MenuLink(name='Back Home', url='/'))
     myAdmin.add_view(MyModelView(Users, db.session, name='Users'))
     myAdmin.add_view(MyModelView(Roles, db.session, name='Roles'))
+    myAdmin.add_view(MyModelView(Tasks, db.session, name='Tasks'))
     myAdmin.add_view(MyModelView(App, db.session, name='App'))
     myAdmin.add_view(MyModelView(Macm, db.session, name='MACM'))
     myAdmin.add_view(MyModelView(Capec, db.session, name='CAPEC'))
