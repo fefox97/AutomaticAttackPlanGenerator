@@ -4,6 +4,7 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
     $("#modal-title").text(title);
     if (icon) {
         $("#modal-title").prepend(icon);
+        $("#modal-title").find("i").addClass("me-2");
     }
     if (badge) {
         $("#modal-title").append(badge);
@@ -278,7 +279,7 @@ function downloadFiles(formData, api, button) {
 function searchInPage(search) {
     let result = window.find(search);
     if (!result) {
-        showModal("Search", "Text not found in the page", null, autohide = true);
+        showModal("Search", "Text not found in the page.", '<i class="fa fa-search"</i>', autohide = true);
     }
 }
 
