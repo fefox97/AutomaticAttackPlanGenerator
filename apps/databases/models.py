@@ -679,16 +679,6 @@ class RiskRecord(db.Model):
     OverallRisk = db.Column(db.Text, nullable=False)
     Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
-
-
-
-
-
-
-
-
-
-
 class ThreatAgentReplyCategory(db.Model):
 
     __tablename__ = 'ThreatAgentReplyCategory'

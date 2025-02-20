@@ -274,5 +274,4 @@ function downloadFiles(formData, api, button) {
 $(document).ready(function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     enableTab();
-    getPendingTasks();
 });
