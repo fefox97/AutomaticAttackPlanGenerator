@@ -275,7 +275,20 @@ function downloadFiles(formData, api, button) {
     });
 }
 
+function searchInPage(search) {
+    let result = window.find(search);
+    if (!result) {
+        showModal("Search", "Text not found in the page", null, autohide = true);
+    }
+}
+
 $(window).on('load', function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     enableTab();
+    $('#navbar-search-main').on('submit', function(e) {
+        e.preventDefault();
+        text = $('#topbarInputIconLeft').val();
+        searchInPage(text);
+    }
+    );
 });
