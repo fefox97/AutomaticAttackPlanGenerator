@@ -61,13 +61,22 @@
                 </div>
 
                 <div class="card card-body border-0 shadow mb-4 mb-xl-0">
-                    <ul>
-                    {% for reference in references %}
-                        <li>
-                            {{ reference.bibtex }}
-                        </li>
-                    {% endfor %}
-                    </ul>
+                    {% if references|length == 0 %}
+                        <div class="alert alert-info">
+                            No references available
+                        </div>
+                    {% else %}
+                        <p>
+                            Here you can find a list of our publications:
+                        </p>
+                        <ul>
+                            {% for reference in references %}
+                            <li>
+                                {{ reference.bibtex }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         </div>
