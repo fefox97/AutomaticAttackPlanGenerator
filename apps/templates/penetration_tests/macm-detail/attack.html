@@ -12,7 +12,7 @@
                 <i class="fas fa-chevron-right"></i>
                 <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{attack.Threat_ID}}-{{ attack.Threat }}</span>
                 <i class="fas fa-chevron-right"></i>
-                <a class="badge bg-capec" href="/capec-detail?id={{attack.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{attack.Capec_ID}}-{{attack.Attack_Pattern}}</a>
+                <a class="badge bg-capec" href="/catalogs/capec-detail?id={{attack.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{attack.Capec_ID}}-{{attack.Attack_Pattern}}</a>
                 <i class="fas fa-chevron-right"></i>
                 <span class="badge bg-tool"> <span class="material-symbols-outlined">construction</span> {{ attack.Tool_Name }}</span>
             </h2>
@@ -21,10 +21,10 @@
     <div id="collapse{{attack.Attack_Number}}" class="accordion-collapse collapse show">
         <div class="accordion-body attack-body-bg">
             <div class="accordion shadow" id="accordion{{attack.Attack_Number}}">
-                {% include 'home/macm-detail/capec_description.html' %}
-                {% include 'home/macm-detail/threat_description.html' %}
-                {% include 'home/macm-detail/execution_flow.html' %}
-                {% include 'home/macm-detail/code.html' %}
+                {% include 'penetration_tests/macm-detail/capec_description.html' %}
+                {% include 'penetration_tests/macm-detail/threat_description.html' %}
+                {% include 'penetration_tests/macm-detail/execution_flow.html' %}
+                {% include 'penetration_tests/macm-detail/code.html' %}
             </div>
         </div>
     </div>

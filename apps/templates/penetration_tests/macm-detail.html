@@ -16,8 +16,8 @@
                             <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         </a>
                     </li>
-                    <li class="breadcrumb-item"><a href="/penetration-tests">Penetration Tests</a></li>
-                    <li class="breadcrumb-item"><a href="/macm?app_id={{ macm_data.App_ID }}">MACM</a></li>
+                    <li class="breadcrumb-item"><a href="/penetration_tests">Penetration Tests</a></li>
+                    <li class="breadcrumb-item"><a href="/penetration_tests/macm?app_id={{ macm_data.App_ID }}">MACM</a></li>
                     <li class="breadcrumb-item active" aria-current="page">MACM-{{ macm_data.Component_ID }}</li>
                 </ol>
             </nav>
@@ -29,7 +29,7 @@
     <div class="col-12">
 
         <!-- Badges start -->
-        {% include 'home/macm-detail/badges.html' %}
+        {% include 'penetration_tests/macm-detail/badges.html' %}
         <!-- Badges end -->
         
         <div class="card border-0 shadow mb-3">
@@ -42,7 +42,7 @@
             
             <div id="collapseThreats" class="card-body collapse show" aria-labelledby="headingThreats">
                 {% if threat_data|length > 0 %}
-                    {% include 'home/macm-detail/threats.html' %}
+                    {% include 'penetration_tests/macm-detail/threats.html' %}
                 {% else %}
                     <div class="alert alert-info" role="alert">
                         <h4 class="alert-heading">No Threat Data</h4>
@@ -62,7 +62,7 @@
             
             <div id="collapseMethodologies" class="card-body collapse show" aria-labelledby="headingMethodologies">
                 {% if methodologies_data|length > 0 %}
-                    {% include 'home/macm-detail/methodology.html' %}
+                    {% include 'penetration_tests/macm-detail/methodology.html' %}
                 {% else %}
                     <div class="alert alert-info" role="alert">
                         <h4 class="alert-heading">No Methodology Data</h4>
@@ -101,7 +101,7 @@
                                         <h4>{{ pentest_phases[phaseID-1].PhaseName }}</h4>
                                         {% for attack in attacks %}
                                             <div class="accordion mb-3" id="accordionOne">
-                                                {% include 'home/macm-detail/attack.html' %}
+                                                {% include 'penetration_tests/macm-detail/attack.html' %}
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -118,11 +118,11 @@
             </div>
         </div>
 
-        {% include 'home/macm-detail/all_commands.html' %}
+        {% include 'penetration_tests/macm-detail/all_commands.html' %}
     </div>
 
-    {% include 'home/modals/parser_modal.html' %}
-    {% include 'home/modals/delete_modal.html' %}
+    {% include 'penetration_tests/modals/parser_modal.html' %}
+    {% include 'penetration_tests/modals/delete_modal.html' %}
 
 {% endblock content %}
 

@@ -103,7 +103,7 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        <td><div class="id-badge"><h2><a class="badge bg-capec" href="/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></div></td>
+                                        <td><div class="id-badge"><h2><a class="badge bg-capec" href="/catalogs/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></div></td>
                                         <!-- Name -->
                                         <td class="text-wrap"><strong>{{ row.Name }}</strong></td>
                                         <!-- Abstraction -->
@@ -179,7 +179,7 @@
                                             {% if row.Peer_Of_Refs is not none %}
                                                 <div class="h4 d-flex flex-wrap">
                                                         {% for peer in row.Peer_Of_Refs | sort %}
-                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ peer }}">{{ peer }}</a>
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ peer }}">{{ peer }}</a>
                                                         {% endfor %}
                                                 </div>
                                             {% endif %}
@@ -225,7 +225,7 @@
                                             {% if row.Capec_Children_ID is not none %}
                                                 <div class="d-flex flex-wrap">
                                                         {% for child in row.Capec_Children_ID | sort %}
-                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}
                                                 </div>
                                             {% endif %}
@@ -235,7 +235,7 @@
                                             {% if row.Capec_Parents_ID is not none %}
                                                 <div class="d-flex flex-wrap">
                                                         {% for child in row.Capec_Parents_ID | sort %}
-                                                        <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
                                                         {% endfor %}
                                                 </div>
                                             {% endif %}

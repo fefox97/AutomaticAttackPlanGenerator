@@ -70,7 +70,7 @@
                                                 Shared by {{ users_dict[owners[pentest.AppID]] }}
                                             </span>
                                         {% endif %}
-                                        <a class="btn btn-secondary btn-sm" href="/macm?app_id={{pentest.AppID}}&objective=pentest"  role="button">
+                                        <a class="btn btn-secondary btn-sm" href="/penetration_tests/macm?app_id={{pentest.AppID}}&objective=pentest"  role="button">
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
@@ -108,10 +108,10 @@
         </div>
     </div>
 
-    {% include 'home/modals/edit_macm_modal.html' %}
-    {% include 'home/modals/delete_modal.html' %}
-    {% include 'home/modals/share_macm_modal.html' %}
-    {% include 'home/modals/unshare_macm_modal.html' %}
+    {% include 'penetration_tests/modals/edit_macm_modal.html' %}
+    {% include 'penetration_tests/modals/delete_modal.html' %}
+    {% include 'penetration_tests/modals/share_macm_modal.html' %}
+    {% include 'penetration_tests/modals/unshare_macm_modal.html' %}
 
 {% endblock content %}
 

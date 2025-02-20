@@ -59,7 +59,7 @@
                                         {% if row.hasCapecIDs is not none %}
                                             <div class="d-flex flex-wrap">
                                                     {% for capec in row.hasCapecIDs  | sort %}
-                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ capec }}">{{ capec }}</a>
+                                                    <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ capec }}">{{ capec }}</a>
                                                     {% endfor %}
                                             </div>
                                         {% endif %}

@@ -23,11 +23,11 @@
                                 <div class="d-flex align-items-center">
                                     <h6 class="me-2 mt-2"><span class="badge bg-secondary"><span class="material-symbols-outlined">swords</span> Attack {{ report.Attack_Number }}</span></h6>
                                     <span class="h8">
-                                        <a class="badge bg-macm" href="/macm-detail?id={{report.Component_ID}}&app_id={{report.AppID}}"> <span class="material-symbols-outlined">target</span> {{ report.Asset }}</a>
+                                        <a class="badge bg-macm" href="/penetration_tests/macm-detail?id={{report.Component_ID}}&app_id={{report.AppID}}"> <span class="material-symbols-outlined">target</span> {{ report.Asset }}</a>
                                         <i class="fas fa-chevron-right"></i>
                                         <span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{report.Threat_ID}}-{{ report.Threat }}</span>
                                         <i class="fas fa-chevron-right"></i>
-                                        <a class="badge bg-capec" href="/capec-detail?id={{report.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{report.Capec_ID}}-{{report.Attack_Pattern}}</a>
+                                        <a class="badge bg-capec" href="/catalogs/capec-detail?id={{report.Capec_ID}}"> <span class="material-symbols-outlined">pattern</span> {{report.Capec_ID}}-{{report.Attack_Pattern}}</a>
                                         <i class="fas fa-chevron-right"></i>
                                         <span class="badge bg-tool"> <span class="material-symbols-outlined">construction</span> {{ report.Tool_Name }}</span>
                                     </span>
