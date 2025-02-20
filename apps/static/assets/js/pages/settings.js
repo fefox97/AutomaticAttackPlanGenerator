@@ -1,5 +1,20 @@
 $(document).ready(function() {
-    
+    $("#editSettingModal").on('show.bs.modal', function(e) {
+        setting_name = e.relatedTarget.dataset['bsSettingName'];
+        setting_key = e.relatedTarget.dataset['bsSettingKey'];
+        setting_value = e.relatedTarget.dataset['bsSettingValue'];
+        $('#editSettingName').text(setting_name);
+        $('#editSettingKey').val(setting_key);
+        $('#editSettingValue').val(setting_value);
+        $('#editMacmModal').modal('show');
+    });
+    $("#editSettingSubmit").click(function() {
+        setting_key = $('#editSettingKey').val();
+        setting_value = $('#editSettingValue').val();
+        console.log(setting_key, setting_value);
+        editSetting(setting_key, setting_value);
+    }
+    );
 });
 
 function reloadDatabases(database) {
@@ -76,4 +91,22 @@ function test(){
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));
     });
+}
+
+function editSetting(SettingKey, SettingValue) {
+    $.ajax({
+        url: '/api/edit_setting',
+        type: 'POST',
+        data: {
+            key: SettingKey,
+            value: SettingValue,
+        },
+        success: function(response) {
+            location.reload();
+        },
+        error: function(response) {
+            $('#editSettingModal').modal('hide');
+            showModal("Update failed", JSON.parse(response.responseText));
+        }
+    })
 }

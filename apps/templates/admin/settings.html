@@ -107,6 +107,16 @@
                             <button class="btn btn-secondary btn-sm" id="TestButton" onclick="test()">Test</button>
                         </div>
                     </li>
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                        <div>
+                            <h3 class="h6 mb-1">Penetration Test Rerport Prompt</h3>
+                            <p class="small pe-4">Set the prompt for the penetration test report</p>
+                            <p class="small pe-4">Current prompt: <span id="PenTestPrompt">{{ settings.get('pentest_report_prompt') }}</span></p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-setting-name="Pentest Report Prompt" data-bs-setting-key="pentest_report_prompt" data-bs-setting-value="{{ settings.get('pentest_report_prompt') }}" data-bs-target="#editSettingModal">Edit</button>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -114,6 +124,8 @@
     </div>
 
 {% endblock content %}
+
+{% include 'admin/modals/edit_setting_modal.html' %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}

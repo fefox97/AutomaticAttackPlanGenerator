@@ -45,6 +45,28 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
         return json.JSONEncoder.default(self, obj)
 
+class Settings(db.Model):
+    
+    __tablename__ = 'Settings'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    key = db.Column(db.String(100), nullable=False)
+    value = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return str(self.key)
+    
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+    
+    @staticmethod
+    def to_dict() -> dict:
+        settings = Settings.query.all()
+        return {setting.key: setting.value for setting in settings}
+
 class PentestPhases(db.Model):
 
     __tablename__ = 'PentestPhases'
