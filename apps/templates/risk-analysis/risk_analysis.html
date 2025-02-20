@@ -56,8 +56,9 @@
                         <ul class="list-group list-group-flush">
                             {% for risk_analysis in risk_analyses %}
                                 <li class="list-group-item d-flex align-items-center justify-content-between px-0">
-                                    <div>
-                                        <h3 class="h6 mb-1">{{ risk_analysis.AppName }}</h3>
+                                    <div class="d-flex align-items-center">
+                                        <h1 class="display-9 mb-1">{{ risk_analysis.AppName }}</h1>
+                                        <h6><span class="badge bg-time bg-small rounded-pill ms-3">{{ risk_analysis.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span></h6>
                                     </div>
                                     <div>
                                         {% if usersPerApp[risk_analysis.AppID] | length > 1 and current_user.id == owners[risk_analysis.AppID] %}

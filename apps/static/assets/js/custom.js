@@ -153,10 +153,10 @@ function getTaskStatus(task) {
                 buttons = [];
                 icon = '<i class="fas fa-info"></i>';
                 if (response.task_status === 'SUCCESS') {
-                    buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Download Report</button>');
+                    buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span>Download Report</span></button>');
                     icon = '<i class="fas fa-check"></i>';
                 }
-                buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span class="button-spinner d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Delete Task</button>');
+                buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span><i class="fas fa-trash"></i></span></button>');
                 addNotification(task.task_id, "Task status", task.task_name + " for the app " + task.app_name + " is " + response.task_status, buttons, task.created_on, icon);
             }
         },
@@ -239,7 +239,7 @@ function clearNotifications() {
 }
 
 function downloadFiles(formData, api, button) {
-    $(button).find('.button-spinner').removeClass('d-none');
+    $(button).addClass('btn-loading');
     $.ajax({
         url: api,
         type: 'POST',
@@ -265,17 +265,17 @@ function downloadFiles(formData, api, button) {
             link.click();
             link.parentNode.removeChild(link);
 
-            showModal("File Download", filename + " downloaded successfully", autohide = true);
-            $(button).find('.button-spinner').addClass('d-none');
+            showModal("File Download", filename + " downloaded successfully", null, autohide = true);
+            $(button).removeClass('btn-loading');
         },
         error: function(error) {
-            showModal("File Download", "Error downloading the file!", autohide = true);
-            $(button).find('.button-spinner').addClass('d-none');
+            showModal("File Download", "Error downloading the file!", null, autohide = true);
+            $(button).removeClass('btn-loading');
         }
     });
 }
 
-$(document).ready(function() {
+$(window).on('load', function() {
     $('.nav-item.active').children('.multi-level.collapse').collapse('show');
     enableTab();
 });

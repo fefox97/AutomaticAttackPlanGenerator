@@ -62,7 +62,7 @@ def risk_analysis():
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
-        risk_analyses = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), MacmUser.IsOwner).all()
+        risk_analyses = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), App.Created_at.label('CreatedAt'), MacmUser.IsOwner).all()
         if len(risk_analyses) == 0:
             risk_analyses = None
     except Exception as error:

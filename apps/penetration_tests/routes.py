@@ -26,8 +26,7 @@ def penetration_tests():
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
-        # pentests = MacmUser.query.filter_by(UserID=current_user.id).all()
-        pentests = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), MacmUser.IsOwner).all()
+        pentests = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), App.Created_at.label('CreatedAt'), MacmUser.IsOwner).all()
         if len(pentests) == 0:
             pentests = None
     except Exception as error:
