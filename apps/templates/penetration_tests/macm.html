@@ -33,33 +33,34 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h4 class="mb-0">{{ app_info.Name if table is not none }} Penetration Test Plan</h2>
-                    <span class="display-7 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
+                    <span class="display-10 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
                 </div>
                 <div>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMacmModal">
-                        <i class="fas fa-edit me-2"></i>
-                        Edit MACM
+                        <span>
+                            <i class="fas fa-edit me-2"></i>
+                            Edit MACM
+                        </span>
                     </button>
                     <button type="button" class="btn btn-primary" id="exportThreatModel">
-                        <i class="fas fa-file-export me-2"></i>
-                        Export Threat Model
-                        <span class="button-spinner d-none" role="status" aria-hidden="true"><span class="spinner-border spinner-border-sm" ></span></span>
+                        <span>
+                            <i class="fas fa-file-export me-2"></i>
+                            Export Threat Model
+                        </span>
                     </button>
                     <button type="button" class="btn btn-primary" id="exportAttackPlan">
-                        <i class="fas fa-file-export me-2"></i>
-                        Export Attack Plan
-                        <span class="button-spinner d-none" role="status" aria-hidden="true"><span class="spinner-border spinner-border-sm" ></span></span>
+                        <span>
+                            <i class="fas fa-file-export me-2"></i>
+                            Export Attack Plan
+                        </span>
                     </button>
                     <button type="button" class="btn btn-primary btn-ai" id="generateAIReport">
                         <i class="bi bi-stars me-2"></i>
                         Generate AI Report
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">Beta</span>
-                        <span class="button-spinner d-none" role="status" aria-hidden="true"><span class="spinner-border spinner-border-sm" ></span></span>
                     </button>
                 </div>
             </div>
-            
-            
             <div class="card-body">
                 <!-- {% for _, extra_component in extra_components.iterrows() %}
                     {{ extra_component.component_id }}

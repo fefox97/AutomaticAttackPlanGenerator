@@ -5,7 +5,6 @@ let neoVizSchema;
 var activeTab;
 
 $(window).on('load', function() {
-
     // Draw Neo4j with NeoVis
     drawNeo4j(app_id);
 

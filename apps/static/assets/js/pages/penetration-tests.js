@@ -8,7 +8,7 @@ $(document).ready(function() {
 
     $('#uploadMacmForm').submit(function(e) {
         e.preventDefault();
-        $('.upload_macm').find('.button-spinner').removeClass('d-none');
+        $('.upload_macm').addClass('btn-loading');
         let formData = new FormData(this);
         $.ajax({
             url: '/api/upload_macm',
@@ -21,7 +21,7 @@ $(document).ready(function() {
         }).done(function(response) {
             location.reload();
         }).fail(function(response) {
-            $('.upload_macm').find('.button-spinner').addClass('d-none');
+            $('.upload_macm').removeClass('btn-loading');
             showModal("Upload failed", JSON.parse(response.responseText));
         });
     });

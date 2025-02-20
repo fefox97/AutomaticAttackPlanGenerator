@@ -10,6 +10,8 @@ $popover-header-color           : $white !important;
 $bg-secondary-color             : $dark !default;
 $bg-shared-background           : #3c6e42 !default;
 
+$bg-time-background             : $gray-300 !default;
+
 $bg-capec-background            : #6C969D !default;
 $bg-threat-background           : #A14A76 !default;
 $bg-tool-background             : #C84C09 !default;
@@ -26,3 +28,26 @@ $bg-network-background          : rgb(158,57,38) !default;
 
 $accordion-button-active-bg     : $gray-200 !important;
 $accordion-border-color         : $gray-400 !important;
+
+$btn-primary-loading-bg         : rgba(31, 41, 55, 0.5);
+$btn-primary-loading-bg2        : rgba(43, 50, 59, 0.5);
+
+$display-font-sizes: (
+    1: 5rem,
+    2: 4.5rem,
+    3: 4rem,
+    4: 3.5rem,
+    5: 3rem,
+    6: 2.5rem,
+    7: 2rem,
+    8: 1.5rem,
+    9: 1.25rem,
+    10: 1rem,
+    11: .875rem,
+    12: .75rem,
+    13: .625rem,
+    14: .5rem,
+    15: .375rem,
+    16: .25rem,
+    17: .125rem
+);

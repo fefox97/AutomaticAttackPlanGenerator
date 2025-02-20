@@ -17,6 +17,11 @@ $color-mode-type: data;
         }
     }
 
+    .bg-time{
+        background-color: $bg-time-background-dark !important; 
+        color: white;
+    }
+
     .table td, th{
         background-color: $table-bg-dark !important;
         color: $table-color-dark !important;

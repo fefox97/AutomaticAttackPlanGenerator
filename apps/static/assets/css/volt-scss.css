@@ -555,33 +555,96 @@ progress {
     .display-1 {
       font-size: 5rem; } }
 .display-2 {
-  font-size: calc(1.475rem + 2.7vw);
+  font-size: calc(1.575rem + 3.9vw);
   font-weight: 500;
   line-height: 1.3; }
   @media (min-width: 1200px) {
     .display-2 {
-      font-size: 3.5rem; } }
+      font-size: 4.5rem; } }
 .display-3 {
-  font-size: calc(1.375rem + 1.5vw);
+  font-size: calc(1.525rem + 3.3vw);
   font-weight: 500;
   line-height: 1.3; }
   @media (min-width: 1200px) {
     .display-3 {
-      font-size: 2.5rem; } }
+      font-size: 4rem; } }
 .display-4 {
-  font-size: calc(1.3125rem + 0.75vw);
+  font-size: calc(1.475rem + 2.7vw);
   font-weight: 500;
   line-height: 1.3; }
   @media (min-width: 1200px) {
     .display-4 {
-      font-size: 1.875rem; } }
+      font-size: 3.5rem; } }
 .display-5 {
-  font-size: 1.2rem;
+  font-size: calc(1.425rem + 2.1vw);
+  font-weight: 500;
+  line-height: 1.3; }
+  @media (min-width: 1200px) {
+    .display-5 {
+      font-size: 3rem; } }
+.display-6 {
+  font-size: calc(1.375rem + 1.5vw);
+  font-weight: 500;
+  line-height: 1.3; }
+  @media (min-width: 1200px) {
+    .display-6 {
+      font-size: 2.5rem; } }
+.display-7 {
+  font-size: calc(1.325rem + 0.9vw);
+  font-weight: 500;
+  line-height: 1.3; }
+  @media (min-width: 1200px) {
+    .display-7 {
+      font-size: 2rem; } }
+.display-8 {
+  font-size: calc(1.275rem + 0.3vw);
+  font-weight: 500;
+  line-height: 1.3; }
+  @media (min-width: 1200px) {
+    .display-8 {
+      font-size: 1.5rem; } }
+.display-9 {
+  font-size: 1.25rem;
   font-weight: 500;
   line-height: 1.3; }
 
-.display-6 {
+.display-10 {
   font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-11 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-12 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-13 {
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-14 {
+  font-size: 0.5rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-15 {
+  font-size: 0.375rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-16 {
+  font-size: 0.25rem;
+  font-weight: 500;
+  line-height: 1.3; }
+
+.display-17 {
+  font-size: 0.125rem;
   font-weight: 500;
   line-height: 1.3; }
 
@@ -19755,6 +19818,10 @@ div.dataTables_scrollBody {
   background-color: #3c6e42 !important;
   border: 2px solid rgba(0, 0, 0, 0.332) !important; }
 
+.bg-time {
+  background-color: #D1D5DB !important;
+  color: black; }
+
 .note {
   background-color: #a8d08d;
   /* Verde pastello */
@@ -19832,34 +19899,110 @@ pre[class*=language-] {
 .button-spinner {
   padding-left: 10px; }
 
-.btn-ai {
+.btn-loading {
   position: relative;
-  cursor: pointer;
-  z-index: 1; }
+  overflow: hidden;
+  transform: translateZ(0);
+  place-items: center;
+  color: #ffffff;
+  cursor: wait;
+  pointer-events: none; }
 
-.btn-ai::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
-  padding: 2px;
-  background: linear-gradient(45deg, #ff6666, #ffff66, #66ff66, #66ffff, #6666ff, #ff66ff, #ff6666);
-  background-size: 400%;
-  z-index: -1;
-  animation: border-stripes 15s linear infinite;
-  mask: linear-gradient(#1F2937 0 0) content-box, linear-gradient(#1F2937 0 0);
-  -webkit-mask: linear-gradient(#1F2937 0 0) content-box, linear-gradient(#1F2937 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-  border-radius: 5px; }
-
-@keyframes border-stripes {
+@keyframes loading {
   0% {
-    background-position: 0 0; }
+    transform: translateX(25px); }
   100% {
-    background-position: 400% 0; } }
+    transform: translateX(-20px); } }
+
+.btn-loading > span {
+  position: relative;
+  z-index: 2; }
+
+.btn-loading::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: -100%;
+  width: 300%;
+  height: 100%;
+  background: rgba(31, 41, 55, 0.5) repeating-linear-gradient(60deg, transparent, transparent 10px, rgba(43, 50, 59, 0.5) 10px, rgba(43, 50, 59, 0.5) 20px);
+  animation: loading 1s infinite linear; }
+
+.btn-ai {
+  --border-radius: 5px;
+  --border-width: 2px;
+  position: relative;
+  color: #fff;
+  z-index: 1;
+  border-radius: 6px;
+  box-shadow: 0 0 2px 2px rgba(31, 38, 135, 0.37); }
+
+.btn-ai::after {
+  --m-i: linear-gradient(#000, #000);
+  --m-o: content-box, padding-box;
+  content: "";
+  position: absolute;
+  left: -1%;
+  top: -4%;
+  width: 102%;
+  height: 106%;
+  padding: var(--border-width);
+  border-radius: calc(var(--border-radius) + var(--border-width));
+  background-image: conic-gradient(#597cee, #a659ee, #ee59c6, #ee5b59, #eecb59, #a1ee59, #59ee80, #59ebee, #597cee);
+  -webkit-mask-image: var(--m-i), var(--m-i);
+  mask-image: var(--m-i), var(--m-i);
+  -webkit-mask-origin: var(--m-o);
+  mask-origin: var(--m-o);
+  mask-clip: var(--m-o);
+  -webkit-mask-clip: var(--m-o);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  filter: hue-rotate(0) blur(2px);
+  animation: rotate-hue linear 2s infinite;
+  background-size: 100% 200%;
+  background-position: 50% 50%;
+  z-index: -1; }
+
+@keyframes rotate-hue {
+  to {
+    filter: hue-rotate(1turn) blur(2px); } }
+
+.btn-ai:hover {
+  box-shadow: 0 0 8px 8px rgba(31, 38, 135, 0.37); }
+
+#notifications_icon:hover {
+  animation: notification-shake 1s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-direction: alternate;
+  animation-play-state: running; }
+
+@keyframes notification-shake {
+  0% {
+    transform: rotate(0deg); }
+  10% {
+    transform: rotate(10deg); }
+  20% {
+    transform: rotate(-10deg); }
+  30% {
+    transform: rotate(10deg); }
+  40% {
+    transform: rotate(-10deg); }
+  50% {
+    transform: rotate(10deg); }
+  60% {
+    transform: rotate(-10deg); }
+  70% {
+    transform: rotate(10deg); }
+  80% {
+    transform: rotate(-10deg); }
+  90% {
+    transform: rotate(10deg); }
+  100% {
+    transform: rotate(0deg); } }
 
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
@@ -19871,6 +20014,10 @@ pre[class*=language-] {
     background-color: #1F2937 !important; }
     [data-bs-theme="dark"] .card.theme-settings .theme-settings-close {
       filter: invert(0); }
+
+[data-bs-theme="dark"] .bg-time {
+  background-color: #6B7280 !important;
+  color: white; }
 
 [data-bs-theme="dark"] .table td, [data-bs-theme="dark"] th {
   background-color: #374151 !important;

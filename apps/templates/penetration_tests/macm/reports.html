@@ -37,8 +37,7 @@
                             <td>
                                 {% if report.Report_Parser %}
                                     <button type="button" class="btn btn-primary" id="parseReportFile" onclick="parseReportFile(this, '{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}', '{{ report.Report_Parser }}')">
-                                        Parse
-                                        <span class="button-spinner d-none" role="status" aria-hidden="true"><span class="spinner-border spinner-border-sm" ></span></span>
+                                        <span>Parse</span>
                                     </button>
                                 {% endif %}
                                 <button type="button" class="btn btn-secondary" id="downloadReportFile" onclick="downloadReportFile('{{ report.AppID }}', '{{ report.Component_ID }}', '{{ report.Tool_ID }}')"><i class="fas fa-download"></i></button>
