@@ -34,7 +34,7 @@ def delete_account():
 # Helper - Extract current page name from request
 def get_segment(request):
     try:
-        segment = request.path.split('/')[-1]
+        segment = request.path.split('/')
         if segment == '':
             segment = 'index'
         return segment
