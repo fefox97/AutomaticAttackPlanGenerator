@@ -7,13 +7,12 @@ from datetime import datetime
 
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
-from flask import redirect, render_template, request, url_for, jsonify
+from flask import render_template, request
 
-# from flask_login import login_required, current_user
 from flask_security import auth_required, current_user
 
 from flask import current_app as app
-from apps.databases.models import AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import App, AttackView, MacmUser, Macm, ThreatModel, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
 from apps import db
@@ -63,7 +62,7 @@ def risk_analysis():
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
-        risk_analyses = MacmUser.query.filter_by(UserID=current_user.id).all()
+        risk_analyses = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), MacmUser.IsOwner).all()
         if len(risk_analyses) == 0:
             risk_analyses = None
     except Exception as error:
