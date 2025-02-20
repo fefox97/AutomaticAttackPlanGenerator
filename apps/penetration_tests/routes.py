@@ -1,7 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
 
 from apps.authentication.models import Users
 from apps.penetration_tests import blueprint

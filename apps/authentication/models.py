@@ -1,7 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
 
 from itsdangerous import URLSafeTimedSerializer
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
