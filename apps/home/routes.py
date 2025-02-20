@@ -7,7 +7,7 @@ from apps.authentication.models import Users
 from apps.home import blueprint
 from flask import redirect, render_template, request, url_for
 from flask import current_app as app
-from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, ThreatCatalogue, \
+from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Settings, ThreatCatalogue, \
     Macm, ThreatModel, ToolCatalogue, PentestPhases
 from sqlalchemy import func
 from apps.my_modules import converter
@@ -154,13 +154,14 @@ def macm_detail():
 def settings():
     excel_file = app.config['THREAT_CATALOG_FILE_NAME']
     path = app.config['DBS_PATH']
+    settings = Settings.to_dict()
     if not os.path.exists(f'{path}/{excel_file}'):
         excel_file = None
     try:
         last_modified = time.ctime(os.path.getmtime(f'{path}/{excel_file}'))
     except:
         last_modified = None
-    return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified)
+    return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified, settings=settings)
 
 # Helper - Extract current page name from request
 def get_segment(request):

@@ -18,7 +18,7 @@ from apps.authentication.models import Tasks
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, AttackView, Macm, ThreatModel, ToolCatalogue
+from apps.databases.models import Attack, AttackView, Macm, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 import pandas as pd
@@ -500,3 +500,16 @@ def issue():
         app.logger.error(f"Error sending issue: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
     return make_response(jsonify({'message': 'Report created successfully'}), 200)
+
+@auth_required
+@blueprint.route('/edit_setting', methods=['POST'])
+def edit_setting():
+    key = request.form.get('key')
+    value = request.form.get('value')
+    try:
+        Settings.query.filter_by(key=key).update({'value': value})
+        db.session.commit()
+        return make_response(jsonify({'message': 'Setting updated successfully'}), 200)
+    except Exception as error:
+        app.logger.error(f"Error editing setting: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
