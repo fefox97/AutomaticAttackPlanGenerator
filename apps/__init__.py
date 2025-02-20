@@ -1,7 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
 
 import os
 import re
@@ -86,7 +83,7 @@ def register_custom_filters(app):
         return injections
 
 from apps.authentication.models import Roles, Users, Tasks
-from apps.databases.models import App, Macm, Capec, MacmUser, Attack, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
+from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
 from apps.admin.views import MyModelView, ToolCatalogueView
 from flask_admin.menu import MenuLink
 
@@ -106,6 +103,8 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue'))
     myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases'))
+    myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))
+    myAdmin.add_view(MyModelView(Bibliography, db.session, name='Bibliography'))
 
 def clean_tasks(app):
     @app.before_request

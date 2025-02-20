@@ -127,6 +127,14 @@
           </ul>
         </div>
       </li>
+      <li class="nav-item {% if 'about_us' in segment %} active {% endif %}">
+        <a href="/about_us" class="nav-link">
+          <span class="sidebar-icon">
+            <span class="material-symbols-outlined">info</span>
+          </span> 
+          <span class="sidebar-text">About Us</span>
+        </a>
+      </li>
       {% if 'editor' in current_user.roles %}
       <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
         <a href="/settings" class="nav-link">

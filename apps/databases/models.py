@@ -1,18 +1,9 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-
 import json
 from datetime import datetime
-from typing import List
-from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint, ForeignKeyConstraint
-from sqlalchemy.dialects import mysql
+from sqlalchemy import ForeignKey, select, func, and_, UniqueConstraint
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
 
@@ -44,6 +35,16 @@ class AlchemyEncoder(json.JSONEncoder):
                     fields[field] = None
             return fields
         return json.JSONEncoder.default(self, obj)
+
+class Bibliography(db.Model):
+    
+    __tablename__ = 'Bibliography'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    bibtex = db.Column(db.String(1000), nullable=False)
+
+    def __repr__(self):
+        return str(self.bibtex)
 
 class Settings(db.Model):
     
