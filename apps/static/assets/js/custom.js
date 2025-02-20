@@ -191,6 +191,9 @@ function downloadReport(app_id, task_id, button) {
 }
 
 function addNotification(id, title, message, buttons, time, icon='<i class="fas fa-info"></i>') {
+    if ($('#no_notification_alert').length) {
+        $('#no_notification_alert').addClass('d-none');
+    }
     let notification = document.createElement('div');
     notification.className = "dropdown-item d-flex align-items-center justify-content-between";
     notification.id = id + '_notification';
@@ -225,6 +228,7 @@ function removeNotification(id) {
     $('#notification_counter').text(parseInt($('#notification_counter').text()) - 1);
     if ($('#notification_counter').text() === '0') {
         $('#notification_counter').addClass('d-none');
+        $('no_notification_alert').removeClass('d-none');
     }
 }
 
