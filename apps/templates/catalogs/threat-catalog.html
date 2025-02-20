@@ -89,7 +89,7 @@
                                         {% if row.hasCapecMeta is not none %}
                                             <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecMeta | sort %}
-                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}
                                             </div>
                                         {% endif %}
@@ -98,7 +98,7 @@
                                         {% if row.hasCapecStandard is not none %}
                                             <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecStandard | sort %}
-                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}
                                             </div>
                                         {% endif %}
@@ -107,7 +107,7 @@
                                         {% if row.hasCapecDetailed is not none %}
                                             <div class="d-flex flex-wrap">
                                                     {% for child in row.hasCapecDetailed | sort %}
-                                                    <a class="badge bg-capec me-1 mb-1" href="/capec-detail?id={{ child }}">{{ child }}</a>
+                                                    <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
                                                     {% endfor %}
                                             </div>
                                         {% endif %}
