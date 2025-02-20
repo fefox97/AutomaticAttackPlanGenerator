@@ -203,10 +203,10 @@ $(window).on('load', function() {
                 AppID: app_id,
             },
             success: function(response) {
-                showModal("AI Report", "AI Report generation started successfully. You will be notified when it is ready. Remeber that this process may take a while and the feature is still in beta.", icon="<i class='bi bi-stars me-2'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
+                showModal("AI Report", "AI Report generation started successfully. You will be notified when it is ready. Remeber that this process may take a while and the feature is still in beta.", icon="<i class='bi bi-stars'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
             },
             error: function(response) {
-                showModal("AI Report", response.responseJSON.message, icon="<i class='bi bi-stars me-2'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
+                showModal("AI Report", response.responseJSON.message, icon="<i class='bi bi-stars'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
             }
         });
     }
