@@ -64,3 +64,9 @@
 
 <!-- Custom JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/custom.js"></script>
+
+<script type="text/javascript">
+    if ('{{ current_user.is_authenticated }}' == 'True') {
+        getPendingTasks();
+    }
+</script>

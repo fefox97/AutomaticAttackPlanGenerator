@@ -8,6 +8,7 @@ from apps import db
 from flask import current_app as app
 
 from apps.authentication.util import send_account_deleted_email
+from apps.databases.models import App, MacmUser
 
 @blueprint.route('/profile', methods=['GET'])
 @auth_required()
@@ -21,9 +22,13 @@ def delete_account():
     if delete_account_form.validate_on_submit():
         # Check if the password is correct
         if verify_password(delete_account_form.password.data, current_user.password):
-            send_account_deleted_email(current_user)
+            macm_apps = MacmUser.query.filter_by(UserID=current_user.id, IsOwner=1).all()
+            for macm_app in macm_apps:
+                App.query.filter_by(AppID=macm_app.AppID).delete()
+            db.session.delete(current_user)
             app.user_datastore.delete_user(current_user)
             app.user_datastore.commit()
+            send_account_deleted_email(current_user)
             return redirect(url_for('security.logout'))
         else:
             flash('Password is incorrect', 'danger')
