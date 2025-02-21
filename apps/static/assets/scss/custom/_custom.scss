@@ -156,6 +156,9 @@ div.dataTables_scrollBody {
 .bg-methodology{
     background-color: $bg-methodology-background !important;
 }
+.bg-asset-types{
+    background-color: $bg-asset-types-background !important;
+}
 
 .bg-macm-label{
     background-color: $bg-macm-label-background !important;
@@ -257,7 +260,16 @@ pre[class*=language-]{
     line-break: anywhere;
 }
 
+#navlinks-buttons {
+    height: 100%;
+    margin: 0 auto !important;
+    width: 100%;
+}
+
 .sidebar {
+    .sidebar-inner {
+        height: 100vh;
+    }
     .multi-level{
         .nav-link{
             padding-left: 2rem !important;

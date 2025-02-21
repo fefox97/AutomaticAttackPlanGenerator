@@ -16334,13 +16334,13 @@ a.badge:hover {
     height: 2rem; }
 
 .sidebar-support-btn {
-  width: 190px; }
+  width: 100%; }
 
 .sidebar-support {
-  position: fixed;
   bottom: 15px;
   right: 15px;
-  width: 190px; }
+  width: inherit;
+  background-color: #1F2937; }
   @media (min-width: 768px) {
     .sidebar-support {
       left: 35px; } }
@@ -20000,6 +20000,9 @@ div.dataTables_scrollBody {
 .bg-methodology {
   background-color: #4fa007 !important; }
 
+.bg-asset-types {
+  background-color: #0768a0 !important; }
+
 .bg-macm-label {
   background-color: #3968b2 !important; }
 
@@ -20084,6 +20087,14 @@ pre[class*=language-] {
 .modal-body-text {
   white-space: pre-line;
   line-break: anywhere; }
+
+#navlinks-buttons {
+  height: 100%;
+  margin: 0 auto !important;
+  width: 100%; }
+
+.sidebar .sidebar-inner {
+  height: 100vh; }
 
 .sidebar .multi-level .nav-link {
   padding-left: 2rem !important; }
