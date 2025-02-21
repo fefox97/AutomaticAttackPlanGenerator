@@ -42,14 +42,14 @@
 }
 
 .sidebar-support-btn {
-    width: 190px;
+    width: 100%;
 }
 
 .sidebar-support {
-    position: fixed;
     bottom: 15px;
     right: 15px;
-    width: 190px;
+    width: inherit;
+    background-color: $primary;
 
     @include media-breakpoint-up(md) {
         left: 35px;

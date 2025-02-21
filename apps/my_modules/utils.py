@@ -13,7 +13,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
+from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
 
 # from flask_login import current_user
 from flask_security import current_user
@@ -113,6 +113,22 @@ class ToolCatalogUtils:
 		print(df)
 		return df
 
+class AssetTypesCatalogUtils:
+
+	converter = Converter()
+
+	def __init__(self):
+		self.base_path = Config.DBS_PATH
+		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		# self.tools_catalog_df = self.load_tools_catalog()
+
+	def load_asset_types_catalog(self):
+		print("\nLoading Asset Types catalog...\n")
+		df = pd.read_excel(self.file_path, sheet_name="AssetTypes", header=0)
+		df.rename(columns={'ID': 'AssetTypeID', 'Primary Label': 'PrimaryLabel', 'Secondary Label': 'SecondaryLabel'}, inplace=True)
+		df.replace(np.nan, None, inplace=True) # replace NaN with None
+		return df
+	
 class MethodologyCatalogUtils:
 
 	converter = Converter()
@@ -304,6 +320,7 @@ class Utils:
 		self.macm_utils = MacmUtils()
 		self.methodology_catalog_utils = MethodologyCatalogUtils()
 		self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
+		self.asset_types_catalog_utils = AssetTypesCatalogUtils()
 		self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
 	def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -412,6 +429,9 @@ class Utils:
 		elif database == 'MethodologyCatalog':
 			methodology_catalog_df = self.methodology_catalog_utils.load_methodology_catalog()
 			self.save_dataframe_to_database(methodology_catalog_df, MethodologyCatalogue)
+		elif database == 'AssetTypesCatalog':
+			asset_types_catalog_df = self.asset_types_catalog_utils.load_asset_types_catalog()
+			self.save_dataframe_to_database(asset_types_catalog_df, AssetTypes)
 		elif database == 'RiskAnalysisCatalog':
 			threat_agent_category_df = self.risk_analysis_catalog_utils.load_threat_agent_category_df()
 			threat_agent_questions_df = self.risk_analysis_catalog_utils.load_threat_agent_questions()

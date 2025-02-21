@@ -10,8 +10,8 @@
 </nav>
 
 <nav id="sidebarMenu" class="sidebar d-lg-block bg-gray-800 text-white collapse" data-simplebar>
-  <div class="sidebar-inner px-4 pt-3">
-    <div class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
+  <div class="sidebar-inner px-4 pt-3 overflow-scroll d-flex flex-column">
+    <div class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center">
       <div class="d-flex align-items-center">
         <div class="avatar-lg me-4">
           <img class="avatar rounded-circle bg-secondary inverted" alt="Image placeholder" src="{{ config.ASSETS_ROOT }}/img/illustrations/user-profile.svg">
@@ -33,154 +33,160 @@
       </div>
     </div>
 
-    <!-- Navbar Links -->
-    <ul class="nav flex-column pt-3 pt-md-0">
-      <li class="nav-item">
-        <a href="/" class="nav-link d-flex align-items-center">
-          <span class="sidebar-icon">
-            <img src="{{ config.ASSETS_ROOT }}/img/brand/light.svg" height="20" width="20" alt="Volt Logo">
-          </span>
-          <span class="mt-1 ms-1 sidebar-text">VSecLab</span>
-        </a>
-      </li>
-      <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
-        <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
-          <span>
-            <span class="sidebar-icon">
-              <span class="material-symbols-outlined">apps</span>
-            </span> 
-            <span class="sidebar-text">Apps</span>
-          </span>
-          <span class="link-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </span>
-        </span>
-            <div class="multi-level collapse"
-              role="list" id="submenu-app" aria-expanded="false">
-              <ul class="flex-column nav">
-                <li class="nav-item {% if 'penetration_tests' in segment %} active {% endif %}">
-                  <a href="/penetration_tests" class="nav-link">
-                    <span class="sidebar-icon">
-                      <span class="material-symbols-outlined">network_node</span>
-                    </span>
-                    <span class="sidebar-text">Penetration Tests</span>
-                  </a>
-                </li>
-                <li class="nav-item {% if 'risk_analysis' in segment %} active {% endif %}">
-                  <a href="/risk_analysis" class="nav-link">
-                    <span class="sidebar-icon">
-                      <span class="material-symbols-outlined">assessment</span>
-                    </span>
-                    <span class="sidebar-text">Risk Analysis</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-      </li>
-      <li class="nav-item {% if 'catalogs' in segment %} active {% endif %}">
-        <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-catalog">
-          <span>
-            <span class="sidebar-icon">
-              <span class="material-symbols-outlined">library_books</span>
-            </span> 
-            <span class="sidebar-text">Catalogs</span>
-          </span>
-          <span class="link-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </span>
-        </span>
-        <div class="multi-level collapse"
-          role="list" id="submenu-catalog" aria-expanded="false">
-          <ul class="flex-column nav">
-            <li class="nav-item {% if 'threat-catalog' in segment %} active {% endif %}">
-              <a href="/catalogs/threat-catalog" class="nav-link">
-                <span class="sidebar-icon">
-                  <span class="material-symbols-outlined">destruction</span>
-                </span> 
-                <span class="sidebar-text">Threat Catalogue</span>
-              </a>
-            </li>
-            <li class="nav-item {% if 'capec' in segment %} active {% endif %}">
-              <a href="/catalogs/capec" class="nav-link">
-                <span class="sidebar-icon">
-                  <span class="material-symbols-outlined">pattern</span>
-                </span> 
-                <span class="sidebar-text">Capec</span>
-              </a>
-            </li>
-            <li class="nav-item {% if 'tools' in segment %} active {% endif %}">
-              <a href="/catalogs/tools" class="nav-link">
-                <span class="sidebar-icon">
-                  <span class="material-symbols-outlined">construction</span>
-                </span> 
-                <span class="sidebar-text">Tools</span>
-              </a>
-            </li>
-            <li class="nav-item {% if 'methodologies' in segment %} active {% endif %}">
-              <a href="/catalogs/methodologies" class="nav-link">
-                <span class="sidebar-icon">
-                  <span class="material-symbols-outlined">tactic</span>
-                </span> 
-                <span class="sidebar-text">Methodologies</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </li>
-      <li class="nav-item {% if 'about_us' in segment %} active {% endif %}">
-        <a href="/about_us" class="nav-link">
-          <span class="sidebar-icon">
-            <span class="material-symbols-outlined">info</span>
-          </span> 
-          <span class="sidebar-text">About Us</span>
-        </a>
-      </li>
-      {% if 'editor' in current_user.roles %}
-      <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
-        <a href="/settings" class="nav-link">
-          <span class="sidebar-icon">
-            <span class="material-symbols-outlined">settings</span>
-          </span> 
-          <span class="sidebar-text">Settings</span>
-        </a>
-      </li>
-      {% endif %}
-      {% if 'admin' in current_user.roles %}
-      <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
-      <li class="nav-item">
-        <a href="/admin" class="nav-link">
-            <span class="sidebar-icon">
-                <span class="material-symbols-outlined">admin_panel_settings</span>
-            </span>
-            <span class="sidebar-text">Admin</span>
-        </a>
-      </li>
-      {% endif %}
-      <li class="nav-item">
-        <a href="{{ url_for_security('logout') }}" class="nav-link">
-            <span class="sidebar-icon">
-                <svg class="icon icon-xs text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg> 
-            </span>
-            <span class="sidebar-text">Logout</span>
-        </a>
-      </li>
-      <div class="sidebar-support">
-        {% if 'admin' in current_user.roles %}
+    <div id="navlinks-buttons" class="d-flex flex-column justify-content-between">
+      <!-- Navbar Links -->
+      <ul class="nav flex-column pt-3 pt-md-0">
         <li class="nav-item">
-          <button type="button" class="btn btn-tertiary d-flex align-items-center justify-content-center sidebar-support-btn mb-2" data-bs-toggle="modal" data-bs-target="#ticketModal"> 
-          Ticket
-          </button>
+          <a href="/" class="nav-link d-flex align-items-center">
+            <span class="sidebar-icon">
+              <img src="{{ config.ASSETS_ROOT }}/img/brand/light.svg" height="20" width="20" alt="Volt Logo">
+            </span>
+            <span class="mt-1 ms-1 sidebar-text">VSecLab</span>
+          </a>
+        </li>
+        <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
+          <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
+            <span>
+              <span class="sidebar-icon">
+                <span class="material-symbols-outlined">apps</span>
+              </span> 
+              <span class="sidebar-text">Apps</span>
+            </span>
+            <span class="link-arrow">
+              <i class="fas fa-chevron-right"></i>
+            </span>
+          </span>
+              <div class="multi-level collapse"
+                role="list" id="submenu-app" aria-expanded="false">
+                <ul class="flex-column nav">
+                  <li class="nav-item {% if 'penetration_tests' in segment %} active {% endif %}">
+                    <a href="/penetration_tests" class="nav-link">
+                      <span class="sidebar-icon">
+                        <span class="material-symbols-outlined">network_node</span>
+                      </span>
+                      <span class="sidebar-text">Penetration Tests</span>
+                    </a>
+                  </li>
+                  <li class="nav-item {% if 'risk_analysis' in segment %} active {% endif %}">
+                    <a href="/risk_analysis" class="nav-link">
+                      <span class="sidebar-icon">
+                        <span class="material-symbols-outlined">assessment</span>
+                      </span>
+                      <span class="sidebar-text">Risk Analysis</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+        </li>
+        <li class="nav-item {% if 'catalogs' in segment %} active {% endif %}">
+          <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-catalog">
+            <span>
+              <span class="sidebar-icon">
+                <span class="material-symbols-outlined">library_books</span>
+              </span> 
+              <span class="sidebar-text">Catalogs</span>
+            </span>
+            <span class="link-arrow">
+              <i class="fas fa-chevron-right"></i>
+            </span>
+          </span>
+          <div class="multi-level collapse"
+            role="list" id="submenu-catalog" aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item {% if 'asset-types' in segment %} active {% endif %}">
+                <a href="/catalogs/asset-types" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined">orbit</span>
+                  </span> 
+                  <span class="sidebar-text">Asset Types</span>
+                </a>
+              </li>
+              <li class="nav-item {% if 'threat-catalog' in segment %} active {% endif %}">
+                <a href="/catalogs/threat-catalog" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined">destruction</span>
+                  </span> 
+                  <span class="sidebar-text">Threats</span>
+                </a>
+              </li>
+              <li class="nav-item {% if 'capec' in segment %} active {% endif %}">
+                <a href="/catalogs/capec" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined">pattern</span>
+                  </span> 
+                  <span class="sidebar-text">Capec</span>
+                </a>
+              </li>
+              <li class="nav-item {% if 'tools' in segment %} active {% endif %}">
+                <a href="/catalogs/tools" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined">construction</span>
+                  </span> 
+                  <span class="sidebar-text">Tools</span>
+                </a>
+              </li>
+              <li class="nav-item {% if 'methodologies' in segment %} active {% endif %}">
+                <a href="/catalogs/methodologies" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined">tactic</span>
+                  </span> 
+                  <span class="sidebar-text">Methodologies</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item {% if 'about_us' in segment %} active {% endif %}">
+          <a href="/about_us" class="nav-link">
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined">info</span>
+            </span> 
+            <span class="sidebar-text">About Us</span>
+          </a>
+        </li>
+        {% if 'editor' in current_user.roles %}
+        <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
+          <a href="/settings" class="nav-link">
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined">settings</span>
+            </span> 
+            <span class="sidebar-text">Settings</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if 'admin' in current_user.roles %}
+        <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
+        <li class="nav-item">
+          <a href="/admin" class="nav-link">
+              <span class="sidebar-icon">
+                  <span class="material-symbols-outlined">admin_panel_settings</span>
+              </span>
+              <span class="sidebar-text">Admin</span>
+          </a>
         </li>
         {% endif %}
         <li class="nav-item">
+          <a href="{{ url_for_security('logout') }}" class="nav-link">
+              <span class="sidebar-icon">
+                  <svg class="icon icon-xs text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg> 
+              </span>
+              <span class="sidebar-text">Logout</span>
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-support mb-3">
+        {% if 'admin' in current_user.roles %}
+          <button type="button" class="btn btn-tertiary d-flex align-items-center justify-content-center sidebar-support-btn mb-2" data-bs-toggle="modal" data-bs-target="#ticketModal"> 
+          Ticket
+          </button>
+        {% endif %}
           <button type="button" class="btn btn-secondary d-flex align-items-center justify-content-center sidebar-support-btn" data-bs-toggle="modal" data-bs-target="#supportModal"> 
             Support
           </button>
-        </li>
-      </div>    
-    </ul>
+      </div>
+    </div>   
   </div>
 </nav>
 

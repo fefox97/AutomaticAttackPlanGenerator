@@ -86,6 +86,26 @@ class PentestPhases(db.Model):
     def __repr__(self):
         return str(self.PhaseID)
 
+class AssetTypes(db.Model):
+    
+    __tablename__ = 'AssetTypes'
+
+    AssetTypeID            = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name          = db.Column(db.Text, nullable=False)
+    Description   = db.Column(db.Text)
+    PrimaryLabel  = db.Column(db.Text)
+    SecondaryLabel = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.AssetTypeID)
+
 class Capec(db.Model):
 
     __tablename__ = 'Capec'
