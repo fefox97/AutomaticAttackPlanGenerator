@@ -1,16 +1,14 @@
 
 
 from flask import render_template, redirect, request, url_for
-from flask import current_app as app
-
-from flask_security import url_for_security, current_user, user_registered
+from flask_security import url_for_security, current_user
 
 from flask_dance.contrib.github import github
 
 from apps.authentication import blueprint
 from apps.authentication.forms import GithubForm
 from apps.authentication.models import Users
-from apps import db, security
+from apps import db
 
 @blueprint.route('/')
 def route_default():
