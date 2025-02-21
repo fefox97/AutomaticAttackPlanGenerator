@@ -44,16 +44,10 @@ def register_assets(app):
     scss.build()
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'api', 'account', 'risk_analysis', 'catalogs', 'penetration_tests'):
+    for module_name in ('authentication', 'home', 'api', 'account', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
     app.register_blueprint(github_blueprint, url_prefix="/login")
-
-def register_error_handlers(app):
-    module = import_module('apps.errors.routes')
-    app.register_error_handler(404, module.page_not_found)
-    app.register_error_handler(500, module.internal_server_error)
-    app.register_error_handler(403, module.access_forbidden)
 
 def register_custom_filters(app):
     @app.template_filter('regex_replace')
@@ -162,7 +156,6 @@ def create_app(config):
     
     register_extensions(app, user_datastore)
     register_blueprints(app)
-    register_error_handlers(app)
     register_assets(app)
     register_custom_filters(app)
     

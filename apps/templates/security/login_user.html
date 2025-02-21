@@ -11,18 +11,18 @@
         <!-- Settings Box + Dark Mode Script -->
         {% include 'includes/settings-box.html' %}
         <script src="{{ config.ASSETS_ROOT }}/js/dark-mode.js"></script>
-
+        <div class="custom-background bg">
+            <canvas id="icbg-animation"></canvas>
+        </div>
         <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
             <div class="container">
-                <!-- <p class="text-center">
-                    Open-source Flask Dashboard
-                </p> -->
-                <div class="row justify-content-center form-bg-image" data-background-lg="{{ config.ASSETS_ROOT }}/img/illustrations/signin.svg">
+                <!-- <div class="row justify-content-center form-bg-image" data-background-lg="{{ config.ASSETS_ROOT }}/img/illustrations/signin.svg"> -->
+                <div class="row justify-content-center form-bg-image">
                     <div class="col-12 d-flex align-items-center justify-content-center">
-                        <div class="bg-gradient shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                        <div class="bg-gradient shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500 bg-body bg-opacity-75">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">
-                                    VSecLab - Sign IN
+                                    VSecLab - Sign in
                                 </h1>
                                 <br />
                                 <!-- print flask-security messages -->
@@ -86,7 +86,7 @@
                                     </div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" name="login" class="btn btn-gray-800">Sign IN</button>
+                                    <button type="submit" name="login" class="btn btn-gray-800">Sign in</button>
                                 </div>
                             </form>
                             <br/>
