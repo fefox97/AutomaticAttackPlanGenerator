@@ -278,7 +278,24 @@
 
         <div class="card border-0 shadow mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h4 mb-0">MACM</h2>
+                <div>
+                    <h4 class="mb-0">{{ app_info.Name if table is not none }} Penetration Test Plan</h2>
+                    <span class="display-10 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMacmModal">
+                        <span>
+                            <i class="fas fa-edit me-2"></i>
+                            Edit MACM
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-primary" id="exportThreatModel">
+                        <span>
+                            <i class="fas fa-file-export me-2"></i>
+                            Export Threat Model
+                        </span>
+                    </button>
+                </div>
             </div>
 
             <div class="card-body">
@@ -371,6 +388,9 @@
             </div>
         </div>
     </div>
+    
+    {% include 'penetration_tests/modals/edit_macm_modal.html' %}
+
 {% endblock %}
 
 {% block javascripts %}

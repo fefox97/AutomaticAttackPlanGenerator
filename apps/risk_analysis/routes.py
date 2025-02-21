@@ -33,6 +33,7 @@ def macm_riskRating():
     try:
         selected_macm = request.args.get('app_id')
         table = Macm.query.filter_by(App_ID=selected_macm).all()
+        app_info = App.query.filter_by(AppID=selected_macm).first()
         if len(table) == 0:
             table = None
     except:
@@ -49,7 +50,7 @@ def macm_riskRating():
                             threat_for_each_component=threat_for_each_component,
                             threat_number=threat_number,
                             selected_macm=selected_macm,wizard_completed=riskAnalysisCatalogUtils.wizard_completed(selected_macm),
-                            stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm))
+                            stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm), app_info=app_info)
 
 @blueprint.route('/', methods=['GET'])
 @auth_required()

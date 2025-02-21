@@ -64,14 +64,6 @@ $(window).on('load', function() {
             {
                 className: 'btn-secondary',
                 extend: 'searchPanes'
-            },
-            {   
-                className: 'btn-primary',
-                text: 'Edit MACM',
-                action: function (e, dt, node, config) {
-                    $('#editAppName').text(app_name);
-                    $('#editMacmModal').modal('show');
-                }
             }
         ],
         initComplete: function () {
@@ -128,6 +120,12 @@ $(window).on('load', function() {
     $('#editMacmSubmit').click(function() {
         const QueryCypher = $('#editQueryCypher').val();
         editMacm(app_id, QueryCypher);
+    });
+
+    $("#exportThreatModel").on('click', function () {
+        let formData = new FormData();
+        formData.append('AppID', app_id);
+        downloadFiles(formData, '/api/download_threat_model', this);
     });
 });
 
