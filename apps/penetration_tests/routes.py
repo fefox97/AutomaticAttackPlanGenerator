@@ -86,6 +86,3 @@ def get_segment(request):
         return segment
     except:
         return None
-
-
-
