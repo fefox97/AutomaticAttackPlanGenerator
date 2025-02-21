@@ -19859,6 +19859,36 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
 [data-bs-theme="dark"] .number500content {
   fill: #6B7280; }
 
+.number404container {
+  position: absolute;
+  display: flex;
+  z-index: -100;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-20deg); }
+
+.number404 {
+  font-size: 50rem;
+  color: #1F2937;
+  animation: number-blink 2s linear infinite; }
+
+.number404:nth-child(1) {
+  animation-delay: 0s; }
+
+.number404:nth-child(2) {
+  animation-delay: 1s; }
+
+.number404:nth-child(3) {
+  animation-delay: 2s; }
+
+@keyframes number-blink {
+  0% {
+    opacity: 0.5; }
+  50% {
+    opacity: 1; }
+  100% {
+    opacity: 0.5; } }
+
 .custom-background {
   position: absolute;
   top: 0;
