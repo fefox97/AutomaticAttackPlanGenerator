@@ -1,9 +1,9 @@
 
 
 from flask import flash, redirect, render_template, request, url_for
-from flask_security import auth_required, current_user, url_for_security, verify_password
-from apps.account import blueprint
-from apps.account.forms import DeleteAccountForm
+from flask_security import auth_required, current_user, verify_password
+from apps.profile import blueprint
+from apps.profile.forms import DeleteAccountForm
 from apps import db
 from flask import current_app as app
 
@@ -13,7 +13,7 @@ from apps.databases.models import App, MacmUser
 @blueprint.route('/profile', methods=['GET'])
 @auth_required()
 def profile():
-    return render_template(f"account/profile.html", segment=get_segment(request))
+    return render_template(f"profile/profile.html", segment=get_segment(request))
 
 @blueprint.route('/delete_account', methods=['GET', 'POST'])
 @auth_required()
@@ -32,7 +32,7 @@ def delete_account():
             return redirect(url_for('security.logout'))
         else:
             flash('Password is incorrect', 'danger')
-            return redirect(url_for('account_blueprint.delete_account'))
+            return redirect(url_for('profile_blueprint.delete_account'))
 
     return render_template(f"security/delete_account.html", segment=get_segment(request), delete_account_form=delete_account_form)
 

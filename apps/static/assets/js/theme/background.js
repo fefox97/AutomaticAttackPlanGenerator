@@ -2,7 +2,7 @@ var icBgAnimation = function() {
 	var width,
 			height,
 			largeHeader,
-			canvas,
+			background_canvas,
 			ctx,
 			points,
 			target,
@@ -23,10 +23,10 @@ var icBgAnimation = function() {
 			y: height / 2
 		};
 
-		canvas = document.getElementById("icbg-animation");
-		canvas.width = width;
-		canvas.height = height;
-		ctx = canvas.getContext("2d");
+		background_canvas = document.getElementById("icbg-animation");
+		background_canvas.width = width;
+		background_canvas.height = height;
+		ctx = background_canvas.getContext("2d");
 
 		// create lines and points
 		points = [];
@@ -112,8 +112,8 @@ var icBgAnimation = function() {
 	function resize() {
 		width = window.innerWidth;
 		height = window.innerHeight;
-		canvas.width = width;
-		canvas.height = height;
+		background_canvas.width = width;
+		background_canvas.height = height;
 	}
 
 	// animation
@@ -163,7 +163,7 @@ var icBgAnimation = function() {
 		});
 	}
 
-	// Canvas manipulation
+	// background_canvas manipulation
 	function drawLines(p) {
 		if (!p.active) return;
 		for (var i in p.closest) {

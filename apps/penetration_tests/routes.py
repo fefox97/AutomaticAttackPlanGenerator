@@ -2,16 +2,14 @@
 
 from apps.authentication.models import Users
 from apps.penetration_tests import blueprint
-from flask import redirect, render_template, request, url_for
+from flask import render_template, request
 from flask import current_app as app
-from apps.databases.models import App, AttackView, MacmUser, MethodologyView, Settings, Macm, ThreatModel, PentestPhases
+from apps.databases.models import App, AttackView, MacmUser, MethodologyView, Macm, ThreatModel, PentestPhases
 from sqlalchemy import func
 from apps.my_modules import converter
-import os
-import time
 from werkzeug.exceptions import NotFound
 
-from flask_security import auth_required, current_user, roles_required
+from flask_security import auth_required, current_user
 
 from apps.my_modules.utils import MacmUtils
 
