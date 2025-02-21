@@ -77,7 +77,7 @@ def register_custom_filters(app):
         return injections
 
 from apps.authentication.models import Roles, Users, Tasks
-from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases
+from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
 from apps.admin.views import MyModelView, ToolCatalogueView
 from flask_admin.menu import MenuLink
 
@@ -95,6 +95,7 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(Attack, db.session, name='Attack'))
     myAdmin.add_view(MyModelView(ToolCatalogue, db.session, name='Tool Catalogue'))
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue'))
+    myAdmin.add_view(MyModelView(AssetTypes, db.session, name='Asset Types'))
     myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases'))
     myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))
