@@ -7,8 +7,8 @@ var icBgAnimation = function() {
 			points,
 			target,
 			animateHeader = true;
-    var glyphcolor = [246, 21, 0];
-    var linecolor = [255, 25, 0];
+    var glyphcolor = [49, 49, 106];
+    var linecolor = [70, 70, 106];
     var glyphcolordark = [246, 241, 0];
     var linecolordark = [255, 235, 0];
 	initTop();
