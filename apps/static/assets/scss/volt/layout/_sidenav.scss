@@ -1,6 +1,11 @@
 /*
  * Sidebar
 */
+
+:root {
+	--max-sidebar-width: 260px;
+}
+
 .sidebar {
 	display: block;
 	position: fixed;
@@ -15,7 +20,7 @@
 	
 	@include media-breakpoint-up(md) {
 		width: 100%;
-		max-width: 260px;
+		max-width: var(--max-sidebar-width);
 	}
 
 	.nav {

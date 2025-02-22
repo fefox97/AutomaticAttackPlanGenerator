@@ -1,3 +1,8 @@
+:root{
+    --my-navbar-height: 5rem;
+    --dark-drowpdown-link-active-bg: red !important;
+}
+
 .custom-background{
     position: absolute;
     top: 0;
@@ -384,6 +389,16 @@ pre[class*=language-]{
     box-shadow: 0 0 8px 8px rgba(31, 38, 135, 0.37);
 }
 
+#notifications {
+    .dropdown-menu{
+        width: 50vw;
+        max-width: 800px;
+    }
+    .notification-item{
+        overflow-x: scroll;
+    }
+}
+
 #notifications_icon:hover{
     animation: notification-shake 1s;
     animation-iteration-count: 1;
@@ -427,4 +442,37 @@ pre[class*=language-]{
     100% {
         transform: rotate(0deg);
     }
+}
+
+#my-navbar{
+    position: fixed;
+    z-index: 98;
+    width: calc(100% - var(--max-sidebar-width));
+    height: var(--my-navbar-height);
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#toast-container{
+    position: fixed;
+    z-index: 99;
+    top: var(--my-navbar-height);
+    right: 1rem;
+    overflow: scroll;
+    max-height: calc(100vh - var(--my-navbar-height) - 1rem);
+}
+
+.body-content{
+    margin-top: var(--my-navbar-height);
+}
+
+@media screen and (max-width: 992px) {
+    #my-navbar{
+        width: 100%;
+        position: relative;
+    }
+    .body-content{
+        margin-top: 0;
+    }
+    
 }

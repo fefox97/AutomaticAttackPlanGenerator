@@ -71,6 +71,7 @@ function copySingleCommand(element) {
         }
     });
     navigator.clipboard.writeText(command);
+    showToast('Copied', 'Command copied to clipboard', true);
     
 }
 
@@ -99,6 +100,7 @@ function getAllCommands(){
 
 function copyAllCommands() {
     navigator.clipboard.writeText($('#allCommands').text());
+    showToast('Copied', 'All commands copied to clipboard', true);
 }
 
 function downloadAllCommands(filename){
