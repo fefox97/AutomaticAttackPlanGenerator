@@ -39,7 +39,7 @@
                 <div class="input-group mb-3 report-file">
                     <span class="input-group-text">Report File</span>
                     <input type="file" class="form-control" id="reportFile" accept="{{ attack.Allowed_Report_Extensions|join(',') }}" macmID="{{ attack.AppID }}" componentID="{{ attack.Component_ID }}" toolID="{{ attack.Tool_ID }}">
-                    <button type="button" class="btn btn-secondary" id="uploadReportFile"><i class="fas fa-upload"></i> Upload</button>
+                    <button type="button" class="btn btn-secondary" id="uploadReportFile"><span><i class="fas fa-upload"></i>Upload</span></button>
                 </div>
                 <div class="col-auto">
                     <label class="visually-hidden" for="uploadedReport">Uploaded Report</label>

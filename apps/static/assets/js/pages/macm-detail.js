@@ -27,6 +27,7 @@ $(document).ready(function() {
 });
 
 function upload_report_file() {
+    $(this).addClass('btn-loading');
     let fileDiv = $(this).parent('.report-file').find('#reportFile');
     let parser = fileDiv.attr('parser');
     let macmID = fileDiv.attr('macmID');
@@ -49,6 +50,7 @@ function upload_report_file() {
             location.reload();
         },
         error: function(data) {
+            $(this).removeClass('btn-loading');
             showModal("Report Upload", JSON.parse(data.responseText), autohide = true)
         }
     });
@@ -69,6 +71,7 @@ function copySingleCommand(element) {
         }
     });
     navigator.clipboard.writeText(command);
+    
 }
 
 function getAllCommands(){
