@@ -37,7 +37,10 @@ function parseReportFile(element, macmID, componentID, toolID, parser) {
         contentType: false,
         processData: false,
         success: function(data) {
-            $('#copyParserOutput').attr('data-clipboard-text', data.output);
+            $('#copyParserOutput').on('click', function() { 
+                navigator.clipboard.writeText(data.output); 
+                showToast('Copied', 'Output copied to clipboard', true);
+            });
             $('#executeParserOutput').on('click', function() { executeParser(data.output, macmID); });
             if (data.output.length > 0) {
                 $('#parserOutput').text(data.output);
