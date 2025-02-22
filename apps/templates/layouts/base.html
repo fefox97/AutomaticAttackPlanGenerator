@@ -65,6 +65,7 @@
 <body>
 
     {% include 'includes/sidebar.html' %}
+    {% include 'includes/navigation.html' %}
 
     <main class="content">
 
@@ -72,12 +73,13 @@
         {% include 'includes/settings-box.html' %}
         <script src="{{ config.ASSETS_ROOT }}/js/dark-mode.js"></script>
 
-        {% include 'includes/navigation.html' %}
 
         {% include 'home/modals/error_modal.html' %}
-
-        {% block content %}{% endblock content %}
-
+        
+        <div class="body-content">
+            {% block content %}{% endblock content %}
+        </div>
+        
         {% include 'includes/footer.html' %}
         {% include 'cookies/banner.html' %}
     </main>

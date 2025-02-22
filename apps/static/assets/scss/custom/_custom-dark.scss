@@ -284,4 +284,11 @@ $color-mode-type: data;
             }
         }
     }
+
+    .toast {
+        background-color: $toast-background-color-dark !important;
+        .toast-header {
+            background-color: $toast-header-background-color-dark !important;
+        }
+    }
 }

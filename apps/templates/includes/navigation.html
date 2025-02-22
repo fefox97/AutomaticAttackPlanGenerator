@@ -1,71 +1,72 @@
-<nav class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
-              <div class="container-fluid px-0">
-                <div class="d-flex justify-content-between w-100" id="navbarSupportedContent">
-                  <div class="d-flex align-items-center">
-                    <!-- Search form -->
-                    <form class="navbar-search form-inline" id="navbar-search-main" action="">
-                      <div class="input-group input-group-merge search-bar">
-                          <span class="input-group-text" id="topbar-addon">
-                            <svg class="icon icon-xs" x-description="Heroicon name: solid/search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
-                            </svg>
-                          </span>
-                          <input type="text" class="form-control" id="topbarInputIconLeft" placeholder="Search" aria-label="Search" aria-describedby="topbar-addon">
-                      </div>
-                    </form>
-                    <!-- / Search form -->
-                  </div>
-                  <!-- Navbar links -->
-                  <ul class="navbar-nav align-items-center">
-                    <li class="nav-item dropdown ms-lg-3">
-                      <a class="nav-link dropdown-toggle pt-1 px-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="media d-flex align-items-center">
-                          <img class="avatar rounded-circle bg-secondary inverted" alt="Image placeholder" src="{{ config.ASSETS_ROOT }}/img/illustrations/user-profile.svg">
-                          <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                            <span class="mb-0 font-small fw-bold text-primary">
-                              <strong>{{ current_user.username }}</strong>
-                            </span>
-                          </div>
-                        </div>
-                      </a>
-                      <div class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('profile_blueprint.profile') }}">
-                          <i class="fas fa-user me-2"></i>            
-                          My Profile
-                        </a>
-                        <div role="separator" class="dropdown-divider my-1"></div>
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for_security('logout') }}">
-                          <svg class="dropdown-icon text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                          </svg>                
-                          Logout
-                        </a>
-                      </div>
-                    </li>
-                    <!-- add notification dropdown -->
-                    <li class="nav-item dropdown" id="notifications">
-                        <a class="nav-link dropdown-toggle text-dark position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i id="notifications_icon" class="fas fa-bell" style="font-size: 1em;"></i>
-                          <span class="badge bg-danger position-absolute top--10 start-80 translate-middle d-none" id="notification_counter">0</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end mt-2 py-1" style="min-width: 350px;">
-                        <div class="d-flex justify-content-between p-3">
-                          <h4 class="h4">Notifications</h4>
-                          <button class="btn btn-danger" id="clear_notifications" onclick="clearNotifications()">
-                          <i class="fas fa-trash"></i>
-                          Clear All
-                          </button>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <div id="notification_container"></div>
-                        <!-- sbow no notification alert -->
-                        <div class="alert alert-info text-center mx-4" id="no_notification_alert">
-                          <i class="fas fa-info-circle"></i>
-                          <span>No notifications</span>
-                        </div>
-                        </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </nav>
+<nav class="navbar navbar-top navbar-expand navbar-dark end-0 bg-body" id="my-navbar">
+	<div class="container-fluid px-0">
+		<div class="d-flex justify-content-between w-100" id="navbarSupportedContent">
+			<div class="d-flex align-items-center">
+				<!-- Search form -->
+				<form class="navbar-search form-inline" id="navbar-search-main" action="">
+					<div class="input-group input-group-merge search-bar">
+						<span class="input-group-text" id="topbar-addon">
+							<svg class="icon icon-xs" x-description="Heroicon name: solid/search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+							</svg>
+						</span>
+						<input type="text" class="form-control" id="topbarInputIconLeft" placeholder="Search" aria-label="Search" aria-describedby="topbar-addon">
+					</div>
+				</form>
+				<!-- / Search form -->
+			</div>
+		<!-- Navbar links -->
+			<ul class="navbar-nav align-items-center">
+				<li class="nav-item dropdown ms-lg-3">
+				<a class="nav-link dropdown-toggle pt-1 px-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<div class="media d-flex align-items-center">
+					<img class="avatar rounded-circle bg-secondary inverted" alt="Image placeholder" src="{{ config.ASSETS_ROOT }}/img/illustrations/user-profile.svg">
+					<div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
+						<span class="mb-0 font-small fw-bold text-primary">
+						<strong>{{ current_user.username }}</strong>
+						</span>
+					</div>
+					</div>
+				</a>
+				<div class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
+					<a class="dropdown-item d-flex align-items-center" href="{{ url_for('profile_blueprint.profile') }}">
+					<i class="fas fa-user me-2"></i>            
+					My Profile
+					</a>
+					<div role="separator" class="dropdown-divider my-1"></div>
+					<a class="dropdown-item d-flex align-items-center" href="{{ url_for_security('logout') }}">
+					<svg class="dropdown-icon text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+					</svg>                
+					Logout
+					</a>
+				</div>
+				</li>
+				<!-- add notification dropdown -->
+				<li class="nav-item dropdown" id="notifications">
+					<a class="nav-link dropdown-toggle text-dark position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<i id="notifications_icon" class="fas fa-bell" style="font-size: 1em;"></i>
+					<span class="badge bg-danger position-absolute top--10 start-80 translate-middle d-none" id="notification_counter">0</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end mt-2 py-1" style="min-width: 350px; z-index: 100;">
+					<div class="d-flex justify-content-between p-3">
+						<h4 class="h4">Notifications</h4>
+						<button class="btn btn-danger" id="clear_notifications" onclick="clearNotifications()">
+							<i class="fas fa-trash"></i>
+							Clear All
+						</button>
+					</div>
+					<div class="dropdown-divider"></div>
+					<div id="notification_container"></div>
+						<!-- sbow no notification alert -->
+						<div class="alert alert-info text-center mx-4" id="no_notification_alert">
+							<i class="fas fa-info-circle"></i>
+							<span>No notifications</span>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+{% include 'includes/toasts/toast.html' %}
