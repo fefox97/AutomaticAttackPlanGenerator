@@ -29,10 +29,10 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
     }
 }
 
-function showToast(title, message, autohide = false, icon='<i class="fas fa-info"></i>') {
+function showToast(title, message, autohide = false, delay=5000, icon='<i class="fas fa-info"></i>') {
     const container = document.getElementById('toast-container');
     const toast_id = 'toast-' + Math.floor(Math.random() * 1000000);
-    addToast(toast_id, container, title, message, icon, autohide);
+    addToast(toast_id, container, title, message, icon, autohide, delay);
     const toast = document.getElementById(toast_id)
     toast.addEventListener('hidden.bs.toast', function() {
         deleteToast(toast_id);
@@ -41,7 +41,7 @@ function showToast(title, message, autohide = false, icon='<i class="fas fa-info
     toastBootstrap.show()
 }
 
-function addToast(id, container, title, message, icon, autohide) {
+function addToast(id, container, title, message, icon, autohide, delay) {
     const wrapper = document.createElement('div')
     time = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     wrapper.id = id
@@ -50,6 +50,7 @@ function addToast(id, container, title, message, icon, autohide) {
     wrapper.setAttribute('aria-live', 'assertive')
     wrapper.setAttribute('aria-atomic', 'true')
     wrapper.setAttribute('data-bs-autohide', autohide)
+    wrapper.setAttribute('data-bs-delay', delay)
     wrapper.innerHTML =
         `<div class="toast-header">
             <strong class="text-body me-auto"> ${icon} ${title}</strong>
@@ -264,7 +265,7 @@ function addNotification(id, title, message, buttons, time, toast, icon='<i clas
     }
     $('#notification_counter').text(parseInt($('#notification_counter').text()) + 1);
     if (toast)
-        showToast(title, message, autohide = false, icon);
+        showToast(title, message, autohide = true, 5000, icon);
 }
 
 function removeNotification(id) {
