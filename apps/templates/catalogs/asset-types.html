@@ -50,7 +50,7 @@
                         <tbody>
                             {% for row in table %}
                                 <tr>
-                                    <td><div class="id-badge"><h2><span class="badge bg-asset-types">{{ row.AssetTypeID }}</span></h2></div></td>
+                                    <td><div class="id-badge"><h2><span class="badge" style="background-color: {{row.Color}}"><span style="color: black; text-shadow: 0 0 3px #fff;">{{ row.AssetTypeID }}</span></span></h2></div></td>
                                     <td>{{ row.Name }}</td>
                                     <td>{{ row.PrimaryLabel }}</td>
                                     <td>{{ row.SecondaryLabel }}</td>
@@ -85,4 +85,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/asset-types.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
 {% endblock javascripts %}
