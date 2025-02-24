@@ -20,6 +20,7 @@ session
                     id: node_1.component_id,
                     label: node_1.name,
                     type: node_1.type,
+                    parameters: node_1.parameters,
                 },
             };
             var new_node_2 = {
@@ -27,6 +28,7 @@ session
                     id: node_2.component_id,
                     label: node_2.name,
                     type: node_2.type,
+                    parameters: node_2.parameters,
                 },
             };
             var new_link = {
@@ -34,8 +36,6 @@ session
                     label: record._fields[1].type,
                     source: node_1.component_id,
                     target: node_2.component_id,
-                    color_link: "blue",
-                    color_text: "white",
                 },
             };
             new_nodes.push(new_node_1);
@@ -49,52 +49,77 @@ session
 
         // define general dagre layout
         var layout = {
-            name: "spread",
-            rankDir: "LR",
-            align: 'LR',
+            name: "euler",
             animate: true,
-            nodeDimensionsIncludeLabels: true,
-            padding: 35,
-            rankSep: 250,
-            nodeSep: 20,
-        };
+            springLength: 100,
+            springCoeff: 0.0008,
+            gravity: -2,
+            maxIterations: 2000,
+            fit: true,
+            mass: function (node) {return 25;},
+        }
+        // var layout = {
+        //     name: "cola",
+        //     animate: true,
+        //     fit: true,
+        //     randomize: false,
+        //     avoidOverlap: true,
+        //     edgeLength: 100,
+        //     nodeDimensionsIncludeLabels: true,
+        //     padding: 35,
+        //     nodeSpacing: function (node) {return 100;},
+        // };
+        // var layout = {
+        //     name: "spread",
+        //     rankDir: "LR",
+        //     align: 'LR',
+        //     animate: true,
+        //     nodeDimensionsIncludeLabels: true,
+        //     padding: 35,
+        //     rankSep: 250,
+        //     nodeSep: 10,
+        // };
 
         // define expandCollapse layout
         var cy = (window.cy = cytoscape({
             container: document.getElementById("cy"),
-
             boxSelectionEnabled: true,
             autounselectify: true,
-
             layout: layout,
-
             style: [
                 {
                     selector: "node",
                     style: {
-                        "content": "data(label)",
-                        "text-valign": "center",
-                        "text-halign": "center",
-                        "height": "110px",
-                        "width": "110px",
-                        // "background-color": "data(color_node)",
-                        "color": "#FFFFFF",
-                        "font-family": "Georgia, serif",
-                        "font-size": "14px",
+                        'content': 'data(label)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'height': '100px',
+                        'width': '100px',
+                        'color': 'black',
+                        'fontSize': '14px',
+                        'fontWeight': 'bold',
+                        'text-wrap': 'wrap',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'white',
+                        'text-max-width': '100px',
+                        'border-width': 3,
+                        'background-color': '#333333',
                     }
                 },
                 {
                     selector: "edge",
                     style: {
-                        "content": "data(label)",
-                        "curve-style": "bezier",
-                        "control-point-weight": 0.5,
-                        "edge-distances": "node-position",
-                        width: 2,
-                        "target-arrow-shape": "triangle",
-                        "line-color": "data(color_link)",
-                        "target-arrow-color": "data(color_link)",
-                        "color": "data(color_text)",
+                        'content': 'data(label)',
+                        'curve-style': 'bezier',
+                        'control-point-weight': 0.5,
+                        'edge-distances': 'node-position',
+                        'width': 2,
+                        'target-arrow-shape': 'triangle',
+                        'line-color': 'black',
+                        'target-arrow-color': 'black',
+                        'color': 'black',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'white',
                     }
                 }
             ],
@@ -104,10 +129,11 @@ session
             },
         }));
 
-        
-
-        for (let [key, value] of Object.entries(styles)) {
-            cy.style().selector(`node.${key}`).style(value);
+        for (let [key, value] of Object.entries(asset_types_colors)) {
+            cy.style().selector(`node.${key.replace('.','_')}`).style({
+                'background-color': value,
+                'border-color': pSBC(-0.5, value),
+            });
         }
 
         cy.nodes().forEach(node => {
@@ -130,29 +156,29 @@ session
         });
 
         // add click event listener for nodes
-        cy.on("tap", "node", function () {
-            let node = this;
-            let children = node.outgoers("node");
+        // cy.on("tap", "node", function () {
+        //     let node = this;
+        //     let children = node.outgoers("node");
 
-            if (children.length > 0) {
-                for (let i = 0; i < children.length; i++) {
-                    // If the node has children
-                    if (children[i].visible()) {
-                        // If children are visible, hide them
-                        children[i].hide();
-                        let grand_children = children[i].outgoers("node");
-                        grand_children.hide();
-                    } else {
-                        // If children are hidden, show them
-                        children[i].show();
-                        let grand_children = children[i].outgoers("node");
-                        grand_children.show();
-                    }
-                }
-                // Run layout again to update positions
-                cy.layout(layout).run();
-            }
-        });
+        //     if (children.length > 0) {
+        //         for (let i = 0; i < children.length; i++) {
+        //             // If the node has children
+        //             if (children[i].visible()) {
+        //                 // If children are visible, hide them
+        //                 children[i].hide();
+        //                 let grand_children = children[i].outgoers("node");
+        //                 grand_children.hide();
+        //             } else {
+        //                 // If children are hidden, show them
+        //                 children[i].show();
+        //                 let grand_children = children[i].outgoers("node");
+        //                 grand_children.show();
+        //             }
+        //         }
+        //         // Run layout again to update positions
+        //         cy.layout(layout).run();
+        //     }
+        // });
 
         // create the popper for the node
         function create_popper_content(ele) {
@@ -160,28 +186,37 @@ session
             if (d.lastName == "YOU") {
                 return `
                     <div class="en-card" >
-                            <div class="en-card-header" style= 'border: 1px solid #D3D6DA !important; border-radius: 5px;
-                            padding: 6px;padding-right: 10px;opacity:1;
-                            background: white;'>
-                                <span style="color:#48558A;font-size:14px;">
-                                <span> ${d.id} </span>
-                                </span>         
-                                
+                            <div class="en-card-header" style='padding: 6px;opacity:1;text-align:center;'>
+                                <span style="color:white;font-size:14px;text-align:center;">
+                                    <span> <strong> Asset ${d.id} </strong> </span>
+                                    <br>
+                                    <span> Name: ${d.label} </span>
+                                    <br>
+                                    <span> Asset Type: ${d.type} </span>
+                                    <br>
+                                    <span> Parameters: ${d.parameters ? d.parameters : "No parameters"} </span>
+                                </span>        
+                            </div>
                     </div>
                     `
             } else {
                 return `
-                    <div class="en-card" style='padding: 6px; margin-right: 8px; border: 1px solid #D3D6DA; background: white; border-radius: 5px;'>
-                            <div class="en-card-header">
-                                <span style="color:#48558A;font-size:14px;">
-                                <span> ${d.id} </span>
-                                </span>         
-                                
+                    <div class="en-card" style='padding: 6px;'>
+                        <div class="en-card-header">
+                                <span style="color:white;font-size:14px;text-align:center;">
+                                <span> <strong> Asset ${d.id} </strong> </span>
+                                <br>
+                                <span> Name: ${d.label} </span>
+                                <br>
+                                <span> Asset Type: ${d.type} </span>
+                                <br>
+                                <span> Parameters: ${d.parameters ? d.parameters : "No parameters"}
+                            </span>         
+                        </div>
                     </div>
                 `
             }
         }
-
 
         // use tippy for hovering over the node
         function makePopper(ele) {
@@ -212,37 +247,74 @@ session
             makePopper(e.target);
         });
 
-
-
-        // use changeDir button to change the direction of the graph
-        var currentDir = null;
-        var changeDir = document.getElementById("changeDir");
-        changeDir.addEventListener("click", function () {
-            // check if we already have a direction
-            if (currentDir === null) {
-                currentDir = cy.options().layout.rankDir;
-            }
-            // change the direction
-            var newDir = currentDir === "LR" ? "UD" : "LR";
-            // update the layout
-            layout = {
-                name: "spread",
-                rankDir: newDir,
-                align: 'LR',
+        var rearrange = document.getElementById("rearrange");
+        rearrange.addEventListener("click", function () {
+            var layout = {
+                name: "euler",
                 animate: true,
-                nodeDimensionsIncludeLabels: true,
-                padding: 35,
-                rankSep: 250,
-                nodeSep: 10,
+                springLength: 100,
+                springCoeff: 0.0008,
+                gravity: -2,
+                maxIterations: 2000,
+                fit: true,
+                mass: function (node) {return 25;},
             };
-
             cy.layout(layout).run();
-
-            // update the button text
-            changeDir.innerHTML = "Change direction to " + currentDir;
-
-            // keep the newDir for next time
-            currentDir = newDir;
-
         });
     });
+
+
+$(document).ready(function () {
+
+    function saveImage(filename) {
+        currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
+        updateEdgeColors('light');
+        let svg_image = cy.svg({ scale: 1, full: true, bg: '#fff' });
+        const doc = new PDFDocument({ size: [595.28, 841.89] });
+        SVGtoPDF(doc, svg_image, 0, 0, { preserveAspectRatio: 'xMinYMin meet' });
+        const stream = doc.pipe(blobStream());
+        stream.on('finish', function () {
+            const url = stream.toBlobURL('application/pdf');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+        });
+        doc.end();
+        updateEdgeColors(currentTheme);
+    }
+
+    const savePopover = new bootstrap.Popover(document.getElementById("exportImage"), {
+        html: true,
+        content: "<div class='d-flex align-items-center justify-content-center'><a id='saveConfirm' role='button' class='btn btn-secondary'>Save</a></div>",
+        title: 'Do you want to save the image?',
+        placement: "top",
+        trigger: "click",
+    });
+
+    savePopover._element.addEventListener("shown.bs.popover", () => {
+        $("#saveConfirm").click(() => {
+            saveImage('graph.pdf');
+            savePopover.hide();
+        });
+    });
+
+    // Update edge colors based on the theme
+    function updateEdgeColors(theme) {
+        const edgeColor = theme === 'dark' ? 'white' : 'black';
+        window.cy.style().selector('edge').style({
+            'line-color': edgeColor,
+            'target-arrow-color': edgeColor,
+        }).update();
+    }
+
+    document.getElementById('DarkMode').addEventListener('click', () => {
+        console.log('DarkMode button clicked');
+        const currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
+        updateEdgeColors(currentTheme);
+    });
+
+    const initialTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
+    updateEdgeColors(initialTheme);
+});
+

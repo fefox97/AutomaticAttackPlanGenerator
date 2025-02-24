@@ -160,7 +160,7 @@
         </div>
         
         {% if table is not none %}
-        <div class="card border-0 shadow mb-3">
+        <!-- <div class="card border-0 shadow mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">MACM Graph</h2>
                 <ul class="nav nav-pills mb-3" id="graph-tabs" role="tablist">
@@ -191,48 +191,30 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         
-        <!-- <div class="card border-0 shadow mb-3">
+        <div class="card border-0 shadow mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h4 mb-0">MACM Graph2</h2>
-                <ul class="nav nav-pills mb-3" id="graph-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="graph-tab" data-bs-toggle="pill" data-bs-target="#pills-graph" type="button" role="tab" aria-controls="pills-graph" aria-selected="true">Graph</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="schema-tab" data-bs-toggle="pill" data-bs-target="#pills-schema" type="button" role="tab" aria-controls="pills-schema" aria-selected="false">Schema</button>
-                    </li>
-                </ul>
+                <h2 class="h4 mb-0">MACM Graph</h2>
                 <div>
-                    <button type="button" class="btn btn-primary" id="centerNetwork" disabled>Center</button>
-                    <button type="button" class="btn btn-primary" id="saveImage" disabled>Save Image</button>
+                    <button type="button" class="btn btn-primary" id="rearrange">Rearrange</button>
+                    <button type="button" class="btn btn-primary" id="exportImage">Save Image</button>
                 </div>
             </div>
             
             <div class="card-body">
-                <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-graph" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
-                        <div class="d-block align-items-center pt-5">
-                            <button id="changeDir">Change Direction</button>
-                            <div id="cytoscape-navigator-overlay">
-                                <div id="cytoscape-navigator-overlay-buttons">
-                                    <button id="zoom-in">+</button>
-                                    <button id="zoom-out">-</button>
-                                </div>
-                            </div>
-                            <div id="cy" class="neovis">
-                            </div>
+                <div class="d-block align-items-center">
+                    <div id="cytoscape-navigator-overlay">
+                        <div id="cytoscape-navigator-overlay-buttons" class="position-absolute bottom-0 end-0 mb-5 me-5 d-flex flex-column z-3">
+                            <button id="zoom-in" class="btn btn-primary"">+</button>
+                            <button id="zoom-out" class="btn btn-primary">-</button>
                         </div>
                     </div>
-                    <div class="tab-pane fade " id="pills-schema" role="tabpanel" aria-labelledby="schema-tab" tabindex="0">
-                        <div class="d-block align-items-center pt-5">
-                            <div id="schema" class="neovis"></div>
-                        </div>
+                    <div id="cy" class="cytoscape position-relative">
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
         {% endif %}
 
         {% include 'penetration_tests/macm/reports.html' %}
@@ -251,10 +233,11 @@
         var app_id = "{{app_info.AppID if app_info is not none | tojson }}";
         var app_name = "{{app_info.Name if app_info is not none | tojson }}";
         var neo4j_params = JSON.parse('{{neo4j_params |tojson|safe }}');
+        var asset_types_colors = JSON.parse('{{asset_types_colors |tojson|safe }}');
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
-    <!-- <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/styles.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/graph.js"></script> -->
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/color-manager.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/graph.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
 {% endblock javascripts %}

@@ -95,6 +95,12 @@ class AssetTypes(db.Model):
     Description   = db.Column(db.Text)
     PrimaryLabel  = db.Column(db.Text)
     SecondaryLabel = db.Column(db.Text)
+    Color         = db.Column(db.Text)
+
+    @staticmethod
+    def get_colors():
+        asset_types_colors = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.Color).all()
+        return {asset_type.Name: asset_type.Color for asset_type in asset_types_colors}
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
