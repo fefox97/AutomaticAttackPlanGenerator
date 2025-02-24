@@ -4,7 +4,7 @@ from apps.authentication.models import Users
 from apps.penetration_tests import blueprint
 from flask import render_template, request
 from flask import current_app as app
-from apps.databases.models import App, AttackView, MacmUser, MethodologyView, Macm, ThreatModel, PentestPhases
+from apps.databases.models import App, AssetTypes, AttackView, MacmUser, MethodologyView, Macm, ThreatModel, PentestPhases
 from sqlalchemy import func
 from apps.my_modules import converter
 from werkzeug.exceptions import NotFound
@@ -54,13 +54,13 @@ def macm():
             "password": app.config['PASS_NEO4J'],
             "encrypted": app.config['TLS_NEO4J']
         }
-        app.logger.info(neo4j_params)
+        asset_types_colors = AssetTypes.get_colors()
     except NotFound as error:
         raise error
     except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         raise Exception('Exception occurred while trying to serve ' + request.path)
-    return render_template(f"penetration_tests/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info)
+    return render_template(f"penetration_tests/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info, asset_types_colors=asset_types_colors)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @auth_required()
