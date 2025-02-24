@@ -264,6 +264,10 @@ $(document).ready(function () {
 
         const initialTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
         updateEdgeColors(initialTheme);
+    }).catch(function (error) {
+        console.log(error);
+        session.close();
+        driver.close();
     });
 
     function saveImage(filename) {
