@@ -260,6 +260,7 @@ function drawNeo4j(database) {
             physics: {
                 enabled: true,
                 barnesHut: {
+                    theta: 0.1,
                     gravitationalConstant: -4000,
                     centralGravity: 0.5,
                     springLength: 150,
@@ -267,7 +268,7 @@ function drawNeo4j(database) {
                     damping: 0.09,
                     avoidOverlap: 0.5
                 },
-                
+                minVelocity: 0.75,
                 solver: 'barnesHut',
                 adaptiveTimestep: true,
             },
