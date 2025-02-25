@@ -10,11 +10,12 @@ $(document).ready(function () {
     var new_links = [];
 
     session
-        .run('MATCH (a)-[b]->(c) RETURN a, b, c')
+        .run(`MATCH (a)
+            OPTIONAL MATCH (a)-[b]->(c)
+            RETURN a, b, c`)
         .then(function (result) {
             result.records.forEach(function (record) {
                 var node_1 = record._fields[0].properties;
-                var node_2 = record._fields[2].properties;
                 var new_node_1 = {
                     data: {
                         id: node_1.component_id,
@@ -23,24 +24,28 @@ $(document).ready(function () {
                         parameters: node_1.parameters,
                     },
                 };
-                var new_node_2 = {
-                    data: {
-                        id: node_2.component_id,
-                        label: node_2.name,
-                        type: node_2.type,
-                        parameters: node_2.parameters,
-                    },
-                };
-                var new_link = {
-                    data: {
-                        label: record._fields[1].type,
-                        source: node_1.component_id,
-                        target: node_2.component_id,
-                    },
-                };
                 new_nodes.push(new_node_1);
-                new_nodes.push(new_node_2);
-                new_links.push(new_link);
+
+                if (record._fields[2]) {
+                    var node_2 = record._fields[2].properties;
+                    var new_node_2 = {
+                        data: {
+                            id: node_2.component_id,
+                            label: node_2.name,
+                            type: node_2.type,
+                            parameters: node_2.parameters,
+                        },
+                    };
+                    var new_link = {
+                        data: {
+                            label: record._fields[1].type,
+                            source: node_1.component_id,
+                            target: node_2.component_id,
+                        },
+                    };
+                    new_nodes.push(new_node_2);
+                    new_links.push(new_link);
+                }
             });
         })
         .then(function () {
