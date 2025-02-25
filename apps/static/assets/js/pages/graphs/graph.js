@@ -284,7 +284,7 @@ $(document).ready(function () {
         currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
         updateEdgeColors('light');
         let svg_image = cy.svg({ scale: 1, full: true });
-        const doc = new PDFDocument({ size: [595.28, 841.89], bufferPages: true });
+        const doc = new PDFDocument({ size: [1000, 1000], bufferPages: true });
         SVGtoPDF(doc, svg_image, 0, 0, { preserveAspectRatio: 'xMidYMid meet' });
         const stream = doc.pipe(blobStream());
         stream.on('finish', function () {
