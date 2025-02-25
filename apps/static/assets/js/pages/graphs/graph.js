@@ -280,12 +280,12 @@ $(document).ready(function () {
         driver.close();
     });
 
-    function saveImage(filename) {
+    function saveImage2PDF(filename) {
         currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
         updateEdgeColors('light');
-        let svg_image = cy.svg({ scale: 1, full: true, bg: '#fff' });
-        const doc = new PDFDocument({ size: [595.28, 841.89] });
-        SVGtoPDF(doc, svg_image, 0, 0, { preserveAspectRatio: 'xMinYMin meet' });
+        let svg_image = cy.svg({ scale: 1, full: true });
+        const doc = new PDFDocument({ size: [595.28, 841.89], bufferPages: true });
+        SVGtoPDF(doc, svg_image, 0, 0, { preserveAspectRatio: 'xMidYMid meet' });
         const stream = doc.pipe(blobStream());
         stream.on('finish', function () {
             const url = stream.toBlobURL('application/pdf');
@@ -298,17 +298,37 @@ $(document).ready(function () {
         updateEdgeColors(currentTheme);
     }
 
+    function saveImage2SVG(filename) {
+        currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
+        updateEdgeColors('light');
+        const svg_image = cy.svg({ scale: 1, full: true });
+        const blob = new Blob([svg_image], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        updateEdgeColors(currentTheme);
+    }
+
     const savePopover = new bootstrap.Popover(document.getElementById("exportImage"), {
         html: true,
-        content: "<div class='d-flex align-items-center justify-content-center'><a id='saveConfirm' role='button' class='btn btn-secondary'>Save</a></div>",
+        content: `<div class='d-flex flex-column align-items-center justify-content-center'>
+                        <a id='saveConfirmPDF' role='button' class='btn btn-secondary mb-2'>Save PDF</a>
+                        <a id='saveConfirmSVG' role='button' class='btn btn-secondary'>Save SVG</a>
+                    </div>`,
         title: 'Do you want to save the image?',
         placement: "top",
         trigger: "click",
     });
 
     savePopover._element.addEventListener("shown.bs.popover", () => {
-        $("#saveConfirm").click(() => {
-            saveImage('graph.pdf');
+        $("#saveConfirmPDF").click(() => {
+            saveImage2PDF('graph.pdf');
+            savePopover.hide();
+        });
+        $("#saveConfirmSVG").click(() => {
+            saveImage2SVG('graph.svg');
             savePopover.hide();
         });
     });
