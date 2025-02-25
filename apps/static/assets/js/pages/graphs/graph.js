@@ -160,6 +160,11 @@ $(document).ready(function () {
                 });
             });
 
+            document.getElementById("center").addEventListener("click", function () {
+                cy.fit();
+                cy.center();
+            });
+
             // add click event listener for nodes
             // cy.on("tap", "node", function () {
             //     let node = this;
