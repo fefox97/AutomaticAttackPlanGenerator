@@ -22,3 +22,22 @@ const pSBC=(p,c0,c1,l)=>{
     if(h)return"rgb"+(f?"a(":"(")+r+","+g+","+b+(f?","+m(a*1000)/1000:"")+")";
     else return"#"+(4294967296+r*16777216+g*65536+b*256+(f?m(a*255):0)).toString(16).slice(1,f?undefined:-2)
 };
+
+function isLight(c){
+    var c = c.substring(1);
+    var rgb = parseInt(c, 16);
+    var r = (rgb >> 16) & 0xff;
+    var g = (rgb >>  8) & 0xff;
+    var b = (rgb >>  0) & 0xff;
+
+    var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+    if (luma < 130) {
+        return false;
+    }
+    return true;
+}
+
+const getTextColor=(color)=>{
+    return isLight(color) ? '#000000' : '#ffffff';
+}

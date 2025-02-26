@@ -103,11 +103,15 @@ $(document).ready(function () {
                             'color': 'white',
                             'fontSize': '14px',
                             'fontFamily': 'Montserrat',
-                            'fontWeight': 'bold',
+                            'fontWeight': '600',
                             'text-wrap': 'wrap',
-                            'text-max-width': '95px',
+                            'text-max-width': '80px',
                             'border-width': 3,
                             'background-color': '#333333',
+                            // 'text-background-shape': 'roundrectangle',
+                            // 'text-background-color': 'black',
+                            // 'text-background-opacity': 0.3,
+                            // 'text-background-padding': 5,
                         }
                     },
                     {
@@ -137,10 +141,12 @@ $(document).ready(function () {
             }));
 
             for (let [key, value] of Object.entries(asset_types_colors)) {
+                let color = pSBC(-0.5, value);
+                let textColor = getTextColor(value);
                 cy.style().selector(`node.${key.replace('.','_')}`).style({
                     'background-color': value,
-                    'border-color': pSBC(-0.5, value),
-                    'shadow': pSBC(-0.5, value) + ' 0px 0px 10px',
+                    'border-color': color,
+                    'color': textColor,
                 });
             }
 
