@@ -205,11 +205,14 @@
             </div>
             
             <div class="card-body">
-                <div class="d-block align-items-center">
+                <div class="d-block align-items-center" id="cytoscape-container">
                     <div id="cytoscape-navigator-overlay">
                         <div id="cytoscape-navigator-overlay-buttons" class="position-absolute bottom-0 end-0 mb-5 me-5 d-flex flex-column z-3">
                             <button id="zoom-in" class="btn btn-primary"">+</button>
                             <button id="zoom-out" class="btn btn-primary">-</button>
+                        </div>
+                        <div id="cytoscape-suggestion-overlay" class="position-absolute z-3 start-0 end-0 d-flex justify-content-center" style="opacity: 0;">
+                            <span class="bg-body px-2 rounded-3">Click on a node to hide/show its connections</span>
                         </div>
                     </div>
                     <div id="cy" class="cytoscape position-relative">

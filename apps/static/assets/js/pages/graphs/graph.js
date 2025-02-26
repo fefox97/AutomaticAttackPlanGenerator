@@ -177,6 +177,7 @@ $(document).ready(function () {
 
             document.getElementById("showAll").addEventListener("click", function () {
                 cy.nodes().show();
+                // cy.nodes().style("opacity", 1);
                 cy.edges().show();
             });
 
@@ -184,6 +185,11 @@ $(document).ready(function () {
             cy.on("tap", "node", function () {
                 let node = this;
                 let children = node.outgoers("node");
+
+                // if (node.style("opacity") == 0.5)
+                //     node.style("opacity", 1);
+                // else
+                //     node.style("opacity", 0.5);
 
                 if (children.length > 0) {
                     for (let i = 0; i < children.length; i++) {
@@ -201,7 +207,7 @@ $(document).ready(function () {
                         }
                     }
                     // Run layout again to update positions
-                    cy.layout(layout).run();
+                    // cy.layout(layout).run();
                 }
             });
 
@@ -346,6 +352,13 @@ $(document).ready(function () {
         console.log('DarkMode button clicked');
         const currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
         updateEdgeColors(currentTheme);
+    });
+
+    $('#cytoscape-container').one('mouseenter', () => {
+        $('#cytoscape-suggestion-overlay').animate({ opacity: 1 }, 1000);
+        timeout = setTimeout(() => {
+            $('#cytoscape-suggestion-overlay').animate({ opacity: 0 }, 1000);
+        }, 5000);
     });
 
 });
