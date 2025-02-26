@@ -583,3 +583,33 @@ pre[class*=language-]{
         stroke-width: 0;
 	}
 }
+
+.tippy-box[data-theme~='cyto-tippy'] {
+    background-color: var(--#{$prefix}body-color);
+    border-radius: 10px;
+    .tippy-content{
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 0;
+        .cyto-card{
+            color: var(--#{$prefix}body-bg) !important;
+            .cyto-card-header{
+                background-color: var(--#{$prefix}emphasis-color);
+                font-size: large;
+                font-weight: 900;
+                text-align: center;
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+            .cyto-card-body{
+                padding: 10px;
+                .label{
+                    font-weight: 800;
+                }
+            }
+        }
+    }
+    .tippy-arrow {
+        color: var(--#{$prefix}body-color);
+    }
+}

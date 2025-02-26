@@ -20330,6 +20330,29 @@ pre[class*=language-] {
     stroke-dasharray: 50% 0;
     stroke-width: 0; } }
 
+.tippy-box[data-theme~='cyto-tippy'] {
+  background-color: var(--bs-body-color);
+  border-radius: 10px; }
+  .tippy-box[data-theme~='cyto-tippy'] .tippy-content {
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 0; }
+    .tippy-box[data-theme~='cyto-tippy'] .tippy-content .cyto-card {
+      color: var(--bs-body-bg) !important; }
+      .tippy-box[data-theme~='cyto-tippy'] .tippy-content .cyto-card .cyto-card-header {
+        background-color: var(--bs-emphasis-color);
+        font-size: large;
+        font-weight: 900;
+        text-align: center;
+        padding-top: 5px;
+        padding-bottom: 5px; }
+      .tippy-box[data-theme~='cyto-tippy'] .tippy-content .cyto-card .cyto-card-body {
+        padding: 10px; }
+        .tippy-box[data-theme~='cyto-tippy'] .tippy-content .cyto-card .cyto-card-body .label {
+          font-weight: 800; }
+  .tippy-box[data-theme~='cyto-tippy'] .tippy-arrow {
+    color: var(--bs-body-color); }
+
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
 
