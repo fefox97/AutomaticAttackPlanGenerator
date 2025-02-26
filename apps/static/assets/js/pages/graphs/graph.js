@@ -19,7 +19,7 @@ $(document).ready(function () {
                 var new_node_1 = {
                     data: {
                         id: node_1.component_id,
-                        label: node_1.name,
+                        label: node_1.name.replace(/_/g, ' '),
                         type: node_1.type,
                         parameters: node_1.parameters,
                     },
@@ -31,7 +31,7 @@ $(document).ready(function () {
                     var new_node_2 = {
                         data: {
                             id: node_2.component_id,
-                            label: node_2.name,
+                            label: node_2.name.replace(/_/g, ' '),
                             type: node_2.type,
                             parameters: node_2.parameters,
                         },
@@ -151,7 +151,8 @@ $(document).ready(function () {
             }
 
             cy.nodes().forEach(node => {
-                node.addClass(node.data().type.replace('.', '_'));
+                if (node.data().type)
+                    node.addClass(node.data().type.replace('.', '_'));
             });
 
             // add event listeners for zooming in and out
