@@ -1,6 +1,13 @@
 <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
-    <a class="navbar-brand me-lg-5" href="/">
+    <!-- <a class="navbar-brand me-lg-5" href="/">
         <img class="navbar-brand-dark" src="{{ config.ASSETS_ROOT }}/img/brand/light.svg" alt="Logo" /> <img class="navbar-brand-light" src="{{ config.ASSETS_ROOT }}/img/brand/dark.svg" alt="Logo" />
+    </a> -->
+    <a href="/" class="nav-link vseclab-link">
+      <span class="vseclab-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M9 21s8-4 8-10V3L9 1 1 3v8c0 6 8 10 8 10z"></path>
+        </svg>
+      </span>
     </a>
     <div class="d-flex align-items-center">
         <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,11 +44,19 @@
       <!-- Navbar Links -->
       <ul class="nav flex-column pt-3 pt-md-0">
         <li class="nav-item">
-          <a href="/" class="nav-link d-flex align-items-center">
-            <span class="sidebar-icon">
-              <img src="{{ config.ASSETS_ROOT }}/img/brand/light.svg" height="20" width="20" alt="Volt Logo">
+          <a href="/" class="nav-link vseclab-link">
+            <span class="vseclab-icon">
+              <svg xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 21s8-4 8-10V3L9 1 1 3v8c0 6 8 10 8 10z"></path>
+              </svg>
             </span>
-            <span class="mt-1 ms-1 sidebar-text">VSecLab</span>
+            <span class="sidebar-text vseclab-text">
+              <svg viewBox="0 0 80 20">
+                <text x="50%" y="80%" text-anchor="middle">
+                  VSecLab
+                </text>
+              </svg>
+            </span>
           </a>
         </li>
         <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">

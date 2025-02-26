@@ -93,7 +93,7 @@
   --bs-dark-border-subtle: #6B7280;
   --bs-white-rgb: 255, 255, 255;
   --bs-black-rgb: 17, 24, 39;
-  --bs-font-sans-serif: "Inter", sans-serif;
+  --bs-font-sans-serif: "Red Hat Display", Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   --bs-body-font-family: var(--bs-font-sans-serif);
@@ -19100,7 +19100,7 @@ a.badge:hover {
  */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family: "Inter", sans-serif;
+  font-family: "Red Hat Display", Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
   font-weight: 500; }
 
 p, ol li, ul li, .p {
@@ -20249,6 +20249,86 @@ pre[class*=language-] {
     position: relative; }
   .body-content {
     margin-top: 0; } }
+
+.vseclab-link {
+  display: flex;
+  justify-content: center; }
+  .vseclab-link .vseclab-text {
+    width: 120px;
+    height: 25px; }
+    .vseclab-link .vseclab-text svg {
+      font-family: 'Natural Precision', sans-serif;
+      width: inherit;
+      height: inherit;
+      transform: translate(5%, 0%); }
+      .vseclab-link .vseclab-text svg text {
+        animation: textstroke 2s;
+        stroke-width: .5;
+        stroke: none;
+        fill: white;
+        font-size: 20px; }
+  .vseclab-link .vseclab-icon {
+    width: 20px !important;
+    height: 30px !important; }
+    .vseclab-link .vseclab-icon svg {
+      width: inherit !important;
+      height: inherit !important;
+      transform: translate(10%, 5%);
+      display: flex;
+      align-items: center; }
+      .vseclab-link .vseclab-icon svg path {
+        animation: iconstroke 2s;
+        stroke-width: .5;
+        stroke: none;
+        fill: #f0bc74; }
+  .vseclab-link:hover text {
+    stroke: #f0bc74 !important;
+    stroke-width: 1; }
+  .vseclab-link:hover path {
+    stroke: #ffffff !important;
+    stroke-width: 3; }
+
+@keyframes textstroke {
+  0% {
+    fill: rgba(242, 244, 246, 0);
+    stroke: #f0bc74;
+    stroke-dashoffset: 25%;
+    stroke-dasharray: 0 50%;
+    stroke-width: .5; }
+  70% {
+    fill: rgba(242, 244, 246, 0.5);
+    stroke: #f0bc74; }
+  80% {
+    fill: rgba(242, 244, 246, 0.75);
+    stroke: #f0bc74;
+    stroke-width: .5; }
+  100% {
+    fill: #F2F4F6;
+    stroke: rgba(240, 188, 116, 0);
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0; } }
+
+@keyframes iconstroke {
+  0% {
+    fill: rgba(240, 188, 116, 0);
+    stroke: #ffffff;
+    stroke-dashoffset: 25%;
+    stroke-dasharray: 0 50%;
+    stroke-width: .5; }
+  70% {
+    fill: rgba(240, 188, 116, 0.5);
+    stroke: #ffffff; }
+  80% {
+    fill: rgba(240, 188, 116, 0.75);
+    stroke: #ffffff;
+    stroke-width: .5; }
+  100% {
+    fill: #f0bc74;
+    stroke: rgba(255, 255, 255, 0);
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0; } }
 
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
