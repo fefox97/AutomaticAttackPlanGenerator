@@ -24,10 +24,6 @@
     height: 50vh;
 }
 
-.cytoscape{
-    height: 80vh;
-}
-
 // .table-dataframe{
 //     width: 100% !important;
 //     /* border-collapse: separate !important; */
@@ -582,6 +578,27 @@ pre[class*=language-]{
         stroke-dasharray: 50% 0;
         stroke-width: 0;
 	}
+}
+
+#cytoscape-container{
+    .cytoscape{
+        height: 80vh;
+    }
+}
+
+@keyframes show-suggestion {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
 .tippy-box[data-theme~='cyto-tippy'] {

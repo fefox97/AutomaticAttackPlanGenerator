@@ -19915,9 +19915,6 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
 .neovis {
   height: 50vh; }
 
-.cytoscape {
-  height: 80vh; }
-
 @-webkit-keyframes floatText {
   0% {
     text-indent: 100%; }
@@ -20329,6 +20326,19 @@ pre[class*=language-] {
     stroke-dashoffset: -25%;
     stroke-dasharray: 50% 0;
     stroke-width: 0; } }
+
+#cytoscape-container .cytoscape {
+  height: 80vh; }
+
+@keyframes show-suggestion {
+  0% {
+    opacity: 0; }
+  10% {
+    opacity: 1; }
+  90% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
 
 .tippy-box[data-theme~='cyto-tippy'] {
   background-color: var(--bs-body-color);
