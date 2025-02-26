@@ -102,6 +102,7 @@ $(document).ready(function () {
                             'width': '100px',
                             'color': 'black',
                             'fontSize': '14px',
+                            'fontFamily': 'Montserrat',
                             'fontWeight': 'bold',
                             'text-wrap': 'wrap',
                             'text-outline-width': 1,
@@ -109,6 +110,7 @@ $(document).ready(function () {
                             'text-max-width': '100px',
                             'border-width': 3,
                             'background-color': '#333333',
+                            'mix-blend-mode': 'multiply',
                         }
                     },
                     {
@@ -119,6 +121,7 @@ $(document).ready(function () {
                             'control-point-weight': 0.5,
                             'edge-distances': 'node-position',
                             'width': 2,
+                            'fontFamily': 'Montserrat',
                             'target-arrow-shape': 'triangle',
                             'line-color': 'black',
                             'target-arrow-color': 'black',
