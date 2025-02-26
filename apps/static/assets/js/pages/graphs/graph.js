@@ -110,7 +110,6 @@ $(document).ready(function () {
                             'text-max-width': '100px',
                             'border-width': 3,
                             'background-color': '#333333',
-                            'mix-blend-mode': 'multiply',
                         }
                     },
                     {
