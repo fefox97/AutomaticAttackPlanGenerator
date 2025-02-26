@@ -480,31 +480,34 @@ pre[class*=language-]{
 .vseclab-link {
     display: flex;
     justify-content: center;
+    align-items: center;
+    text-align: center;
     .vseclab-text {
         width: 120px;
         height: 25px;
+        left: 10px;
         svg {
+            vertical-align: unset !important;
             font-family: 'Natural Precision', sans-serif;
             width: inherit;
             height: inherit;
-            transform: translate(5%, 0%);
             text {
                 animation: textstroke 2s;
                 stroke-width: .5;
                 stroke: none;
                 fill: white;
-                font-size: 20px;
+                font-size: 25px;
             }
         }
     }
 
     .vseclab-icon {
-        width: 20px !important;
-        height: 30px !important;
+        width: 18px !important;
+        height: 22px !important;
         svg {
-            width: inherit !important;
-            height: inherit !important;
-            transform: translate(10%, 5%);
+            width: inherit;
+            height: inherit;
+            // transform: translate(10%, 5%);
             display: flex;
             align-items: center;
             path {
