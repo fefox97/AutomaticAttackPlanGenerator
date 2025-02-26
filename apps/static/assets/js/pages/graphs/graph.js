@@ -168,30 +168,35 @@ $(document).ready(function () {
                 cy.center();
             });
 
-            // add click event listener for nodes
-            // cy.on("tap", "node", function () {
-            //     let node = this;
-            //     let children = node.outgoers("node");
+            document.getElementById("showAll").addEventListener("click", function () {
+                cy.nodes().show();
+                cy.edges().show();
+            });
 
-            //     if (children.length > 0) {
-            //         for (let i = 0; i < children.length; i++) {
-            //             // If the node has children
-            //             if (children[i].visible()) {
-            //                 // If children are visible, hide them
-            //                 children[i].hide();
-            //                 let grand_children = children[i].outgoers("node");
-            //                 grand_children.hide();
-            //             } else {
-            //                 // If children are hidden, show them
-            //                 children[i].show();
-            //                 let grand_children = children[i].outgoers("node");
-            //                 grand_children.show();
-            //             }
-            //         }
-            //         // Run layout again to update positions
-            //         cy.layout(layout).run();
-            //     }
-            // });
+            // add click event listener for nodes
+            cy.on("tap", "node", function () {
+                let node = this;
+                let children = node.outgoers("node");
+
+                if (children.length > 0) {
+                    for (let i = 0; i < children.length; i++) {
+                        // If the node has children
+                        if (children[i].visible()) {
+                            // If children are visible, hide them
+                            children[i].hide();
+                            let grand_children = children[i].outgoers("node");
+                            grand_children.hide();
+                        } else {
+                            // If children are hidden, show them
+                            children[i].show();
+                            let grand_children = children[i].outgoers("node");
+                            grand_children.show();
+                        }
+                    }
+                    // Run layout again to update positions
+                    cy.layout(layout).run();
+                }
+            });
 
             // create the popper for the node
             function create_popper_content(ele) {
