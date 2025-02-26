@@ -100,14 +100,12 @@ $(document).ready(function () {
                             'text-halign': 'center',
                             'height': '100px',
                             'width': '100px',
-                            'color': 'black',
+                            'color': 'white',
                             'fontSize': '14px',
                             'fontFamily': 'Montserrat',
                             'fontWeight': 'bold',
                             'text-wrap': 'wrap',
-                            'text-outline-width': 1,
-                            'text-outline-color': 'white',
-                            'text-max-width': '100px',
+                            'text-max-width': '95px',
                             'border-width': 3,
                             'background-color': '#333333',
                         }
@@ -125,8 +123,10 @@ $(document).ready(function () {
                             'line-color': 'black',
                             'target-arrow-color': 'black',
                             'color': 'black',
-                            'text-outline-width': 1,
-                            'text-outline-color': 'white',
+                            'text-background-shape': 'roundrectangle',
+                            'text-background-color': 'white',
+                            'text-background-opacity': 1,
+                            'text-background-padding': 2,
                         }
                     }
                 ],
@@ -140,6 +140,7 @@ $(document).ready(function () {
                 cy.style().selector(`node.${key.replace('.','_')}`).style({
                     'background-color': value,
                     'border-color': pSBC(-0.5, value),
+                    'shadow': pSBC(-0.5, value) + ' 0px 0px 10px',
                 });
             }
 
@@ -276,6 +277,7 @@ $(document).ready(function () {
 
         const initialTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
         updateEdgeColors(initialTheme);
+
     }).catch(function (error) {
         console.log(error);
         session.close();
@@ -337,10 +339,13 @@ $(document).ready(function () {
 
     // Update edge colors based on the theme
     function updateEdgeColors(theme) {
-        const edgeColor = theme === 'dark' ? 'white' : 'black';
+        const edgeColor = theme === 'dark' ? 'white' : '#374151';
+        const backgroundColor = theme === 'dark' ? '#374151' : 'white';
         cy.style().selector('edge').style({
             'line-color': edgeColor,
             'target-arrow-color': edgeColor,
+            'text-background-color': backgroundColor,
+            color: edgeColor,
         }).update();
     }
 
