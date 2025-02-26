@@ -201,45 +201,25 @@ $(document).ready(function () {
             // create the popper for the node
             function create_popper_content(ele) {
                 var d = ele.data();
-                if (d.lastName == "YOU") {
-                    return `
-                        <div class="en-card" >
-                                <div class="en-card-header" style='padding: 6px;opacity:1;text-align:center;'>
-                                    <span style="color:white;font-size:14px;text-align:center;">
-                                        <span> <strong> Asset ${d.id} </strong> </span>
-                                        <br>
-                                        <span> Name: ${d.label} </span>
-                                        <br>
-                                        <span> Asset Type: ${d.type} </span>
-                                        <br>
-                                        <span> Parameters: ${d.parameters ? d.parameters : "No parameters"} </span>
-                                    </span>        
-                                </div>
+                return `
+                    <div class="cyto-card">
+                        <div class="cyto-card-header">
+                            <span>Asset ${d.id}</span>
                         </div>
-                        `
-                } else {
-                    return `
-                        <div class="en-card" style='padding: 6px;'>
-                            <div class="en-card-header">
-                                    <span style="color:white;font-size:14px;text-align:center;">
-                                    <span> <strong> Asset ${d.id} </strong> </span>
-                                    <br>
-                                    <span> Name: ${d.label} </span>
-                                    <br>
-                                    <span> Asset Type: ${d.type} </span>
-                                    <br>
-                                    <span> Parameters: ${d.parameters ? d.parameters : "No parameters"}
-                                </span>         
-                            </div>
+                        <div class="cyto-card-body">
+                            <span><span class="label">Name:</span> ${d.label} </span>
+                            <br>
+                            <span><span class="label">Asset Type:</span> ${d.type} </span>
+                            <br>
+                            <span><span class="label">Parameters:</span> ${d.parameters ? d.parameters : "No parameters"}</span>
                         </div>
-                    `
-                }
+                    </div>
+                `;
             }
 
         // use tippy for hovering over the node
         function makePopper(ele) {
             let ref = ele.popperRef();
-
             ele.tippy = tippy(document.createElement('div'), {
                 getReferenceClientRect: ref.getBoundingClientRect,
                 content: () => {
@@ -251,7 +231,8 @@ $(document).ready(function () {
                     instance.destroy();
                 },
                 interactive: true,
-                appendTo: document.body // or append dummyDomEle to document.body
+                appendTo: document.body,
+                theme: 'cyto-tippy',
             });
             ele.tippy.show();
             ele.on('mouseout', function (e) {
