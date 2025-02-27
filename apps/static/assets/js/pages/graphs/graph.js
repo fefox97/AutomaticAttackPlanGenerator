@@ -181,6 +181,13 @@ $(document).ready(function () {
                 cy.edges().show();
             });
 
+            document.getElementById("fullscreen").addEventListener("click", function () {
+                $('#macmGraph').toggleClass('fullscreen');
+                cy.resize();
+                cy.fit();
+                cy.center();
+            });
+
             // add click event listener for nodes
             cy.on("tap", "node", function () {
                 let node = this;
