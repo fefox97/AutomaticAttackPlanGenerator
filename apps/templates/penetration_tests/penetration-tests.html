@@ -34,13 +34,19 @@
                 
                 <div id="collapseLoadMACM" class="card-body collapse show" aria-labelledby="headingLoadMACM">
                     <form id="uploadMacmForm" method="post" enctype="multipart/form-data" action="/api/upload_macm">
-                        <label for="macmFile" class="form-label">Insert Cypher File</label>
-                        <input class="form-control" type="file" id="macmFile" name="macmFile">
-                        <br>
+                        <div class="form-group mb-3">
+                            <label for="macmAppName" class="form-label">App Name</label>
+                            {{ upload_macm_form.macmAppName(size=100, class="form-control", id="macmAppName") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="macmFile" class="form-label">Insert Cypher File</label>
+                            <input class="form-control" type="file" id="macmFile" name="macmFile">
+                        </div>
                         <p class="text-center">OR</p>
-                        <br>
-                        <label for="macmCypher" class="form-label">Insert Cypher Query</label>
-                        <textarea class="form-control mb-3" id="macmCypher" name="macmCypher" rows="3"></textarea>
+                        <div class="form-group mb-3">
+                            <label for="macmCypher" class="form-label">Insert Cypher Query</label>
+                            <textarea class="form-control" id="macmCypher" name="macmCypher" rows="3"></textarea>
+                        </div>
                         <button type="submit" class="btn btn-primary upload_macm">
                             <span>Upload</span>
                         </button>
@@ -60,7 +66,7 @@
                                 <li class="list-group-item d-flex align-items-center justify-content-between px-0">
                                     <div class="d-flex align-items-center">
                                         <h1 class="display-9 mb-1">{{ pentest.AppName }}</h1>
-                                        <h6><span class="badge bg-time bg-small rounded-pill ms-3">{{ pentest.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span></h6>
+                                        <span class="badge bg-time bg-small rounded-pill ms-3 fs-10">{{ pentest.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span>
                                     </div>
                                     <div>
                                         {% if usersPerApp[pentest.AppID] | length > 1 and current_user.id == owners[pentest.AppID] %}
@@ -70,7 +76,7 @@
                                                 Shared by {{ users_dict[owners[pentest.AppID]] }}
                                             </span>
                                         {% endif %}
-                                        <a class="btn btn-secondary btn-sm" href="/penetration_tests/macm?app_id={{pentest.AppID}}&objective=pentest"  role="button">
+                                        <a class="btn btn-secondary btn-sm" href="/penetration_tests/macm?app_id={{pentest.AppID}}"  role="button">
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
@@ -79,6 +85,10 @@
                                             Edit
                                         </button>
                                         {% if current_user.id == owners[pentest.AppID] %}
+                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#renameMacmModal" data-bs-toggle="modal"  data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
+                                                <i class="fas fa-i-cursor mr-auto"></i>
+                                                Rename
+                                            </button>
                                             <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#shareMacmModal" data-bs-toggle="modal"  data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
                                                 <i class="fas fa-share mr-auto"></i>
                                                 Share
@@ -88,7 +98,7 @@
                                                 Delete
                                             </button>
                                         {% else %}
-                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#unshareMacmModal" data-bs-toggle="modal"  data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}" data-bs-UserID="{{current_user.id}}">
+                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#unshareMacmModal" data-bs-toggle="modal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}" data-bs-UserID="{{current_user.id}}">
                                                 <i class="fas fa-share mr-auto"></i>
                                                 Unshare
                                             </button>
@@ -108,6 +118,7 @@
         </div>
     </div>
 
+    {% include 'penetration_tests/modals/rename_macm_modal.html' %}
     {% include 'penetration_tests/modals/edit_macm_modal.html' %}
     {% include 'penetration_tests/modals/delete_modal.html' %}
     {% include 'penetration_tests/modals/share_macm_modal.html' %}
@@ -122,5 +133,6 @@
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/penetration-tests.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/rename-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/share-macm.js"></script>
 {% endblock javascripts %}

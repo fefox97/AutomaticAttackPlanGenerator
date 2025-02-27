@@ -15,7 +15,7 @@ from apps.authentication.models import Tasks
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import Attack, AttackView, Macm, Settings, ThreatModel, ToolCatalogue
+from apps.databases.models import App, Attack, AttackView, Macm, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 import pandas as pd
@@ -85,6 +85,9 @@ def search_capec_by_keyword():
 @auth_required
 @blueprint.route('/upload_macm', methods=['POST'])
 def upload_macm():
+    app_name = request.form.get('macmAppName')
+    if app_name in [None, '']:
+        return make_response(jsonify({'message': 'No App Name provided'}), 400)
     if 'macmFile' in request.files and request.files['macmFile'].filename != '':
         file = request.files['macmFile']
         app.logger.info(f"Uploading MACM from file {request.files['macmFile']}")
@@ -97,8 +100,7 @@ def upload_macm():
         return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
     try:
         macm_db = f'db.{current_user.id}.{uuid.uuid4()}'
-        macm.upload_macm(query_str, database=macm_db)
-        utils.upload_databases('Macm', neo4j_db=macm_db)
+        macm.upload_macm(query_str, app_name=app_name, database=macm_db)
         return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
     except Exception as error:
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
@@ -114,6 +116,23 @@ def update_macm():
             app.logger.info(f"Updating MACM {app_id} with query {query}")
             macm.update_macm(query, app_id)
             return make_response(jsonify({'message': 'MACM updated successfully'}), 200)
+        except Exception as error:
+            return make_response(jsonify({'message': error.args}), 400)
+    else:
+        return make_response(jsonify({'message': 'No MACM provided'}), 400)
+
+@auth_required
+@blueprint.route('/rename_macm', methods=['POST'])
+def rename_macm():
+    app_id = request.form.get('AppID')
+    new_name = request.form.get('AppName')
+    if new_name in [None, '']:
+        return make_response(jsonify({'message': 'No App Name provided'}), 400)
+    if app_id:
+        try:
+            app.logger.info(f"Renaming MACM {app_id} to {new_name}")
+            macm.rename_macm(app_id, new_name)
+            return make_response(jsonify({'message': 'MACM renamed successfully'}), 200)
         except Exception as error:
             return make_response(jsonify({'message': error.args}), 400)
     else:
@@ -221,7 +240,7 @@ def download_excel():
 def download_threat_model():
     app_id = request.form.get('AppID')
     try:
-        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
         threat_model = ThreatModel.query.filter_by(AppID=app_id).with_entities(
             ThreatModel.Asset,
             ThreatModel.Asset_Type.label('Asset Type'),
@@ -256,7 +275,7 @@ def download_threat_model():
 def download_attack_plan():
     app_id = request.form.get('AppID')
     try:
-        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
         attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
             AttackView.Attack_Number.label('Attack Number'),
             AttackView.Component_ID.label('Component ID'),
@@ -304,7 +323,7 @@ def generate_ai_report():
         if Tasks.query.filter_by(app_id=app_id, user_id=current_user.id).first() is not None:
                 return make_response(jsonify({'message': 'Report already in progress or completed. Check the notifications to download the report.'}), 400)
 
-        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
         attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
             AttackView.Attack_Number.label('Attack Number'),
             AttackView.Component_ID.label('Component ID'),
@@ -338,7 +357,7 @@ def download_ai_report():
     task_id = request.form.get('TaskID')
     try:
         task_result = AsyncResult(task_id)
-        app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+        app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
         if task_result is None or task_result.status != 'SUCCESS':
             return jsonify({'message': 'Task not found'}), 404
         report_file = APIUtils().download_pentest_report(app_name, task_result.result)

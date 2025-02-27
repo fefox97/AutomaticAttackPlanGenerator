@@ -1,5 +1,6 @@
 
 
+from apps.penetration_tests.forms import UploadMacmForm
 from apps.authentication.models import Users
 from apps.penetration_tests import blueprint
 from flask import render_template, request
@@ -17,6 +18,7 @@ from apps.my_modules.utils import MacmUtils
 @auth_required()
 def penetration_tests():
     try:
+        upload_macm_form = UploadMacmForm(request.form)
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
@@ -27,7 +29,7 @@ def penetration_tests():
     except Exception as error:
         pentests = None
         raise error
-    return render_template(f"penetration_tests/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
+    return render_template(f"penetration_tests/penetration-tests.html", segment=get_segment(request), pentests=pentests, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict, upload_macm_form=upload_macm_form)
 
 @blueprint.route('/macm', methods=['GET','POST'])
 @auth_required()
@@ -67,13 +69,14 @@ def macm():
 def macm_detail():
     selected_macm = request.args.get('app_id')
     selected_id = request.args.get('id')
+    app_name = App.query.filter_by(AppID=selected_macm).first().Name
     macm_data = Macm.query.filter_by(Component_ID=selected_id, App_ID=selected_macm).first()
     threat_data = ThreatModel.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
     methodologies_data = MethodologyView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
     attack_data = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).all()
     pentest_phases = PentestPhases.query.all()
     av_pentest_phases = AttackView.query.filter_by(Component_ID=selected_id, AppID=selected_macm).with_entities(AttackView.PhaseID, AttackView.PhaseName).distinct().order_by(AttackView.PhaseID).all()
-    return render_template(f"penetration_tests/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data)
+    return render_template(f"penetration_tests/macm-detail.html", segment=get_segment(request), macm_data=macm_data, attack_data=attack_data, pentest_phases=pentest_phases, av_pentest_phases=av_pentest_phases, threat_data=threat_data, methodologies_data=methodologies_data, app_name=app_name)
 
 # Helper - Extract current page name from request
 def get_segment(request):
