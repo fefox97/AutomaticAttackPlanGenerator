@@ -20338,17 +20338,27 @@ pre[class*=language-] {
   z-index: 100;
   width: 100%;
   height: 100%;
-  position: fixed; }
+  position: fixed;
+  animation: unfoldIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
 
-@keyframes show-suggestion {
+#macmGraph.fullscreen-hide {
+  animation: foldOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+
+@keyframes unfoldIn {
   0% {
-    opacity: 0; }
-  10% {
-    opacity: 1; }
-  90% {
-    opacity: 1; }
+    transform: translateY(50%) scale(1); }
+  50% {
+    transform: scale(0.8); }
   100% {
-    opacity: 0; } }
+    transform: translateY(0) scale(1); } }
+
+@keyframes foldOut {
+  0% {
+    transform: translateY(-50%) scale(1); }
+  50% {
+    transform: scale(0.8); }
+  100% {
+    transform: translateY(0) scale(1); } }
 
 .tippy-box[data-theme~='cyto-tippy'] {
   background-color: var(--bs-body-color);

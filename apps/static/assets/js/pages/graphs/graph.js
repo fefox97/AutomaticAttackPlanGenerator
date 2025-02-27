@@ -182,10 +182,18 @@ $(document).ready(function () {
             });
 
             document.getElementById("fullscreen").addEventListener("click", function () {
-                $('#macmGraph').toggleClass('fullscreen');
-                cy.resize();
-                cy.fit();
-                cy.center();
+                if ($('#macmGraph').hasClass('fullscreen')) {
+                    $('#fullscreen').children('i').removeClass('fa-compress');
+                    $('#fullscreen').children('i').addClass('fa-expand');
+                    $('#macmGraph').removeClass('fullscreen');
+                    $('#macmGraph').addClass('fullscreen-hide');
+                }
+                else {
+                    $('#fullscreen').children('i').removeClass('fa-expand');
+                    $('#fullscreen').children('i').addClass('fa-compress');
+                    $('#macmGraph').removeClass('fullscreen-hide');
+                    $('#macmGraph').addClass('fullscreen');
+                }
             });
 
             // add click event listener for nodes
