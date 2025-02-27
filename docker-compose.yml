@@ -138,11 +138,11 @@ services:
         source: ./nginx/reverse-proxy-docker.conf
         target: /etc/nginx/conf.d/default.conf
       - type: bind
-        source: ./certs/webapp.crt
-        target: /etc/ssl/certs/webapp.crt
+        source: ./certs/localhost.crt
+        target: /etc/ssl/certs/localhost.crt
       - type: bind
-        source: ./certs/webapp.key
-        target: /etc/ssl/private/webapp.key
+        source: ./certs/localhost.key
+        target: /etc/ssl/private/localhost.key
       - type: bind
         source: ./certs/dhparam.pem
         target: /etc/nginx/dhparam.pem
@@ -151,14 +151,14 @@ services:
       - web_network
     depends_on: 
       - pennet
-  cloudflare:
-    container_name: cloudflare
-    restart: always
-    image: "cloudflare/cloudflared:latest"
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
-    networks:
-      - web_network
-      - db_network
+  # cloudflare:
+  #   container_name: cloudflare
+  #   restart: always
+  #   image: "cloudflare/cloudflared:latest"
+  #   command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
+  #   networks:
+  #     - web_network
+  #     - db_network
 networks:
   db_network:
     driver: bridge
