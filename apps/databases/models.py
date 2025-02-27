@@ -300,7 +300,6 @@ class Macm(db.Model):
 
     Id              = db.Column(db.Integer, primary_key=True, nullable=False)
     Component_ID    = db.Column(db.Integer, nullable=False, index=True)
-    Application     = db.Column(db.Text)
     Name            = db.Column(db.Text)
     Type            = db.Column(db.Text)
     App_ID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), nullable=False, index=True)

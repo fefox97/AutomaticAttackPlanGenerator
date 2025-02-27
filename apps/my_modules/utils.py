@@ -179,22 +179,17 @@ class MacmUtils:
 		return max_id if max_id is not None else 0
 	
 	def get_macm_info(self, database='macm'):
-		appID = Macm.query.filter_by(App_ID=database).with_entities(Macm.App_ID).distinct().all()
-		appID = [app[0] for app in appID]
-		appID = appID[0] if appID else None
-		applicationName = Macm.query.filter_by(App_ID=database).with_entities(Macm.Application).distinct().all()
-		applicationName = [app[0] for app in applicationName]
-		applicationName = applicationName[0] if applicationName else None
+		app = App.query.filter_by(AppID=database).with_entities(App.AppID, App.Name).first()
 		maxID = self.get_greatest_component_id(database)
-		return appID, applicationName, maxID
+		return app.AppID, app.Name, maxID
 
 	def read_macm(self, database='macm'):
-		macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.application, asset.name, asset.type, asset.app_id, asset.parameters, labels(asset)", database_=database, result_transformer_=Result.to_df)
-		macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.application': 'Application', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters', 'labels(asset)': 'Labels'}, inplace=True)
+		macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.name, asset.type, asset.app_id, asset.parameters, labels(asset)", database_=database, result_transformer_=Result.to_df)
+		macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters', 'labels(asset)': 'Labels'}, inplace=True)
 		macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
 		return macm_df
 
-	def upload_macm(self, query, database='macm'):
+	def upload_macm(self, query, app_name, database='macm'):
 		try:
 			self.clear_database(database)
 		except:
@@ -202,6 +197,7 @@ class MacmUtils:
 			self.create_database(database)
 		self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
 		self.driver.execute_query(query, database_=database)
+		Utils().upload_databases('Macm', neo4j_db=database, app_name=app_name)
 
 	def update_macm(self, query, database='macm'):
 		try:
@@ -229,10 +225,24 @@ class MacmUtils:
 			print(error)
 			return False
 
+	def rename_macm(self, app_id, new_name):
+		try:
+			if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
+				app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
+				raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
+			if new_name.strip() == '':
+				raise Exception("New name cannot be empty")
+			App.query.filter_by(AppID=app_id).update({'Name': new_name})
+			db.session.commit()
+			return True
+		except Exception as error:
+			print(f"Error renaming MACM {app_id} to {new_name}:\n {error}")
+			raise error
+
 	def delete_macm(self, app_id, delete_neo4j=True):
 		try:
 			if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
-				app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+				app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
 				raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
 			App.query.filter_by(AppID=app_id).delete()
 			Macm.query.filter_by(App_ID=app_id).delete()
@@ -250,7 +260,7 @@ class MacmUtils:
 	def share_macm(self, app_id, users):
 		try:
 			owner = MacmUser.query.filter_by(AppID=app_id, IsOwner=True).with_entities(MacmUser.UserID).first()[0]
-			app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+			app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
 			if owner is not current_user.id:
 				raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
 			current_users = MacmUser.query.filter_by(AppID=app_id).where(MacmUser.UserID != current_user.id).all()
@@ -275,7 +285,7 @@ class MacmUtils:
 	def unshare_macm(self, app_id, user_id):
 		try:
 			owner = MacmUser.query.filter_by(AppID=app_id, IsOwner=True).with_entities(MacmUser.UserID).first()[0]
-			app_name = Macm.query.filter_by(App_ID=app_id).with_entities(Macm.Application).first()[0]
+			app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
 			if owner is current_user.id:
 				raise Exception(f"User {current_user.username} is the owner of MACM {app_name}")
 			MacmUser.query.filter_by(AppID=app_id, UserID=user_id).delete()
@@ -408,7 +418,7 @@ class Utils:
 		relations_df.index.name = 'Id'
 		return relations_df
 
-	def upload_databases(self, database, neo4j_db='macm'):
+	def upload_databases(self, database, app_name=None, neo4j_db='macm'):
 		if database == 'Capec':
 			attack_pattern_df = self.attack_pattern_utils.load_attack_patterns()
 			self.save_dataframe_to_database(attack_pattern_df, Capec)
@@ -450,7 +460,6 @@ class Utils:
 		elif database == 'Macm':
 			macm_df = self.macm_utils.read_macm(database=neo4j_db)
 			tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
-			app_name = macm_df['Application'].iloc[0]
 			macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'IsOwner': True}, index=[0])
 			app_df = pd.DataFrame({'AppID': neo4j_db, 'Name': app_name}, index=[0])
 			macm_df['App_ID'] = neo4j_db
