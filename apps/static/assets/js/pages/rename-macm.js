@@ -22,6 +22,7 @@ $(document).ready(function() {
         const AppName = event.relatedTarget.getAttribute('data-bs-AppName');
         this.querySelector('#renameAppID').value = AppID;
         this.querySelector('#renameCurrentAppName').textContent = AppName;
+        this.querySelector('#renameNewAppName').value = AppName;
     });
 
     $('#renameMacmSubmit').click(function() {
