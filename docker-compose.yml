@@ -135,7 +135,7 @@ services:
       - "7787:7787"
     volumes:
       - type: bind
-        source: ./nginx/reverse-proxy-docker.conf
+        source: ./nginx/reverse-proxy-docker-localhost.conf
         target: /etc/nginx/conf.d/default.conf
       - type: bind
         source: ./certs/localhost.crt
