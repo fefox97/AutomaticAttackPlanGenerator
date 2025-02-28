@@ -18,7 +18,7 @@ def index():
 @auth_required()
 @roles_required('editor')
 def settings():
-    excel_file = app.config['THREAT_CATALOG_FILE_NAME']
+    excel_file = app.config['CATALOGS_FILE_NAME']
     path = app.config['DBS_PATH']
     settings = Settings.to_dict()
     if not os.path.exists(f'{path}/{excel_file}'):

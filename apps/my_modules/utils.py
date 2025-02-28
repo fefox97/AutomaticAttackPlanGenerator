@@ -68,7 +68,7 @@ class ThreatCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
 		# self.threat_catalog_df = self.load_threat_catalog()
 
 	def load_threat_catalog(self):
@@ -92,7 +92,7 @@ class ToolCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
 		# self.tools_catalog_df = self.load_tools_catalog()
 
 	def load_tools_catalog(self):
@@ -119,7 +119,7 @@ class AssetTypesCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
 		# self.tools_catalog_df = self.load_tools_catalog()
 
 	def load_asset_types_catalog(self):
@@ -135,7 +135,7 @@ class MethodologyCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
 		# self.tools_catalog_df = self.load_tools_catalog()
 
 	def load_methodology_catalog(self):
@@ -546,7 +546,7 @@ class RiskAnalysisCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.THREAT_CATALOG_FILE_NAME}"
+		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
 		# self.threat_catalog_df = self.load_threat_catalog()
 
 	def load_threat_agent_category_df(self):

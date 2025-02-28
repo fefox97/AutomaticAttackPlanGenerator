@@ -105,7 +105,8 @@ class Config(object):
     USE_SQLITE  = True
 
     DBS_PATH                    = os.getenv('DBS_PATH'    , None)
-    THREAT_CATALOG_FILE_NAME    = os.getenv('THREAT_CATALOG_FILE_NAME'    , None)
+    CATALOGS_FILE_NAME          = os.getenv('CATALOGS_FILE_NAME'    , None)
+    
     URI_NEO4J                   = os.getenv('URI_NEO4J'    , None)
     URI_NEO4J_WSS               = os.getenv('URI_NEO4J_WSS'    , None)
     USER_NEO4J                  = os.getenv('USER_NEO4J'    , None)

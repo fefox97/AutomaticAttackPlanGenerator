@@ -225,7 +225,7 @@ def upload_excel():
         if not APIUtils().allowed_file(file.filename, ['xlsx', 'xls']):
             return make_response(jsonify({'message': 'File type not allowed'}), 400)
         try:
-            filename = app.config['THREAT_CATALOG_FILE_NAME']
+            filename = app.config['CATALOGS_FILE_NAME']
             path = app.config["DBS_PATH"]
             file.save(f'{path}/{filename}')
             return make_response(jsonify({'message': 'Excel uploaded successfully', 'filename': filename}), 200)
@@ -237,7 +237,7 @@ def upload_excel():
 @auth_required
 @blueprint.route('/download_excel', methods=['POST'])
 def download_excel():
-    filename = app.config['THREAT_CATALOG_FILE_NAME']
+    filename = app.config['CATALOGS_FILE_NAME']
     path = app.config["DBS_PATH"]
     return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
 
