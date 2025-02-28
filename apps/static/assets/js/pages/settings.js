@@ -3,6 +3,11 @@ $(document).ready(function() {
         setting_name = e.relatedTarget.dataset['bsSettingName'];
         setting_key = e.relatedTarget.dataset['bsSettingKey'];
         setting_value = e.relatedTarget.dataset['bsSettingValue'];
+        if (setting_value.length > 100) {
+            $('#editSettingValue').attr('rows', '6');
+        }else{
+            $('#editSettingValue').attr('rows', '1');
+        }
         $('#editSettingName').text(setting_name);
         $('#editSettingKey').val(setting_key);
         $('#editSettingValue').val(setting_value);
@@ -11,8 +16,7 @@ $(document).ready(function() {
     $("#editSettingSubmit").click(function() {
         setting_key = $('#editSettingKey').val();
         setting_value = $('#editSettingValue').val();
-        console.log(setting_key, setting_value);
-        editSetting(setting_key, setting_value);
+        editSetting(setting_key, setting_value, $('#editSettingModal'));
     }
     );
 });
@@ -93,7 +97,7 @@ function test(){
     });
 }
 
-function editSetting(SettingKey, SettingValue) {
+function editSetting(SettingKey, SettingValue, settingModal) {
     $.ajax({
         url: '/api/edit_setting',
         type: 'POST',
@@ -105,7 +109,7 @@ function editSetting(SettingKey, SettingValue) {
             location.reload();
         },
         error: function(response) {
-            $('#editSettingModal').modal('hide');
+            settingModal.modal('hide');
             showModal("Update failed", JSON.parse(response.responseText));
         }
     })
