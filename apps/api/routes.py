@@ -6,6 +6,7 @@ import traceback
 import uuid
 
 from atlassian import Jira
+from sqlalchemy import select
 from apps.api import blueprint
 from flask import render_template_string, request, send_file, make_response
 from flask_security import auth_required, current_user, roles_required
@@ -15,10 +16,9 @@ from apps.authentication.models import Tasks
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import App, Attack, AttackView, Macm, Settings, ThreatModel, ToolCatalogue
+from apps.databases.models import App, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
-import pandas as pd
 from celery.result import AsyncResult
 
 from apps.templates.security.email.report_issue import report_issue_html_content
@@ -26,7 +26,13 @@ from apps.templates.security.email.report_issue import report_issue_html_content
 @auth_required
 @blueprint.route('/get_pending_tasks', methods=['GET'])
 def get_pending_tasks():
-    tasks = Tasks.query.filter_by(user_id=current_user.id,).all()
+    tasks_query = select(Tasks.id,
+                    Tasks.name,
+                    Tasks.app_id,
+                    Tasks.created_on,
+                    App.Name.label('app_name')
+                    ).select_from(Tasks).filter_by(user_id=current_user.id).join(App, App.AppID == Tasks.app_id)
+    tasks = db.session.execute(tasks_query).fetchall()
     return jsonify({'tasks': [{
             'task_id': task.id,
             'task_name': task.name,
