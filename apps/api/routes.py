@@ -204,11 +204,14 @@ def unshare_macm():
 @blueprint.route('/reload_databases', methods=['POST'])
 def reload_databases():
     database = request.form.get('database')
-    if database:
-        utils.upload_databases(database)
-        return make_response(jsonify({'message': f'Database {database} reloaded'}), 200)
-    else:
-        return make_response(jsonify({'message': 'No database provided'}), 400)
+    try:
+        if database:
+            utils.upload_databases(database)
+            return make_response(jsonify({'message': f'Database {database} reloaded'}), 200)
+        else:
+            return make_response(jsonify({'message': 'No database provided'}), 400)
+    except Exception as error:
+        return make_response(jsonify({'message': error.args}), 400)
 
 @auth_required
 @blueprint.route('/test', methods=['GET', 'POST'])
