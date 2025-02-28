@@ -183,16 +183,10 @@ $(document).ready(function () {
 
             document.getElementById("fullscreen").addEventListener("click", function () {
                 if ($('#macmGraph').hasClass('fullscreen')) {
-                    $('#fullscreen').children('i').removeClass('fa-compress');
-                    $('#fullscreen').children('i').addClass('fa-expand');
-                    $('#macmGraph').removeClass('fullscreen');
-                    $('#macmGraph').addClass('fullscreen-hide');
+                    disableFullScreen();
                 }
                 else {
-                    $('#fullscreen').children('i').removeClass('fa-expand');
-                    $('#fullscreen').children('i').addClass('fa-compress');
-                    $('#macmGraph').removeClass('fullscreen-hide');
-                    $('#macmGraph').addClass('fullscreen');
+                    enableFullScreen();
                 }
             });
 
@@ -297,6 +291,26 @@ $(document).ready(function () {
         session.close();
         driver.close();
     });
+
+    function disableFullScreen() {
+        $('#fullscreen').children('i').removeClass('fa-compress');
+        $('#fullscreen').children('i').addClass('fa-expand');
+        $('#macmGraph').removeClass('fullscreen');
+        $('#macmGraph').addClass('fullscreen-hide');
+        console.log('Enter key pressed');
+    }
+    
+    function enableFullScreen() {
+        $('#fullscreen').children('i').removeClass('fa-expand');
+        $('#fullscreen').children('i').addClass('fa-compress');
+        $('#macmGraph').removeClass('fullscreen-hide');
+        $('#macmGraph').addClass('fullscreen');
+        $(document).keypress(function(event) {
+            if (event.keyCode === 27) {
+                disableFullScreen();
+            }
+        });
+    }
 
     function saveImage2PDF(filename) {
         currentTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
