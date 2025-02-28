@@ -127,23 +127,21 @@ def configure_roles(app):
         app.user_datastore.commit()
         notify_admins(user)
 
+def initialize_database(app):
+    try:
+        db.create_all()
+    except Exception as e:
+
+        print('> Error: DBMS Exception: ' + str(e) )
+
+        # fallback to SQLite
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
+
+        print('> Fallback to SQLite ')
+        db.create_all()
+
 def configure_database(app):
-
-    @app.before_request
-    def initialize_database():
-        try:
-            db.create_all()
-        except Exception as e:
-
-            print('> Error: DBMS Exception: ' + str(e) )
-
-            # fallback to SQLite
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-
-            print('> Fallback to SQLite ')
-            db.create_all()
-
     @app.teardown_request
     def shutdown_session(exception=None):
         db.session.remove()
@@ -162,6 +160,8 @@ def create_app(config):
     register_assets(app)
     register_custom_filters(app)
     
+    with app.app_context():
+        initialize_database(app)
     configure_database(app)
     configure_admin(app)
     configure_roles(app)
