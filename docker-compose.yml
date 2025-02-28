@@ -90,7 +90,7 @@ services:
     container_name: celery_worker
     restart: always
     build: .
-    command: celery -A celery_worker.celery worker --loglevel=info --include=apps.celery_module.tasks
+    command: celery -A run.celery worker --loglevel=info --include=apps.celery_module.tasks
     volumes:
       - ./apps:/apps
     environment:
@@ -101,12 +101,13 @@ services:
       - pennet
     networks:
       - celery_network
+      - db_network
 
   flower:
     container_name: flower
     restart: always
     build: .
-    command: celery -A celery_worker.celery --broker=redis://redis:6379/0 flower
+    command: celery -A run.celery --broker=redis://redis:6379/0 flower
     ports:
       - "5555:5555"
     depends_on:
@@ -114,6 +115,7 @@ services:
       - pennet
     networks:
       - celery_network
+      - db_network
 
   redis:
     image: redis:alpine
