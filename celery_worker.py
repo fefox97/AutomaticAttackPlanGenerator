@@ -1,12 +1,9 @@
-
-
 import os
-from   sys import exit
+from sys import exit
 
-from flask import Flask
-
-from apps.celery_module.celery_utils import make_celery
+# from apps.celery_module.celery_utils import make_celery
 from apps.config import config_dict
+from run import app
 
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 get_config_mode = 'Debug' if DEBUG else 'Production'
@@ -16,8 +13,5 @@ try:
 except KeyError:
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production] ')
 
-app = Flask(__name__)
-app.config.from_object(app_config)
-celery = make_celery(app)
+celery = app.extensions['celery']
 celery.conf.update(app.config)
-app.app_context().push()
