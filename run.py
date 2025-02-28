@@ -24,6 +24,7 @@ except KeyError:
 
 app = create_app(app_config)
 migrate = Migrate(app, db)
+celery = app.extensions['celery']
 
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)
