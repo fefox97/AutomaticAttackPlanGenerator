@@ -38,7 +38,6 @@ if DEBUG:
     app.logger.info('USER_NEO4J         = ' + app_config.USER_NEO4J)
     app.logger.info('PASS_NEO4J         = ' + app_config.PASS_NEO4J)
     app.logger.info('DBS_PATH           = ' + app_config.DBS_PATH)
-    app.logger.info('OPENROUTER_MODEL   = ' + app_config.OPENROUTER_MODEL)
 
 if __name__ == "__main__":
     app.run()

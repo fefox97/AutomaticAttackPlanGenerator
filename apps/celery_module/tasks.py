@@ -2,11 +2,11 @@ from flask import current_app as app
 import requests
 import json
 from apps import celery
+from apps.databases.models import Settings
 
 @celery.task
 def query_llm(prompt):
     with app.app_context():
-        app.logger.info(app.config["OPENROUTER_MODEL"])
         try:
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
@@ -16,7 +16,7 @@ def query_llm(prompt):
                     "X-Title": app.config["SITE_NAME"],
                 },
                 data=json.dumps({
-                    "model": app.config["OPENROUTER_MODEL"],
+                    "model": Settings.query.filter_by(key='pentest_report_ai_model').first().value,
                     "messages": [
                     {
                         "role": "user",

@@ -46,7 +46,6 @@ services:
       - URL=${URL}
       - SITE_NAME=${SITE_NAME}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - OPENROUTER_MODEL=${OPENROUTER_MODEL}
       - DATABASE_URL=mysql+mysqlconnector://${MYSQL_USER}:${MYSQL_PASSWORD}@db/WebApp
       - DEBUG=${DEBUG}
       - FLASK_APP=${FLASK_APP}

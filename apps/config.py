@@ -47,7 +47,6 @@ class Config(object):
 
     # OpenRouter Management
     OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', None)
-    OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', None)
 
     # Celery
     CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
