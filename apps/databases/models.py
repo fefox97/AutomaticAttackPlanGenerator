@@ -346,6 +346,8 @@ class MacmUser(db.Model):
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
     AppID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), primary_key=True, nullable=False, index=True)
     IsOwner        = db.Column(db.Boolean)
+    User           = db.relationship("Users", backref="MacmUser")
+    App            = db.relationship("App", backref="MacmUser")
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
