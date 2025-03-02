@@ -20561,6 +20561,9 @@ pre[class*=language-] {
   [data-bs-theme="dark"] .admin .nav .active a {
     background-color: #374151 !important;
     border: 2px solid #4B5563 !important; }
+  [data-bs-theme="dark"] .admin .nav .dropdown.open > .dropdown-toggle {
+    background-color: #374151 !important;
+    border: 2px solid #4B5563 !important; }
   [data-bs-theme="dark"] .admin .nav a {
     text-shadow: none !important; }
     [data-bs-theme="dark"] .admin .nav a:hover {

@@ -227,11 +227,15 @@ $color-mode-type: data;
     
         .nav{
             text-shadow: none !important;
-            .active{
+            .active {
                 a {
                     background-color: $gray-700 !important;
                     border: 2px solid $gray-600 !important;
                 }
+            }
+            .dropdown.open > .dropdown-toggle{
+                background-color: $gray-700 !important;
+                border: 2px solid $gray-600 !important;
             }
             a{
                 text-shadow: none !important;
