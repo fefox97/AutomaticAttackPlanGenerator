@@ -80,12 +80,12 @@ def register_custom_filters(app):
 
 from apps.authentication.models import Roles, Users, Tasks
 from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
-from apps.admin.views import MyModelView, ToolCatalogueView
+from apps.admin.views import MyAdminIndexView, MyModelView, ThreatCatalogueView
 from flask_admin.menu import MenuLink
 
 def configure_admin(app):
-    myAdmin.url = '/admin'
     myAdmin.base_template = 'admin/index.html'
+    myAdmin._set_admin_index_view(MyAdminIndexView(url='/', endpoint='admin'))
     myAdmin.add_link(MenuLink(name='Back Home', url='/'))
     myAdmin.add_view(MyModelView(Users, db.session, name='Users', category='Users'))
     myAdmin.add_view(MyModelView(Roles, db.session, name='Roles', category='Users'))
@@ -98,7 +98,7 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(ToolCatalogue, db.session, name='Tool Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(AssetTypes, db.session, name='Asset Types', category='Catalogs'))
-    myAdmin.add_view(ToolCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue', category='Catalogs'))
+    myAdmin.add_view(ThreatCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases', category='Catalogs'))
     myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))
     myAdmin.add_view(MyModelView(Bibliography, db.session, name='Bibliography'))

@@ -25,7 +25,7 @@ class Users(db.Model, UserMixin):
     last_login_at = db.Column(db.DateTime, nullable=True)
     current_login_ip = db.Column(db.String(100), nullable=True)
     login_count = db.Column(db.Integer, nullable=True)
-    roles         = db.relationship('Roles', secondary='roles_users', backref=db.backref('users', lazy='dynamic'))
+    roles         = db.relationship('Roles', secondary='roles_users', backref=db.backref('users'))
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
