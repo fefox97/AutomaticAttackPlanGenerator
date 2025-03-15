@@ -31,7 +31,7 @@ jobs:
 
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no user@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} << 'EOF'
             cd ${{ secrets.WEBAPP_PATH }}
             git pull origin main
             docker compose restart
