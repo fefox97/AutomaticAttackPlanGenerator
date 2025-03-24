@@ -34,6 +34,5 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} << 'EOF'
             cd ${{ secrets.WEBAPP_PATH }}
             git pull origin main
-            docker compose down
-            docker compose up --build -d
+            docker compose restart
           EOF
