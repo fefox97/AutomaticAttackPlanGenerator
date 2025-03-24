@@ -6,32 +6,31 @@ from apps import celery
 from apps.databases.models import Settings
 
 @celery.task
-def query_llm(prompt, max_tries=10, sleep_time=1):
+def query_llm(app_id, max_tries=10, sleep_time=1):
     with app.app_context():
         try:
             for i in range(max_tries):
                 response = requests.post(
-                    url="https://openrouter.ai/api/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {app.config["OPENROUTER_API_KEY"]}",
-                        "HTTP-Referer": app.config["URL"],
-                        "X-Title": app.config["SITE_NAME"],
-                    },
-                    data=json.dumps({
-                        "model": Settings.query.filter_by(key='pentest_report_ai_model').first().value,
-                        "messages": [
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                        ]
-                    }),
-                    timeout=100
-                )
+                        url=app.config["DIFY_API_URL"],
+                        headers={
+                            "Authorization": f"Bearer {app.config["DIFY_API_KEY"]}",
+                            "Content-Type": "application/json",
+
+                        },
+                        data=json.dumps({
+                            "inputs": {
+                                "app_id": app_id
+                            },
+                            "response_mode": "blocking",
+                            "user": app.config["DIFY_USER"]
+                        }),
+                        timeout=100
+                    )
+                response_status = response.json()['data']['status']
                 # check if the response has choices
-                if 'error' in response.json():
-                    raise Exception(response.json()['error'])
-                response_text = response.json()['choices'][0]['message']['content']
+                if response_status != 'succeeded':
+                    raise Exception(f"Error in the response from LLM: {response.json()['data']['error']}")
+                response_text = response.json()['data']['outputs']['result']
                 if response_text == "":
                     app.logger.info(f"Empty response from LLM, retrying in {sleep_time} seconds")
                     time.sleep(sleep_time)
@@ -40,4 +39,5 @@ def query_llm(prompt, max_tries=10, sleep_time=1):
             raise Exception("Maximum tries reached, no response from LLM")
         
         except:
+            app.logger.error(f"Error making the request to LLM", exc_info=True)
             raise Exception("Error making the request to LLM")
