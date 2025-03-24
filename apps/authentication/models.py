@@ -115,6 +115,7 @@ class Tasks(db.Model):
     updated_on    = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
     user_id       = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'))
     user          = db.relationship(Users)
+    app           = db.relationship('App', backref=db.backref('tasks'))
 
     def __repr__(self):
         return str(self.name)
