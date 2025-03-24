@@ -24,7 +24,7 @@ def query_llm(app_id, max_tries=10, sleep_time=1):
                             "response_mode": "blocking",
                             "user": app.config["DIFY_USER"]
                         }),
-                        timeout=100
+                        timeout=1000
                     )
                 response_status = response.json()['data']['status']
                 # check if the response has choices
