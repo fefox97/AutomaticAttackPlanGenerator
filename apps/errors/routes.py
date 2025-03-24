@@ -10,7 +10,6 @@ def page_not_found(e):
 
 @blueprint.app_errorhandler(500)
 def internal_server_error(e):
-    app.logger.error('Eewwewewqewe ' + request.path, exc_info=True)
     return render_template('errors/page-500.html'), 500
 
 @blueprint.app_errorhandler(403)

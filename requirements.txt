@@ -61,6 +61,8 @@ bs4
 celery
 redis
 flower
-pdfkit
+
+markdown2
+weasyprint
 
 bibtexparser

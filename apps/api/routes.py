@@ -333,27 +333,8 @@ def generate_ai_report():
                 return make_response(jsonify({'message': 'Report already in progress or completed. Check the notifications to download the report.'}), 400)
 
         app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
-        attack_plan = AttackView.query.filter_by(AppID=app_id).with_entities(
-            AttackView.Attack_Number.label('Attack Number'),
-            AttackView.Component_ID.label('Component ID'),
-            AttackView.Asset,
-            AttackView.Asset_Type.label('Asset Type'),
-            AttackView.Threat_ID.label('Threat ID'),
-            AttackView.Threat,
-            AttackView.Threat_Description.label('Threat Description'),
-            AttackView.Capec_ID.label('CAPEC ID'),
-            AttackView.Attack_Pattern.label('Attack Pattern'),
-            AttackView.Capec_Description.label('CAPEC Description'),
-            AttackView.Execution_Flow.label('Execution Flow'),
-            AttackView.Tool_ID.label('Tool ID'),
-            AttackView.Tool_Name.label('Tool Name'),
-            AttackView.Tool_Description.label('Tool Description'),
-            AttackView.Command,
-            ).all()
-        if attack_plan is None:
-            raise Exception(f"Attack Plan not found for MACM {app_name}")
 
-        APIUtils().generate_pentest_report(app_id, app_name, attack_plan, ['Execution Flow'])
+        APIUtils().generate_pentest_report(app_id)
         return jsonify({'message': 'Report generation started'})
     except Exception as error:
         app.logger.info(f"Error generating the report for MACM {app_id}:\n {error}")

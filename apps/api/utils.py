@@ -14,7 +14,8 @@ from bs4 import BeautifulSoup
 
 from apps.my_modules.converter import Converter
 from apps import db
-import pdfkit
+import markdown2
+from weasyprint import HTML
 
 class AttackPatternAPIUtils:
 
@@ -127,17 +128,13 @@ class APIUtils:
             app.logger.error(f"Error converting query to json", exc_info=True)
             return None
     
-    def generate_pentest_report(self, app_id, app_name, query_output, html_columns=None):
+    def generate_pentest_report(self, app_id):
         try:
-            attack_plan_json = self.query_to_json(query_output, html_columns)
-            prompt_start = Settings.query.filter_by(key='pentest_report_prompt').first().value
-            prompt = prompt_start + " \n\n" + attack_plan_json
-            report = query_llm.delay(prompt)
+            report = query_llm.delay(app_id)
             task = Tasks(
                 id=report.id,
                 name="Pentest report generation",
                 app_id=app_id,
-                app_name=app_name,
                 user_id=current_user.id,
             )
             db.session.add(task)
@@ -147,27 +144,12 @@ class APIUtils:
             app.logger.error(f"Error making the request to LLM", exc_info=True)
             return None
 
-    def download_pentest_report(self, app_name, body):
+    def download_pentest_report(self, app_name, content):
         try:
-            config = pdfkit.configuration(wkhtmltopdf='/bin/wkhtmltopdf')
-            body = body.replace("<title>", "<title>" + app_name + " - ")
-            if "<h1>" in body:
-                body = re.sub(r'<h1>.*?</h1>', f'<h1>{app_name} Pentest Report</h1>', body)
-            else:
-                body = f'<h1>{app_name} Pentest Report</h1>' + body
-            options = {
-                'header-right': '[title]',
-                'footer-right': '[page] of [topage]',
-                'footer-font-size': '10',
-                'margin-top': '0.5in',
-                'margin-right': '0.5in',
-                'margin-bottom': '0.75in',
-                'margin-left': '0.5in',
-                'encoding': 'UTF-8',  # Ensure the encoding is set to UTF-8
-            }
+            content = f"# 📄 {app_name} Pentest Report\n" + content
+            body = markdown2.markdown(content)
             filebytes = io.BytesIO()
-            pdf_string = pdfkit.from_string(body, False, configuration=config, options=options)
-            filebytes.write(pdf_string)
+            HTML(string=body).write_pdf(filebytes, stylesheets=[app.config['PENTEST_REPORT_CSS']])
             filebytes.seek(0)
             return filebytes
         except Exception as e:
