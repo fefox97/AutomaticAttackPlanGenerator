@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 class Config(object):
 
     basedir = os.path.abspath(os.path.dirname(__file__))
-
     # Load .env file
     load_dotenv()
 
@@ -47,6 +46,12 @@ class Config(object):
 
     # OpenRouter Management
     OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', None)
+    
+    # Dify Management
+    DIFY_API_URL= os.getenv('DIFY_API_URL', None)
+    DIFY_API_KEY = os.getenv('DIFY_API_KEY', None)
+    DIFY_USER = os.getenv('DIFY_USER', None)
+    PENTEST_REPORT_CSS = os.getenv('PENTEST_REPORT_CSS', f'{basedir}/static/assets/css/pentest_report.css')
 
     # Celery
     CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
