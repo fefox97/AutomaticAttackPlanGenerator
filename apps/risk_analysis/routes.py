@@ -449,16 +449,22 @@ def stride_impact_rating():
         stride_impact_previous_results["Created_at"] = None
         stride_impact_previous_results["Updated_at"] = None
 
-
     for stride_impact_evaluation in stride_impact_evaluation_list:
         impact_per_stride = []
         impact_per_stride.append(stride_impact_evaluation.Financialdamage)
         impact_per_stride.append(stride_impact_evaluation.Reputationdamage)
         impact_per_stride.append(stride_impact_evaluation.Noncompliance)
         impact_per_stride.append(stride_impact_evaluation.Privacyviolation)
-        stride_impact_previous_results[stride_impact_evaluation.Stride]=impact_per_stride
-        stride_impact_previous_results["Created_at"]=stride_impact_evaluation.Created_at
-        stride_impact_previous_results["Updated_at"]=stride_impact_evaluation.Updated_at
+        stride_impact_previous_results[stride_impact_evaluation.Stride] = impact_per_stride
+        stride_impact_previous_results["Created_at"] = stride_impact_evaluation.Created_at
+
+        # Modifica per troncare Updated_at ai secondi (rimuovendo i millisecondi)
+        if stride_impact_evaluation.Updated_at:
+            # Tronca il datetime ai secondi
+            truncated_datetime = stride_impact_evaluation.Updated_at.replace(microsecond=0)
+            stride_impact_previous_results["Updated_at"] = truncated_datetime
+        else:
+            stride_impact_previous_results["Updated_at"] = None
 
     template = "risk-analysis/stride_impact_risk.html"
     return render_template(
@@ -476,7 +482,6 @@ def stride_impact_evaluation():
     Endpoint to evaluate STRIDE impact for a given application.
     """
     appId = request.form.get('appId')
-    print(f"applicazione: {appId}")
 
     # Initialize variables for reports and data analysis
     reports = []
@@ -559,11 +564,7 @@ def stride_impact_evaluation():
         }
 
     for stride, impacts in stride_data.items():
-        print(f"Processing STRIDE category: {stride}")
-        print(f"Financial Damage: {impacts['financialdamage']}")
-        print(f"Reputation Damage: {impacts['reputationdamage']}")
-        print(f"Non-compliance: {impacts['noncompliance']}")
-        print(f"Privacy Violation: {impacts['privacyviolation']}")
+
 
         # Usa il metodo per aggiornare o creare il record
         StrideImpactRecord.update_or_create(
