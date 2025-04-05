@@ -502,8 +502,7 @@ pre[class*=language-]{
     }
 
     .vseclab-icon {
-        width: 18px !important;
-        height: 22px !important;
+        width: 25px !important;
         svg {
             width: inherit;
             height: inherit;
@@ -525,7 +524,7 @@ pre[class*=language-]{
             stroke-width: 1;
         }
         path {
-            stroke: $white !important;
+            stroke: $secondary !important;
             stroke-width: 3;
         }
     }
