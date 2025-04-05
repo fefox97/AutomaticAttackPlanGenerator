@@ -20276,8 +20276,7 @@ pre[class*=language-] {
         fill: white;
         font-size: 25px; }
   .vseclab-link .vseclab-icon {
-    width: 18px !important;
-    height: 22px !important; }
+    width: 25px !important; }
     .vseclab-link .vseclab-icon svg {
       width: inherit;
       height: inherit;
@@ -20292,7 +20291,7 @@ pre[class*=language-] {
     stroke: #f0bc74 !important;
     stroke-width: 1; }
   .vseclab-link:hover path {
-    stroke: #ffffff !important;
+    stroke: #f0bc74 !important;
     stroke-width: 3; }
 
 @keyframes textstroke {
