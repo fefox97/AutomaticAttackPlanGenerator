@@ -17,51 +17,45 @@
 {% endblock stylesheets %}
 
 {% block content %}
-
 <div class="col-12 my-4">
-    {% if not threat_data %}
-
-        <div class="alert alert-info" role="alert">
-            <h4 class="alert-heading">No Threat Data</h4>
-            <p>There is no threat data for this MACM component.</p>
-        </div>
-        {% else %}
-            <div class="alert alert-info p-3 rounded">
-                <strong class="d-block mb-2">Risk Levels Legend:</strong>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge critical me-2">Critical</span>
-                    <span>- Very high risk level (8-9): Immediate action required!</span>
-                </div>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge high me-2">High</span>
-                    <span>- High risk level (6-7): Significant attention needed.</span>
-                </div>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge medium me-2">Medium</span>
-                    <span>- Medium risk level (4-5): Moderate concern, monitor closely.</span>
-                </div>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge low me-2">Low</span>
-                    <span>- Low risk level (2-3): Low priority, no immediate action needed.</span>
-                </div>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="badge note me-2">Note</span>
-                    <span>- No significant risk (1): No action required.</span>
-                </div>
-            </div>
+<div class="alert alert-info p-3 rounded">
+    <strong class="d-block mb-2">Overall Risk Levels Legend:</strong>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge critical me-2">Critical</span>
+        <span>- Very high risk level (8-9): Immediate action required!</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge high me-2">High</span>
+        <span>- High risk level (6-7): Significant attention needed.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge medium me-2">Medium</span>
+        <span>- Medium risk level (4-5): Moderate concern, monitor closely.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge low me-2">Low</span>
+        <span>- Low risk level (2-3): Low priority, no immediate action needed.</span>
+    </div>
+    <div class="d-flex align-items-center mb-2">
+        <span class="badge note me-2">Note</span>
+        <span>- No significant risk (1): No action required.</span>
+    </div>
+</div>
 
 
-    <form id="save_risk_evaluation" action="/risk_analysis/save_risk_evaluation" method="POST">
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Save Evaluation</button>
-        </div>
-        <br>
-         <input type="hidden" name="component_id" value="{{ component_id }}">
-         <input type="hidden" name="selected_macm" value="{{ selected_macm }}">
-        <input type="hidden" name="evaluation_data" id="evaluation_data" value="">
-        {% for threat in threat_data %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+<form id="save_risk_evaluation" action="/risk_analysis/save_risk_evaluation" method="POST">
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary">Save Evaluation</button>
+    </div>
+    <br>
+
+    <!-- Hidden fields -->
+    <input type="hidden" name="component_id" value="{{ component_id }}">
+    <input type="hidden" name="selected_macm" value="{{ selected_macm }}">
+
+    {% for threat in threat_data %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
                 <h3 class="mb-0 d-flex align-items-center">
                     {{ threat.Threat_ID }}:
                     <strong>{{ threat.Threat }}</strong>
@@ -69,98 +63,102 @@
                         <span class="badge text-dark me-2 small small-badge" id="likelihood_{{ threat.Threat_ID }}">Likelihood: N/A</span>
                         <span class="badge text-dark small small-badge" id="technical_impact_{{ threat.Threat_ID }}">Technical Impact: N/A</span>
                         <span class="badge text-dark small small-badge" id="business_impact_{{ threat.Threat_ID }}">Business Impact: N/A</span>
-                        <span class="badge text-dark " id="overall_risk_{{ threat.Threat_ID }}">Overall Risk: N/A</span>
+                        <span class="badge text-dark" id="overall_risk_{{ threat.Threat_ID }}">Overall Risk: N/A</span>
                     </div>
                 </h3>
             </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <strong class="d-block">STRIDE Classification:</strong>
-                        <span class="badge bg-secondary">{{ form_data[threat.Threat].stride }}</span>
-                    </div>
-                    <div>
-                        <strong>Description:</strong>
-                        <p class="text-muted">{{ threat.Threat_Description }}</p>
-                    </div>
 
-                            <!-- Likelihood Table -->
-                            <div class="table-responsive">
-                                <table class="table table-bordered text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>Parameter</th>
-                                            <th>Skill Level</th>
-                                            <th>Motive</th>
-                                            <th>Opportunity</th>
-                                            <th>Size</th>
-                                            <th>Ease of Discovery</th>
-                                            <th>Ease of Exploit</th>
-                                            <th>Awareness</th>
-                                            <th>Intrusion Detection</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Likelihood</strong></td>
-                                            {% for param in ['skill', 'motive', 'opportunity', 'size'] %}
-                                                <td>
-                                                    <input type="number" id="{{ param }}_{{ threat.Threat_ID }}" value="{{ form_data[param] or 5 }}"
-                                                        min="1" max="9" class="form-control likelihood-input"
-                                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
-                                                </td>
-                                            {% endfor %}
-                                            {% for param in ['ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
-                                                <td>
-                                                    <input type="number" id="{{ param }}_{{ threat.Threat_ID }}" value="{{ form_data[threat.Threat][param] or 5 }}"
-                                                        min="1" max="9" class="form-control likelihood-input"
-                                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
-                                                </td>
-                                            {% endfor %}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong class="d-block">STRIDE Classification:</strong>
+                    <span class="badge bg-secondary">{{ form_data[threat.Threat].stride }}</span>
+                </div>
 
-                    <!-- Impact Table -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered text-center">
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Loss of Confidentiality</th>
-                                    <th>Loss of Integrity</th>
-                                    <th>Loss of Availability</th>
-                                    <th>Loss of Accountability</th>
-                                    <th>Financial Damage</th>
-                                    <th>Reputation Damage</th>
-                                    <th>Non-Compliance</th>
-                                    <th>Privacy Violation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Impact</strong></td>
-                                    {% for param in ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability', 'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'] %}
-                                        <td>
-                                            <input type="number" id="{{ param }}_{{ threat.Threat_ID }}"  value="{{ form_data[threat.Threat][param] or 5 }}"
-                                                min="1" max="9" class="form-control impact-input"
-                                                onchange="calculateImpact('{{ threat.Threat_ID }}')">
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div>
+                    <strong>Description:</strong>
+                    <p class="text-muted">{{ threat.Description }}</p>
+                </div>
 
-                    <div class="alert alert-light mt-3">
-                        <div id="impact_{{ threat.Threat_ID }}" class="d-flex justify-content-between"></div>
-                    </div>
+                <!-- Likelihood Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Skill Level</th>
+                                <th>Motive</th>
+                                <th>Opportunity</th>
+                                <th>Size</th>
+                                <th>Ease of Discovery</th>
+                                <th>Ease of Exploit</th>
+                                <th>Awareness</th>
+                                <th>Intrusion Detection</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Likelihood</strong></td>
+                                {% for param in ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'] %}
+                                    <td>
+                                        <input type="number"
+                                               id="{{ param }}_{{ threat.Threat_ID }}"
+                                               name="{{ threat.Threat_ID }}[{{ param }}]"
+                                               value="{{ form_data[param] or 5 }}"
+                                               min="1" max="9"
+                                               class="form-control likelihood-input"
+                                               onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Impact Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Loss of Confidentiality</th>
+                                <th>Loss of Integrity</th>
+                                <th>Loss of Availability</th>
+                                <th>Loss of Accountability</th>
+                                <th>Financial Damage</th>
+                                <th>Reputation Damage</th>
+                                <th>Non-Compliance</th>
+                                <th>Privacy Violation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Impact</strong></td>
+                                {% for param in ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability', 'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'] %}
+                                    <td>
+                                        <input type="number"
+                                               id="{{ param }}_{{ threat.Threat_ID }}"
+                                               name="{{ threat.Threat_ID }}[{{ param }}]"
+                                               value="{{ form_data[threat.Threat][param] or 5 }}"
+                                               min="1" max="9"
+                                               class="form-control impact-input"
+                                               onchange="calculateImpact('{{ threat.Threat_ID }}')">
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-light mt-3">
+                    <div id="impact_{{ threat.Threat_ID }}" class="d-flex justify-content-between"></div>
                 </div>
             </div>
-        {% endfor %}
-        {% endif %}
-    </form>
+        </div>
+    {% endfor %}
+
+</form>
 </div>
+
 {% block javascripts %}
 <script type="text/javascript">
 function calculateLikelihood(threatID) {
@@ -301,6 +299,80 @@ function setColor(id, category) {
     }
 
 </script>
+<script type="text/javascript">
+    document.getElementById('save_risk_evaluation').addEventListener('submit', function (event) {
+        event.preventDefault();  // Impedisce il comportamento di submit predefinito
+
+        const evaluationData = [];  // Array per raccogliere i dati delle minacce
+
+        {% for threat in threat_data %}
+        const threatID = "{{ threat.Threat_ID }}";
+
+        // Raccogliere i valori dei parametri di likelihood
+        const likelihoodParams = ['skill', 'motive', 'opportunity', 'size', 'ease_of_discovery', 'ease_of_exploit', 'awareness', 'intrusion_detection'];
+        const likelihoodData = {};
+        likelihoodParams.forEach(param => {
+            likelihoodData[param] = parseFloat(document.getElementById(`${param}_${threatID}`).value) || 5;
+        });
+
+        // Raccogliere i valori dei parametri di impact
+        const impactParams = ['loss_of_confidentiality', 'loss_of_integrity', 'loss_of_availability', 'loss_of_accountability',
+                              'financialdamage', 'reputationdamage', 'noncompliance', 'privacyviolation'];
+        const impactData = {};
+        impactParams.forEach(param => {
+            impactData[param] = parseFloat(document.getElementById(`${param}_${threatID}`).value) || 5;
+        });
+
+        // Raccogliere i valori calcolati
+        const likelihood = parseFloat(document.getElementById(`likelihood_${threatID}`).innerText.split(':')[1]) || 0;
+        const technicalImpact = parseFloat(document.getElementById(`technical_impact_${threatID}`).innerText.split(':')[1]) || 0;
+        const businessImpact = parseFloat(document.getElementById(`business_impact_${threatID}`).innerText.split(':')[1]) || 0;
+        const overallRisk = document.getElementById(`overall_risk_${threatID}`).innerText.split(':')[1]?.trim() || "Unknown";
+
+        // Costruire l'oggetto dei dati da inviare
+        evaluationData.push({
+            Threat_ID: threatID,
+            Likelihood: likelihood,
+            Technical_Impact: technicalImpact,
+            Business_Impact: businessImpact,
+            Overall_Risk: overallRisk,
+            Likelihood_Params: likelihoodData,
+            Impact_Params: impactData,
+        });
+        {% endfor %}
+
+        // Preparare il payload da inviare
+        const payload = {
+            component_id: "{{ component_id }}",
+            selected_macm: "{{ selected_macm }}",
+            evaluation_data: evaluationData
+        };
+
+        // Inviare i dati al server tramite fetch
+        fetch('/risk_analysis/save_risk_evaluation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta al server');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Risposta dal server:', data);
+            alert('Dati salvati con successo!');
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Errore durante il salvataggio dei dati.');
+        });
+    });
+</script>
+
 
 {% endblock %}
 {% endblock %}
