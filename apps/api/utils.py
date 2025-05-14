@@ -1,12 +1,21 @@
+import io
 import os
-from apps import db
-from apps.databases.models import Capec, MacmUser, Macm, Attack
+import re
+
+from flask_login import current_user
+from apps.celery_module.tasks import query_llm
+from apps.databases.models import Capec, Settings
+from apps.authentication.models import Tasks
 from flask import current_app as app
 from sqlalchemy import or_, and_
-import nmap as nm
 import zipfile
+import pandas as pd
+from bs4 import BeautifulSoup
 
 from apps.my_modules.converter import Converter
+from apps import db
+import markdown2
+from weasyprint import HTML
 
 class AttackPatternAPIUtils:
 
@@ -71,3 +80,78 @@ class APIUtils:
             for file in file_list:
                 zipf.write(file, os.path.basename(file))
         return f"{destinationpPath}/{zip_name}"
+
+    def query_to_excel(self, query_output, sheet_name, column_format=None, html_columns=None):
+        try:
+
+            # Create a DataFrame using pd.DataFrame
+            df = pd.DataFrame(query_output)
+
+            if html_columns is not None:
+                for col in html_columns:
+                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if x is not None else x)
+
+            file_bytes = io.BytesIO()
+            with pd.ExcelWriter(file_bytes, engine='xlsxwriter') as writer:
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+                
+                # Get the xlsxwriter workbook and worksheet objects.
+                workbook  = writer.book
+                worksheet = writer.sheets[sheet_name]
+
+                # Set the format for the columns
+                wrap_format = workbook.add_format({'text_wrap': True})
+                if column_format is not None:
+                    for col, fmt in column_format.items():
+                        worksheet.set_column(fmt['columns'], fmt['width'], wrap_format)
+
+                worksheet.freeze_panes(1, 0)
+
+                writer.close()
+            file_bytes.seek(0)
+            return file_bytes
+        
+        except:
+            app.logger.error(f"Error saving query to excel", exc_info=True)
+            return None
+    
+    def query_to_json(self, query_output, html_columns=None):
+        try:
+            df = pd.DataFrame(query_output)
+
+            if html_columns is not None:
+                for col in html_columns:
+                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if x is not None else x)
+            return df.to_json(orient='index')
+        
+        except:
+            app.logger.error(f"Error converting query to json", exc_info=True)
+            return None
+    
+    def generate_pentest_report(self, app_id):
+        try:
+            report = query_llm.delay(app_id)
+            task = Tasks(
+                id=report.id,
+                name="Pentest report generation",
+                app_id=app_id,
+                user_id=current_user.id,
+            )
+            db.session.add(task)
+            db.session.commit()
+            return True
+        except:
+            app.logger.error(f"Error making the request to LLM", exc_info=True)
+            return None
+
+    def download_pentest_report(self, app_name, content):
+        try:
+            content = f"# 📄 {app_name} Pentest Report\n" + content
+            body = markdown2.markdown(content)
+            filebytes = io.BytesIO()
+            HTML(string=body).write_pdf(filebytes, stylesheets=[app.config['PENTEST_REPORT_CSS']])
+            filebytes.seek(0)
+            return filebytes
+        except Exception as e:
+            app.logger.error(f"Error making the request to LLM: {e}", exc_info=True)
+            return None

@@ -1,7 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
 import json
 from datetime import datetime
 from io import BytesIO
@@ -10,20 +7,16 @@ import pandas as pd
 
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
-from flask import redirect, render_template, request, url_for, jsonify, send_file
-from flask_login import login_required, current_user
+from flask import render_template, request, send_file
+from flask_security import auth_required, current_user
+
 from flask import current_app as app
-from apps.databases.models import (AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm,
-                                   ThreatModel, ToolCatalogue, PentestPhases,
-                                   ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply,
-                                   ThreatAgentReplyCategory, ThreatAgentCategory,
-                                   ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores,
-                                   StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord)
+from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
 from sqlalchemy import func
 from apps.my_modules import converter, ThreatAgentUtils
 from apps import db
 
-
+from flask_security import auth_required
 
 # Helper - Extract current page name from request
 def get_segment(request):
@@ -37,7 +30,7 @@ def get_segment(request):
 
 
 @blueprint.route('/macm_riskRating', methods=['GET'])
-@login_required
+@auth_required()
 def macm_riskRating():
     riskAnalysisCatalogUtils = ThreatAgentUtils()
     selected_macm = request.args.get('app_id')
@@ -45,6 +38,7 @@ def macm_riskRating():
     try:
         # Recupera i dati relativi a Macm
         table = Macm.query.filter_by(App_ID=selected_macm).all()
+        app_info = App.query.filter_by(AppID=selected_macm).first()
         if len(table) == 0:
             table = None
     except Exception as e:
@@ -92,20 +86,20 @@ def macm_riskRating():
         threat_number=threat_number,
         selected_macm=selected_macm,
         wizard_completed=riskAnalysisCatalogUtils.wizard_completed(selected_macm),
-        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm),
+        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm), app_info=app_info,
         analyzed_component_ids=analyzed_component_ids,
         final_step_completed=final_step_completed
     )
 
 @blueprint.route('/', methods=['GET'])
-@login_required
+@auth_required()
 def risk_analysis():
     try:
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
-        risk_analyses = MacmUser.query.filter_by(UserID=current_user.id).all()
+        risk_analyses = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), App.Created_at.label('CreatedAt'), MacmUser.IsOwner).all()
         if len(risk_analyses) == 0:
             risk_analyses = None
     except Exception as error:
@@ -117,7 +111,7 @@ def risk_analysis():
                            users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict)
 
 @blueprint.route('/threat-agent-wizard', methods=['GET'])
-@login_required
+@auth_required()
 def threat_agent_wizard():
     context = {}
     appId = request.args.get('app_id')
@@ -182,7 +176,7 @@ def threat_agent_wizard():
     )
 
 @blueprint.route('/submit-questionnaire', methods=['POST'])
-@login_required
+@auth_required()
 def submit_questionnaire():
     if request.method == 'POST':
         riskAnalysisCatalogUtils = ThreatAgentUtils()
@@ -268,7 +262,7 @@ def submit_questionnaire():
 
 
 @blueprint.route('/threat_agent_evaluation', methods=['POST'])
-@login_required
+@auth_required()
 def threat_agent_evaluation():
     """
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
@@ -473,6 +467,7 @@ def threat_agent_evaluation():
 
 
 @blueprint.route('/stride-impact-rating', methods=['GET'])
+@auth_required()
 def stride_impact_rating():
     """
     Endpoint to evaluate STRIDE impact for a given application.
@@ -524,7 +519,7 @@ def stride_impact_rating():
 
 
 @blueprint.route('/stride_impact_evaluation', methods=['POST'])
-@login_required
+@auth_required()
 def stride_impact_evaluation():
     threatAgentUtils= ThreatAgentUtils()
     """

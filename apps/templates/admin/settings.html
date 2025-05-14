@@ -7,12 +7,37 @@
 
 {% block content %}
 
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
         
     </div>
     <div class="row">
         <div class="col-12">
-            <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">General Settings</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
+                        <div>
+                            <h3 class="h6 mb-1">Penetration Test Report AI Model</h3>
+                            <p class="small pe-4">Set the AI Model for the penetration test report</p>
+                            <p class="small pe-4">Current AI Model: <span id="PenTestAIModel">{{ settings.get('pentest_report_ai_model') }}</span></p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-setting-name="Pentest Report AI Model" data-bs-setting-key="pentest_report_ai_model" data-bs-setting-value="{{ settings.get('pentest_report_ai_model') }}" data-bs-target="#editSettingModal"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                        <div>
+                            <h3 class="h6 mb-1">Penetration Test Report Prompt</h3>
+                            <p class="small pe-4">Set the prompt for the penetration test report</p>
+                            <p class="small pe-4">Current prompt: <span id="PenTestPrompt">{{ settings.get('pentest_report_prompt') }}</span></p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-setting-name="Pentest Report Prompt" data-bs-setting-key="pentest_report_prompt" data-bs-setting-value="{{ settings.get('pentest_report_prompt') }}" data-bs-target="#editSettingModal"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card card-body border-0 shadow">
                 <h2 class="h5 mb-4">Database Settings</h2>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -21,7 +46,9 @@
                             <p class="small pe-4">Reload Capec Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadCapec" onclick="reloadDatabases('Capec')">Reload</button>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadCapec" onclick="reloadDatabases('Capec')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item px-0 border-bottom">
@@ -53,7 +80,20 @@
                             <p class="small pe-4">Reload Threat Catalogue Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadThreatCatalog" onclick="reloadDatabases('ThreatCatalog')">Reload</button>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadThreatCatalog" onclick="reloadDatabases('ThreatCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
+                        <div>
+                            <h3 class="h6 mb-1">Reload Asset Types Catalogue</h3>
+                            <p class="small pe-4">Reload Asset Types Database</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadAssetTypesCatalog" onclick="reloadDatabases('AssetTypesCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -62,7 +102,9 @@
                             <p class="small pe-4">Reload Tool Catalog Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadToolCatalog" onclick="reloadDatabases('ToolCatalog')">Reload</button>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadToolCatalog" onclick="reloadDatabases('ToolCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -71,7 +113,9 @@
                             <p class="small pe-4">Reload Methodology Catalog Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadMethodologyCatalog" onclick="reloadDatabases('MethodologyCatalog')">Reload</button>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadMethodologyCatalog" onclick="reloadDatabases('MethodologyCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
@@ -80,7 +124,9 @@
                             <p class="small pe-4">Reload Risk Analysis Catalogs Database</p>
                         </div>
                         <div>
-                            <button class="btn btn-secondary btn-sm" id="ReloadRiskAnalysisCatalog" onclick="reloadDatabases('RiskAnalysisCatalog')">Reload</button>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadRiskAnalysisCatalog" onclick="reloadDatabases('RiskAnalysisCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
                         </div>
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0">
@@ -95,10 +141,11 @@
                 </ul>
             </div>
         </div>
-        
     </div>
 
 {% endblock content %}
+
+{% include 'admin/modals/edit_setting_modal.html' %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}

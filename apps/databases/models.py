@@ -1,17 +1,9 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import json
 from datetime import datetime
-from typing import List
-from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy import ForeignKey, select, orm, func, and_, UniqueConstraint
-from sqlalchemy.dialects import mysql
+from sqlalchemy import ForeignKey, select, func, and_, UniqueConstraint
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
 
@@ -45,6 +37,37 @@ class AlchemyEncoder(json.JSONEncoder):
             return fields
         return json.JSONEncoder.default(self, obj)
 
+class Bibliography(db.Model):
+    
+    __tablename__ = 'Bibliography'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    bibtex = db.Column(db.String(1000), nullable=False)
+
+    def __repr__(self):
+        return str(self.bibtex)
+
+class Settings(db.Model):
+    
+    __tablename__ = 'Settings'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    key = db.Column(db.String(100), nullable=False)
+    value = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return str(self.key)
+    
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+            setattr(self, property, value)
+    
+    @staticmethod
+    def to_dict() -> dict:
+        settings = Settings.query.all()
+        return {setting.key: setting.value for setting in settings}
 
 class PentestPhases(db.Model):
     __tablename__ = 'PentestPhases'
@@ -63,6 +86,31 @@ class PentestPhases(db.Model):
     def __repr__(self):
         return str(self.PhaseID)
 
+class AssetTypes(db.Model):
+    
+    __tablename__ = 'AssetTypes'
+
+    AssetTypeID            = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name          = db.Column(db.Text, nullable=False)
+    Description   = db.Column(db.Text)
+    PrimaryLabel  = db.Column(db.Text)
+    SecondaryLabel = db.Column(db.Text)
+    Color         = db.Column(db.Text)
+
+    @staticmethod
+    def get_colors():
+        asset_types_colors = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.Color).all()
+        return {asset_type.Name: asset_type.Color for asset_type in asset_types_colors}
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.AssetTypeID)
 
 class Capec(db.Model):
     __tablename__ = 'Capec'
@@ -109,12 +157,13 @@ class Capec(db.Model):
     @hybrid_property
     def abstraction_order(self):
         table_ordering = case(
-            whens={"Meta": 1, "Standard": 2, "Detailed": 3},
-            value=Capec.Abstraction
+            (Capec.Abstraction == "Meta", 1),
+            (Capec.Abstraction == "Standard", 2),
+            (Capec.Abstraction == "Detailed", 3),
+            else_=None
         )
-        return (table_ordering)
-
-
+        return table_ordering
+    
 class ThreatCatalogue(db.Model):
     __tablename__ = 'ThreatCatalogue'
 
@@ -251,14 +300,15 @@ class CapecToolRel(db.Model):
 class Macm(db.Model):
     __tablename__ = 'Macm'
 
-    Component_ID = db.Column(db.Integer, primary_key=True, nullable=False)
-    Application = db.Column(db.Text)
-    Name = db.Column(db.Text)
-    Type = db.Column(db.Text)
-    App_ID = db.Column(db.String(100), ForeignKey("MacmUser.AppID", ondelete='CASCADE'), primary_key=True,
-                       nullable=False, index=True)
-    Labels = db.Column(db.JSON)
-    Parameters = db.Column(db.JSON)
+    Id              = db.Column(db.Integer, primary_key=True, nullable=False)
+    Component_ID    = db.Column(db.Integer, nullable=False, index=True)
+    Name            = db.Column(db.Text)
+    Type            = db.Column(db.Text)
+    App_ID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), nullable=False, index=True)
+    Labels          = db.Column(db.JSON)
+    Parameters      = db.Column(db.JSON)
+
+    __table_args__ =  (UniqueConstraint('Component_ID', 'App_ID', name='uix_1'),)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -271,13 +321,34 @@ class Macm(db.Model):
         return str(self.Name)
 
 
+class App(db.Model):
+    
+    __tablename__ = 'App'
+
+    AppID = db.Column(db.String(100), primary_key=True, nullable=False)
+    Name = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.Name)
+
 class MacmUser(db.Model):
     __tablename__ = 'MacmUser'
 
-    UserID = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
-    AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
-    IsOwner = db.Column(db.Boolean)
-    AppName = db.Column(db.Text)
+    UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
+    AppID          = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), primary_key=True, nullable=False, index=True)
+    IsOwner        = db.Column(db.Boolean)
+    User           = db.relationship("Users", backref="MacmUser")
+    App            = db.relationship("App", backref="MacmUser")
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -298,21 +369,18 @@ class MacmUser(db.Model):
     def ownerPerApp(self):
         result = self.query.with_entities(self.AppID, self.UserID).filter_by(IsOwner=True).all()
         return {app_id: user_id for app_id, user_id in result}
-
-
+    
 class Attack(db.Model):
     __tablename__ = 'Attack'
 
-    Id = db.Column(db.Integer, primary_key=True, nullable=False)
-    ToolID = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
-    ComponentID = db.Column(db.Integer, ForeignKey("Macm.Component_ID", ondelete='CASCADE'))
-    AppID = db.Column(db.String(100), ForeignKey("MacmUser.AppID", ondelete='CASCADE'))
-    Parameters = db.Column(db.JSON)
-    ReportFiles = db.Column(db.JSON)
-
-    Component = db.relationship("Macm", backref="Attack")
+    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
+    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+    ComponentID  = db.Column(db.Integer, nullable=False)
+    AppID        = db.Column(db.String(100), ForeignKey("App.AppID", ondelete='CASCADE'), nullable=False)
+    Parameters   = db.Column(db.JSON)
+    ReportFiles  = db.Column(db.JSON)
+    
     Tool = db.relationship("ToolCatalogue", backref="Attack")
-    App = db.relationship("MacmUser", backref="Attack")
 
     __table_args__ = (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
@@ -344,40 +412,41 @@ class ThreatModel(db.Model):
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('TM_Number')
 
     __table__ = create_view(
-        "ThreatModel",
-        select(
-            ThreatCatalogue.TID.label("Threat_ID"),
-            ThreatCatalogue.Asset.label("Asset_Type"),
-            ThreatCatalogue.Threat,
-            ThreatCatalogue.Description.label("Threat_Description"),
-            ThreatCatalogue.Compromised,
-            ThreatCatalogue.PreC,
-            ThreatCatalogue.PreI,
-            ThreatCatalogue.PreA,
-            ThreatCatalogue.PostC,
-            ThreatCatalogue.PostI,
-            ThreatCatalogue.PostA,
-            ThreatCatalogue.STRIDE.label("STRIDE"),
-            ThreatCatalogue.EasyOfDiscovery,
-            ThreatCatalogue.EasyOfExploit,
-            ThreatCatalogue.Awareness,
-            ThreatCatalogue.IntrusionDetection,
-            ThreatCatalogue.LossOfConfidentiality,
-            ThreatCatalogue.LossOfIntegrity,
-            ThreatCatalogue.LossOfAvailability,
-            ThreatCatalogue.LossOfAccountability,
-            Macm.Component_ID,
-            Macm.Name.label("Asset"),
-            Macm.Parameters,
-            Macm.App_ID.label("AppID")
-        )
-        .select_from(Macm)
-        .join(ThreatCatalogue, Macm.Type == ThreatCatalogue.Asset)
-        .add_columns(row_number_column),
-        db.metadata,
-        replace=True
-    )
-
+                "ThreatModel",
+                select(
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"),
+                    ThreatCatalogue.Compromised,
+                    ThreatCatalogue.PreC,
+                    ThreatCatalogue.PreI,
+                    ThreatCatalogue.PreA,
+                    ThreatCatalogue.PostC,
+                    ThreatCatalogue.PostI,
+                    ThreatCatalogue.PostA,
+                    ThreatCatalogue.STRIDE.label("STRIDE"),
+                    ThreatCatalogue.EasyOfDiscovery,
+                    ThreatCatalogue.EasyOfExploit,
+                    ThreatCatalogue.Awareness,
+                    ThreatCatalogue.IntrusionDetection,
+                    ThreatCatalogue.LossOfConfidentiality,
+                    ThreatCatalogue.LossOfIntegrity,
+                    ThreatCatalogue.LossOfAvailability,
+                    ThreatCatalogue.LossOfAccountability,
+                    Macm.Component_ID,
+                    Macm.Name.label("Asset"), 
+                    Macm.Parameters,
+                    App.AppID
+                )
+                .select_from(Macm)
+                .join(App, Macm.App_ID==App.AppID)
+                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
+                .add_columns(row_number_column),
+                db.metadata,
+                replace=True
+                )
+    
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Threat_ID}')
 
@@ -387,46 +456,46 @@ class AttackView(db.Model):
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Attack_Number')
 
     __table__ = create_view(
-        "AttackView",
-        select(
-            ToolCatalogue.ToolID.label("Tool_ID"),
-            ToolCatalogue.Name.label("Tool_Name"),
-            ToolCatalogue.Command,
-            ToolCatalogue.Description.label("Tool_Description"),
-            ToolCatalogue.IsExecutable.label("Is_Executable"),
-            ToolCatalogue.ReportParser.label("Report_Parser"),
-            ToolCatalogue.AllowedReportExtensions.label("Allowed_Report_Extensions"),
-            Capec.Capec_ID,
-            Capec.Name.label("Attack_Pattern"),
-            Capec.Execution_Flow,
-            Capec.Description.label("Capec_Description"),
-            ThreatCatalogue.TID.label("Threat_ID"),
-            ThreatCatalogue.Asset.label("Asset_Type"),
-            ThreatCatalogue.Threat,
-            ThreatCatalogue.Description.label("Threat_Description"),
-            Macm.Component_ID,
-            Macm.Name.label("Asset"),
-            Attack.Parameters,
-            Macm.App_ID.label("AppID"),
-            PentestPhases.PhaseID.label("PhaseID"),
-            PentestPhases.PhaseName.label("PhaseName"),
-            Attack.ReportFiles
-        )
-        .select_from(Macm)
-        .join(ThreatCatalogue, Macm.Type == ThreatCatalogue.Asset)
-        .join(CapecThreatRel)
-        .join(Capec)
-        .join(CapecToolRel)
-        .join(ToolCatalogue)
-        .join(Attack, and_(Macm.Component_ID == Attack.ComponentID, Attack.ToolID == ToolCatalogue.ToolID,
-                           Macm.App_ID == Attack.AppID))
-        .join(ToolPhaseRel, ToolCatalogue.ToolID == ToolPhaseRel.ToolID)
-        .join(PentestPhases, ToolPhaseRel.PhaseID == PentestPhases.PhaseID)
-        .add_columns(row_number_column),
-        db.metadata,
-        replace=True
-    )
-
+                "AttackView",
+                select(
+                    ToolCatalogue.ToolID.label("Tool_ID"), 
+                    ToolCatalogue.Name.label("Tool_Name"), 
+                    ToolCatalogue.Command,
+                    ToolCatalogue.Description.label("Tool_Description"),
+                    ToolCatalogue.IsExecutable.label("Is_Executable"),
+                    ToolCatalogue.ReportParser.label("Report_Parser"),
+                    ToolCatalogue.AllowedReportExtensions.label("Allowed_Report_Extensions"),
+                    Capec.Capec_ID,
+                    Capec.Name.label("Attack_Pattern"), 
+                    Capec.Execution_Flow, 
+                    Capec.Description.label("Capec_Description"), 
+                    ThreatCatalogue.TID.label("Threat_ID"), 
+                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    ThreatCatalogue.Threat, 
+                    ThreatCatalogue.Description.label("Threat_Description"), 
+                    Macm.Component_ID, 
+                    Macm.Name.label("Asset"), 
+                    Attack.Parameters,
+                    App.AppID,
+                    PentestPhases.PhaseID.label("PhaseID"),
+                    PentestPhases.PhaseName.label("PhaseName"),
+                    Attack.ReportFiles
+                )
+                .select_from(Macm)
+                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
+                .join(CapecThreatRel)
+                .join(Capec)
+                .join(CapecToolRel)
+                .join(ToolCatalogue)
+                .join(App, Macm.App_ID==App.AppID)
+                .join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID))
+                .join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID)
+                .join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID)
+                .add_columns(row_number_column),
+                db.metadata,
+                replace=True
+                )
+    
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Capec_ID}')
 
@@ -434,22 +503,23 @@ class AttackView(db.Model):
 class MethodologyView(db.Model):
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
     __table__ = create_view(
-        "MethodologyView",
-        select(
-            MethodologyCatalogue.MID,
-            MethodologyCatalogue.Name,
-            MethodologyCatalogue.Description,
-            MethodologyCatalogue.AssetType,
-            MethodologyCatalogue.Link,
-            Macm.Component_ID,
-            Macm.App_ID.label("AppID")
-        ).select_from(Macm)
-        .join(MethodologyCatalogue, Macm.Type == MethodologyCatalogue.AssetType)
-        .add_columns(row_number_column),
-        db.metadata,
-        replace=True
-    )
-
+                "MethodologyView",
+                select(
+                    MethodologyCatalogue.MID, 
+                    MethodologyCatalogue.Name, 
+                    MethodologyCatalogue.Description,
+                    MethodologyCatalogue.AssetType,
+                    MethodologyCatalogue.Link,
+                    Macm.Component_ID,
+                    App.AppID
+                ).select_from(Macm)
+                .join(App, Macm.App_ID==App.AppID)
+                .join(MethodologyCatalogue, Macm.Type==MethodologyCatalogue.AssetType)
+                .add_columns(row_number_column),
+                db.metadata,
+                replace=True
+                )
+    
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Methodology_ID}')
 
@@ -640,11 +710,6 @@ class RiskRecord(db.Model):
     OverallRisk = db.Column(db.Text, nullable=False)
     Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
-
-
-
-
-
 class ThreatAgentReplyCategory(db.Model):
     __tablename__ = 'ThreatAgentReplyCategory'
 

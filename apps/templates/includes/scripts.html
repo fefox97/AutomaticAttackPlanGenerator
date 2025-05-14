@@ -34,17 +34,19 @@
 <!-- Simplebar -->
 <script src="{{ config.ASSETS_ROOT }}/vendor/simplebar/dist/simplebar.min.js"></script>
 
+<!-- MathJax -->
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 <!-- Github buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 
-<!-- Volt JS -->
+<!-- JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/volt.js"></script>
 
 <!-- Datatables -->
 <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.6/b-2.4.2/b-colvis-2.4.2/cr-1.7.0/fc-4.3.0/fh-3.4.0/kt-2.10.0/sc-2.2.0/sb-1.5.0/sp-2.2.0/sl-1.7.0/datatables.min.js"></script>
 
 <!-- Bootstrap JS -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
 <!-- NeoVis -->
@@ -61,6 +63,32 @@
 <!-- Code-Input -->
 <script src="{{ config.ASSETS_ROOT }}/custom_modules/code-input/code-input.min.js"></script>
 
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<!-- Cytoscape -->
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.4/cytoscape.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/weaverjs@1.2.0/dist/weaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@2.0.0/cytoscape-popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-cxtmenu@3.5.0/cytoscape-cxtmenu.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-spread@3.0.0/cytoscape-spread.min.js"></script>
+<!-- <script src="https://unpkg.com/webcola/WebCola/cola.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-cola@2.5.0/cytoscape-cola.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-euler@1.2.3/cytoscape-euler.min.js"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-svg@0.4.0/cytoscape-svg.min.js"></script>
+
+<!-- SVG to PDF -->
+<script src="https://cdn.jsdelivr.net/npm/pdfkit@0.16.0/js/pdfkit.standalone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-to-pdfkit@0.1.8/source.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blob-stream-browserify@0.1.3/index.min.js"></script>
 
 <!-- Custom JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/custom.js"></script>
+
+<script type="text/javascript">
+    if ('{{ current_user.is_authenticated }}' == 'True') {
+        getPendingTasks();
+    }
+</script>

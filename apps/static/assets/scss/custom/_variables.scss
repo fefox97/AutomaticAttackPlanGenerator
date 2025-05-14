@@ -1,3 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/natural-precision');
+@import url('https://fonts.cdnfonts.com/css/wotfard');
+@import url('https://fonts.cdnfonts.com/css/mismo');
+@import url('https://fonts.cdnfonts.com/css/gobold');
+
+$font-family-sans-serif: 
+    "Red Hat Display",
+    Montserrat,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    "Noto Sans",
+    "Liberation Sans",
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji" !important;
+
 // $primary: blue;
 
 // Tags Input
@@ -10,11 +36,14 @@ $popover-header-color           : $white !important;
 $bg-secondary-color             : $dark !default;
 $bg-shared-background           : #3c6e42 !default;
 
+$bg-time-background             : $gray-300 !default;
+
 $bg-capec-background            : #6C969D !default;
 $bg-threat-background           : #A14A76 !default;
 $bg-tool-background             : #C84C09 !default;
 $bg-macm-background             : #044FC8 !default;
 $bg-methodology-background      : #4fa007 !default;
+$bg-asset-types-background      : #0768a0 !default;
 
 $bg-meta-background             : #052b68 !default;
 $bg-standard-background         : #073f98 !default;
@@ -26,3 +55,26 @@ $bg-network-background          : rgb(158,57,38) !default;
 
 $accordion-button-active-bg     : $gray-200 !important;
 $accordion-border-color         : $gray-400 !important;
+
+$btn-primary-loading-bg         : rgba(31, 41, 55, 0.5);
+$btn-primary-loading-bg2        : rgba(43, 50, 59, 0.5);
+
+$display-font-sizes: (
+    1: 5rem,
+    2: 4.5rem,
+    3: 4rem,
+    4: 3.5rem,
+    5: 3rem,
+    6: 2.5rem,
+    7: 2rem,
+    8: 1.5rem,
+    9: 1.25rem,
+    10: 1rem,
+    11: .875rem,
+    12: .75rem,
+    13: .625rem,
+    14: .5rem,
+    15: .375rem,
+    16: .25rem,
+    17: .125rem
+);

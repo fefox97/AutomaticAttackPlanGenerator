@@ -1,23 +1,26 @@
-flask==2.0.2
-flask_login==0.5.0
-flask_migrate==3.1.0
-WTForms==3.0.1
-flask_wtf==1.0.0
+flask
+flask_login
+flask_migrate
+WTForms==3.1.2
+flask_wtf
+Flask-Security-Too
+argon2_cffi
+Authlib
 
-flask_sqlalchemy==2.5.1
-sqlalchemy==1.4.36
+flask_sqlalchemy
+sqlalchemy
 sqlalchemy_utils
 sqlalchemy_schemadisplay
 
-email_validator==1.1.3
-gunicorn==20.1.0
-jinja2==3.0.3
-flask-restx==0.5.1
-Werkzeug==2.0.3
-python-dotenv==0.19.2
-Flask-Minify==0.37
-Flask-Dance==5.1.0
-blinker==1.4
+email_validator
+gunicorn
+jinja2
+flask-restx
+Werkzeug
+python-dotenv
+Flask-Minify
+Flask-Dance
+blinker
 pyOpenSSL
 
 flask_admin
@@ -28,6 +31,7 @@ pandas
 numpy
 neo4j
 PyMySQL
+mysql-connector-python
 html2text
 openpyxl
 Flask-WTF
@@ -39,8 +43,6 @@ Flask-Assets
 libsass
 glob2
 
-Flask-Modals
-Flask-Modals-markupsafe
 
 neo4j==5.14.0
 
@@ -50,3 +52,17 @@ python-nmap
 # psycopg2-binary
 
 atlassian-python-api
+
+Flask-Mailman
+
+xlsxwriter
+bs4
+
+celery
+redis
+flower
+
+markdown2
+weasyprint
+
+bibtexparser

@@ -1,66 +1,16 @@
 var macm = undefined;
 var default_shown_columns = undefined;
-let neoVizGraph;
-let neoVizSchema;
-var activeTab;
 
 $(window).on('load', function() {
-
-    // Draw Neo4j with NeoVis
-    drawNeo4j(app_id);
-
-    neoVizGraph.registerOnEvent("completed", () => {
-        $("#saveImage").prop("disabled", false);
-        $("#centerNetwork").prop("disabled", false);
-    });
     
-    neoVizSchema.registerOnEvent("completed", () => {
-        $("#saveImage").prop("disabled", false);
-        $("#centerNetwork").prop("disabled", false);
-    });
-    
-    const savePopover = new bootstrap.Popover(document.getElementById("saveImage"), {
-        html: true,
-        content: "<div class='d-flex align-items-center justify-content-center'><a id='saveConfirm' role='button' class='btn btn-secondary'>Save</a></div>",
-        title: 'Do you want to save the image?',
-        placement: "top",
-        trigger: "click",
-    });
-
-    const tabList = document.querySelectorAll('#graph-tabs button')
-    tabList.forEach(tabEl => {
-        activeTab = tabEl.ariaSelected === 'true' ? tabEl.id : activeTab;
-        tabEl.addEventListener('click', event => {
-            activeTab = event.target.id;
-        })
-    });
-
-    savePopover._element.addEventListener("shown.bs.popover", () => {
-        $("#saveConfirm").click(() => {
-            if (activeTab === 'graph-tab') {
-                saveImage(neoVizGraph, "graph.png");
-            }
-            else if (activeTab === 'schema-tab') {
-                saveImage(neoVizSchema, "schema.png");
-            }
-            savePopover.hide();
-        });
-    });
-
-    $("#centerNetwork").click(() => {
-        if (activeTab === 'graph-tab') {
-            neoVizGraph.stabilize();
-            neoVizGraph.network.fit();
-        }
-        else if (activeTab === 'schema-tab') {
-            neoVizSchema.stabilize();
-            neoVizSchema.network.fit();
-        }
+    $("#editMacmModal").on('click', function () {
+        $('#editAppName').text(app_name);
+        $('#editMacmModal').modal('show');
     });
 
     // Set default shown columns
     if (localStorage.getItem('macm_columns') === null) {    
-        default_shown_columns = ['Component ID', 'Application', 'Name', 'Type', 'App ID', 'Action'];
+        default_shown_columns = ['Component ID', 'Name', 'Type', 'Action'];
         localStorage.setItem('macm_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('macm_columns'));
@@ -96,7 +46,7 @@ $(window).on('load', function() {
                 }
             },
             {
-                targets: [0, 1, 4, 5],
+                targets: [0, 1, 4],
                 searchPanes: {
                     show: false,
                 },
@@ -117,14 +67,6 @@ $(window).on('load', function() {
             {
                 className: 'btn-secondary',
                 extend: 'searchPanes'
-            },
-            {   
-                className: 'btn-primary',
-                text: 'Edit MACM',
-                action: function (e, dt, node, config) {
-                    $('#editAppName').text(app_name);
-                    $('#editMacmModal').modal('show');
-                }
             }
         ],
         initComplete: function () {
@@ -182,6 +124,39 @@ $(window).on('load', function() {
         const QueryCypher = $('#editQueryCypher').val();
         editMacm(app_id, QueryCypher);
     });
+
+    $("#exportThreatModel").on('click', function () {
+        let formData = new FormData();
+        formData.append('AppID', app_id);
+        downloadFiles(formData, '/api/download_threat_model', this);
+    });
+
+    $("#exportAttackPlan").on('click', function () {
+        let formData = new FormData();
+        formData.append('AppID', app_id);
+        downloadFiles(formData, '/api/download_attack_plan', this);
+    });
+    
+    $("#generateAIReport").on('click', function () {
+        generateAIReport(app_id);
+    });
+
+    function generateAIReport(app_id) {
+        $.ajax({
+            url: '/api/generate_ai_report',
+            type: 'POST',
+            data: {
+                AppID: app_id,
+            },
+            success: function(response) {
+                showModal("AI Report", "AI Report generation started successfully. You will be notified when it is ready. Remeber that this process may take a while and the feature is still in beta.", icon="<i class='bi bi-stars'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
+            },
+            error: function(response) {
+                showModal("AI Report", response.responseJSON.message, icon="<i class='bi bi-stars'></i>", false, false, badge="<span class='badge rounded-pill bg-warning text-dark ms-2'>Beta</span>");
+            }
+        });
+    }
+
 });
 
 function deleteComponent(App_ID, ComponentID, ComponentName) {
@@ -204,152 +179,4 @@ function deleteComponent(App_ID, ComponentID, ComponentName) {
         })
     });
     $('#deleteModal').modal('show');
-}
-
-function drawNeo4j(database) {
-    const configGraph = {
-        containerId: "graph",
-        serverDatabase: database,
-        consoleDebug: false,
-        neo4j: {
-            serverUrl: neo4j_params.uri,
-            serverUser: neo4j_params.user,
-            serverPassword: neo4j_params.password,
-            driverConfig: {
-                encrypted: neo4j_params.encrypted,
-                trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
-            },
-        },
-        visConfig: {
-            nodes: {
-            },
-            edges: {
-                arrows: {
-                    to: {enabled: true}
-                },
-            },
-            physics: {
-                enabled: true,
-                barnesHut: {
-                    gravitationalConstant: -4000,
-                    centralGravity: 0.5,
-                    springLength: 150,
-                    springConstant: 0.04,
-                    damping: 0.09,
-                    avoidOverlap: 0.5
-                },
-                
-                solver: 'barnesHut',
-                adaptiveTimestep: true,
-            },
-        },
-        labels: {
-            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
-                caption: true,
-                label: "name",
-                group: "type",
-                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
-                    cypher: {
-                        value: "MATCH (n) WHERE id(n) = $id RETURN n"
-                    },
-                    function: {
-                        title: NeoVis.objectToTitleHtml,
-                    },
-                }
-            },
-        },
-        relationships: {
-            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
-                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
-                    function: {
-                        label: rel => rel.type,
-                        title: (props) => NeoVis.objectToTitleHtml(props),
-                    },
-                },
-            }
-        },
-        initialCypher: `
-                        MATCH (a)
-                        OPTIONAL MATCH (a)-[b]->(c)
-                        RETURN a,b,c
-                        `
-    };
-
-    const configSchema = {
-        containerId: "schema",
-        serverDatabase: database,
-        neo4j: {
-            serverUrl: neo4j_params.uri,
-            serverUser: neo4j_params.user,
-            serverPassword: neo4j_params.password,
-            driverConfig: {
-                encrypted: neo4j_params.encrypted,
-                trust: "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES",
-            },
-        },
-        visConfig: {
-            nodes: {
-            },
-            edges: {
-                arrows: {
-                    to: {enabled: true}
-                },
-            },
-            physics: {
-                enabled: true,
-                barnesHut: {
-                    gravitationalConstant: -4000,
-                    centralGravity: 0.5,
-                    springLength: 150,
-                    springConstant: 0.04,
-                    damping: 0.09,
-                    avoidOverlap: 0.5
-                },
-                
-                solver: 'barnesHut',
-                adaptiveTimestep: true,
-            },
-        },
-        labels: {
-            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
-                caption: true,
-                label: "name",
-                group: "name",
-                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
-                    cypher: {
-                        value: "MATCH (n) WHERE id(n) = $id RETURN n"
-                    },
-                    function: {
-                        title: NeoVis.objectToTitleHtml,
-                    },
-                }
-            },
-        },
-        relationships: {
-            [NeoVis.NEOVIS_DEFAULT_CONFIG]: {
-                [NeoVis.NEOVIS_ADVANCED_CONFIG]: {
-                    function: {
-                        label: rel => rel.type,
-                        title: (props) => NeoVis.objectToTitleHtml(props),
-                    },
-                },
-            }
-        },
-        initialCypher: "CALL db.schema.visualization()"
-    };
-
-    neoVizGraph = new NeoVis.default(configGraph);
-    neoVizSchema = new NeoVis.default(configSchema);
-    neoVizGraph.render();
-    neoVizSchema.render();
-}
-
-function saveImage(neoViz, filename) {
-    const link = document.createElement("a");
-    const data = neoViz.network.canvas.getContext("2d").canvas.toDataURL("image/png");
-    link.href = data;
-    link.download = filename || "network.png";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }

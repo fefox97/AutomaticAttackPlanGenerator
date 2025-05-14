@@ -1,34 +1,43 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
 
-import os
-import hashlib
-import binascii
+
+from flask import render_template, current_app as app
+
+from apps import mail
 
 # Inspiration -> https://www.vitoshacademy.com/hashing-passwords-in-python/
 
+def send_welcome_email(user):
+    """
+    Send welcome email to the user
+    """
+    mail.send_mail(
+        from_email=app.config["MAIL_DEFAULT_SENDER"],
+        subject="Welcome to Pennet",
+        recipient_list=[user.email],
+        message=render_template('security/email/welcome_github.html', user=user),
+        html_message=render_template('security/email/welcome_github.html', user=user)
+    )
 
-def hash_pass(password):
-    """Hash a password for storing."""
+def send_account_deleted_email(user):
+    """
+    Send account delete email to the user
+    """
+    mail.send_mail(
+        from_email=app.config["MAIL_DEFAULT_SENDER"],
+        subject="Account Deleted",
+        recipient_list=[user.email],
+        message=render_template('security/email/account_deleted.html', user=user),
+        html_message=render_template('security/email/account_deleted.html', user=user)
+    )
 
-    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'),
-                                    salt, 100000)
-    pwdhash = binascii.hexlify(pwdhash)
-    return (salt + pwdhash)  # return bytes
-
-
-def verify_pass(provided_password, stored_password):
-    """Verify a stored password against one provided by user"""
-
-    stored_password = stored_password.decode('ascii')
-    salt = stored_password[:64]
-    stored_password = stored_password[64:]
-    pwdhash = hashlib.pbkdf2_hmac('sha512',
-                                    provided_password.encode('utf-8'),
-                                    salt.encode('ascii'),
-                                    100000)
-    pwdhash = binascii.hexlify(pwdhash).decode('ascii')
-    return pwdhash == stored_password
+def notify_admins(user):
+    """
+    Notify admins about new user registration
+    """
+    mail.send_mail(
+        from_email=app.config["MAIL_DEFAULT_SENDER"],
+        subject="New User Registration",
+        recipient_list=[app.config["MAIL_DEFAULT_SENDER"]],
+        message=render_template('security/email/new_user.html', user=user),
+        html_message=render_template('security/email/new_user.html', user=user)
+    )

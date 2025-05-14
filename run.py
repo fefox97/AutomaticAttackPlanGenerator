@@ -1,7 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+
 
 import os
 from   flask_migrate import Migrate
@@ -26,16 +23,22 @@ except KeyError:
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production] ')
 
 app = create_app(app_config)
-Migrate(app, db)
+migrate = Migrate(app, db)
+celery = app.extensions['celery']
 
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)
 
 if DEBUG:
-    app.logger.info('DEBUG            = ' + str(DEBUG)             )
-    app.logger.info('Page Compression = ' + 'FALSE' if DEBUG else 'TRUE' )
-    app.logger.info('DBMS             = ' + app_config.SQLALCHEMY_DATABASE_URI)
-    app.logger.info('ASSETS_ROOT      = ' + app_config.ASSETS_ROOT )
+    app.logger.info('DEBUG              = ' + str(DEBUG))
+    app.logger.info('Page Compression   = ' + 'FALSE' if DEBUG else 'TRUE')
+    app.logger.info('DBMS               = ' + app_config.SQLALCHEMY_DATABASE_URI)
+    app.logger.info('ASSETS_ROOT        = ' + app_config.ASSETS_ROOT)
+    app.logger.info('UPLOAD_FOLDER      = ' + app_config.UPLOAD_FOLDER)
+    app.logger.info('URI_NEO4J          = ' + app_config.URI_NEO4J)
+    app.logger.info('USER_NEO4J         = ' + app_config.USER_NEO4J)
+    app.logger.info('PASS_NEO4J         = ' + app_config.PASS_NEO4J)
+    app.logger.info('DBS_PATH           = ' + app_config.DBS_PATH)
 
 if __name__ == "__main__":
     app.run()

@@ -8,20 +8,24 @@
 {% block content %}
 
     <main>
+        <div class="custom-background bg">
+            <canvas id="icbg-animation"></canvas>
+        </div>
         <section class="vh-100 d-flex align-items-center justify-content-center">
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center d-flex align-items-center justify-content-center">
                         <div>
-                            <img class="img-fluid w-75" src="{{ config.ASSETS_ROOT }}/img/illustrations/404.svg" alt="404 not found">
+                            <!-- <img class="img-fluid w-75" src="{{ config.ASSETS_ROOT }}/img/illustrations/404.svg" alt="404 not found"> -->
+                            <span class="material-symbols-outlined" style="font-size:150pt;">block</span>
                             <h1 class="mt-5">
                                 Access <span class="fw-bolder text-primary">denied</span>
                             </h1>
                             <p class="lead my-4">
-                                Please contact support or authenticate
+                                You are not allowed to access this page.
                             </p>
-                            <a class="btn btn-dark animate-hover" href="{{ url_for('authentication_blueprint.login') }}">
-                               <i class="fas fa-chevron-left me-3 ps-2 animate-left-3"></i>LOGIN</a>
+                            <a class="btn btn-dark animate-hover" href="{{ url_for_security('login') }}">
+                                <i class="fas fa-chevron-left me-3 ps-2 animate-left-3"></i>Back</a>
                         </div>
                     </div>
                 </div>
@@ -32,4 +36,6 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+    <script src="{{ config.ASSETS_ROOT }}/js/theme/background.js"></script>
+{% endblock javascripts %}

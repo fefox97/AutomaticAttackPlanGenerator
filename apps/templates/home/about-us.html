@@ -1,0 +1,91 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} About Us {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        👋🏻 Welcome to VSecLab
+                    </h2>
+                </div>
+
+                <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                    <p>
+                        VSecLab is the Security Lab of the University of Campania "Luigi Vanvitelli". Our group is composed by a team of researchers and students that work on different topics related to the security of computer systems and networks.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-envelope"></i>
+                        Contact Us
+                    </h2>
+                </div>
+
+                <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                    <p>
+                        If you want to contact us, feel free to send an email to the following addresses:
+                    </p>
+                    <p>
+                        <i class="fas fa-user"></i> Felice Moretta:
+                        <a href="mailto:felice.moretta@unicampania.it">felice.moretta@unicampania.it</a> 
+                        <br>
+                        <i class="fas fa-user"></i> Daniele Granata:
+                        <a href="mailto:daniele.granata@uniparthenope.it">daniele.granata@uniparthenope.it</a>
+                        <br>
+                        <i class="fas fa-user"></i> Umberto Barbato:
+                        <a href="mailto:umberto.barbato@unicampania.it">umberto.barbato@unicampania.it</a>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-book"></i>
+                        Bibliography
+                    </h2>
+                </div>
+
+                <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                    {% if references|length == 0 %}
+                        <div class="alert alert-info">
+                            No references available
+                        </div>
+                    {% else %}
+                        <p>
+                            Here you can find a list of our publications:
+                        </p>
+                        <ul>
+                            {% for reference in references %}
+                            <li>
+                                {{ reference.bibtex }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

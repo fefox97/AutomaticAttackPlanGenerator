@@ -1,0 +1,36 @@
+<!-- Share MACM Modal -->
+<div class="modal fade" id="shareMacmModal" tabindex="-1" aria-labelledby="shareMacmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareMacmModalLabel">Share <span id="shareAppName"></span> MACM</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <span class="h6">Share the MACM with other users</span>
+                </div>
+                <div class="mb-3">
+                    {% if users|length == 0 %}
+                        <div class="alert alert-warning" role="alert">
+                            No users found.
+                        </div>
+                    {% else %}
+                        {% for user in users %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="{{ user.id }}" id="user{{ user.id }}">
+                                <label class="form-check-label" for="user{{ user.id }}">{{ user.username }}</label>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="shareSubmit" class="btn btn-primary">Share</button>
+            </div>
+        </div>
+    </div>
+</div>

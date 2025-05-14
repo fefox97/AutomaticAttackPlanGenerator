@@ -24,11 +24,12 @@ function deleteReportFile(macmID, componentID, toolID) {
     });
 }
 
-function parseReportFile(macmID, componentID, toolID, parser) {
+function parseReportFile(element, macmID, componentID, toolID, parser) {
     let formData = new FormData();
     formData.append('macmID', macmID);
     formData.append('componentID', componentID);
     formData.append('toolID', toolID);
+    $(element).addClass('btn-loading');
     $.ajax({
         url: '/api/' + parser,
         type: 'POST',
@@ -36,7 +37,10 @@ function parseReportFile(macmID, componentID, toolID, parser) {
         contentType: false,
         processData: false,
         success: function(data) {
-            $('#copyParserOutput').attr('data-clipboard-text', data.output);
+            $('#copyParserOutput').on('click', function() { 
+                navigator.clipboard.writeText(data.output); 
+                showToast('Copied', 'Output copied to clipboard', true);
+            });
             $('#executeParserOutput').on('click', function() { executeParser(data.output, macmID); });
             if (data.output.length > 0) {
                 $('#parserOutput').text(data.output);
@@ -47,9 +51,11 @@ function parseReportFile(macmID, componentID, toolID, parser) {
                 $('#copyParserOutput').hide();
                 $('#executeParserOutput').hide();
             }
+            $(element).removeClass('btn-loading');
             $('#modalParserOutput').modal('show');
         },
         error: function(data) {
+            $(element).removeClass('btn-loading');
             showModal("Report Upload", "Error parsing the report.", autohide = true)
         }
     });
@@ -60,16 +66,16 @@ function downloadReportFile(macmID, componentID, toolID) {
     formData.append('macmID', macmID);
     formData.append('componentID', componentID);
     formData.append('toolID', toolID);
-    downloadFiles(formData, '/api/download_report');
+    downloadReportFiles(formData, '/api/download_report');
 }
 
 function downloadAllReportFiles(macmID) {
     let formData = new FormData();
     formData.append('macmID', macmID);
-    downloadFiles(formData, '/api/download_all_reports');
+    downloadReportFiles(formData, '/api/download_all_reports');
 }
 
-function downloadFiles(formData, api) {
+function downloadReportFiles(formData, api) {
     fetch(api, {
         method: 'POST',
         body: formData
@@ -93,10 +99,10 @@ function downloadFiles(formData, api) {
         link.parentNode.removeChild(link);
     })
     .then(_ => {
-        showModal("Report Download", "Report " + filename + " downloaded successfully", autohide = true)
+        showModal("Report Download", "Report " + filename + " downloaded successfully", null, autohide = true)
     })
     .catch(error => {
-        showModal("Report Download", "Error downloading the file!", autohide = true)
+        showModal("Report Download", "Error downloading the file!", null, autohide = true)
     });
 }
 
