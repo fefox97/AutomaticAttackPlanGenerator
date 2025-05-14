@@ -616,6 +616,7 @@ class RiskRecord(db.Model):
     __tablename__ = 'RiskRecord'
     AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
     ComponentID = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
+    ThreatID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
     Skill = db.Column(db.Integer, nullable=False)
     Size = db.Column(db.Integer, nullable=False)
     Motive = db.Column(db.Integer, nullable=False)
@@ -632,12 +633,15 @@ class RiskRecord(db.Model):
     Reputationdamage = db.Column(db.Integer, nullable=False)
     Noncompliance = db.Column(db.Integer, nullable=False)
     Privacyviolation = db.Column(db.Integer, nullable=False)
-    Likelyhood = db.Column(db.Integer, nullable=False)
+    Likelihood = db.Column(db.Integer, nullable=False)
     TecnicalImpact = db.Column(db.Integer, nullable=False)
     BusinessImpact = db.Column(db.Integer, nullable=False)
+    TechnicalRisk = db.Column(db.Text, nullable=False)
     OverallRisk = db.Column(db.Text, nullable=False)
     Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+
 
 
 
@@ -647,3 +651,5 @@ class ThreatAgentReplyCategory(db.Model):
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
     Reply_id = db.Column(db.Integer, ForeignKey("ThreatAgentReply.Id", ondelete='CASCADE'))
     Category_id = db.Column(db.Integer, ForeignKey("ThreatAgentCategory.Id", ondelete='CASCADE'))
+
+
