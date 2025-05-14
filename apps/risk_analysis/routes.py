@@ -866,7 +866,7 @@ def save_risk_evaluation():
 
 
 @blueprint.route('/final-step', methods=['GET'])
-@login_required
+@auth_required
 def final_step():
     selected_macm = request.args.get('app_id')
 
