@@ -704,7 +704,7 @@ class RiskRecord(db.Model):
     Noncompliance = db.Column(db.Integer, nullable=False)
     Privacyviolation = db.Column(db.Integer, nullable=False)
     Likelihood = db.Column(db.Integer, nullable=False)
-    TecnicalImpact = db.Column(db.Integer, nullable=False)
+    TechnicalImpact = db.Column(db.Integer, nullable=False)
     BusinessImpact = db.Column(db.Integer, nullable=False)
     TechnicalRisk = db.Column(db.Text, nullable=False)
     OverallRisk = db.Column(db.Text, nullable=False)
