@@ -1,0 +1,292 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Capec {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Capec</li>
+                </ol>
+            </nav>
+            <h2 class="h4">Capec</h2>
+            {% if table is not none %}
+                <p class="mb-0">This is a reproduciton of the <a href="http://capec.mitre.org/">CAPEC</a> database, containing {{ table|length }} entries, divided in <span class="badge bg-Meta">Meta Attack Patterns: {{ meta_attack_pattern_number }}</span>, <span class="badge bg-Standard">Standard Attack Patterns: {{ standard_attack_pattern_number }}</span>, <span class="badge bg-Detailed">Detailed Attack Patterns: {{ detailed_attack_pattern_number }}</span>.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-12">
+        <div class="card border-0 shadow">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Attack Patterns Table</h2>
+            </div>
+
+            <div class="card-body">
+
+                <label for="SearchID">Search by ID</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="SearchID" aria-describedby="SearchIDHelp" placeholder="Enter ID">
+                    <button type="submit" class="btn btn-primary" data-bs-toggle="tooltip" id="SearchIDButton">Search</button>
+                    <button type="reset" class="btn btn-secondary" data-bs-toggle="tooltip" id="ResetIDButton">Reset</button>
+                    <button type="button" class="btn btn-outline-tertiary active" data-bs-toggle="button" id="ShowTreeToggle" aria-pressed="true">Show Tree</button>
+                </div>
+                <small id="SearchIDHelp" class="form-text text-muted">Enter one or multiple IDs.</small>
+                
+                <div class="d-block align-items-center pt-3">
+                    <div class="row">
+                        <label for="tags-input" class="form-label">Tags</label>
+                        <div class="col">
+                            <select class="form-select" id="tags-input" name="tags_separator[]" multiple data-allow-new="true" data-separator=" |,|  " data-allow-clear="1">
+                                <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
+                            </select>
+                            <div class="invalid-feedback">Please select a valid tag.</div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group" role="group" aria-label="Search type button group">
+                                <input type="radio" class="btn-check" name="SearchType" id="andSearch" autocomplete="off" value="and" checked>
+                                <label class="btn btn-outline-primary" for="andSearch">And</label>
+                                <input type="radio" class="btn-check" name="SearchType" id="orSearch" autocomplete="off" value="or">
+                                <label class="btn btn-outline-primary" for="orSearch">Or</label>
+                            </div>
+                        </div>
+                        <div class="col-auto">    
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" id="ResetTagButton">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-block align-items-center pt-5">
+                    <!-- [ stiped-table ] start -->
+                    {% if table is not none %}
+                        <table id="capec_table" class="table table-striped table-hover table-dataframe">
+                            <thead>
+                                <tr>
+                                    <th>Capec ID</th>
+                                    <th>Name</th>
+                                    <th>Abstraction</th>
+                                    <th>Description</th>
+                                    <th>Extended Description</th>
+                                    <th>Created</th>
+                                    <th>External References</th>
+                                    <th>Modified</th>
+                                    <th>Spec Version</th>
+                                    <th>Alternate Terms</th>
+                                    <th>Consequences</th>
+                                    <th>Domains</th>
+                                    <th>Example Instances</th>
+                                    <th>Execution Flow</th>
+                                    <th>Likelihood Of Attack</th>
+                                    <th>Peer Of Refs</th>
+                                    <th>Prerequisites</th>
+                                    <th>Resources Required</th>
+                                    <th>Skills Required</th>
+                                    <th>Status</th>
+                                    <th>Typical Severity</th>
+                                    <th>Version</th>
+                                    <th>Capec Children ID</th>
+                                    <th>Capec Parents ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in table %}
+                                    <tr>
+                                        <td><div class="id-badge"><h2><a class="badge bg-capec" href="/catalogs/capec-detail?id={{ row.Capec_ID }}">{{ row.Capec_ID }}</a></h2></div></td>
+                                        <!-- Name -->
+                                        <td class="text-wrap"><strong>{{ row.Name }}</strong></td>
+                                        <!-- Abstraction -->
+                                        <td>
+                                            <span class="badge bg-{{row.Abstraction}}">{{ row.Abstraction }}</span>
+                                        </td>
+                                        <!-- Description -->
+                                        <td class="text-wrap">{{ row.Description }}</td>
+                                        <!-- Extended Description -->
+                                        <td class="text-wrap">{{ row.Extended_Description if row.Extended_Description is not none }}</td>
+                                        <!-- Created -->
+                                        <td>{{ row.Created }}</td>
+                                        <!-- External References -->
+                                        <td>
+                                            {% for reference in row.External_References %}
+                                                {{ reference.source_name | title }}: <a class="link" href="{{ reference.url }}">{{ reference.external_id if reference.external_id else reference.description}}</a>
+                                                <br>
+                                            {% endfor %}
+                                        </td>
+                                        <!-- Modified -->
+                                        <td>{{ row.Modified }}</td>
+                                        <!-- Spec Version -->
+                                        <td>{{ row.Spec_Version }}</td>
+                                        <!-- Alternate Terms -->
+                                        <td>
+                                            {% if row.Alternate_Terms is not none %}
+                                            <ul>
+                                                {% for term in row.Alternate_Terms %}
+                                                    <li>{{ term }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Consequences -->
+                                        <td>
+                                            {% if row.Consequences is not none %}
+                                                {% for key, value in row.Consequences.items() %}
+                                                    <strong>{{ key.replace('_', ' ') }}</strong>:
+                                                    <ul>
+                                                        {% for consequence in value %}
+                                                            <li>{{ consequence }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Domains -->
+                                        <td>
+                                            {% if row.Domains is not none %}
+                                                {% for domain in row.Domains %}
+                                                    <span class="badge bg-domains me-1 mb-1">{{ domain }}</span> <br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Example Instances -->
+                                        <td>
+                                            {% if row.Example_Instances is not none %}
+                                                <ol>
+                                                    {% for example in row.Example_Instances %}
+                                                        <li>{{ example  }}</li>
+                                                    {% endfor %}
+                                                </ol>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Execution Flow -->
+                                        <td class="text-wrap">{{ row.Execution_Flow | replace('<table>', '<table class="table table-striped table-ef">') | replace('<p>', '') | replace('</p>', '') | safe }}</td>
+                                        <!-- Likelihood Of Attack -->
+                                        <td>
+                                            <span class="badge bg-{{row.Likelihood_Of_Attack}}">{{ row.Likelihood_Of_Attack }}</span>
+                                        </td>
+                                        <!-- Peer Of Refs -->
+                                        <td>
+                                            {% if row.Peer_Of_Refs is not none %}
+                                                <div class="h4 d-flex flex-wrap">
+                                                        {% for peer in row.Peer_Of_Refs | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ peer }}">{{ peer }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Prerequisites -->
+                                        <td>
+                                            {% if row.Prerequisites is not none %}
+                                            <ul>
+                                                {% for prerequisite in row.Prerequisites %}
+                                                    <li>{{ prerequisite }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Resources Required -->
+                                        <td>
+                                            {% if row.Resources_Required is not none %}
+                                            <ul>
+                                                {% for resource in row.Resources_Required %}
+                                                    <li>{{ resource }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Skills Required -->
+                                        <td class="text-wrap">
+                                            {% if row.Skills_Required is not none %}
+                                                {% for key, value in row.Skills_Required.items() %}
+                                                    <strong>{{ key.replace('_', ' ') }}</strong>: {{ value }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <!-- Status -->
+                                        <td>{{ row.Status }}</td>
+                                        <!-- Typical Severity -->
+                                        <td>
+                                            <span class="badge bg-{{ row.Typical_Severity | replace(' ', '') }}">{{ row.Typical_Severity }}</span>
+                                        </td>
+                                        <!-- Version -->
+                                        <td>{{ row.Version }}</td>
+                                        <!-- Capec Children ID -->
+                                        <td>
+                                            {% if row.Capec_Children_ID is not none %}
+                                                <div class="d-flex flex-wrap">
+                                                        {% for child in row.Capec_Children_ID | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <!-- Capec Parents ID -->
+                                        <td>
+                                            {% if row.Capec_Parents_ID is not none %}
+                                                <div class="d-flex flex-wrap">
+                                                        {% for child in row.Capec_Parents_ID | sort %}
+                                                        <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ child }}">{{ child }}</a>
+                                                        {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Capec ID</th>
+                                    <th>Name</th>
+                                    <th>Abstraction</th>
+                                    <th>Description</th>
+                                    <th>Extended Description</th>
+                                    <th>Created</th>
+                                    <th>External References</th>
+                                    <th>Modified</th>
+                                    <th>Spec Version</th>
+                                    <th>Alternate Terms</th>
+                                    <th>Consequences</th>
+                                    <th>Domains</th>
+                                    <th>Example Instances</th>
+                                    <th>Execution Flow</th>
+                                    <th>Likelihood Of Attack</th>
+                                    <th>Peer Of Refs</th>
+                                    <th>Prerequisites</th>
+                                    <th>Resources Required</th>
+                                    <th>Skills Required</th>
+                                    <th>Status</th>
+                                    <th>Typical Severity</th>
+                                    <th>Version</th>
+                                    <th>Capec Children ID</th>
+                                    <th>Capec Parents ID</th>
+                                </tr>
+                            </tfoot>
+                        </table> 
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">No Capec Data</h4>
+                            <p>There is no Capec data.</p>
+                        </div>
+                    {% endif %}
+                    <!-- [ stiped-table ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="module" src="{{ config.ASSETS_ROOT }}/js/pages/capec.js"></script>
+{% endblock javascripts %}

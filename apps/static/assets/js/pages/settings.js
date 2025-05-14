@@ -1,8 +1,29 @@
 $(document).ready(function() {
-    
+    $("#editSettingModal").on('show.bs.modal', function(e) {
+        setting_name = e.relatedTarget.dataset['bsSettingName'];
+        setting_key = e.relatedTarget.dataset['bsSettingKey'];
+        setting_value = e.relatedTarget.dataset['bsSettingValue'];
+        if (setting_value.length > 100) {
+            $('#editSettingValue').attr('rows', '6');
+        }else{
+            $('#editSettingValue').attr('rows', '1');
+        }
+        $('#editSettingName').text(setting_name);
+        $('#editSettingKey').val(setting_key);
+        $('#editSettingValue').val(setting_value);
+        $('#editMacmModal').modal('show');
+    });
+    $("#editSettingSubmit").click(function() {
+        setting_key = $('#editSettingKey').val();
+        setting_value = $('#editSettingValue').val();
+        editSetting(setting_key, setting_value, $('#editSettingModal'));
+    }
+    );
 });
 
 function reloadDatabases(database) {
+    let button = '#Reload'+database;
+    $(button).addClass('btn-loading');
     $.ajax({
         url: '/api/reload_databases',
         type: 'POST',
@@ -11,8 +32,10 @@ function reloadDatabases(database) {
         }
     }).done(function(response) {
         showModal("Success", response, true);
+        $(button).removeClass('btn-loading');
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));
+        $(button).removeClass('btn-loading');
     });
 }
 
@@ -72,4 +95,22 @@ function test(){
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));
     });
+}
+
+function editSetting(SettingKey, SettingValue, settingModal) {
+    $.ajax({
+        url: '/api/edit_setting',
+        type: 'POST',
+        data: {
+            key: SettingKey,
+            value: SettingValue,
+        },
+        success: function(response) {
+            location.reload();
+        },
+        error: function(response) {
+            settingModal.modal('hide');
+            showModal("Update failed", JSON.parse(response.responseText));
+        }
+    })
 }

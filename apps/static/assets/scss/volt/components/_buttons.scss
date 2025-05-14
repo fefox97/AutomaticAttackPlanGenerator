@@ -41,11 +41,15 @@
     }
 }
 
-.btn-upgrade-pro {
-    position: fixed;
+.sidebar-support-btn {
+    width: 100%;
+}
+
+.sidebar-support {
     bottom: 15px;
     right: 15px;
-    width: 190px;
+    width: inherit;
+    background-color: $primary;
 
     @include media-breakpoint-up(md) {
         left: 35px;

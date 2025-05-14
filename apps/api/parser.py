@@ -36,7 +36,7 @@ class NmapParser:
         maxID = int(maxID) + 1
         query = ''
         for host in hosts.keys():
-            query += f"""CREATE (VM{maxID}:service {{component_id:'{maxID}', name:'VM{maxID}', type:'Service.VM', app_id:'{appID}',application:'{applicationName}', parameters: '{{"ip":"{host}"}}'}})
+            query += f"""CREATE (VM{maxID}:service {{component_id:'{maxID}', name:'VM{maxID}', type:'Service.VM', app_id:'{appID}', parameters: '{{"ip":"{host}"}}'}})
                 WITH VM{maxID}
                 MATCH (net {{component_id:'{componentID}'}})
                 MERGE (VM{maxID})<-[:connects]-(net)\n"""
@@ -60,7 +60,7 @@ class NmapParser:
             product = values['product']
             del values['product']
             values['port'] = f"{port}"
-            query += f"""CREATE (service{maxID}:service {{component_id:'{maxID}', name:'{product}', type:'Service', app_id:'{appID}',application:'{applicationName}', parameters: '{json.dumps(values).replace(';', '')}'}})
+            query += f"""CREATE (service{maxID}:service {{component_id:'{maxID}', name:'{product}', type:'Service', app_id:'{appID}', parameters: '{json.dumps(values).replace(';', '')}'}})
                 WITH service{maxID}
                 MATCH (host {{component_id:'{componentID}'}})
                 MERGE (service{maxID})<-[:hosts]-(host)\n"""

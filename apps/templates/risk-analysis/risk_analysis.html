@@ -1,18 +1,18 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Penetration Tests {% endblock %} 
+{% block title %} Risk Analysis {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
         <div class="d-block mb-4 mb-md-0">
             <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
                 <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                     <li class="breadcrumb-item">
-                        <a href="/apps/static">
+                        <a href="/">
                             <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         </a>
                     </li>
@@ -56,8 +56,9 @@
                         <ul class="list-group list-group-flush">
                             {% for risk_analysis in risk_analyses %}
                                 <li class="list-group-item d-flex align-items-center justify-content-between px-0">
-                                    <div>
-                                        <h3 class="h6 mb-1">{{ risk_analysis.AppName }}</h3>
+                                    <div class="d-flex align-items-center">
+                                        <h1 class="display-9 mb-1">{{ risk_analysis.AppName }}</h1>
+                                        <h6><span class="badge bg-time bg-small rounded-pill ms-3">{{ risk_analysis.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span></h6>
                                     </div>
                                     <div>
                                         {% if usersPerApp[risk_analysis.AppID] | length > 1 and current_user.id == owners[risk_analysis.AppID] %}
@@ -105,10 +106,10 @@
         </div>
     </div>
 
-    {% include 'home/modals/edit_macm_modal.html' %}
-    {% include 'home/modals/delete_modal.html' %}
-    {% include 'home/modals/share_macm_modal.html' %}
-    {% include 'home/modals/unshare_macm_modal.html' %}
+    {% include 'penetration_tests/modals/edit_macm_modal.html' %}
+    {% include 'penetration_tests/modals/delete_modal.html' %}
+    {% include 'penetration_tests/modals/share_macm_modal.html' %}
+    {% include 'penetration_tests/modals/unshare_macm_modal.html' %}
 
 {% endblock content %}
 

@@ -1,0 +1,113 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tools {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Tools</li>
+                </ol>
+            </nav>
+            <h2 class="h4">Tools</h2>
+            <p class="mb-0">The Tool Catalogue contains a list of tools that can be used to perform the Penetration Tests. Each tool is designed to execute a specific set of Attack Patterns that can be used to launch a real attack on a target asset. Each tool is associated with a particular Penetration Test Phase. Moreover, each tool is also associated with an <strong>Applicability Pattern</strong> that precisely identifies the assets it can be applied to. The Applicability Pattern is represented by a Cypher query that needs to be executed on the system model. Finally, each tool is associated with a concrete command that enables it to perform the attack.</p>
+        </div>
+    </div>
+    
+    <div class="col-12">
+        <div class="card border-0 shadow">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Tools Table</h2>
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-block align-items-center">
+                    <!-- [ stiped-table ] start -->
+                    {% if table is not none %}
+                    <table id="toolsCatalogTable" class="table table-striped table-hover table-dataframe text-wrap">
+                        <thead>
+                            <tr>
+                                <th>Tool ID</th>
+                                <th>Name</th>
+                                <th>Capec ID</th>
+                                <th>Cypher Query</th>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Phase</th>
+                                <th>Is Executable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in table %}
+                                <tr>
+                                    <td><div class="id-badge"><h2><span class="badge bg-tool">{{ row.ToolID }}</span></h2></div></td>
+                                    <td>{{ row.Name }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasCapecIDs is not none %}
+                                            <div class="d-flex flex-wrap">
+                                                    {% for capec in row.hasCapecIDs  | sort %}
+                                                    <a class="badge bg-capec me-1 mb-1" href="/catalogs/capec-detail?id={{ capec }}">{{ capec }}</a>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ row.CypherQuery }}</td>
+                                    <td>{{ row.Command }}</td>
+                                    <td>{{ row.Description if row.Description }}</td>
+                                    <td class="text-nowrap">
+                                        {% if row.hasPhase  is not none %}
+                                            <div class="d-flex flex-wrap">
+                                                    {% for phase in row.hasPhase %}
+                                                        <span class="badge bg-secondary me-1 mb-1">{{ phase.PhaseName }}</span>
+                                                    {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ row.IsExecutable }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Tool ID</th>
+                                <th>Name</th>
+                                <th>Capec ID</th>
+                                <th>Cypher Query</th>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Phase</th>
+                                <th>Is Executable</th>
+                            </tr>
+                        </tfoot>
+                    </table> 
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">No Tools Data</h4>
+                            <p>There is no tools data.</p>
+                        </div>
+                    {% endif %}
+                    <!-- [ stiped-table ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/tools.js"></script>
+{% endblock javascripts %}

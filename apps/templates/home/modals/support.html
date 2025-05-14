@@ -13,22 +13,22 @@
                 </div>
                 <!-- label for email -->
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="email" placeholder="Email" readonly value="{{current_user.email}}">
+                    <input type="text" class="form-control" id="supportEmail" placeholder="Email" readonly value="{{current_user.email}}">
                     <label for="email">Email</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="subject" placeholder="Subject">
+                    <input type="text" class="form-control" id="supportSubject" placeholder="Subject">
                     <label for="subject">Subject</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <textarea class="form-control mt-2" id="issue" style="height: 150px" placeholder="Please describe the issue you are experiencing"></textarea>
+                    <textarea class="form-control mt-2" id="supportIssue" style="height: 150px" placeholder="Please describe the issue you are experiencing"></textarea>
                     <label for="issue">Issue</label>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" id="sendSupportRequest" class="btn btn-primary" onclick="sendSupportRequest()">Send</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="sendSupportRequest" class="btn btn-primary" onclick="sendSupportRequest()">Send</button>
             </div>
         </div>
     </div>

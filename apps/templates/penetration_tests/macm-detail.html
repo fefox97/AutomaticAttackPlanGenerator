@@ -1,0 +1,134 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} MACM-{{ macm_data.Component_ID }}  {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/penetration_tests">Penetration Tests</a></li>
+                    <li class="breadcrumb-item"><a href="/penetration_tests/macm?app_id={{ macm_data.App_ID }}">{{ app_name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">MACM-{{ macm_data.Component_ID }}</li>
+                </ol>
+            </nav>
+            <h2 class="h4">MACM-<span class="badge bg-macm">{{ macm_data.Component_ID }}</span> Details</h2>
+            <p class="text-info mb-0 h3"> <i class="fas fa-bullseye"></i> {{ macm_data.Name }}</p>
+        </div>
+    </div>
+    
+    <div class="col-12">
+
+        <!-- Badges start -->
+        {% include 'penetration_tests/macm-detail/badges.html' %}
+        <!-- Badges end -->
+        
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if threat_data|length <= 0 }}" id="headingThreats" data-bs-toggle="collapse" data-bs-target="#collapseThreats" aria-expanded="true" aria-controls="collapseThreats">
+                <h2 class="h5 mb-0">
+                    Threats
+                    <i class="fas fa-chevron-down mr-auto"></i>
+                </h2>
+            </div>
+            
+            <div id="collapseThreats" class="card-body collapse show" aria-labelledby="headingThreats">
+                {% if threat_data|length > 0 %}
+                    {% include 'penetration_tests/macm-detail/threats.html' %}
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">No Threat Data</h4>
+                        <p>There is no threat data for this MACM component.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if methodologies_data|length <= 0 }}" id="headingMethodologies" data-bs-toggle="collapse" data-bs-target="#collapseMethodologies" aria-expanded="true" aria-controls="collapseMethodologies">
+                <h2 class="h5 mb-0">
+                    Methodologies
+                    <i class="fas fa-chevron-down mr-auto"></i>
+                </h2>
+            </div>
+            
+            <div id="collapseMethodologies" class="card-body collapse show" aria-labelledby="headingMethodologies">
+                {% if methodologies_data|length > 0 %}
+                    {% include 'penetration_tests/macm-detail/methodology.html' %}
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">No Methodology Data</h4>
+                        <p>There is no methodology data for this MACM component.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Attacks</h2>
+                <div>
+                    <div class="accordion-options">
+                        <button type="button" class="btn btn-outline-tertiary" data-bs-toggle="button" id="ExpandToggle" aria-pressed="false">Expand All</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if attack_data|length > 0 %}
+                    <div class="row">
+                        <div class="col-2">
+                            <nav id="navbar-phases" class="h-100 flex-column align-items-stretch pe-4 border-end">
+                                <h1 class="h6">Phases</h1>
+                                <nav class="nav nav-pills flex-column">
+                                    {% for pentest_phase in av_pentest_phases %}
+                                        <a class="nav-link mb-2" href="#Phase{{ pentest_phase.PhaseID }}">{{ pentest_phase.PhaseName }}</a>
+                                    {% endfor %}
+                                </nav>
+                            </nav>
+                        </div>
+                    
+                        <div class="col-10">
+                            <div data-bs-spy="scroll" data-bs-target="#navbar-phases" data-bs-smooth-scroll="true" tabindex="0" class="scrollspy-container">
+                                {% for phaseID, attacks in attack_data | groupby('PhaseID') %}
+                                    <div id="Phase{{ pentest_phases[phaseID-1].PhaseID }}">
+                                        <h4>{{ pentest_phases[phaseID-1].PhaseName }}</h4>
+                                        {% for attack in attacks %}
+                                            <div class="accordion mb-3" id="accordionOne">
+                                                {% include 'penetration_tests/macm-detail/attack.html' %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">No Attack Data</h4>
+                        <p>There is no attack data for this MACM component.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'penetration_tests/macm-detail/all_commands.html' %}
+    </div>
+
+    {% include 'penetration_tests/modals/parser_modal.html' %}
+    {% include 'penetration_tests/modals/delete_modal.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm-detail.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
+{% endblock javascripts %}

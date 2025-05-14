@@ -2,6 +2,10 @@ $color-mode-type: data;
 
 @include color-mode(dark) {
 
+    .inverted {
+        filter: invert(1) hue-rotate(180deg);
+    }
+
     .card {
         background-color: $card-bg-dark !important;
         color: $card-color-dark !important;
@@ -11,6 +15,11 @@ $color-mode-type: data;
                 filter: invert(0);
             }
         }
+    }
+
+    .bg-time{
+        background-color: $bg-time-background-dark !important; 
+        color: white;
     }
 
     .table td, th{
@@ -199,80 +208,10 @@ $color-mode-type: data;
         }
     }
 
-    // ADMIN PANEL
-    .admin{
-        .navbar{
-            .brand {
-                text-shadow: none !important;
-            }
-            .navbar-inner {
-                background-image: none !important;
-                background-color: $gray-800 !important;
-                border: none !important;
-                display: flex;
-                .nav {
-                    display: flex;
-                }
-            }
-        }
-    
-        .nav{
-            text-shadow: none !important;
-            .active{
-                a {
-                    background-color: $gray-700 !important;
-                    border: 2px solid $gray-600 !important;
-                }
-            }
-            a{
-                text-shadow: none !important;
-                &:hover{
-                    border: 2px solid $gray-600 !important;
-                    background-color: $gray-500 !important;
-                }
-            }
-        }
-    
-        #no-more-tables {
-            .table-bordered {
-                border: 2px solid $gray-600 !important;
-            }
-            tbody, thead {
-                border: 2px solid $gray-600 !important;
-            }
-            th, td {
-                border-left: none !important;
-            }
-        }
-
-        .pagination {
-            a {
-                color: $white !important;
-                background-color: $gray-700 !important;
-                border: 1px solid $gray-600 !important;
-                &:hover {
-                    background-color: $gray-500 !important;
-                }
-            }
-            .active {
-                a {
-                    background-color: $gray-800 !important;
-                }
-            }
-        }
-    
-        .admin-form {
-            .controls {
-                textarea, input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="date"], input[type="datetime-local"], input[type="time"], input[type="url"] {
-                    background-color: $gray-800 !important;
-                    color: $white !important;
-                    border: 1px solid $gray-600 !important;
-                }
-                input[type="submit"] {
-                    background-image: unset !important;
-                    text-shadow: none !important;
-                }
-            }
+    .toast {
+        background-color: $toast-background-color-dark !important;
+        .toast-header {
+            background-color: $toast-header-background-color-dark !important;
         }
     }
 }
