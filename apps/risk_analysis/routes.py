@@ -86,7 +86,8 @@ def macm_riskRating():
         threat_number=threat_number,
         selected_macm=selected_macm,
         wizard_completed=riskAnalysisCatalogUtils.wizard_completed(selected_macm),
-        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm), app_info=app_info,
+        stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(selected_macm),
+        app_info=app_info,
         analyzed_component_ids=analyzed_component_ids,
         final_step_completed=final_step_completed
     )
@@ -760,6 +761,7 @@ def save_risk_evaluation():
 
     try:
         table = Macm.query.filter_by(App_ID=selected_macm).all()
+        app_info = App.query.filter_by(AppID=selected_macm).first()
         if not table:
             table = None
     except Exception:
@@ -860,7 +862,8 @@ def save_risk_evaluation():
         wizard_completed=threatAgentUtils.wizard_completed(selected_macm),
         stride_impact_completed=threatAgentUtils.stride_impact_completed(selected_macm),
         analyzed_component_ids=analyzed_component_ids,
-        final_step_completed=final_step_completed
+        final_step_completed=final_step_completed,
+        app_info=app_info,
     )
 
 
