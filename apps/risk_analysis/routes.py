@@ -799,7 +799,7 @@ def save_risk_evaluation():
 
         if risk_record:
             risk_record.Likelihood = int(round(likelihood_value))
-            risk_record.TecnicalImpact = int(round(tech_impact_value))
+            risk_record.TechnicalImpact = int(round(tech_impact_value))
             risk_record.BusinessImpact = int(round(bus_impact_value))
             risk_record.OverallRisk = overall_risk
             risk_record.updated_at = datetime.utcnow()
@@ -825,7 +825,7 @@ def save_risk_evaluation():
                 Noncompliance=int(threat_data.get('noncompliance', 5)),
                 Privacyviolation=int(threat_data.get('privacyviolation', 5)),
                 Likelihood=int(round(likelihood_value)),
-                TecnicalImpact=int(round(tech_impact_value)),
+                TechnicalImpact=int(round(tech_impact_value)),
                 BusinessImpact=int(round(bus_impact_value)),
                 TechnicalRisk=tech_category,
                 OverallRisk=overall_risk
@@ -897,7 +897,7 @@ def final_step():
                 "Noncompliance": record.Noncompliance,
                 "PrivacyViolation": record.Privacyviolation,
                 "Likelihood": record.Likelihood,
-                "TechnicalImpact": record.TecnicalImpact,
+                "TechnicalImpact": record.TechnicalImpact,
                 "BusinessImpact": record.BusinessImpact,
                 "OverallRisk": record.OverallRisk,
                 "EaseOfDiscovery": record.Easyofdiscovery,
