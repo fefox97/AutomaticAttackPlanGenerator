@@ -13,7 +13,7 @@ from flask_security import auth_required, current_user
 from flask import current_app as app
 from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
 from sqlalchemy import func
-from apps.my_modules import converter, ThreatAgentUtils
+from apps.my_modules import converter, RiskAnalysisCatalogUtils
 from apps import db
 
 from flask_security import auth_required
@@ -32,7 +32,7 @@ def get_segment(request):
 @blueprint.route('/macm_riskRating', methods=['GET'])
 @auth_required()
 def macm_riskRating():
-    riskAnalysisCatalogUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     selected_macm = request.args.get('app_id')
 
     try:
@@ -179,7 +179,7 @@ def threat_agent_wizard():
 @auth_required()
 def submit_questionnaire():
     if request.method == 'POST':
-        riskAnalysisCatalogUtils = ThreatAgentUtils()
+        riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
         # Initialize a dictionary to store the user's responses
         user_responses = {}
         appId = request.form.get('appId')
@@ -268,7 +268,7 @@ def threat_agent_evaluation():
     Endpoint to evaluate threat agents for a given application and calculate OWASP risk scores.
     """
     # Extract `appId` and `objective` from the form
-    riskAnalysisCatalogUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     objective = request.form.get('objective', 'riskanalysis')  # Default to 'riskanalysis'
     appId = request.form.get('appId')
 
@@ -521,7 +521,7 @@ def stride_impact_rating():
 @blueprint.route('/stride_impact_evaluation', methods=['POST'])
 @auth_required()
 def stride_impact_evaluation():
-    threatAgentUtils= ThreatAgentUtils()
+    threatAgentUtils= RiskAnalysisCatalogUtils()
     """
     Endpoint to evaluate STRIDE impact for a given application.
     """
@@ -618,7 +618,7 @@ def stride_impact_evaluation():
             privacyviolation=impacts['privacyviolation']
         )
 
-    riskAnalysisCatalogUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     analyzed_component_ids, final_step_completed = riskAnalysisCatalogUtils.completed_risk_analysis(appId)
 
     template = "risk-analysis/macm_riskRating.html"
@@ -640,7 +640,7 @@ def stride_impact_evaluation():
 
 @blueprint.route('/macm-detailRisk', methods=['GET'])
 def macm_riskDetailed():
-    riskAnalysisCatalogUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     try:
         selected_macm = request.args.get('app_id')
         selected_id = request.args.get('id')
@@ -738,7 +738,7 @@ def macm_riskDetailed():
             form_data[threat.Threat]['loss_of_availability'] = threat.LossOfAvailability
             form_data[threat.Threat]['loss_of_accountability'] = threat.LossOfAccountability
 
-    riskAnalysisCatalogUtils = ThreatAgentUtils()
+    riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     analyzed_component_ids, final_step_completed = riskAnalysisCatalogUtils.completed_risk_analysis(selected_macm)
 
 
@@ -752,7 +752,7 @@ def macm_riskDetailed():
 
 @blueprint.route('/save_risk_evaluation', methods=['POST'])
 def save_risk_evaluation():
-    threatAgentUtils = ThreatAgentUtils()
+    threatAgentUtils = RiskAnalysisCatalogUtils()
 
     selected_macm = request.form.get('selected_macm')
     component_id = request.form.get('component_id')
