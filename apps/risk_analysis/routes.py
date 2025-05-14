@@ -303,6 +303,8 @@ def threat_agent_evaluation():
             .all()
         )
 
+        app_info = App.query.filter_by(AppID=appId).first()
+
         # Fetch table data for the given `appId`
         table = Macm.query.filter_by(App_ID=appId).all()
         if not table:
@@ -463,7 +465,8 @@ def threat_agent_evaluation():
         wizard_completed=True,
         stride_impact_completed=riskAnalysisCatalogUtils.stride_impact_completed(appId),
         analyzed_component_ids=analyzed_component_ids,
-        final_step_completed=final_step_completed
+        final_step_completed=final_step_completed,
+        app_info=app_info,
     )
 
 
