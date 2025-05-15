@@ -541,6 +541,7 @@ def stride_impact_evaluation():
 
     try:
         # Fetch distinct reports for the given `appId`
+        app_info = App.query.filter_by(AppID=appId).first()
         reports = (
             AttackView.query.filter_by(AppID=appId)
             .with_entities(
@@ -639,7 +640,8 @@ def stride_impact_evaluation():
         wizard_completed=threatAgentUtils.wizard_completed(appId),
         stride_impact_completed=threatAgentUtils.stride_impact_completed(appId),
         analyzed_component_ids=analyzed_component_ids,
-        final_step_completed=final_step_completed
+        final_step_completed=final_step_completed,
+        app_info=app_info,
     )
 
 @blueprint.route('/macm-detailRisk', methods=['GET'])
