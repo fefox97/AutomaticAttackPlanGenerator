@@ -645,6 +645,7 @@ def stride_impact_evaluation():
     )
 
 @blueprint.route('/macm-detailRisk', methods=['GET'])
+@auth_required()
 def macm_riskDetailed():
     riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     try:
@@ -757,6 +758,7 @@ def macm_riskDetailed():
 
 
 @blueprint.route('/save_risk_evaluation', methods=['POST'])
+@auth_required()
 def save_risk_evaluation():
     threatAgentUtils = RiskAnalysisCatalogUtils()
 
@@ -874,7 +876,7 @@ def save_risk_evaluation():
 
 
 @blueprint.route('/final-step', methods=['GET'])
-@auth_required
+@auth_required()
 def final_step():
     selected_macm = request.args.get('app_id')
 
