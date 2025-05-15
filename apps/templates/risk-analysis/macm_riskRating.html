@@ -337,7 +337,7 @@
                                                                {% else %}
                                                                    bg-macm
                                                                {% endif %}"
-                                                       href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
+                                                       href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if row['Component_ID'] in analyzed_component_ids %}
                                                             <i class="fas fa-check-circle text-white ms-1"></i>
