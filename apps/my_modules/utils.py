@@ -8,16 +8,14 @@ from neo4j import Result
 import re
 
 import urllib
+from apps.my_modules import converter
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord
-
-# from flask_login import current_user
-from flask_security import current_user
-
+from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
+from flask_login import current_user
 from apps.config import Config
 from apps import db
 
@@ -716,3 +714,103 @@ class RiskAnalysisCatalogUtils:
 		# Check if the STRIDE impact records exist for the application
 		stride_impact_records = StrideImpactRecord.query.filter_by(AppID=appId).all()
 		return len(stride_impact_records) > 5
+
+	def get_category(self,value):
+		if value < 3.0:
+			return "Low"
+		elif value < 7.0:
+			return "Medium"
+		else:
+			return "High"
+
+	def calculate_likelihood(self,threat_data):
+		likelihood_params = [
+			'skill', 'motive', 'opportunity', 'size',
+			'ease_of_discovery', 'ease_of_exploit',
+			'awareness', 'intrusion_detection'
+		]
+		sum_values = 0
+		count = 0
+		for param in likelihood_params:
+			val = int(threat_data.get(param, 5))  # default 5
+			sum_values += val
+			count += 1
+		likelihood = sum_values / count if count else 5
+		likelihood_category = self.get_category(likelihood)
+		return likelihood, likelihood_category
+
+	def calculate_impact(self,threat_data):
+		tech_params = [
+			'loss_of_confidentiality', 'loss_of_integrity',
+			'loss_of_availability', 'loss_of_accountability'
+		]
+		bus_params = [
+			'financialdamage', 'reputationdamage',
+			'noncompliance', 'privacyviolation'
+		]
+		tech_sum = sum(int(threat_data.get(param, 5)) for param in tech_params)
+		bus_sum = sum(int(threat_data.get(param, 5)) for param in bus_params)
+		technical_impact = tech_sum / len(tech_params)
+		business_impact = bus_sum / len(bus_params)
+		tech_category = self.get_category(technical_impact)
+		bus_category = self.get_category(business_impact)
+		return technical_impact, business_impact, tech_category, bus_category
+
+	def calculate_overall_risk(self,likelihood_category, impact_category):
+		risk_matrix = {
+			"Low": {
+				"Low": "Note",
+				"Medium": "Low",
+				"High": "Medium"
+			},
+			"Medium": {
+				"Low": "Low",
+				"Medium": "Medium",
+				"High": "High"
+			},
+			"High": {
+				"Low": "Medium",
+				"Medium": "High",
+				"High": "Critical"
+			}
+		}
+		return risk_matrix.get(likelihood_category, {}).get(impact_category, "Unknown")
+
+	def get_all_threat_ids(self,post_data):
+		threat_ids = set()
+		for key in post_data.keys():
+			if '[' in key and ']' in key:
+				threat_id = key.split('[')[0]
+				threat_ids.add(threat_id)
+		return threat_ids
+
+	def completed_risk_analysis(self,appId):
+		try:
+			# Calcola le minacce per ciascun componente
+			threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
+				ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
+			threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+
+			# Calcola il numero totale di minacce
+			threat_number = ThreatModel.query.filter_by(AppID=appId).count()
+		except Exception as e:
+			threat_for_each_component = {}
+			threat_number = 0
+
+		# Calcolo degli ID dei componenti analizzati
+		try:
+			analyzed_components = (
+				db.session.query(RiskRecord.ComponentID)
+				.filter_by(AppID=appId)
+				.distinct()
+				.all()
+			)
+			analyzed_component_ids = [c[0] for c in analyzed_components]
+		except Exception as e:
+			analyzed_component_ids = []
+
+		# Calcola se il passo finale è stato completato (verifica se tutti i componenti hanno almeno un rischio associato)
+		components_with_threats = {t.Component_ID for t in ThreatModel.query.filter_by(AppID=appId).all()}
+		components_with_risk = {r.ComponentID for r in RiskRecord.query.filter_by(AppID=appId).all()}
+		final_step_completed = components_with_threats.issubset(components_with_risk)
+		return analyzed_component_ids,final_step_completed
