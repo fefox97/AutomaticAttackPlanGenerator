@@ -91,7 +91,7 @@
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/penetration_tests/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
+                                                    <a class="badge bg-macm position-relative" href="/penetration_tests/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if attack_for_this_component %}
                                                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-capec badge-macm-detail">

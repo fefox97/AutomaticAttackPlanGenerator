@@ -10,6 +10,7 @@ from .types import ExternalReferencesType
 from apps import db
 from sqlalchemy import UniqueConstraint
 
+
 # from sqlalchemy import event
 # from sqlalchemy.engine import Engine
 # from sqlite3 import Connection as SQLite3Connection
@@ -69,12 +70,11 @@ class Settings(db.Model):
         return {setting.key: setting.value for setting in settings}
 
 class PentestPhases(db.Model):
-
     __tablename__ = 'PentestPhases'
 
-    PhaseID                = db.Column(db.Integer, primary_key=True, nullable=False)
-    PhaseName              = db.Column(db.Text)
-    IsSubPhaseOf           = db.Column(db.Integer)
+    PhaseID = db.Column(db.Integer, primary_key=True, nullable=False)
+    PhaseName = db.Column(db.Text)
+    IsSubPhaseOf = db.Column(db.Integer)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -113,37 +113,36 @@ class AssetTypes(db.Model):
         return str(self.AssetTypeID)
 
 class Capec(db.Model):
-
     __tablename__ = 'Capec'
 
-    Capec_ID                = db.Column(db.Integer, primary_key=True, nullable=False)
-    Created                 = db.Column(db.TIMESTAMP)
-    Created_By_Ref          = db.Column(db.JSON)
-    Description             = db.Column(db.Text)
-    Modified                = db.Column(db.TIMESTAMP)
-    Name                    = db.Column(db.Text)
-    Object_Marking_Refs     = db.Column(db.JSON)
-    Spec_Version            = db.Column(db.Text)
-    Abstraction             = db.Column(db.Text)
-    Alternate_Terms         = db.Column(db.JSON)
-    Can_Follow_Refs         = db.Column(db.JSON)
-    Can_Precede_Refs        = db.Column(db.JSON)
-    Consequences            = db.Column(db.JSON)
-    Domains                 = db.Column(db.JSON)
-    External_References     = db.Column(ExternalReferencesType(10000))
-    Example_Instances       = db.Column(db.JSON)
-    Execution_Flow          = db.Column(db.Text)
-    Extended_Description    = db.Column(db.JSON)
-    Likelihood_Of_Attack    = db.Column(db.Text)
-    Peer_Of_Refs            = db.Column(db.JSON)
-    Prerequisites           = db.Column(db.JSON)
-    Resources_Required      = db.Column(db.JSON)
-    Skills_Required         = db.Column(db.JSON)
-    Status                  = db.Column(db.Text)
-    Typical_Severity        = db.Column(db.Text)
-    Version                 = db.Column(db.Text)
-    Capec_Children_ID       = db.Column(db.JSON)
-    Capec_Parents_ID        = db.Column(db.JSON)
+    Capec_ID = db.Column(db.Integer, primary_key=True, nullable=False)
+    Created = db.Column(db.TIMESTAMP)
+    Created_By_Ref = db.Column(db.JSON)
+    Description = db.Column(db.Text)
+    Modified = db.Column(db.TIMESTAMP)
+    Name = db.Column(db.Text)
+    Object_Marking_Refs = db.Column(db.JSON)
+    Spec_Version = db.Column(db.Text)
+    Abstraction = db.Column(db.Text)
+    Alternate_Terms = db.Column(db.JSON)
+    Can_Follow_Refs = db.Column(db.JSON)
+    Can_Precede_Refs = db.Column(db.JSON)
+    Consequences = db.Column(db.JSON)
+    Domains = db.Column(db.JSON)
+    External_References = db.Column(ExternalReferencesType(10000))
+    Example_Instances = db.Column(db.JSON)
+    Execution_Flow = db.Column(db.Text)
+    Extended_Description = db.Column(db.JSON)
+    Likelihood_Of_Attack = db.Column(db.Text)
+    Peer_Of_Refs = db.Column(db.JSON)
+    Prerequisites = db.Column(db.JSON)
+    Resources_Required = db.Column(db.JSON)
+    Skills_Required = db.Column(db.JSON)
+    Status = db.Column(db.Text)
+    Typical_Severity = db.Column(db.Text)
+    Version = db.Column(db.Text)
+    Capec_Children_ID = db.Column(db.JSON)
+    Capec_Parents_ID = db.Column(db.JSON)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -153,7 +152,7 @@ class Capec(db.Model):
             setattr(self, property, value)
 
     def __repr__(self):
-        return str(self.Capec_ID) 
+        return str(self.Capec_ID)
 
     @hybrid_property
     def abstraction_order(self):
@@ -166,51 +165,53 @@ class Capec(db.Model):
         return table_ordering
     
 class ThreatCatalogue(db.Model):
-
     __tablename__ = 'ThreatCatalogue'
 
-    TID                 = db.Column(db.String(100), primary_key=True, nullable=False)
-    Asset               = db.Column(db.Text)
-    Threat              = db.Column(db.Text)
-    Description         = db.Column(db.Text)
-    STRIDE              = db.Column(db.Text)
-    Compromised         = db.Column(db.Text)
-    PreC                = db.Column(db.JSON)
-    PreI                = db.Column(db.JSON)
-    PreA                = db.Column(db.JSON)
-    PreCondition        = db.Column(db.JSON)
-    PostC               = db.Column(db.JSON)
-    PostI               = db.Column(db.JSON)
-    PostA               = db.Column(db.JSON)
-    PostCondition       = db.Column(db.JSON)
-    Commento            = db.Column(db.Text)
-    
-    EasyOfDiscovery     = db.Column(db.Integer, default=5)
-    EasyOfExploit       = db.Column(db.Integer, default=5)
-    Awareness           = db.Column(db.Integer, default=5)
-    IntrusionDetection  = db.Column(db.Integer, default=5)
+    TID = db.Column(db.String(100), primary_key=True, nullable=False)
+    Asset = db.Column(db.Text)
+    Threat = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    STRIDE = db.Column(db.Text)
+    Compromised = db.Column(db.Text)
+    PreC = db.Column(db.JSON)
+    PreI = db.Column(db.JSON)
+    PreA = db.Column(db.JSON)
+    PreCondition = db.Column(db.JSON)
+    PostC = db.Column(db.JSON)
+    PostI = db.Column(db.JSON)
+    PostA = db.Column(db.JSON)
+    PostCondition = db.Column(db.JSON)
+    Commento = db.Column(db.Text)
+
+    EasyOfDiscovery = db.Column(db.Integer, default=5)
+    EasyOfExploit = db.Column(db.Integer, default=5)
+    Awareness = db.Column(db.Integer, default=5)
+    IntrusionDetection = db.Column(db.Integer, default=5)
     LossOfConfidentiality = db.Column(db.Integer, default=5)
-    LossOfIntegrity     = db.Column(db.Integer, default=5)
-    LossOfAvailability  = db.Column(db.Integer, default=5)
+    LossOfIntegrity = db.Column(db.Integer, default=5)
+    LossOfAvailability = db.Column(db.Integer, default=5)
     LossOfAccountability = db.Column(db.Integer, default=5)
-    
-    hasCapec            = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat')
+
+    hasCapec = db.relationship('Capec', secondary='CapecThreatRel', backref='hasThreat')
 
     @hybrid_property
     def hasCapecMeta(self):
-        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(Capec.Abstraction == 'Meta').all()
+        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(
+            Capec.Abstraction == 'Meta').all()
         return [id[0] for id in ids]
-    
+
     @hybrid_property
     def hasCapecStandard(self):
-        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(Capec.Abstraction == 'Standard').all()
+        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(
+            Capec.Abstraction == 'Standard').all()
         return [id[0] for id in ids]
-    
+
     @hybrid_property
     def hasCapecDetailed(self):
-        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(Capec.Abstraction == 'Detailed').all()
+        ids = db.session.query(Capec.Capec_ID).join(CapecThreatRel).filter(CapecThreatRel.TID == self.TID).filter(
+            Capec.Abstraction == 'Detailed').all()
         return [id[0] for id in ids]
-    
+
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
             if hasattr(value, '__iter__') and not isinstance(value, str):
@@ -221,40 +222,41 @@ class ThreatCatalogue(db.Model):
     def __repr__(self):
         return str(self.TID)
 
-class CapecThreatRel(db.Model):
 
+class CapecThreatRel(db.Model):
     __tablename__ = 'CapecThreatRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
-    TID          = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Capec_ID = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
+    TID = db.Column(db.String(100), ForeignKey("ThreatCatalogue.TID", ondelete='CASCADE'))
+
 
 class ToolCatalogue(db.Model):
-
     __tablename__ = 'ToolCatalogue'
 
-    ToolID      = db.Column(db.Integer, primary_key=True, nullable=False)
-    Name        = db.Column(db.Text)
-    CapecID     = db.Column(db.JSON)
+    ToolID = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name = db.Column(db.Text)
+    CapecID = db.Column(db.JSON)
     CypherQuery = db.Column(db.Text)
-    Command     = db.Column(db.Text)
+    Command = db.Column(db.Text)
     Description = db.Column(db.Text)
-    PhaseID     = db.Column(db.JSON)
+    PhaseID = db.Column(db.JSON)
     IsExecutable = db.Column(db.Boolean)
     ReportParser = db.Column(db.Text)
     AllowedReportExtensions = db.Column(db.JSON)
-    
-    hasPhase       = db.relationship("PentestPhases", secondary='ToolPhaseRel', backref='hasTool')
-    hasCapec    = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool')
+
+    hasPhase = db.relationship("PentestPhases", secondary='ToolPhaseRel', backref='hasTool')
+    hasCapec = db.relationship('Capec', secondary='CapecToolRel', backref='hasTool')
 
     @hybrid_property
     def hasCapecIDs(self):
         ids = db.session.query(Capec.Capec_ID).join(CapecToolRel).filter(CapecToolRel.ToolID == self.ToolID).all()
         return [id[0] for id in ids]
-    
+
     @hybrid_property
     def hasPhaseIDs(self):
-        ids = db.session.query(PentestPhases.PhaseID).join(ToolPhaseRel).filter(ToolPhaseRel.ToolID == self.ToolID).all()
+        ids = db.session.query(PentestPhases.PhaseID).join(ToolPhaseRel).filter(
+            ToolPhaseRel.ToolID == self.ToolID).all()
         return [id[0] for id in ids]
 
     def __init__(self, **kwargs):
@@ -267,8 +269,8 @@ class ToolCatalogue(db.Model):
     def __repr__(self):
         return str(self.ToolID)
 
-class MethodologyCatalogue(db.Model):
 
+class MethodologyCatalogue(db.Model):
     __tablename__ = 'MethodologyCatalogue'
 
     MID = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -286,16 +288,16 @@ class MethodologyCatalogue(db.Model):
     def __repr__(self):
         return str(self.MID)
 
-class CapecToolRel(db.Model):
 
+class CapecToolRel(db.Model):
     __tablename__ = 'CapecToolRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Capec_ID     = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Capec_ID = db.Column(db.Integer, ForeignKey("Capec.Capec_ID", ondelete='CASCADE'))
+    ToolID = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+
 
 class Macm(db.Model):
-
     __tablename__ = 'Macm'
 
     Id              = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -317,7 +319,7 @@ class Macm(db.Model):
 
     def __repr__(self):
         return str(self.Name)
-    
+
 
 class App(db.Model):
     
@@ -340,7 +342,6 @@ class App(db.Model):
         return str(self.Name)
 
 class MacmUser(db.Model):
-
     __tablename__ = 'MacmUser'
 
     UserID         = db.Column(db.Integer, ForeignKey("Users.id", ondelete='CASCADE'), primary_key=True, nullable=False)
@@ -358,19 +359,18 @@ class MacmUser(db.Model):
 
     def __repr__(self):
         return str(f'{self.UserID}-{self.AppID}')
-    
+
     @classmethod
     def usersPerApp(self):
         result = self.query.with_entities(self.AppID, func.group_concat(self.UserID)).group_by(self.AppID).all()
         return {app_id: [int(x) for x in user_ids.split(',')] for app_id, user_ids in result}
-    
+
     @classmethod
     def ownerPerApp(self):
         result = self.query.with_entities(self.AppID, self.UserID).filter_by(IsOwner=True).all()
         return {app_id: user_id for app_id, user_id in result}
     
 class Attack(db.Model):
-
     __tablename__ = 'Attack'
 
     Id           = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -382,19 +382,19 @@ class Attack(db.Model):
     
     Tool = db.relationship("ToolCatalogue", backref="Attack")
 
-    __table_args__ =  (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
+    __table_args__ = (UniqueConstraint('ToolID', 'ComponentID', 'AppID', name='uix_1'),)
 
     def __repr__(self):
         return str(f'{self.AppID}-{self.ComponentID}-{self.ToolID}')
-    
-class ToolPhaseRel(db.Model):
 
+
+class ToolPhaseRel(db.Model):
     __tablename__ = 'ToolPhaseRel'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    ToolID       = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
-    PhaseID      = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID", ondelete='CASCADE'))
-    __table_args__ =  (UniqueConstraint('ToolID', 'PhaseID', name='uix_1'),)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    ToolID = db.Column(db.Integer, ForeignKey("ToolCatalogue.ToolID", ondelete='CASCADE'))
+    PhaseID = db.Column(db.Integer, ForeignKey("PentestPhases.PhaseID", ondelete='CASCADE'))
+    __table_args__ = (UniqueConstraint('ToolID', 'PhaseID', name='uix_1'),)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -406,10 +406,11 @@ class ToolPhaseRel(db.Model):
     def __repr__(self):
         return str(f'{self.ToolID}-{self.PhaseID}')
 
+
 class ThreatModel(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('TM_Number')
-    
+
     __table__ = create_view(
                 "ThreatModel",
                 select(
@@ -449,10 +450,11 @@ class ThreatModel(db.Model):
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Threat_ID}')
 
+
 class AttackView(db.Model):
     # row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Attack_Number')
-    
+
     __table__ = create_view(
                 "AttackView",
                 select(
@@ -497,6 +499,7 @@ class AttackView(db.Model):
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Capec_ID}')
 
+
 class MethodologyView(db.Model):
     row_number_column = func.row_number().over(partition_by=Macm.App_ID).label('Methodology_Number')
     __table__ = create_view(
@@ -520,6 +523,7 @@ class MethodologyView(db.Model):
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.Methodology_ID}')
 
+
 class ThreatAgentReply(db.Model):
     __tablename__ = 'ThreatAgentReply'
 
@@ -530,26 +534,25 @@ class ThreatAgentReply(db.Model):
 
 
 class ThreatAgentAttribute(db.Model):
-
     __tablename__ = 'ThreatAgentAttribute'
 
     Id = db.Column(db.Integer, primary_key=True, nullable=False)
     Attribute = db.Column(db.Text)
-    Description = db.Column(db.Text,nullable=True)
+    Description = db.Column(db.Text, nullable=True)
     Score = db.Column(db.Integer)
     Attribute = db.Column(db.Text)
     AttributeValue = db.Column(db.Text)
-    Description = db.Column(db.Text,nullable=True)
+    Description = db.Column(db.Text, nullable=True)
     Score = db.Column(db.Integer)
 
-class ThreatAgentCategory(db.Model):
 
+class ThreatAgentCategory(db.Model):
     __tablename__ = 'ThreatAgentCategory'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Category       = db.Column(db.Text)
-    Description       = db.Column(db.Text)
-    CommonAction       = db.Column(db.Text)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Category = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    CommonAction = db.Column(db.Text)
     hasReply = db.relationship('Reply', secondary='CategoryThreatRel', backref='hasCategory', lazy='dynamic')
 
     @hybrid_property
@@ -562,14 +565,14 @@ class ThreatAgentCategory(db.Model):
         ids = self.hasAttribute.filter().with_entities(ThreatAgentAttribute.Id).all()
         return [id[0] for id in ids]
 
-class ThreatAgentQuestion(db.Model):
 
+class ThreatAgentQuestion(db.Model):
     __tablename__ = 'ThreatAgentQuestion'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Question       = db.Column(db.Text)
-    Qid       = db.Column(db.Text)
-    #Replies       = db.Column(db.Text)
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Question = db.Column(db.Text)
+    Qid = db.Column(db.Text)
+    # Replies       = db.Column(db.Text)
     hasReply = db.relationship('Reply', secondary='CategoryThreatRel', backref='hasCategory', lazy='dynamic')
 
     @hybrid_property
@@ -596,8 +599,6 @@ class ThreatAgentQuestionReplies(db.Model):
     Question_id = db.Column(db.Integer, ForeignKey("ThreatAgentQuestion.Id", ondelete='CASCADE'))
     Reply_id = db.Column(db.Integer, ForeignKey("ThreatAgentReply.Id", ondelete='CASCADE'))
 
-    def __repr__(self):
-        return f"<ThreatAgentQuestionReplies(id={self.id}, question_id={self.question_id}, reply_id={self.reply_id})>"
 
 class ThreatAgentRiskScores(db.Model):
     __tablename__ = 'ThreatAgentRiskScores'
@@ -685,6 +686,7 @@ class RiskRecord(db.Model):
     __tablename__ = 'RiskRecord'
     AppID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
     ComponentID = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
+    ThreatID = db.Column(db.String(100), primary_key=True, nullable=False, index=True)
     Skill = db.Column(db.Integer, nullable=False)
     Size = db.Column(db.Integer, nullable=False)
     Motive = db.Column(db.Integer, nullable=False)
@@ -701,16 +703,18 @@ class RiskRecord(db.Model):
     Reputationdamage = db.Column(db.Integer, nullable=False)
     Noncompliance = db.Column(db.Integer, nullable=False)
     Privacyviolation = db.Column(db.Integer, nullable=False)
-    Likelyhood = db.Column(db.Integer, nullable=False)
-    TecnicalImpact = db.Column(db.Integer, nullable=False)
+    Likelihood = db.Column(db.Integer, nullable=False)
+    TechnicalImpact = db.Column(db.Integer, nullable=False)
     BusinessImpact = db.Column(db.Integer, nullable=False)
+    TechnicalRisk = db.Column(db.Text, nullable=False)
     OverallRisk = db.Column(db.Text, nullable=False)
     Created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     Updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
 class ThreatAgentReplyCategory(db.Model):
-
     __tablename__ = 'ThreatAgentReplyCategory'
 
-    Id           = db.Column(db.Integer, primary_key=True, nullable=False)
-    Reply_id       = db.Column(db.Integer, ForeignKey("ThreatAgentReply.Id", ondelete='CASCADE'))
-    Category_id       = db.Column(db.Integer, ForeignKey("ThreatAgentCategory.Id", ondelete='CASCADE'))
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Reply_id = db.Column(db.Integer, ForeignKey("ThreatAgentReply.Id", ondelete='CASCADE'))
+    Category_id = db.Column(db.Integer, ForeignKey("ThreatAgentCategory.Id", ondelete='CASCADE'))
+
+
