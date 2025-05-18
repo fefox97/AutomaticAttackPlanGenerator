@@ -293,6 +293,7 @@ def download_attack_plan():
             AttackView.Threat_ID.label('Threat ID'),
             AttackView.Threat,
             AttackView.Threat_Description.label('Threat Description'),
+            AttackView.PhaseName.label('Phase'),
             AttackView.Capec_ID.label('CAPEC ID'),
             AttackView.Attack_Pattern.label('Attack Pattern'),
             AttackView.Capec_Description.label('CAPEC Description'),
@@ -311,11 +312,12 @@ def download_attack_plan():
             3: {'columns': 'D:D', 'width': 20},
             4: {'columns': 'F:F', 'width': 20},
             5: {'columns': 'G:G', 'width': 40},
-            6: {'columns': 'I:I', 'width': 20},
-            7: {'columns': 'J:J', 'width': 40},
-            8: {'columns': 'K:K', 'width': 120},
-            9: {'columns': 'M:M', 'width': 10},
-            10: {'columns': 'N:O', 'width': 40},
+            6: {'columns': 'H:H', 'width': 30},
+            7: {'columns': 'J:J', 'width': 20},
+            8: {'columns': 'K:K', 'width': 40},
+            9: {'columns': 'L:L', 'width': 120},
+            10: {'columns': 'N:N', 'width': 10},
+            11: {'columns': 'O:P', 'width': 40},
         }
 
         excel_file = APIUtils().query_to_excel(attack_plan, 'Attack Plan', column_format, ['Execution Flow'])
