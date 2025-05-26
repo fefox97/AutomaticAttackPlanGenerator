@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy import ForeignKey, select, func, and_, UniqueConstraint
+from sqlalchemy import ForeignKey, select, func, and_, or_, UniqueConstraint
 from sqlalchemy_utils import create_view
 from .types import ExternalReferencesType
 
@@ -441,7 +441,7 @@ class ThreatModel(db.Model):
                 )
                 .select_from(Macm)
                 .join(App, Macm.App_ID==App.AppID)
-                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
+                .join(ThreatCatalogue, or_(Macm.Type==ThreatCatalogue.Asset, Macm.Labels.contains(ThreatCatalogue.Asset)))
                 .add_columns(row_number_column),
                 db.metadata,
                 replace=True
@@ -482,7 +482,7 @@ class AttackView(db.Model):
                     Attack.ReportFiles
                 )
                 .select_from(Macm)
-                .join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset)
+                .join(ThreatCatalogue, or_(Macm.Type==ThreatCatalogue.Asset, Macm.Labels.contains(ThreatCatalogue.Asset)))
                 .join(CapecThreatRel)
                 .join(Capec)
                 .join(CapecToolRel)
