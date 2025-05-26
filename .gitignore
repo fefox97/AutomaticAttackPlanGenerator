@@ -52,3 +52,4 @@ nginx/dhparam.pem
 old.env
 
 docker-compose.yml
+Catalogs.xlsx
