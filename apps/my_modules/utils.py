@@ -14,10 +14,11 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
+from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
 from flask_login import current_user
 from apps.config import Config
 from apps import db
+from flask import current_app as app
 
 class AttackPatternUtils:
 	
@@ -66,12 +67,25 @@ class ThreatCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
-		# self.threat_catalog_df = self.load_threat_catalog()
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
 
 	def load_threat_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading threat catalogue...\n")
-		df = pd.read_excel(self.file_path, sheet_name="Threat Components", header=0)
+		df = pd.read_excel(file_path, sheet_name="Threat Components", header=0)
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		# df = df.astype('str')
 		columns_to_convert = ['EasyOfDiscovery', 'EasyOfExploit', 'Awareness', 'IntrusionDetection', 'LossOfConfidentiality', 'LossOfIntegrity', 'LossOfAvailability', 'LossOfAccountability']
@@ -90,12 +104,25 @@ class ToolCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
-		# self.tools_catalog_df = self.load_tools_catalog()
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
 
 	def load_tools_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading tools catalog...\n")
-		df = pd.read_excel(self.file_path, sheet_name="Tools", header=0)
+		df = pd.read_excel(file_path, sheet_name="Tools", header=0)
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		df['AllowedReportExtensions'] = df['AllowedReportExtensions'].apply(lambda x: self.converter.string_to_list(x))
 		df['CapecID'] = df['CapecID'].apply(lambda x: self.converter.string_to_list(x))
@@ -103,8 +130,11 @@ class ToolCatalogUtils:
 		return df
 
 	def load_pentest_phases(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading pentest phases...\n")
-		df = pd.read_excel(self.file_path, sheet_name="Pentest Phases", header=0)
+		df = pd.read_excel(file_path, sheet_name="Pentest Phases", header=0)
 		df.replace(np.nan, None, inplace=True)
 		df['PhaseID'] = df['PhaseID'].apply(lambda x: int(x) if x is not None else None)
 		df['IsSubPhaseOf'] = df['IsSubPhaseOf'].apply(lambda x: int(x) if x is not None else None)
@@ -117,12 +147,25 @@ class AssetTypesCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
-		# self.tools_catalog_df = self.load_tools_catalog()
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
 
 	def load_asset_types_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading Asset Types catalog...\n")
-		df = pd.read_excel(self.file_path, sheet_name="AssetTypes", header=0)
+		df = pd.read_excel(file_path, sheet_name="AssetTypes", header=0)
 		df.rename(columns={'ID': 'AssetTypeID', 'Primary Label': 'PrimaryLabel', 'Secondary Label': 'SecondaryLabel'}, inplace=True)
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
@@ -133,12 +176,25 @@ class MethodologyCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
-		# self.tools_catalog_df = self.load_tools_catalog()
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
 
 	def load_methodology_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading methodology catalog...\n")
-		df = pd.read_excel(self.file_path, sheet_name="Methodologies", header=0)
+		df = pd.read_excel(file_path, sheet_name="Methodologies", header=0)
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
 
@@ -544,12 +600,25 @@ class RiskAnalysisCatalogUtils:
 
 	def __init__(self):
 		self.base_path = Config.DBS_PATH
-		self.file_path = f"{self.base_path}/{Config.CATALOGS_FILE_NAME}"
-		# self.threat_catalog_df = self.load_threat_catalog()
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
 
 	def load_threat_agent_category_df(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading threat agents info...\n")
-		df = pd.read_excel(self.file_path, sheet_name="ThreatAgentCategory", header=0)
+		df = pd.read_excel(file_path, sheet_name="ThreatAgentCategory", header=0)
 		#df.replace(np.nan, None, inplace=True) # replace NaN with None
 		df = df.astype('str')
 		columns_to_convert = ['Reply', 'Attribute']
@@ -558,8 +627,11 @@ class RiskAnalysisCatalogUtils:
 		return df
 
 	def load_threat_agent_questions(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading threat questions info...\n")
-		df = pd.read_excel(self.file_path, sheet_name="ThreatAgentQuestions", header=0)
+		df = pd.read_excel(file_path, sheet_name="ThreatAgentQuestions", header=0)
 		df = df.astype('str')
 		columns_to_convert = ['Replies']
 		for column in columns_to_convert:
@@ -567,14 +639,20 @@ class RiskAnalysisCatalogUtils:
 		return df
 
 	def load_threat_agent_reply(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading threat replies info...\n")
-		df = pd.read_excel(self.file_path, sheet_name="ThreatAgentReply", header=0)
+		df = pd.read_excel(file_path, sheet_name="ThreatAgentReply", header=0)
 		df = df.astype('str')
 		return df
 
 	def load_threat_agent_attributes(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
 		print("\nLoading threat agent attributes info...\n")
-		df = pd.read_excel(self.file_path, sheet_name="ThreatAgentAttribute", header=0)
+		df = pd.read_excel(file_path, sheet_name="ThreatAgentAttribute", header=0)
 		df = df.astype('str')
 		return df
 

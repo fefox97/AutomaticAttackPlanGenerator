@@ -1,5 +1,4 @@
-
-
+import os
 import datetime
 import json
 import traceback
@@ -228,9 +227,25 @@ def upload_excel():
         if not APIUtils().allowed_file(file.filename, ['xlsx', 'xls', 'xlsm']):
             return make_response(jsonify({'message': 'File type not allowed'}), 400)
         try:
-            filename = app.config['CATALOGS_FILE_NAME']
+            filename = file.filename
             path = app.config["DBS_PATH"]
             file.save(f'{path}/{filename}')
+            catalogs_filename = Settings.query.filter_by(key='catalogs_filename').first()
+            old_filename = catalogs_filename.value if catalogs_filename else None
+            if catalogs_filename:
+                catalogs_filename.value = filename
+            else:
+                catalogs_filename = Settings(key='catalogs_filename', value=filename)
+                db.session.add(catalogs_filename)
+            db.session.commit()
+            # Cancella il vecchio file se esiste e il nome è diverso
+            if old_filename and old_filename != filename:
+                old_file_path = os.path.join(path, old_filename)
+                try:
+                    if os.path.exists(old_file_path):
+                        os.remove(old_file_path)
+                except Exception as e:
+                    app.logger.warning(f"Impossibile cancellare il vecchio file catalogo: {e}")
             return make_response(jsonify({'message': 'Excel uploaded successfully', 'filename': filename}), 200)
         except Exception as error:
             return make_response(jsonify({'message': error.args}), 400)
@@ -240,7 +255,7 @@ def upload_excel():
 @auth_required
 @blueprint.route('/download_excel', methods=['POST'])
 def download_excel():
-    filename = app.config['CATALOGS_FILE_NAME']
+    filename = Settings.query.filter_by(key='catalogs_filename').first().value
     path = app.config["DBS_PATH"]
     return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
 
