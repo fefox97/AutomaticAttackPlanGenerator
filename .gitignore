@@ -39,7 +39,7 @@ migrations
 
 apps/static/.webassets-cache/
 apps/static/uploads/
-apps/static/assets/dbs/ThreatCatalogComplete.xlsx
+apps/static/assets/dbs/*
 
 *.sql
 neo4j/*
@@ -52,4 +52,3 @@ nginx/dhparam.pem
 old.env
 
 docker-compose.yml
-Catalogs.xlsx
