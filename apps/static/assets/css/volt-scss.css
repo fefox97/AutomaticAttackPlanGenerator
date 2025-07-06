@@ -20390,6 +20390,9 @@ pre[class*=language-] {
   .tippy-box[data-theme~='cyto-tippy'] .tippy-arrow {
     color: var(--bs-body-color); }
 
+.breadcrumb-icon {
+  font-size: 20px; }
+
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
 

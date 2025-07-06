@@ -1,13 +1,14 @@
 
 
 from apps.catalogs import blueprint
-from flask import render_template, request
+from flask import request
 from flask import current_app as app
 from apps.databases.models import AssetTypes, Capec, MethodologyCatalogue, ThreatCatalogue, \
     ToolCatalogue
 
 from flask_security import auth_required
 
+from apps import render_template
 
 @blueprint.route('/capec', methods=['GET'])
 @auth_required()

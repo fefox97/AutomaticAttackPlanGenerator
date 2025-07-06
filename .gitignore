@@ -40,6 +40,8 @@ migrations
 apps/static/.webassets-cache/
 apps/static/uploads/
 apps/static/assets/dbs/ThreatCatalogComplete.xlsx
+apps/static/assets/dbs/*.xlsx
+apps/static/assets/dbs/*.xlsm
 
 *.sql
 neo4j/*

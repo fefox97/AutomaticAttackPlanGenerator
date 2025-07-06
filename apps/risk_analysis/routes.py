@@ -4,7 +4,7 @@ from datetime import datetime
 
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
-from flask import render_template, request
+from flask import request
 
 from flask_security import auth_required, current_user
 
@@ -12,7 +12,7 @@ from flask import current_app as app
 from apps.databases.models import App, AttackView, MacmUser, Macm, ThreatModel, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord
 from sqlalchemy import func
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
-from apps import db
+from apps import db, render_template
 
 from flask_security import auth_required
 

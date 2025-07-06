@@ -3,7 +3,7 @@ import os
 import re
 
 from flask_login import current_user
-from apps.celery_module.tasks import query_llm
+from apps.celery_module.tasks import query_llm, retrieve_wiki_pages
 from apps.databases.models import Capec, Settings
 from apps.authentication.models import Tasks
 from flask import current_app as app
@@ -134,6 +134,7 @@ class APIUtils:
             task = Tasks(
                 id=report.id,
                 name="Pentest report generation",
+                type="pentest_report",
                 app_id=app_id,
                 user_id=current_user.id,
             )
@@ -154,4 +155,21 @@ class APIUtils:
             return filebytes
         except Exception as e:
             app.logger.error(f"Error making the request to LLM: {e}", exc_info=True)
+            return None
+        
+    def retrieve_wiki_pages(self, wiki_repo_url=None, wiki_folder=None):
+        try:
+            pages = retrieve_wiki_pages.delay(wiki_repo_url=wiki_repo_url, wiki_folder=wiki_folder)
+            task = Tasks(
+                id=pages.id,
+                name="Wiki pages retrieval",
+                type="wiki_pages_retrieval",
+                app_id=None,
+                user_id=current_user.id,
+            )
+            db.session.add(task)
+            db.session.commit()
+            return pages
+        except Exception as e:
+            app.logger.error(f"Error retrieving wiki pages: {e}", exc_info=True)
             return None

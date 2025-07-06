@@ -1,10 +1,10 @@
 
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, request, url_for
 from flask_security import auth_required, current_user, verify_password
 from apps.profile import blueprint
 from apps.profile.forms import DeleteAccountForm
-from apps import db
+from apps import db, render_template
 from flask import current_app as app
 
 from apps.authentication.util import send_account_deleted_email

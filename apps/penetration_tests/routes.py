@@ -3,12 +3,13 @@
 from apps.penetration_tests.forms import UploadMacmForm
 from apps.authentication.models import Users
 from apps.penetration_tests import blueprint
-from flask import render_template, request
+from flask import request
 from flask import current_app as app
 from apps.databases.models import App, AssetTypes, AttackView, MacmUser, MethodologyView, Macm, ThreatModel, PentestPhases
 from sqlalchemy import func
 from apps.my_modules import converter
 from werkzeug.exceptions import NotFound
+from apps import render_template
 
 from flask_security import auth_required, current_user
 
