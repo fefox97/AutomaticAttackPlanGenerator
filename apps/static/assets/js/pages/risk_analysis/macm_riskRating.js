@@ -36,7 +36,7 @@ $(window).on('load', function() {
                 width: '120px',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'type') {
-                        let id = data.match(/(<a.*>\s*)(\d*)(\s)/)[2];
+                        let id = $(data).find('a').attr('id');
                         return parseInt(id);
                     }
                     return data;

@@ -1,59 +1,100 @@
 {% extends "layouts/base.html" %}
 {% block title %}Threat Agent Wizard{% endblock title %}
 
+{% block stylesheets %}
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #4a4a4a;
+    }
+    .question h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-top: 20px;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    li {
+        margin-bottom: 10px;
+    }
+    input[type="radio"], input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    label {
+        font-size: 1.1rem;
+        color: #34495e;
+    }
+    .btn-submit {
+        display: inline-block;
+        width: 100%;
+        padding: 10px 20px;
+        background-color: #3498db;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .btn-submit:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .text-center {
+        text-align: center;
+    }
+</style>
+{% endblock stylesheets %}
+
 {% block content %}
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
-        <div class="d-block mb-4 mb-md-0">
-            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
-                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
-                    <li class="breadcrumb-item">
-                        <a href="/apps/static">
-                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item"><a href="/risk_analysis">Risk Ratings</a></li>
-                    <li class="breadcrumb-item"><a href="/risk_analysis/macm_riskRating?app_id={{ appId }}">MACM</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Threat Agent Wizard</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
+<div class="col-8">
+    <h1>Threat Agent Questionnaire</h1>
+    <form id="questionnaire-form" method="POST" action="/risk_analysis/submit-questionnaire">
+        <input type="hidden" name="appId" value="{{ appId }}">
 
-
-    <div class="col-12 my-3">
-        <div class="card border-0 shadow mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h4 mb-0">Threat Agent Questionnaire</h2>
-            </div>
-            
-            
-            <div class="card-body">
-                <form id="questionnaire-form" method="POST" action="/risk_analysis/submit-questionnaire">
-                    <input type="hidden" name="appId" value="{{ appId }}">
-                    {% for question in questions_replies %}
-                    <div class="question">
-                        <h5>{{ question.question }}</h5>
-                        <div class="mx-3">
-                            {% for reply in question.replies %}
-                                {% if reply.multiple == 1 %}
-                                    <input type="checkbox" class="question-input" name="question_{{ question.id }}[]" value="{{ reply.id }}" id="question_{{ question.id }}_{{ reply.id }}">
-                                {% else %}
-                                    <input type="radio" class="question-input" name="question_{{ question.id }}" value="{{ reply.id }}" id="question_{{ question.id }}_{{ reply.id }}">
-                                {% endif %}
-                                <label for="question_{{ question.id }}_{{ reply.id }}">{{ reply.details }}</label>
-                                <br>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endfor %}
-        
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary btn-submit">Submit</button>
-                    </div>
-                </form>
-            </div>
+        {% for question in questions_replies %}
+        <div class="question">
+            <h3>{{ question.question }}</h3>
+            <ul>
+                {% for reply in question.replies %}
+                <li>
+                    {% if reply.multiple == 1 %}
+                    <input type="checkbox"
+                           class="question-input"
+                           name="question_{{ question.id }}[]"
+                           value="{{ reply.id }}"
+                           id="question_{{ question.id }}_{{ reply.id }}">
+                    {% else %}
+                    <input type="radio"
+                           class="question-input"
+                           name="question_{{ question.id }}"
+                           value="{{ reply.id }}"
+                           id="question_{{ question.id }}_{{ reply.id }}">
+                    {% endif %}
+                    <label for="question_{{ question.id }}_{{ reply.id }}">{{ reply.details }}</label>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
-    </div>
+        {% endfor %}
+
+        <div class="text-center">
+            <button type="submit" class="btn-submit" disabled>Submit</button>
+        </div>
+    </form>
+</div>
 {% endblock content %}
 
 {% block javascripts %}

@@ -52,45 +52,89 @@ $(document).ready(function () {
             session.close();
             driver.close();
 
-            // define general dagre layout
-            var layout = {
-                name: "euler",
-                animate: true,
-                springLength: 100,
-                springCoeff: 0.0008,
-                gravity: -2,
-                maxIterations: 2000,
-                fit: true,
-                mass: function (node) {return 25;},
-            }
-            // var layout = {
-            //     name: "cola",
-            //     animate: true,
-            //     fit: true,
-            //     randomize: false,
-            //     avoidOverlap: true,
-            //     edgeLength: 100,
-            //     nodeDimensionsIncludeLabels: true,
-            //     padding: 35,
-            //     nodeSpacing: function (node) {return 100;},
-            // };
-            // var layout = {
-            //     name: "spread",
-            //     rankDir: "LR",
-            //     align: 'LR',
-            //     animate: true,
-            //     nodeDimensionsIncludeLabels: true,
-            //     padding: 35,
-            //     rankSep: 250,
-            //     nodeSep: 10,
-            // };
+            // Definisci i layout come array di oggetti
+            const layouts = [
+                {
+                    name: 'euler',
+                    animate: true,
+                    springLength: 140,
+                    springCoeff: 0.0009,
+                    gravity: -5,
+                    maxIterations: 2000,
+                    fit: true,
+                    mass: function (node) { return 25; },
+                },
+                {
+                    name: 'elk',
+                    animate: true,
+                    fit: true,
+                    padding: 35,
+                    nodeDimensionsIncludeLabels: true,
+                    elk: {
+                        'algorithm': 'mrtree',
+                        'elk.direction': 'DOWN',
+                        'elk.spacing.nodeNodeBetweenLayers': 100,
+                        'elk.spacing.nodeNode': 100,
+                        'elk.spacing.edgeEdgeBetweenLayers': 50,
+                        'elk.spacing.edgeEdge': 100,
+                        'separateConnectedComponents': 'false',
+                    },
+                },
+                {
+                    name: 'cola',
+                    animate: true,
+                    fit: true,
+                    randomize: false,
+                    avoidOverlap: true,
+                    edgeLength: 100,
+                    nodeDimensionsIncludeLabels: true,
+                    padding: 35,
+                    nodeSpacing: function (node) { return 100; },
+                },
+                {
+                    name: 'spread',
+                    rankDir: 'LR',
+                    align: 'LR',
+                    animate: true,
+                    nodeDimensionsIncludeLabels: true,
+                    padding: 35,
+                    rankSep: 250,
+                    nodeSep: 10,
+                }
+            ];
 
-            // define expandCollapse layout
+            // Funzione per trovare l'indice del layout dato il nome
+            function getLayoutIndexByName(name) {
+                return layouts.findIndex(l => l.name === name);
+            }
+
+            // Funzione per cambiare layout tramite indice
+            function changeLayoutByIndex(idx) {
+                if (layouts[idx]) {
+                    cy.layout(layouts[idx]).run();
+                }
+            }
+
+            // Funzione per cambiare layout tramite nome (compatibilità con il selettore)
+            function changeLayout(layoutName) {
+                const idx = getLayoutIndexByName(layoutName);
+                changeLayoutByIndex(idx);
+            }
+
+            // Recupera la preferenza del layout dallo storage o usa il default
+            let savedLayoutName = localStorage.getItem('cytoscapeLayoutName');
+            let currentLayoutIndex = 0;
+            if (savedLayoutName) {
+                const idx = getLayoutIndexByName(savedLayoutName);
+                if (idx !== -1) currentLayoutIndex = idx;
+            }
+
+            // Applica il layout iniziale
             var cy = (window.cy = cytoscape({
                 container: document.getElementById("cy"),
                 boxSelectionEnabled: true,
                 autounselectify: true,
-                layout: layout,
+                layout: layouts[currentLayoutIndex],
                 style: [
                     {
                         selector: "node",
@@ -140,6 +184,12 @@ $(document).ready(function () {
                 },
             }));
 
+            // Imposta il selettore al valore salvato
+            const layoutSelector = document.getElementById('layoutSelector');
+            if (layoutSelector && layouts[currentLayoutIndex]) {
+                layoutSelector.value = layouts[currentLayoutIndex].name;
+            }
+
             for (let [key, value] of Object.entries(asset_types_colors)) {
                 let color = pSBC(-0.5, value);
                 let textColor = getTextColor(value);
@@ -153,6 +203,12 @@ $(document).ready(function () {
             cy.nodes().forEach(node => {
                 if (node.data().type)
                     node.addClass(node.data().type.replace('.', '_'));
+            });
+
+            // Event listener per cambiare layout e salvare la preferenza
+            layoutSelector.addEventListener('change', function (e) {
+                changeLayout(e.target.value);
+                localStorage.setItem('cytoscapeLayoutName', e.target.value);
             });
 
             // add event listeners for zooming in and out
@@ -270,17 +326,7 @@ $(document).ready(function () {
 
         var rearrange = document.getElementById("rearrange");
         rearrange.addEventListener("click", function () {
-            var layout = {
-                name: "euler",
-                animate: true,
-                springLength: 100,
-                springCoeff: 0.0008,
-                gravity: -2,
-                maxIterations: 2000,
-                fit: true,
-                mass: function (node) {return 25;},
-            };
-            cy.layout(layout).run();
+            changeLayoutByIndex(1); // Change to 'euler' layout
         });
 
         const initialTheme = document.querySelector('[data-bs-theme]').dataset.bsTheme;
