@@ -114,3 +114,18 @@ function editSetting(SettingKey, SettingValue, settingModal) {
         }
     })
 }
+
+function retrieveWiki() {
+    let button = '#RetrieveWikiPages';
+    $(button).addClass('btn-loading');
+    $.ajax({
+        url: '/api/retrieve_wiki',
+        type: 'GET',
+    }).done(function(response) {
+        showModal("Wiki Pages", response.message, true);
+        $(button).removeClass('btn-loading');
+    }).fail(function(response) {
+        showModal("Error", JSON.parse(response.responseText));
+        $(button).removeClass('btn-loading');
+    });
+}

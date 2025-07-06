@@ -656,3 +656,7 @@ pre[class*=language-]{
         color: var(--#{$prefix}body-color);
     }
 }
+
+.breadcrumb-icon {
+    font-size: 20px;
+}

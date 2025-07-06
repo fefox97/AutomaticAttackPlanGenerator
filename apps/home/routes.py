@@ -1,18 +1,31 @@
 
 
 from apps.home import blueprint
-from flask import redirect, render_template, request, url_for
+from flask import redirect, request, url_for
 from flask import current_app as app
 from apps.databases.models import Bibliography, Settings
 import os
 import time
+from apps import render_template
+
+from apps import pages
 
 from flask_security import auth_required, roles_required
 
+@blueprint.route('/')
 @blueprint.route('/index')
-@auth_required()
 def index():
-    return redirect(url_for('penetration_tests_blueprint.penetration_tests'))
+    """
+    Redirect to the home page.
+    """
+    return redirect(url_for('home_blueprint.home'))
+
+@blueprint.route('/home')
+def home():
+    """
+    Redirect to the home page.
+    """
+    return render_template('home/home.html', segment=get_segment(request))
 
 @blueprint.route('/settings', methods=['GET'])
 @auth_required()
@@ -30,7 +43,6 @@ def settings():
     return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified, settings=settings)
 
 @blueprint.route('/about_us', methods=['GET'])
-@auth_required()
 def about_us():
     references = Bibliography.query.all()
     return render_template('home/about-us.html', segment=get_segment(request), references=references)

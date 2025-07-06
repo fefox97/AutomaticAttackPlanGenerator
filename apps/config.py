@@ -33,7 +33,7 @@ class Config(object):
     SECURITY_DEFAULT_REMEMBER_ME = os.getenv('SECURITY_DEFAULT_REMEMBER_ME', True)
     SECURITY_POST_LOGIN_VIEW = os.getenv('SECURITY_POST_LOGIN_VIEW', 'index')
     SECURITY_POST_REGISTER_VIEW = os.getenv('SECURITY_POST_REGISTER_VIEW', 'login')
-    SECURITY_POST_LOGOUT_VIEW = os.getenv('SECURITY_POST_LOGOUT_VIEW', 'login')
+    SECURITY_POST_LOGOUT_VIEW = os.getenv('SECURITY_POST_LOGOUT_VIEW', 'home')
     SECURITY_USERNAME_ENABLE = os.getenv('SECURITY_USERNAME_ENABLE', True)
     SECURITY_USERNAME_REQUIRED = os.getenv('SECURITY_USERNAME_REQUIRED', True)
     SECURITY_TRACKABLE = os.getenv('SECURITY_TRACKABLE', True)
@@ -91,6 +91,13 @@ class Config(object):
 
     GITHUB_CLIENT_ID      = os.getenv('GITHUB_ID'    , None)
     GITHUB_CLIENT_SECRET  = os.getenv('GITHUB_SECRET', None)
+
+    # Setup for FlatPages
+    FLATPAGES_ROOT = os.getenv('FLATPAGES_ROOT', None)
+    FLATPAGES_EXTENSION = os.getenv('FLATPAGES_EXTENSION', '.md')
+    FLATPAGES_MARKDOWN_EXTENSIONS = ['fenced_code', 'codehilite']
+    WIKI_REPO = os.getenv('WIKI_REPO', None)
+    GITHUB_REPO_TOKEN = os.getenv('GITHUB_REPO_TOKEN', None)
 
     # Enable/Disable Github Social Login    
     if GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET:

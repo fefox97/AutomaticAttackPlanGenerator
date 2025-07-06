@@ -80,6 +80,10 @@ services:
       - USER_REGISTERABLE=${USER_REGISTERABLE}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - FLATPAGES_ROOT=${FLATPAGES_ROOT}
+      - FLATPAGES_EXTENSION=${FLATPAGES_EXTENSION}
+      - WIKI_REPO=${WIKI_REPO}
+      - GITHUB_REPO_TOKEN=${GITHUB_REPO_TOKEN}
     networks:
       - db_network
       - web_network
