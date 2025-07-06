@@ -9,6 +9,8 @@
         margin-bottom: 20px;
     }
 
+
+
     .progress-step {
         width: 33%;
         text-align: center;
@@ -86,6 +88,11 @@
         font-size: 14px;
         color: #343a40;
     }
+
+    .progress-step-container {
+    clear: both;
+}
+
 </style>
 
 
@@ -212,13 +219,14 @@
         <div class="progress-step {% if final_step_completed %}completed{% elif wizard_completed and stride_impact_completed %}active{% else %}inactive{% endif %}">
             <div class="step-circle"></div>
             <div class="step-label">
-        {% if wizard_completed and stride_impact_completed %}
-            <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
-                STRIDE Summary Assessment
-            </a>
-        {% else %}
-            STRIDE Summary Assessment
-        {% endif %}
+                {% if wizard_completed and stride_impact_completed %}
+                    <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
+                        Export Risk Analysis Report
+                    </a>
+                {% else %}
+                    Export Risk Analysis Report
+                {% endif %}
+            </div>
     </div>
 </div>
 
@@ -324,11 +332,20 @@
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}">
+                                                    <a class="badge position-relative
+                                                               {% if row['Component_ID'] in analyzed_component_ids %}
+                                                                   bg-success
+                                                               {% else %}
+                                                                   bg-macm
+                                                               {% endif %}"
+                                                       href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
+                                                        {% if row['Component_ID'] in analyzed_component_ids %}
+                                                            <i class="fas fa-check-circle text-white ms-1"></i>
+                                                        {% endif %}
                                                         {% if threat_for_this_component %}
                                                             <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-threat badge-macm-detail">
-                                                                {{threat_for_each_component[row['Component_ID']]}}
+                                                                {{ threat_for_each_component[row['Component_ID']] }}
                                                                 <span class="visually-hidden">Threats available</span>
                                                             </span>
                                                         {% endif %}
