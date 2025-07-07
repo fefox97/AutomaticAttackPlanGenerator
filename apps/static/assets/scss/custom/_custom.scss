@@ -275,9 +275,16 @@ pre[class*=language-]{
     .sidebar-inner {
         height: 100vh;
     }
+
     .multi-level{
         .nav-link{
             padding-left: 2rem !important;
+        }
+        // Indentazione struttura wiki sidebar
+        @for $i from 0 through 8 {
+            .wiki-indent-#{$i} {
+                padding-left: #{1.5 + $i * 1.5}rem !important;
+            }
         }
     }
 }

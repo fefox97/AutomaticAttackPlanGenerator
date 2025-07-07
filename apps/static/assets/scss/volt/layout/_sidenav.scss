@@ -63,8 +63,8 @@
 		.link-arrow{
 			font-size: $font-size-sm;
 		}
-
-		&[data-bs-toggle=collapse][aria-expanded=true] .link-arrow{
+		
+		&[data-bs-toggle=collapse][aria-expanded=true] .link-arrow i{
 			@include transform(rotate(90deg));
 			transition: $transition-base;
 		}

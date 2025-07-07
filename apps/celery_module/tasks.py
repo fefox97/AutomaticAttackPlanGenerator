@@ -5,7 +5,9 @@ import requests
 import json
 from apps import celery
 from apps.databases.models import Settings
-from github import Github
+from github import Github, Auth
+import re
+import shutil
 
 @celery.task
 def query_llm(app_id, max_tries=10, sleep_time=1):
@@ -60,7 +62,8 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
         try:
             if not wiki_repo_url:
                 raise Exception("Wiki repository URL is not set in settings")
-            g = Github()
+            auth = Auth.Token(app.config['GITHUB_REPO_TOKEN'])
+            g = Github(auth=auth)
             repo = g.get_repo(wiki_repo_url)
             pages = get_all_md_files(repo)
 
@@ -73,7 +76,6 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
                     if os.path.isfile(file_path):
                         os.remove(file_path)
                     elif os.path.isdir(file_path):
-                        import shutil
                         shutil.rmtree(file_path)
 
             app.logger.info(f"Retrieved {len(pages)} pages from the wiki repository {wiki_repo_url}")
@@ -81,12 +83,15 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
             # Ricostruisci la struttura di cartelle e file
             for page in pages:
                 file_content = repo.get_contents(page)
-                dest_path = os.path.join(wiki_folder, page)
-                dest_dir = os.path.dirname(dest_path)
-                if not os.path.exists(dest_dir):
-                    os.makedirs(dest_dir, exist_ok=True)
-                with open(dest_path, 'w') as f:
-                    f.write(file_content.decoded_content.decode('utf-8'))
+                file_content_decoded = file_content.decoded_content.decode('utf-8')
+                title_header_pattern = r"---[\s\S]*?title:\s*.+[\s\S]*?---"
+                if file_content_decoded not in [None, ''] and re.match(title_header_pattern, file_content_decoded.lstrip(), re.IGNORECASE | re.MULTILINE):
+                    dest_path = os.path.join(wiki_folder, page)
+                    dest_dir = os.path.dirname(dest_path)
+                    if not os.path.exists(dest_dir):
+                        os.makedirs(dest_dir, exist_ok=True)
+                    with open(dest_path, 'w') as f:
+                        f.write(file_content_decoded)
             return pages
         except Exception as e:
             app.logger.error(f"Error retrieving wiki pages: {e}", exc_info=True)
