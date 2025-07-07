@@ -3,7 +3,7 @@
 from apps.catalogs import blueprint
 from flask import request
 from flask import current_app as app
-from apps.databases.models import AssetTypes, Capec, MethodologyCatalogue, ThreatCatalogue, \
+from apps.databases.models import AssetTypes, Capec, MethodologyCatalogue, Protocols, ThreatCatalogue, \
     ToolCatalogue
 
 from flask_security import auth_required
@@ -70,6 +70,17 @@ def asset_types():
     except:
         table = None
     return render_template(f"catalogs/asset-types.html", segment=get_segment(request), table=table)
+
+@blueprint.route('/protocols', methods=['GET'])
+@auth_required()
+def protocols():
+    try:
+        table = Protocols.query.all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    return render_template(f"catalogs/protocols.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/methodologies', methods=['GET'])
 @auth_required()
