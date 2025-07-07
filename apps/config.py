@@ -3,8 +3,8 @@
 import os, random, string
 from dotenv import load_dotenv
 
-from apps.markdown_extensions.bold_extension import BoldClassExtension
 from apps.markdown_extensions.card_extension import CardExtension
+from apps.markdown_extensions.table_extension import TableClassExtension
 
 class Config(object):
 
@@ -104,7 +104,7 @@ class Config(object):
         'markdown.extensions.extra',
         'markdown.extensions.meta',
         CardExtension(),
-        BoldClassExtension()
+        TableClassExtension(),
     ]
     WIKI_REPO = os.getenv('WIKI_REPO', None)
     GITHUB_REPO_TOKEN = os.getenv('GITHUB_REPO_TOKEN', None)

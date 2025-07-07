@@ -38,7 +38,7 @@
 <script>
     MathJax = {
         tex: {
-            inlineMath: [['$', '$'], ['\(', '\)']],
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
         },
     };
 </script>
@@ -92,6 +92,10 @@
 <script src="https://cdn.jsdelivr.net/npm/pdfkit@0.16.0/js/pdfkit.standalone.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/svg-to-pdfkit@0.1.8/source.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blob-stream-browserify@0.1.3/index.min.js"></script>
+
+<!-- Highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+<!-- <script type="text/javascript" src="https://unpkg.com/highlightjs-cypher/dist/cypher.min.js"></script> -->
 
 <!-- Custom JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/custom.js"></script>

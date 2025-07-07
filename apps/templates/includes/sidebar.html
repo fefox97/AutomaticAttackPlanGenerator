@@ -297,6 +297,16 @@
           </span>
           <div class="multi-level collapse"
             role="list" id="submenu-wiki" aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item {% if 'macm_examples' in segment %} active {% endif %}">
+                <a href="/wiki/macm_examples" class="nav-link wiki-indent-0">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined align-top">code</span>
+                  </span>
+                  <span class="sidebar-text">MACM Examples</span>
+                </a>
+              </li>
+            </ul>
             {{ render_wiki_tree(wiki_tree, 'wiki') }}
           </div>
         </li>

@@ -256,6 +256,17 @@ class MacmUtils:
 			print(f"Error executing query {query}: {error}")
 			return None
 
+	def check_database_exists(self, database):
+		try:
+			output = self.driver.execute_query(f"SHOW DATABASE {database}", result_transformer_=Result.to_df)
+			if output.empty:
+				print(f"Database {database} does not exist.")
+				return False
+			return True
+		except Exception as error:
+			print(f"Error checking if database {database} exists: {error}")
+			return False
+
 	def get_greatest_component_id(self, database='macm'):
 		query = "MATCH (asset) RETURN max(toInteger(asset.component_id)) as max_id"
 		max_id = self.driver.execute_query(query, database_=database, result_transformer_=Result.to_df).iloc[0]['max_id']
