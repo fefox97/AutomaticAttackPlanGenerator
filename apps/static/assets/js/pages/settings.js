@@ -19,6 +19,11 @@ $(document).ready(function() {
         editSetting(setting_key, setting_value, $('#editSettingModal'));
     }
     );
+
+    $('#deleteWikiSubmit').click(function() {
+        $('#deleteWikiModal').modal('hide');
+        deleteWiki();
+    });
 });
 
 function reloadDatabases(database) {
@@ -120,6 +125,21 @@ function retrieveWiki() {
     $(button).addClass('btn-loading');
     $.ajax({
         url: '/api/retrieve_wiki',
+        type: 'GET',
+    }).done(function(response) {
+        showModal("Wiki Pages", response.message, '<i class="fa fa-info"</i>', autohide=true);
+        $(button).removeClass('btn-loading');
+    }).fail(function(response) {
+        showModal("Error", JSON.parse(response.responseText));
+        $(button).removeClass('btn-loading');
+    });
+}
+
+function deleteWiki() {
+    let button = '#DeleteWikiPages';
+    $(button).addClass('btn-loading');
+    $.ajax({
+        url: '/api/delete_wiki',
         type: 'GET',
     }).done(function(response) {
         showModal("Wiki Pages", response.message, '<i class="fa fa-info"</i>', autohide=true);

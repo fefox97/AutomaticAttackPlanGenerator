@@ -577,3 +577,15 @@ def get_wiki():
     except Exception as error:
         app.logger.error(f"Error retrieving wiki: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
+    
+@auth_required
+@roles_required('admin')
+@blueprint.route('/delete_wiki', methods=['GET'])
+def delete_wiki():
+    wiki_folder = app.config['FLATPAGES_ROOT']
+    try:
+        APIUtils().delete_wiki_pages(wiki_folder=wiki_folder)
+        return jsonify({'message': "Wiki pages deleted successfully"})
+    except Exception as error:
+        app.logger.error(f"Error deleting wiki: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
