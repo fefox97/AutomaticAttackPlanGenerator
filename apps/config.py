@@ -3,6 +3,8 @@
 import os, random, string
 from dotenv import load_dotenv
 
+from apps.markdown_extensions.card_extension import CardExtension
+
 class Config(object):
 
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -95,7 +97,13 @@ class Config(object):
     # Setup for FlatPages
     FLATPAGES_ROOT = os.getenv('FLATPAGES_ROOT', None)
     FLATPAGES_EXTENSION = os.getenv('FLATPAGES_EXTENSION', '.md')
-    FLATPAGES_MARKDOWN_EXTENSIONS = ['fenced_code', 'codehilite']
+    FLATPAGES_MARKDOWN_EXTENSIONS = [
+        'fenced_code',
+        'codehilite',
+        'markdown.extensions.extra',
+        'markdown.extensions.meta',
+        CardExtension(),
+    ]
     WIKI_REPO = os.getenv('WIKI_REPO', None)
     GITHUB_REPO_TOKEN = os.getenv('GITHUB_REPO_TOKEN', None)
 

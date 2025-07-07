@@ -342,4 +342,5 @@ $(window).on('load', function() {
         text = $('#topbarInputIconLeft').val();
         searchInPage(text);
     });
+
 });
