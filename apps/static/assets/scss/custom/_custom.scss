@@ -669,3 +669,29 @@ pre[class*=language-]{
 .breadcrumb-icon {
     font-size: 20px;
 }
+
+.wiki-page {
+    strong:not(table strong) {
+        color: $secondary !important;
+    }
+    table {
+        border-collapse: collapse !important;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        border-radius: 30px !important;
+        margin-bottom: 15px !important;
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+        }
+        th {
+            font-weight: bold;
+        }
+    }
+}
+
+.language-cypher {
+    .token + .operator {
+        background: none !important;
+    }
+}
