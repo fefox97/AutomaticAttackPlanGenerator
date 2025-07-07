@@ -20465,6 +20465,9 @@ pre[class*=language-] {
 [data-bs-theme="dark"] .text-primary {
   color: #ffffff !important; }
 
+[data-bs-theme="dark"] .text-highlight {
+  color: #f0bc74 !important; }
+
 [data-bs-theme="dark"] .breadcrumb {
   background-color: transparent !important; }
   [data-bs-theme="dark"] .breadcrumb .breadcrumb-item::before, [data-bs-theme="dark"] .breadcrumb .breadcrumb-item a {
