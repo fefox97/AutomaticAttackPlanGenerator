@@ -12,7 +12,7 @@ class CardTreeprocessor(Treeprocessor):
             print(f"Current child tag: {child.tag}")
             if child.tag in ['h1', 'h2']:
                 # Inizia una nuova card
-                current_card = ET.Element('div', {'class': 'card mb-2'})
+                current_card = ET.Element('div', {'class': 'card mb-3'})
                 header = ET.SubElement(current_card, 'div', {'class': 'card-header'})
                 header.append(child)  # sposta h1 dentro header
                 body = ET.SubElement(current_card, 'div', {'class': 'card-body'})

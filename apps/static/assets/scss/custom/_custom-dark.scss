@@ -62,6 +62,10 @@ $color-mode-type: data;
     .text-primary {
         color: $white !important;
     }
+    
+    .text-highlight {
+        color: $secondary !important;
+    }
 
     .breadcrumb {
         background-color: transparent !important;
