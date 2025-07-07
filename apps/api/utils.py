@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import shutil
 
 from flask_login import current_user
 from apps.celery_module.tasks import query_llm, retrieve_wiki_pages
@@ -173,3 +174,16 @@ class APIUtils:
         except Exception as e:
             app.logger.error(f"Error retrieving wiki pages: {e}", exc_info=True)
             return None
+        
+    def delete_wiki_pages(self, wiki_folder):
+        try:
+            if os.path.exists(wiki_folder):
+                shutil.rmtree(wiki_folder)
+                app.logger.info(f"Wiki pages in {wiki_folder} deleted successfully.")
+                return True
+            else:
+                app.logger.warning(f"Wiki folder {wiki_folder} does not exist.")
+                return False
+        except Exception as e:
+            app.logger.error(f"Error deleting wiki pages: {e}", exc_info=True)
+            return False
