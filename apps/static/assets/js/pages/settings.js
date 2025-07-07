@@ -122,7 +122,7 @@ function retrieveWiki() {
         url: '/api/retrieve_wiki',
         type: 'GET',
     }).done(function(response) {
-        showModal("Wiki Pages", response.message, autohide=true);
+        showModal("Wiki Pages", response.message, '<i class="fa fa-info"</i>', autohide=true);
         $(button).removeClass('btn-loading');
     }).fail(function(response) {
         showModal("Error", JSON.parse(response.responseText));

@@ -552,6 +552,7 @@ def issue():
     return make_response(jsonify({'message': 'Report created successfully'}), 200)
 
 @auth_required
+@roles_required('admin')
 @blueprint.route('/edit_setting', methods=['POST'])
 def edit_setting():
     key = request.form.get('key')
