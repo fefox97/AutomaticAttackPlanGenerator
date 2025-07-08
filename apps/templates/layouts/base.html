@@ -61,6 +61,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+
     <!-- Custom SCSS -->
     {% assets "css_all" %}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -70,12 +73,12 @@
 
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     {% include 'includes/sidebar.html' %}
     {% include 'includes/navigation.html' %}
 
-    <main class="content">
+    <main class="content flex-fill">
 
         <!-- Settings Box + Dark Mode Script -->
         {% include 'includes/settings-box.html' %}
@@ -88,9 +91,9 @@
             {% block content %}{% endblock content %}
         </div>
         
-        {% include 'includes/footer.html' %}
         {% include 'cookies/banner.html' %}
     </main>
+    {% include 'includes/footer.html' %}
 
 {% include 'includes/scripts.html' %}
 

@@ -7,14 +7,15 @@ import pandas as pd
 
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
-from flask import render_template, request, send_file
+from flask import request, send_file
+
 from flask_security import auth_required, current_user
 
 from flask import current_app as app
 from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
 from sqlalchemy import func
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
-from apps import db
+from apps import db, render_template
 
 from flask_security import auth_required
 

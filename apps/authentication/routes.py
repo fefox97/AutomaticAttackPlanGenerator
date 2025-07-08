@@ -1,18 +1,18 @@
 
 
-from flask import render_template, redirect, request, url_for
-from flask_security import url_for_security, current_user
+from flask import redirect, request, url_for
+from flask_security import current_user
 
 from flask_dance.contrib.github import github
 
 from apps.authentication import blueprint
 from apps.authentication.forms import GithubForm
 from apps.authentication.models import Users
-from apps import db
+from apps import db, render_template
 
-@blueprint.route('/')
-def route_default():
-    return redirect(url_for_security('login'))
+# @blueprint.route('/')
+# def route_default():
+#     return redirect(url_for_security('login'))
 
 @blueprint.route("/github")
 def login_github():

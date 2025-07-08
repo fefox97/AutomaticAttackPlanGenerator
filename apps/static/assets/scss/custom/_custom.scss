@@ -164,7 +164,9 @@ div.dataTables_scrollBody {
 .bg-asset-types{
     background-color: $bg-asset-types-background !important;
 }
-
+.bg-protocols{
+    background-color: $bg-protocols-background !important;
+}
 .bg-macm-label{
     background-color: $bg-macm-label-background !important;
 }
@@ -275,9 +277,16 @@ pre[class*=language-]{
     .sidebar-inner {
         height: 100vh;
     }
+
     .multi-level{
         .nav-link{
             padding-left: 2rem !important;
+        }
+        // Indentazione struttura wiki sidebar
+        @for $i from 0 through 8 {
+            .wiki-indent-#{$i} {
+                padding-left: #{1.5 + $i * 1.5}rem !important;
+            }
         }
     }
 }
@@ -654,5 +663,35 @@ pre[class*=language-]{
     }
     .tippy-arrow {
         color: var(--#{$prefix}body-color);
+    }
+}
+
+.breadcrumb-icon {
+    font-size: 20px;
+}
+
+.wiki-page {
+    strong:not(table strong) {
+        color: $secondary !important;
+    }
+    table {
+        border-collapse: collapse !important;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        border-radius: 30px !important;
+        margin-bottom: 15px !important;
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+        }
+        th {
+            font-weight: bold;
+        }
+    }
+}
+
+.language-cypher {
+    .token + .operator {
+        background: none !important;
     }
 }

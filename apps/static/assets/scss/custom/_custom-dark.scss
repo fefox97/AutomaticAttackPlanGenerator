@@ -62,6 +62,7 @@ $color-mode-type: data;
     .text-primary {
         color: $white !important;
     }
+    
 
     .breadcrumb {
         background-color: transparent !important;
@@ -212,6 +213,15 @@ $color-mode-type: data;
         background-color: $toast-background-color-dark !important;
         .toast-header {
             background-color: $toast-header-background-color-dark !important;
+        }
+    }
+
+    .wiki-page {
+        a {
+            color: $tertiary-dark !important;
+            &:hover, &:focus {
+                color: $tertiary-dark-highlight !important;
+            }
         }
     }
 }

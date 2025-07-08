@@ -14,7 +14,7 @@ from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
+from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
 from flask_login import current_user
 from apps.config import Config
 from apps import db
@@ -169,6 +169,35 @@ class AssetTypesCatalogUtils:
 		df.rename(columns={'ID': 'AssetTypeID', 'Primary Label': 'PrimaryLabel', 'Secondary Label': 'SecondaryLabel'}, inplace=True)
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
+
+class ProtocolsCatalogUtils:
+
+	converter = Converter()
+
+	def __init__(self):
+		self.base_path = Config.DBS_PATH
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
+
+	def load_protocols_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
+		print("\nLoading Protocols catalog...\n")
+		df = pd.read_excel(file_path, sheet_name="Protocols", header=0)
+		df.rename(columns={'Extended Name': 'ExtendedName', 'Layer': 'ISOLayer'}, inplace=True)
+		df.replace(np.nan, None, inplace=True) # replace NaN with None
+		return df
 	
 class MethodologyCatalogUtils:
 
@@ -226,6 +255,17 @@ class MacmUtils:
 		except Exception as error:
 			print(f"Error executing query {query}: {error}")
 			return None
+
+	def check_database_exists(self, database):
+		try:
+			output = self.driver.execute_query(f"SHOW DATABASE {database}", result_transformer_=Result.to_df)
+			if output.empty:
+				print(f"Database {database} does not exist.")
+				return False
+			return True
+		except Exception as error:
+			print(f"Error checking if database {database} exists: {error}")
+			return False
 
 	def get_greatest_component_id(self, database='macm'):
 		query = "MATCH (asset) RETURN max(toInteger(asset.component_id)) as max_id"
@@ -385,6 +425,7 @@ class Utils:
 		self.methodology_catalog_utils = MethodologyCatalogUtils()
 		self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
 		self.asset_types_catalog_utils = AssetTypesCatalogUtils()
+		self.protocols_catalog_utils = ProtocolsCatalogUtils()
 		self.engine = sqlalchemy.create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
 	def save_dataframe_to_database(self, df: pd.DataFrame, mapper, replace=True):
@@ -496,6 +537,9 @@ class Utils:
 		elif database == 'AssetTypesCatalog':
 			asset_types_catalog_df = self.asset_types_catalog_utils.load_asset_types_catalog()
 			self.save_dataframe_to_database(asset_types_catalog_df, AssetTypes)
+		elif database == 'ProtocolsCatalog':
+			protocols_catalog_df = self.protocols_catalog_utils.load_protocols_catalog()
+			self.save_dataframe_to_database(protocols_catalog_df, Protocols)
 		elif database == 'RiskAnalysisCatalog':
 			threat_agent_category_df = self.risk_analysis_catalog_utils.load_threat_agent_category_df()
 			threat_agent_questions_df = self.risk_analysis_catalog_utils.load_threat_agent_questions()
