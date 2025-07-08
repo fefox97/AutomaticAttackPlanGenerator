@@ -110,6 +110,7 @@ class Tasks(db.Model):
 
     id            = db.Column(db.String(255), primary_key=True)
     name          = db.Column(db.String(255), nullable=False)
+    type          = db.Column(db.String(50), nullable=False)
     app_id        = db.Column(db.String(100), db.ForeignKey('App.AppID', ondelete='CASCADE'))
     created_on    = db.Column(db.DateTime, default=db.func.now())
     updated_on    = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

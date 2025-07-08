@@ -1,3 +1,41 @@
+{% macro render_wiki_tree(tree, parent_path, level=0) %}
+  <ul class="flex-column nav">
+    {# Prima mostra le pagine nella cartella corrente #}
+    {% if '__pages__' in tree %}
+      {% for page in tree['__pages__'] %}
+        <li class="nav-item {% if page.path and page.path.replace(page.folder ~ '/', '') in segment %} active {% endif %}">
+          <a href="/wiki/{{ page.path }}" class="nav-link wiki-indent-{{ level }}">
+            {% if page.icon %}
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined align-top">{{ page.icon }}</span>
+            </span>
+            {% endif %}
+            <span class="sidebar-text">{{ page.title }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    {% endif %}
+    {# Poi mostra le sottocartelle ricorsivamente #}
+    {% for key, value in tree.items() %}
+      {% if key != '__pages__' %}
+        {% set this_path = parent_path ~ '-' ~ key|replace(' ', '-') %}
+        <li class="nav-item folder {% if key and key in segment %} active {% endif %}">
+          <span class="nav-link sidebar-folder collapsed wiki-indent-{{ level }}" data-bs-toggle="collapse" data-bs-target="#folder-{{ this_path }}" aria-expanded="false">
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined align-top">folder</span>
+            </span>
+            <span class="sidebar-text">{{ key }}</span>
+            <span class="link-arrow"><i class="fas fa-chevron-right"></i></span>
+          </span>
+          <div class="multi-level collapse" id="folder-{{ this_path }}">
+            {{ render_wiki_tree(value, this_path, level+1) }}
+          </div>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
 <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
     <a href="/" class="nav-link vseclab-link">
       <span class="vseclab-icon">
@@ -135,6 +173,16 @@
             </span>
           </a>
         </li>
+        <li class="nav-item {% if 'home' in segment %} active {% endif %}">
+          <a href="/" class="nav-link">
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined align-top">
+                home
+              </span>
+            </span>
+            <span class="sidebar-text">Home</span>
+          </a>
+        </li>
         <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
           <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
             <span>
@@ -192,6 +240,14 @@
                   <span class="sidebar-text">Asset Types</span>
                 </a>
               </li>
+              <li class="nav-item {% if 'protocols' in segment %} active {% endif %}">
+                <a href="/catalogs/protocols" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined align-top">settings_input_component</span>
+                  </span> 
+                  <span class="sidebar-text">Protocols</span>
+                </a>
+              </li>
               <li class="nav-item {% if 'threat-catalog' in segment %} active {% endif %}">
                 <a href="/catalogs/threat-catalog" class="nav-link">
                   <span class="sidebar-icon">
@@ -227,6 +283,33 @@
             </ul>
           </div>
         </li>
+        <li class="nav-item {% if 'wiki' in segment %} active {% endif %}">
+          <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-wiki">
+            <span>
+              <span class="sidebar-icon">
+                <span class="material-symbols-outlined align-top">menu_book</span>
+              </span> 
+              <span class="sidebar-text">Wiki</span>
+            </span>
+            <span class="link-arrow">
+              <i class="fas fa-chevron-right"></i>
+            </span>
+          </span>
+          <div class="multi-level collapse"
+            role="list" id="submenu-wiki" aria-expanded="false">
+            <ul class="flex-column nav">
+              <li class="nav-item {% if 'macm_examples' in segment %} active {% endif %}">
+                <a href="/wiki/macm_examples" class="nav-link wiki-indent-0">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined align-top">code</span>
+                  </span>
+                  <span class="sidebar-text">MACM Examples</span>
+                </a>
+              </li>
+            </ul>
+            {{ render_wiki_tree(wiki_tree, 'wiki') }}
+          </div>
+        </li>
         <li class="nav-item {% if 'about_us' in segment %} active {% endif %}">
           <a href="/about_us" class="nav-link">
             <span class="sidebar-icon">
@@ -256,6 +339,7 @@
           </a>
         </li>
         {% endif %}
+        {% if current_user.is_authenticated %}
         <li class="nav-item">
           <a href="{{ url_for_security('logout') }}" class="nav-link">
               <span class="sidebar-icon">
@@ -264,6 +348,7 @@
               <span class="sidebar-text">Logout</span>
           </a>
         </li>
+        {% endif %}
       </ul>
       <div class="sidebar-support mb-3">
         {% if 'admin' in current_user.roles %}

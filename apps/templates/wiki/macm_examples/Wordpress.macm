@@ -1,0 +1,22 @@
+CREATE
+		(CSC:any {component_id:'1', name:'CSC', type:'User', app_id:'103', application:'WordPress'}),
+		(Net1:Network {component_id:'3', name:'LAN Network', type:'Network', app_id:'103', application:'WordPress', access:'public', parameters: '{"ip_range":"192.168.1.0/24", "ip":"192.168.1.1"}'}),
+        (PC:HW:PC {component_id:'4', name:'PC', type:'HW.PC', app_id:'103',application:'WordPress', parameters: '{"ip":"192.168.1.134"}'}),
+        (PC_OS:Service:OS {component_id:'5', name:'OS', type:'Service.OS', app_id:'103',application:'WordPress'}),
+        (Server:HW:Server {component_id:'6', name:'Server', type:'HW.Server', app_id:'103',application:'WordPress'}),
+        (Server_OS:Service:OS {component_id:'7', name:'OS', type:'Service.OS', app_id:'103',application:'WordPress'}),
+        (Browser:Service:Browser {component_id:'8', name:'Browser', type:'Service.Browser', app_id:'103',application:'WordPress'}),
+        (WordPress:Service:Web {component_id:'9', name:'WordPress', type:'Service.Web', app_id:'103',application:'WordPress'}),
+        (MySQL:Service:DB {component_id:'10', name:'MySQL', type:'Service.DB', app_id:'103',application:'WordPress'}),
+
+
+        (CSC)-[:uses]->(Browser),
+        (Net1)-[:connects]->(PC),
+        (Net1)-[:connects]->(Server),
+        (Server)-[:hosts]->(Server_OS),
+        (Server_OS)-[:hosts]->(WordPress),
+        (Server_OS)-[:hosts]->(MySQL),
+        (PC)-[:hosts]->(PC_OS),
+        (PC_OS)-[:hosts]->(Browser),
+        (WordPress)-[:uses]->(MySQL),
+        (Browser)-[:uses {protocol: 'http'}]->(WordPress)

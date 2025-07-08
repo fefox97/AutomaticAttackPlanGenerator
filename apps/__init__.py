@@ -1,7 +1,6 @@
-
-
 import os
 import re
+import sys
 
 from celery import Celery
 from flask import Flask, request
@@ -12,8 +11,10 @@ from flask_assets import Environment, Bundle
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mailman import Mail
 from flask_security import Security, SQLAlchemyUserDatastore, user_registered
-
+from flask import render_template as real_render_template
 from apps.celery_module.celery_utils import make_celery
+
+from flask_flatpages import FlatPages
 
 db = SQLAlchemy()
 security = Security()
@@ -21,12 +22,28 @@ myAdmin = Admin()
 mail = Mail()
 user_datastore = None
 celery = Celery()
+pages = FlatPages()
+
+def render_template(*args, **kwargs):
+    tree = {}
+    for page in pages:
+        folder = getattr(page, 'folder', None)
+        node = tree
+        if folder:
+            parts = folder.strip('/').split('/')
+            for part in parts:
+                node = node.setdefault(part, {})
+            node.setdefault('__pages__', []).append(page)
+        else:
+            tree.setdefault('__pages__', []).append(page)
+    return real_render_template(*args, **kwargs, pages=pages, wiki_tree=tree)
 
 def register_extensions(app, user_datastore):
     db.init_app(app)
     security.init_app(app, datastore=user_datastore)
     myAdmin.init_app(app)
     mail.init_app(app)
+    pages.init_app(app)
 
 def clear_tmp(path):
     for root, dirs, files in os.walk(path):
@@ -46,7 +63,7 @@ def register_assets(app):
     scss.build()
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors'):
+    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
     app.register_blueprint(github_blueprint, url_prefix="/login")
@@ -79,7 +96,7 @@ def register_custom_filters(app):
         return injections
 
 from apps.authentication.models import Roles, Users, Tasks
-from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
+from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Protocols, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
 from apps.admin.views import MyAdminIndexView, MyModelView, ThreatCatalogueView
 from flask_admin.menu import MenuLink
 
@@ -98,6 +115,7 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(ToolCatalogue, db.session, name='Tool Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(MethodologyCatalogue, db.session, name='Methodology Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(AssetTypes, db.session, name='Asset Types', category='Catalogs'))
+    myAdmin.add_view(MyModelView(Protocols, db.session, name='Protocols', category='Catalogs'))
     myAdmin.add_view(ThreatCatalogueView(ThreatCatalogue, db.session, name='Threat Catalogue', category='Catalogs'))
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases', category='Catalogs'))
     myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))

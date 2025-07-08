@@ -8,12 +8,47 @@
 {% block content %}
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
-        
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <span class="material-symbols-outlined align-top breadcrumb-icon">
+                                home
+                            </span>
+                            Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Settings
+                    </li>
+                </ol>
+            </nav>
+        </div>
     </div>
     <div class="row">
         <div class="col-12">
             <div class="card card-body border-0 shadow mb-4">
-                <h2 class="h5 mb-4">General Settings</h2>
+                <h2 class="h5 mb-4">Wiki Settings</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                        <div>
+                            <h3 class="h6 mb-1">Retrieve Wiki Pages</h3>
+                            <p class="small pe-4">Retrieve the list of wiki pages from the repository</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="RetrieveWikiPages" onclick="retrieveWiki()">
+                                <span><i class="fas fa-sync-alt"></i> Retrieve</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" id="DeleteWikiPages" data-bs-toggle="modal" data-bs-target="#deleteWikiModal">
+                                <span><i class="fas fa-trash"></i> Delete</span>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">AI Settings</h2>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
                         <div>
@@ -98,6 +133,17 @@
                     </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
                         <div>
+                            <h3 class="h6 mb-1">Reload Protocols Catalogue</h3>
+                            <p class="small pe-4">Reload Protocols Database</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="ReloadProtocolsCatalog" onclick="reloadDatabases('ProtocolsCatalog')">
+                                <span><i class="fas fa-sync-alt"></i> Reload</span>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
+                        <div>
                             <h3 class="h6 mb-1">Reload Tool Catalog</h3>
                             <p class="small pe-4">Reload Tool Catalog Database</p>
                         </div>
@@ -146,6 +192,7 @@
 {% endblock content %}
 
 {% include 'admin/modals/edit_setting_modal.html' %}
+{% include 'admin/modals/delete_wiki_modal.html' %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}

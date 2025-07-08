@@ -193,12 +193,19 @@ function getTaskStatus(task, toast=false) {
             } else {
                 buttons = [];
                 icon = '<i class="fas fa-info"></i>';
-                if (response.task_status === 'SUCCESS') {
+                if (response.task_status === 'SUCCESS' && task.type === 'pentest_report') {
                     buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span>Download Report</span></button>');
                     icon = '<i class="fas fa-check"></i>';
                 }
                 buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span><i class="fas fa-trash"></i></span></button>');
-                addNotification(task.task_id, "Task status", task.task_name + " for the app " + task.app_name + " is " + response.task_status, buttons, task.created_on, toast, icon);
+                if (task.type === 'wiki_pages_retrieval') {
+                    message = "Wiki pages retrieval task is " + response.task_status + ". You can now navigate to the Wiki section to view the retrieved pages.";
+                } else if (task.type === 'pentest_report') {
+                    message = "Pentest report task for the app " + task.app_name + " is " + response.task_status + ".";
+                } else {
+                    message = "Error: Unknown task type.";
+                }
+                addNotification(task.task_id, "Task status", message, buttons, task.created_on, toast, icon);
             }
         },
         error: function(response) {
@@ -335,4 +342,5 @@ $(window).on('load', function() {
         text = $('#topbarInputIconLeft').val();
         searchInPage(text);
     });
+
 });

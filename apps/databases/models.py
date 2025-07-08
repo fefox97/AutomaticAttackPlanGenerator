@@ -112,6 +112,25 @@ class AssetTypes(db.Model):
     def __repr__(self):
         return str(self.AssetTypeID)
 
+class Protocols(db.Model):
+    __tablename__ = 'Protocols'
+
+    ProtocolID = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name = db.Column(db.Text, nullable=False)
+    ExtendedName = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    ISOLayer = db.Column(db.Text)
+    Relationship = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(self.ProtocolID)
 class Capec(db.Model):
     __tablename__ = 'Capec'
 

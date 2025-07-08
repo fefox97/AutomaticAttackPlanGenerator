@@ -12,6 +12,7 @@ from flask_security import auth_required, current_user, roles_required
 from flask import current_app as app
 from flask import jsonify
 from apps.authentication.models import Tasks
+from apps.celery_module.tasks import retrieve_wiki_pages
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
@@ -22,23 +23,49 @@ from celery.result import AsyncResult
 
 from apps.templates.security.email.report_issue import report_issue_html_content
 
+from github import Github
+import os
+
 @auth_required
 @blueprint.route('/get_pending_tasks', methods=['GET'])
 def get_pending_tasks():
-    tasks_query = select(Tasks.id,
+    pentest_report_tasks_query = select(Tasks.id,
                     Tasks.name,
+                    Tasks.type,
                     Tasks.app_id,
                     Tasks.created_on,
                     App.Name.label('app_name')
-                    ).select_from(Tasks).filter_by(user_id=current_user.id).join(App, App.AppID == Tasks.app_id)
-    tasks = db.session.execute(tasks_query).fetchall()
-    return jsonify({'tasks': [{
+                    ).select_from(Tasks).filter_by(user_id=current_user.id, type='pentest_report').join(App, App.AppID == Tasks.app_id)
+    wiki_pages_retrieval_tasks_query = select(Tasks.id,
+                            Tasks.name,
+                            Tasks.type,
+                            Tasks.created_on
+                        ).filter_by(user_id=current_user.id, type='wiki_pages_retrieval')
+    pentest_report_tasks = db.session.execute(pentest_report_tasks_query).fetchall()
+    wiki_pages_retrieval_tasks = db.session.execute(wiki_pages_retrieval_tasks_query).fetchall()
+
+    # Unify all tasks in a single list
+    all_tasks = []
+    for task in pentest_report_tasks:
+        all_tasks.append({
             'task_id': task.id,
             'task_name': task.name,
+            'type': task.type,
             'app_id': task.app_id,
             'app_name': task.app_name,
             'created_on': task.created_on,
-        } for task in tasks]})
+        })
+    for task in wiki_pages_retrieval_tasks:
+        all_tasks.append({
+            'task_id': task.id,
+            'task_name': task.name,
+            'type': task.type,
+            'created_on': task.created_on,
+            'app_id': None,
+            'app_name': None,
+        })
+
+    return jsonify({'tasks': all_tasks})
 
 @auth_required
 @blueprint.route('/get_task_status', methods=['POST'])
@@ -525,6 +552,7 @@ def issue():
     return make_response(jsonify({'message': 'Report created successfully'}), 200)
 
 @auth_required
+@roles_required('admin')
 @blueprint.route('/edit_setting', methods=['POST'])
 def edit_setting():
     key = request.form.get('key')
@@ -535,4 +563,29 @@ def edit_setting():
         return make_response(jsonify({'message': 'Setting updated successfully'}), 200)
     except Exception as error:
         app.logger.error(f"Error editing setting: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+    
+@auth_required
+@roles_required('admin')
+@blueprint.route('/retrieve_wiki', methods=['GET'])
+def get_wiki():
+    repo_url = app.config['WIKI_REPO']
+    wiki_folder = app.config['FLATPAGES_ROOT']
+    try:
+        pages = APIUtils().retrieve_wiki_pages(wiki_repo_url=repo_url, wiki_folder=wiki_folder)
+        return jsonify({'message': "Wiki pages retrieve started successfully"})
+    except Exception as error:
+        app.logger.error(f"Error retrieving wiki: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+    
+@auth_required
+@roles_required('admin')
+@blueprint.route('/delete_wiki', methods=['GET'])
+def delete_wiki():
+    wiki_folder = app.config['FLATPAGES_ROOT']
+    try:
+        APIUtils().delete_wiki_pages(wiki_folder=wiki_folder)
+        return jsonify({'message': "Wiki pages deleted successfully"})
+    except Exception as error:
+        app.logger.error(f"Error deleting wiki: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
