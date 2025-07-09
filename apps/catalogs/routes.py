@@ -11,7 +11,6 @@ from flask_security import auth_required
 from apps import render_template
 
 @blueprint.route('/capec', methods=['GET'])
-@auth_required()
 def capec():
     try:
         table = Capec.query.order_by(Capec.abstraction_order, Capec.Capec_ID).all()
@@ -32,14 +31,12 @@ def capec():
     return render_template(f"catalogs/capec.html", segment=get_segment(request), table=table, meta_attack_pattern_number=meta_attack_pattern_number, standard_attack_pattern_number=standard_attack_pattern_number, detailed_attack_pattern_number=detailed_attack_pattern_number)
 
 @blueprint.route('/capec-detail', methods=['GET'])
-@auth_required()
 def capec_detail():
     selected_id = request.args.get('id')
     selected_attack_pattern = Capec.query.filter_by(Capec_ID=selected_id).first()
     return render_template(f"catalogs/capec-detail.html", segment=get_segment(request), data=selected_attack_pattern)
 
 @blueprint.route('/threat-catalog', methods=['GET'])
-@auth_required()
 def threat_catalog():
     try:
         table = ThreatCatalogue.query.all()
@@ -50,7 +47,6 @@ def threat_catalog():
     return render_template(f"catalogs/threat-catalog.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/tools', methods=['GET'])
-@auth_required()
 def tools():
     try:
         table = ToolCatalogue.query.all()
@@ -61,7 +57,6 @@ def tools():
     return render_template(f"catalogs/tools.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/asset-types', methods=['GET'])
-@auth_required()
 def asset_types():
     try:
         table = AssetTypes.query.all()
@@ -72,7 +67,6 @@ def asset_types():
     return render_template(f"catalogs/asset-types.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/protocols', methods=['GET'])
-@auth_required()
 def protocols():
     try:
         table = Protocols.query.all()
@@ -83,7 +77,6 @@ def protocols():
     return render_template(f"catalogs/protocols.html", segment=get_segment(request), table=table)
 
 @blueprint.route('/methodologies', methods=['GET'])
-@auth_required()
 def methodologies():
     try:
         table = MethodologyCatalogue.query.all()

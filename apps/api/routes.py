@@ -26,8 +26,8 @@ from apps.templates.security.email.report_issue import report_issue_html_content
 from github import Github
 import os
 
-@auth_required
 @blueprint.route('/get_pending_tasks', methods=['GET'])
+@auth_required()
 def get_pending_tasks():
     pentest_report_tasks_query = select(Tasks.id,
                     Tasks.name,
@@ -67,8 +67,8 @@ def get_pending_tasks():
 
     return jsonify({'tasks': all_tasks})
 
-@auth_required
 @blueprint.route('/get_task_status', methods=['POST'])
+@auth_required()
 def get_task_status():
     task_id = request.form.get("task_id")
     task_result = AsyncResult(task_id)
@@ -81,8 +81,8 @@ def get_task_status():
         result['task_result'] = task_result.result.args
     return jsonify(result)
 
-@auth_required
 @blueprint.route('/delete_task', methods=['POST'])
+@auth_required()
 def delete_task():
     task_id = request.form.get("task_id")
     task = Tasks.query.filter_by(id=task_id).first()
@@ -93,16 +93,15 @@ def delete_task():
     else:
         return jsonify({'message': 'Task not found'}), 404
 
-@auth_required
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
+    app.logger.info(f"Current user: {current_user}")
     search_id = request.form.get("SearchID") or ''
     showTree = True if request.form.get("ShowTree") == 'true' else False
     search_id_conv = converter.string_to_int_list(search_id)
     children = AttackPatternAPIUtils().get_child_attack_patterns(search_id_conv, show_tree=showTree)
     return jsonify({'children': children})
 
-@auth_required
 @blueprint.route('/search_capec_by_keyword', methods=['POST'])
 def search_capec_by_keyword():
     search_keys = request.form.get("SearchKeyword")
@@ -114,8 +113,8 @@ def search_capec_by_keyword():
     result = AttackPatternAPIUtils().search_capec_by_keyword(search_keys, search_type)
     return jsonify({'ids': result})
 
-@auth_required
 @blueprint.route('/upload_macm', methods=['POST'])
+@auth_required()
 def upload_macm():
     app_name = request.form.get('macmAppName')
     if app_name in [None, '']:
@@ -138,8 +137,8 @@ def upload_macm():
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/update_macm', methods=['POST'])
+@auth_required()
 def update_macm():
     app_id = request.form.get('AppID')
     query = request.form.get('QueryCypher')
@@ -153,8 +152,8 @@ def update_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
-@auth_required
 @blueprint.route('/rename_macm', methods=['POST'])
+@auth_required()
 def rename_macm():
     app_id = request.form.get('AppID')
     new_name = request.form.get('AppName')
@@ -170,8 +169,8 @@ def rename_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
-@auth_required
 @blueprint.route('/delete_macm', methods=['POST'])
+@auth_required()
 def clear_macm():
     selected_macm = request.form.get('AppID')
     app.logger.info(f"Deleting MACM {selected_macm}")
@@ -181,8 +180,8 @@ def clear_macm():
     except Exception as error:
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/delete_macm_component', methods=['POST'])
+@auth_required()
 def delete_macm_component():
     app_id = request.form.get('AppID')
     component_id = request.form.get('ComponentID')
@@ -196,8 +195,8 @@ def delete_macm_component():
     else:
         return make_response(jsonify({'message': 'No MACM or component provided'}), 400)
 
-@auth_required
 @blueprint.route('/share_macm', methods=['POST'])
+@auth_required()
 def share_macm():
     app_id = request.form.get('AppID')
     users = request.form.get('Users')
@@ -211,8 +210,8 @@ def share_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
-@auth_required
 @blueprint.route('/unshare_macm', methods=['POST'])
+@auth_required()
 def unshare_macm():
     app_id = request.form.get('AppID')
     user_id = request.form.get('UserID')
@@ -226,8 +225,9 @@ def unshare_macm():
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
-@auth_required
 @blueprint.route('/reload_databases', methods=['POST'])
+@auth_required()
+@roles_required('admin')
 def reload_databases():
     database = request.form.get('database')
     try:
@@ -239,14 +239,14 @@ def reload_databases():
     except Exception as error:
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/test', methods=['GET', 'POST'])
+@auth_required()
 def test():
     response = utils.test_function()
     return make_response(jsonify(response), 200)
 
-@auth_required
 @blueprint.route('/upload_excel', methods=['POST'])
+@auth_required()
 def upload_excel():
     if 'file' in request.files and request.files['file'].filename != '':
         file = request.files['file']
@@ -279,15 +279,15 @@ def upload_excel():
     else:
         return make_response(jsonify({'message': 'No file provided'}), 400)
 
-@auth_required
 @blueprint.route('/download_excel', methods=['POST'])
+@auth_required()
 def download_excel():
     filename = Settings.query.filter_by(key='catalogs_filename').first().value
     path = app.config["DBS_PATH"]
     return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
 
-@auth_required
 @blueprint.route('/download_threat_model', methods=['POST'])
+@auth_required()
 def download_threat_model():
     app_id = request.form.get('AppID')
     try:
@@ -321,8 +321,8 @@ def download_threat_model():
         app.logger.info(f"Error downloading threat model for MACM {app_id}:\n {error}")
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/download_attack_plan', methods=['POST'])
+@auth_required()
 def download_attack_plan():
     app_id = request.form.get('AppID')
     try:
@@ -368,8 +368,8 @@ def download_attack_plan():
         app.logger.info(f"Error downloading the Attack Plan for MACM {app_id}:\n {error}")
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/generate_ai_report', methods=['POST'])
+@auth_required()
 def generate_ai_report():
     app_id = request.form.get('AppID')
     try:
@@ -384,8 +384,8 @@ def generate_ai_report():
         app.logger.info(f"Error generating the report for MACM {app_id}:\n {error}")
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/download_ai_report', methods=['POST'])
+@auth_required()
 def download_ai_report():
     app_id = request.form.get('AppID')
     task_id = request.form.get('TaskID')
@@ -400,8 +400,8 @@ def download_ai_report():
         app.logger.info(f"Error downloading the report for MACM {app_id}:\n {error}")
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/upload_report', methods=['POST'])
+@auth_required()
 def upload_report():
     if 'reportFile' in request.files and request.files['reportFile'].filename != '':
         file = request.files['reportFile']
@@ -433,8 +433,8 @@ def upload_report():
         app.logger.error('No file provided')
         return make_response(jsonify({'message': 'No file provided'}), 400)
 
-@auth_required
 @blueprint.route('/delete_report', methods=['POST'])
+@auth_required()
 def delete_report():
     macmID = request.form.get('macmID')
     componentID = request.form.get('componentID')
@@ -455,8 +455,8 @@ def delete_report():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/download_report', methods=['POST'])
+@auth_required()
 def download_report():
     macmID = request.form.get('macmID')
     componentID = request.form.get('componentID')
@@ -469,8 +469,8 @@ def download_report():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/download_all_reports', methods=['POST'])
+@auth_required()
 def download_all_reports():
     macmID = request.form.get('macmID')
     try:
@@ -486,8 +486,8 @@ def download_all_reports():
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @blueprint.route('/nmap/<string:parser>', methods=['POST'])
+@auth_required()
 def nmap(parser):
     macmID = request.form.get('macmID')
     componentID = request.form.get('componentID')
@@ -504,8 +504,8 @@ def nmap(parser):
         traceback.print_exc()
         return make_response(jsonify({'message': error.args}), 400)
 
-@auth_required
 @roles_required('admin')
+@auth_required()
 @blueprint.route('/ticket', methods=['POST'])
 def ticket():
     jira = Jira(url=app.config['JIRA_URL'], username=app.config['JIRA_USERNAME'], password=app.config['JIRA_API_KEY'], cloud=True)
@@ -531,8 +531,8 @@ def ticket():
         return make_response(jsonify({'message': error.args}), 400)
     return make_response(jsonify({'message': 'Report created successfully with ID ' + new_issue['key']}), 200)
 
-@auth_required
 @blueprint.route('/issue', methods=['POST'])
+@auth_required()
 def issue():
     try:
         issue = request.form.get('issue')
@@ -551,9 +551,9 @@ def issue():
         return make_response(jsonify({'message': error.args}), 400)
     return make_response(jsonify({'message': 'Report created successfully'}), 200)
 
-@auth_required
-@roles_required('admin')
 @blueprint.route('/edit_setting', methods=['POST'])
+@auth_required()
+@roles_required('admin')
 def edit_setting():
     key = request.form.get('key')
     value = request.form.get('value')
@@ -565,9 +565,9 @@ def edit_setting():
         app.logger.error(f"Error editing setting: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
     
-@auth_required
-@roles_required('admin')
 @blueprint.route('/retrieve_wiki', methods=['GET'])
+@auth_required()
+@roles_required('editor')
 def get_wiki():
     repo_url = app.config['WIKI_REPO']
     wiki_folder = app.config['FLATPAGES_ROOT']
@@ -578,9 +578,9 @@ def get_wiki():
         app.logger.error(f"Error retrieving wiki: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
     
-@auth_required
-@roles_required('admin')
 @blueprint.route('/delete_wiki', methods=['GET'])
+@auth_required()
+@roles_required('editor')
 def delete_wiki():
     wiki_folder = app.config['FLATPAGES_ROOT']
     try:

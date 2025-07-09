@@ -29,6 +29,22 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
     }
 }
 
+function showError(code, autohide = false) {
+    if (code === 404) {
+        response = "Page not found.";
+    } else if (code === 500) {
+        response = "Internal server error.";
+    } else if (code === 403) {
+        response = "Forbidden: You do not have permission to access this resource.";
+    } else if (code === 401) {
+        response = "Unauthorized: Please log in to access this resource.";
+    } else {
+        response = "An unexpected error occurred. Please try again later.";
+    }
+    let title = "Error " + code;
+    showModal(title, response, '<i class="fas fa-exclamation-triangle"></i>', autohide);
+}
+
 function showToast(title, message, autohide = false, delay=5000, icon='<i class="fas fa-info"></i>') {
     const container = document.getElementById('toast-container');
     const toast_id = 'toast-' + Math.floor(Math.random() * 1000000);

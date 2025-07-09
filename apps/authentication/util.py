@@ -1,6 +1,6 @@
-
-
-from flask import render_template, current_app as app
+from functools import wraps
+from flask import jsonify, render_template, current_app as app
+from flask_security import current_user
 
 from apps import mail
 
@@ -41,3 +41,11 @@ def notify_admins(user):
         message=render_template('security/email/new_user.html', user=user),
         html_message=render_template('security/email/new_user.html', user=user)
     )
+
+def api_auth_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        if current_user.is_anonymous:
+            return jsonify({'message': 'User not authenticated'}), 401
+        return f(*args, **kwargs)
+    return decorator
