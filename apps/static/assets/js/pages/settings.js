@@ -39,7 +39,8 @@ function reloadDatabases(database) {
         showModal("Success", response, true);
         $(button).removeClass('btn-loading');
     }).fail(function(response) {
-        showModal("Error", JSON.parse(response.responseText));
+        console.error(response.status);
+        showError(response.status, autohide = true);
         $(button).removeClass('btn-loading');
     });
 }
@@ -57,7 +58,7 @@ function uploadExcel() {
     }).done(function(response) {
         showModal("Success", response, true);
     }).fail(function(response) {
-        showModal("Error", JSON.parse(response.responseText));
+        showError(response.status, autohide = true);
     });
 }
 
@@ -98,7 +99,7 @@ function test(){
     }).done(function(response) {
         showModal("Success", response);
     }).fail(function(response) {
-        showModal("Error", JSON.parse(response.responseText));
+        showError(response.status, autohide = true);
     });
 }
 
@@ -130,7 +131,7 @@ function retrieveWiki() {
         showModal("Wiki Pages", response.message, '<i class="fa fa-info"</i>', autohide=true);
         $(button).removeClass('btn-loading');
     }).fail(function(response) {
-        showModal("Error", JSON.parse(response.responseText));
+        showError(response.status, autohide = true);
         $(button).removeClass('btn-loading');
     });
 }
@@ -145,7 +146,7 @@ function deleteWiki() {
         showModal("Wiki Pages", response.message, '<i class="fa fa-info"</i>', autohide=true);
         $(button).removeClass('btn-loading');
     }).fail(function(response) {
-        showModal("Error", JSON.parse(response.responseText));
+        showError(response.status, autohide = true);
         $(button).removeClass('btn-loading');
     });
 }

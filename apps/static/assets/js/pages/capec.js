@@ -158,11 +158,12 @@ function searchIDQuery () {
             'ShowTree': $('#ShowTreeToggle').hasClass('active')
         },
     }).done(function(response) {
+        console.log(response);
         let ids = response.children.toString().split(',');
         ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
         capec_table.column(0).search(ids, true, false).draw();
     }).fail(function(error) {
-        console.log(error);
+        showError(error.status, autohide = true);
     });
 };
 
@@ -185,6 +186,6 @@ function searchKeywordQuery() {
         ids = ids.map(function(id) { return '^' + id + '$'; }).join('|');
         capec_table.column(0).search(ids, true, false).draw();
     }).fail(function(error) {
-        console.log(error);
+        showError(error.status, autohide = true);
     });
 }
