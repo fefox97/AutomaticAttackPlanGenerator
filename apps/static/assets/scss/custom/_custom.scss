@@ -171,6 +171,29 @@ div.dataTables_scrollBody {
     background-color: $bg-macm-label-background !important;
 }
 
+.text-capec{
+    color: $capec-color !important;
+}
+.text-threat{
+    color: $threat-color !important;
+}
+.text-macm{
+    color: $macm-color !important;
+}
+.text-tool{
+    color: $tool-color !important;
+}
+.text-methodology{
+    color: $methodology-color !important;
+}
+.text-asset-types{
+    color: $asset-types-color !important;
+}
+.text-protocols{
+    color: $protocols-color !important;
+}
+
+
 .bg-network{
     background-color: $bg-network-background !important;
 }
@@ -694,4 +717,15 @@ pre[class*=language-]{
     .token + .operator {
         background: none !important;
     }
+}
+
+.home-statistics {
+    .card {
+        background-color: $gray-200 !important;
+    }
+}
+
+.knowledge-base-col-statistics {
+    flex: 0 0 16.5%;
+    width: 16%;
 }

@@ -20024,6 +20024,27 @@ div.dataTables_scrollBody {
 .bg-macm-label {
   background-color: #3968b2 !important; }
 
+.text-capec {
+  color: #6C969D !important; }
+
+.text-threat {
+  color: #A14A76 !important; }
+
+.text-macm {
+  color: #044FC8 !important; }
+
+.text-tool {
+  color: #C84C09 !important; }
+
+.text-methodology {
+  color: #4fa007 !important; }
+
+.text-asset-types {
+  color: #0768a0 !important; }
+
+.text-protocols {
+  color: #219268 !important; }
+
 .bg-network {
   background-color: #9e3926 !important; }
 
@@ -20441,11 +20462,18 @@ pre[class*=language-] {
 .language-cypher .token + .operator {
   background: none !important; }
 
+.home-statistics .card {
+  background-color: #E5E7EB !important; }
+
+.knowledge-base-col-statistics {
+  flex: 0 0 16.5%;
+  width: 16%; }
+
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
 
 [data-bs-theme="dark"] .card {
-  background-color: #374151 !important;
+  background-color: #374151;
   color: #F2F4F6 !important; }
   [data-bs-theme="dark"] .card.theme-settings {
     background-color: #1F2937 !important; }
@@ -20604,3 +20632,27 @@ pre[class*=language-] {
   color: #6e6ede !important; }
   [data-bs-theme="dark"] .wiki-page a:hover, [data-bs-theme="dark"] .wiki-page a:focus {
     color: #5c5cb7 !important; }
+
+[data-bs-theme="dark"] .home-statistics .card {
+  background-color: #4B5563 !important; }
+
+[data-bs-theme="dark"] .text-capec {
+  color: #6C969D !important; }
+
+[data-bs-theme="dark"] .text-threat {
+  color: #A14A76 !important; }
+
+[data-bs-theme="dark"] .text-macm {
+  color: #2e67c1 !important; }
+
+[data-bs-theme="dark"] .text-tool {
+  color: #C84C09 !important; }
+
+[data-bs-theme="dark"] .text-methodology {
+  color: #4fa007 !important; }
+
+[data-bs-theme="dark"] .text-asset-types {
+  color: #4d97c1 !important; }
+
+[data-bs-theme="dark"] .text-protocols {
+  color: #219268 !important; }
