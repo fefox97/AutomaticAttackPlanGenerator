@@ -39,6 +39,132 @@
                     </p>
                 </div>
             </div>
+            
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        Statistics
+                    </h2>
+                </div>
+
+                <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                    <div class="row text-center home-statistics">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-success mb-2">apps</span>
+                                    <h5 class="card-title mt-2">Applications</h5>
+                                    <p class="card-text flex-grow">Number of applications analyzed</p>
+                                    <h2 class="count-up text-success mt-auto" id="app-count">{{ app_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-primary mb-2">inventory_2</span>
+                                    <h5 class="card-title mt-2">Assets</h5>
+                                    <p class="card-text flex-grow">Number of assets identified for all applications</p>
+                                    <h2 class="count-up text-primary mt-auto" id="asset-count">{{ asset_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-danger mb-2">security</span>
+                                    <h5 class="card-title mt-2">Attacks</h5>
+                                    <p class="card-text flex-grow">Number of attacks identified for all applications</p>
+                                    <h2 class="count-up text-danger mt-auto" id="attack-count">{{ attack_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-warning mb-2">warning</span>
+                                    <h5 class="card-title mt-2">Threats</h5>
+                                    <p class="card-text flex-grow">Number of threats identified for all applications</p>
+                                    <h2 class="count-up text-warning mt-auto" id="threat-count">{{ threat_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        Knwoledge Bases statistics
+                    </h2>
+                </div>
+
+                <div class="card card-body border-0 shadow mb-4 mb-xl-0">
+                    <div class="row text-center home-statistics d-flex flex-wrap justify-content-center">
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-asset-types mb-2">orbit</span>
+                                    <h5 class="card-title mt-2">Asset Types</h5>
+                                    <p class="card-text flex-grow">Number of asset types defined in the knowledge base</p>
+                                    <h2 class="count-up text-asset-types mt-auto" id="asset-types-count">{{ asset_types_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-protocols mb-2">settings_input_component</span>
+                                    <h5 class="card-title mt-2">Protocols</h5>
+                                    <p class="card-text flex-grow">Number of protocols defined in the knowledge base</p>
+                                    <h2 class="count-up text-protocols mt-auto" id="protocol-catalogue-counts-count">{{ protocol_catalogue_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-threat mb-2">destruction</span>
+                                    <h5 class="card-title mt-2">Threats</h5>
+                                    <p class="card-text flex-grow">Number of threats defined in the knowledge base</p>
+                                    <h2 class="count-up text-threat mt-auto" id="threat-catalogue-count">{{ threat_catalogue_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-capec mb-2">pattern</span>
+                                    <h5 class="card-title mt-2">Attack Pattern</h5>
+                                    <p class="card-text flex-grow">Number of Attack Patterns, defined by CAPEC, included in the knowledge base</p>
+                                    <h2 class="count-up text-capec mt-auto" id="capec-count">{{ capec_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-methodology mb-2">tactic</span>
+                                    <h5 class="card-title mt-2">Methodology</h5>
+                                    <p class="card-text flex-grow">Number of methodologies defined in the knowledge base</p>
+                                    <h2 class="count-up text-methodology mt-auto" id="methodology-catalogue-count">{{ methodology_catalogue_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="knowledge-base-col-statistics mb-3">
+                            <div class="card border-0 h-100 d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column justify-content-between h-100">
+                                    <span class="material-symbols-outlined display-4 text-tool mb-2">construction</span>
+                                    <h5 class="card-title mt-2">Tools</h5>
+                                    <p class="card-text flex-grow">Number of tools defined in the knowledge base</p>
+                                    <h2 class="count-up text-tool mt-auto" id="tool-catalogue-count">{{ tool_catalogue_counts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -46,4 +172,6 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/home.js"></script>
+{% endblock javascripts %}

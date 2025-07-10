@@ -7,7 +7,7 @@ $color-mode-type: data;
     }
 
     .card {
-        background-color: $card-bg-dark !important;
+        background-color: $card-bg-dark;
         color: $card-color-dark !important;
         &.theme-settings {
             background-color: $gray-800 !important;
@@ -223,5 +223,33 @@ $color-mode-type: data;
                 color: $tertiary-dark-highlight !important;
             }
         }
+    }
+
+    .home-statistics {
+        .card {
+            background-color: $gray-600 !important;
+        }
+    }
+
+    .text-capec{
+        color: $capec-color-dark !important;
+    }
+    .text-threat{
+        color: $threat-color-dark !important;
+    }
+    .text-macm{
+        color: $macm-color-dark !important;
+    }
+    .text-tool{
+        color: $tool-color-dark !important;
+    }
+    .text-methodology{
+        color: $methodology-color-dark !important;
+    }
+    .text-asset-types{
+        color: $asset-types-color-dark !important;
+    }
+    .text-protocols{
+        color: $protocols-color-dark !important;
     }
 }
