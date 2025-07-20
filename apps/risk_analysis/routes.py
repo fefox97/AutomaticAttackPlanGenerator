@@ -889,16 +889,13 @@ def final_step():
         Macm, and_(RiskRecord.ComponentID == Macm.Component_ID, Macm.App_ID == RiskRecord.AppID)
     ).with_entities(
         Macm.Name.label('Asset'),
+        Macm.Type.label('Asset Type'),
+        ThreatCatalogue.TID,
         ThreatCatalogue.Threat,
-        RiskRecord.ComponentID,
-        RiskRecord.Financialdamage.label('Financial Damage'),
-        RiskRecord.Reputationdamage.label('Reputation Damage'),
-        RiskRecord.Noncompliance.label('Non Compliance'),
-        RiskRecord.Privacyviolation.label('Privacy Violation'),
-        RiskRecord.Likelihood,
-        RiskRecord.TechnicalImpact.label('Technical Impact'),
-        RiskRecord.BusinessImpact.label('Business Impact'),
-        RiskRecord.OverallRisk.label('Overall Risk'),
+        RiskRecord.Skill,
+        RiskRecord.Motive,
+        RiskRecord.Opportunity,
+        RiskRecord.Size,
         RiskRecord.Easyofdiscovery.label('Ease of Discovery'),
         RiskRecord.Easyofexploit.label('Ease of Exploit'),
         RiskRecord.Awareness,
@@ -906,7 +903,15 @@ def final_step():
         RiskRecord.Lossconfidentiality.label('Loss of Confidentiality'),
         RiskRecord.Lossintegrity.label('Loss of Integrity'),
         RiskRecord.Lossavailability.label('Loss of Availability'),
-        RiskRecord.Lossaccountability.label('Loss of Accountability')
+        RiskRecord.Lossaccountability.label('Loss of Accountability'),
+        RiskRecord.Financialdamage.label('Financial Damage'),
+        RiskRecord.Reputationdamage.label('Reputation Damage'),
+        RiskRecord.Noncompliance.label('Non Compliance'),
+        RiskRecord.Privacyviolation.label('Privacy Violation'),
+        RiskRecord.Likelihood,
+        RiskRecord.TechnicalImpact.label('Technical Impact'),
+        RiskRecord.BusinessImpact.label('Business Impact'),
+        RiskRecord.OverallRisk.label('Overall Risk')
     ).all()
 
     # Crea un DataFrame pandas dai dati
