@@ -339,6 +339,23 @@ class Macm(db.Model):
     def __repr__(self):
         return str(self.Name)
 
+class MacmChecks(db.Model):
+    __tablename__ = 'MacmChecks'
+
+    Id = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name = db.Column(db.Text)
+    Description = db.Column(db.Text)
+    Query = db.Column(db.Text)
+
+    def __init__(self, **kwargs):
+        for property, value in kwargs.items():
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                value = value[0]
+
+            setattr(self, property, value)
+
+    def __repr__(self):
+        return str(f'{self.Component_ID}-{self.CheckName}')
 
 class App(db.Model):
     

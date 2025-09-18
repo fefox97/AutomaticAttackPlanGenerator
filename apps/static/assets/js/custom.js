@@ -14,7 +14,7 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
         messages = response;
     } else {
         for (let key in response) {
-            messages += key + ": " + response[key] + "\n";
+            messages += response[key] + "\n";
         }
     }
     $("#modal-body-text").text(messages);

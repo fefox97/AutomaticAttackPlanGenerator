@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} MACM Checks {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <span class="material-symbols-outlined align-top breadcrumb-icon">
+                                home
+                            </span>
+                            Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">MACM Validity Checks</li>
+                </ol>
+            </nav>
+            <h2 class="h4">MACM Validity Checks</h2>
+            <p class="mb-0">This is a list of syntactic and semantic checks to validate the correctness of a MACM model.</p>
+        </div>
+    </div>
+    
+    <div class="col-12">
+        <div class="card border-0 shadow">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Check Table</h2>
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-block align-items-center">
+                    <!-- [ stiped-table ] start -->
+                    {% if table is not none %}
+                    <table id="macmCheckCatalogTable" class="table table-striped table-hover table-dataframe text-wrap">
+                        <thead>
+                            <tr>
+                                <th>Check ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Query</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in table %}
+                                <tr>
+                                    <td><div class="id-badge"><h2><span class="badge bg-macm-check">{{ row.Id }}</span></h2></div></td>
+                                    <td>{{ row.Name }}</td>
+                                    <td>{{ row.Description }}</td>
+                                    <td>{{ row.Query }} </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Check ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Query</th>
+                            </tr>
+                        </tfoot>
+                    </table> 
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">No MACM Check Data</h4>
+                            <p>There are no checks available in the database.</p>
+                        </div>
+                    {% endif %}
+                    <!-- [ stiped-table ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm-checks.js"></script>
+{% endblock javascripts %}

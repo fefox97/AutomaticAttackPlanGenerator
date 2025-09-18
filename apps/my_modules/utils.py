@@ -8,13 +8,14 @@ from neo4j import Result
 import re
 
 import urllib
+from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
 from sqlalchemy import inspect, select, func, and_, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
+from apps.databases.models import App, AssetTypes, MacmChecks, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
 from flask_login import current_user
 from apps.config import Config
 from apps import db
@@ -227,6 +228,34 @@ class MethodologyCatalogUtils:
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
 
+class MACMCheckCatalogUtils:
+
+	converter = Converter()
+
+	def __init__(self):
+		self.base_path = Config.DBS_PATH
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
+
+	def load_macm_checks_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
+		print("\nLoading MACM Checks catalog...\n")
+		df = pd.read_excel(file_path, sheet_name="MACMChecks", header=0)
+		df.replace(np.nan, None, inplace=True) # replace NaN with None
+		return df
+
 class MacmUtils:
 
 	converter = Converter()
@@ -289,9 +318,23 @@ class MacmUtils:
 		except:
 			print(f"Database {database} does not exist: creating it...")
 			self.create_database(database)
-		self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
-		self.driver.execute_query(query, database_=database)
+		# self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
+		self.load_macm_constraints(database)
+		try:
+			self.driver.execute_query(query, database_=database)
+		except Exception as error:
+			print(f"Error uploading MACM: {error}")
+			self.delete_database(database)
+			raise MACMCheckException(f"Error uploading MACM: {error}")
 		Utils().upload_databases('Macm', neo4j_db=database, app_name=app_name)
+
+	def load_macm_constraints(self, database='macm'):
+		try:
+			for constraint in MacmChecks.query.with_entities(MacmChecks.Query).all():
+				self.driver.execute_query(constraint.Query, database_=database)
+		except Exception as error:
+			print(f"Error loading MACM constraints: {error}")
+			raise error
 
 	def update_macm(self, query, database='macm'):
 		try:
@@ -423,6 +466,7 @@ class Utils:
 		self.tool_catalog_utils = ToolCatalogUtils()
 		self.macm_utils = MacmUtils()
 		self.methodology_catalog_utils = MethodologyCatalogUtils()
+		self.macm_check_catalog_utils = MACMCheckCatalogUtils()
 		self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
 		self.asset_types_catalog_utils = AssetTypesCatalogUtils()
 		self.protocols_catalog_utils = ProtocolsCatalogUtils()
@@ -534,6 +578,9 @@ class Utils:
 		elif database == 'MethodologyCatalog':
 			methodology_catalog_df = self.methodology_catalog_utils.load_methodology_catalog()
 			self.save_dataframe_to_database(methodology_catalog_df, MethodologyCatalogue)
+		elif database == 'MACMChecksCatalog':
+			macm_checks_catalog_df = self.macm_check_catalog_utils.load_macm_checks_catalog()
+			self.save_dataframe_to_database(macm_checks_catalog_df, MacmChecks)
 		elif database == 'AssetTypesCatalog':
 			asset_types_catalog_df = self.asset_types_catalog_utils.load_asset_types_catalog()
 			self.save_dataframe_to_database(asset_types_catalog_df, AssetTypes)
