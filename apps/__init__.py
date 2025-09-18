@@ -63,7 +63,7 @@ def register_assets(app):
     scss.build()
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki'):
+    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki', 'macm'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
     app.register_blueprint(github_blueprint, url_prefix="/login")

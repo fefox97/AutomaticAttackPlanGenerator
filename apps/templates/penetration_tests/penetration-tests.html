@@ -27,36 +27,6 @@
     
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if pentests is not none }}" id="headingLoadMACM" data-bs-toggle="collapse" data-bs-target="#collapseLoadMACM" aria-expanded="true" aria-controls="collapseLoadMACM">
-                    <h2 class="h4 mb-0">
-                        Load MACM
-                        <i class="fas fa-chevron-down mr-auto"></i>
-                    </h2>
-                </div>
-                
-                <div id="collapseLoadMACM" class="card-body collapse show" aria-labelledby="headingLoadMACM">
-                    <form id="uploadMacmForm" method="post" enctype="multipart/form-data" action="/api/upload_macm">
-                        <div class="form-group mb-3">
-                            <label for="macmAppName" class="form-label">App Name</label>
-                            {{ upload_macm_form.macmAppName(size=100, class="form-control", id="macmAppName") }}
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="macmFile" class="form-label">Insert Cypher File</label>
-                            <input class="form-control" type="file" id="macmFile" name="macmFile">
-                        </div>
-                        <p class="text-center">OR</p>
-                        <div class="form-group mb-3">
-                            <label for="macmCypher" class="form-label">Insert Cypher Query</label>
-                            <textarea class="form-control" id="macmCypher" name="macmCypher" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary upload_macm">
-                            <span>Upload</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
             <div class="card border-0 shadow">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h4 mb-0">Penetration Tests</h2>
@@ -83,29 +53,10 @@
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
-                                        <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#editMacmModal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
-                                            <i class="fas fa-edit mr-auto"></i>
-                                            Edit
-                                        </button>
-                                        {% if current_user.id == owners[pentest.AppID] %}
-                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#renameMacmModal" data-bs-toggle="modal"  data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
-                                                <i class="fas fa-i-cursor mr-auto"></i>
-                                                Rename
-                                            </button>
-                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#shareMacmModal" data-bs-toggle="modal"  data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
-                                                <i class="fas fa-share mr-auto"></i>
-                                                Share
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}">
-                                                <i class="fas fa-trash mr-auto"></i>
-                                                Delete
-                                            </button>
-                                        {% else %}
-                                            <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#unshareMacmModal" data-bs-toggle="modal" data-bs-AppID="{{pentest.AppID}}" data-bs-AppName="{{pentest.AppName}}" data-bs-UserID="{{current_user.id}}">
-                                                <i class="fas fa-share mr-auto"></i>
-                                                Unshare
-                                            </button>
-                                        {% endif %}
+                                        <a href="/macm" class="btn btn-primary btn-sm text-white">
+                                            <i class="fas fa-th mr-auto"></i>
+                                            Manage
+                                        </a>
                                     </div>
                                 </li>
                             {% endfor %}
@@ -134,8 +85,5 @@
     <script type="text/javascript">
         var usersPerApp = JSON.parse('{{ usersPerApp | tojson }}');
     </script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/penetration-tests.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/rename-macm.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/share-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/penetration-tests.js"></script>
 {% endblock javascripts %}

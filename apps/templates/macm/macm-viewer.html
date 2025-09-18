@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} MACM Viewer {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <span class="material-symbols-outlined align-top breadcrumb-icon">
+                                home
+                            </span>
+                            Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ app_info.Name }} MACM
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow mb-3" id="macmGraph">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">The {{ app_info.Name }} MACM Graph</h2>
+            <div>
+                <label for="layoutSelector" class="me-2 fw-semibold">Layout:</label>
+                <select id="layoutSelector" class="form-select d-inline-block w-auto me-3 align-middle" style="min-width: 120px;">
+                    <option value="euler">Euler</option>
+                    <option value="elk">ELK</option>
+                    <option value="cola">Cola</option>
+                    <option value="spread">Spread</option>
+                </select>
+                <button type="button" class="btn btn-primary" id="center"><i class="fas fa-crosshairs me-2"></i>Center</button>
+                <button type="button" class="btn btn-primary" id="showAll"><i class="fas fa-eye me-2"></i>Show All</button>
+                
+                <button type="button" class="btn btn-primary" id="rearrange"><i class="fas fa-random me-2"></i>Rearrange</button>
+                <button type="button" class="btn btn-primary" id="fullscreen"> <i class="fas fa-expand me-2"></i>Fullscreen</button>
+                <button type="button" class="btn btn-primary" id="exportImage"> <i class="fas fa-download me-2"></i>Export Image</button>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="d-block align-items-center" id="cytoscape-container">
+                <div id="cytoscape-navigator-overlay">
+                    <div id="cytoscape-navigator-overlay-buttons" class="position-absolute bottom-0 end-0 mb-5 me-5 d-flex flex-column z-3">
+                        <button id="zoom-in" class="btn btn-primary"">+</button>
+                        <button id="zoom-out" class="btn btn-primary">-</button>
+                    </div>
+                    <div id="cytoscape-suggestion-overlay" class="position-absolute z-3 start-0 end-0 d-flex justify-content-center" style="opacity: 0;">
+                        <span class="bg-body px-2 rounded-3">Click on a node to hide/show its connections</span>
+                    </div>
+                </div>
+                <div id="cy" class="cytoscape position-relative">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript">
+        var app_id = "{{ selected_macm }}";
+        var neo4j_params = JSON.parse('{{neo4j_params |tojson|safe }}');
+        var asset_types_colors = JSON.parse('{{asset_types_colors |tojson|safe }}');
+    </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/graph.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/macm-viewer.js"></script>
+{% endblock javascripts %}
