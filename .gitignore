@@ -42,7 +42,9 @@ apps/static/uploads/
 apps/static/assets/dbs/*
 
 *.sql
-neo4j/*
+neo4j/data/*
+neo4j/logs/*
+neo4j/ssl/*
 .docker-env
 
 # nginx certificates to be generated
