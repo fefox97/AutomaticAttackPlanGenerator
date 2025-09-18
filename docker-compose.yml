@@ -14,6 +14,7 @@ services:
       # NEO4J_dbms_ssl_policy_https_trust_all: 'true'
       # NEO4J_dbms_ssl_policy_https_base__directory: /ssl
     volumes:
+      - ./neo4j/apoc.conf:/var/lib/neo4j/conf/apoc.conf
       - ./neo4j/data:/data
       - ./neo4j/logs:/logs
       # - ./neo4j/ssl:/ssl

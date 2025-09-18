@@ -3,7 +3,7 @@
 from apps.catalogs import blueprint
 from flask import request
 from flask import current_app as app
-from apps.databases.models import AssetTypes, Capec, MethodologyCatalogue, Protocols, ThreatCatalogue, \
+from apps.databases.models import AssetTypes, Capec, MacmChecks, MethodologyCatalogue, Protocols, ThreatCatalogue, \
     ToolCatalogue
 
 from flask_security import auth_required
@@ -85,6 +85,16 @@ def methodologies():
     except:
         table = None
     return render_template(f"catalogs/methodologies.html", segment=get_segment(request), table=table)
+
+@blueprint.route('/macm-checks', methods=['GET'])
+def macm_checks():
+    try:
+        table = MacmChecks.query.all()
+        if len(table) == 0:
+            table = None
+    except:
+        table = None
+    return render_template(f"catalogs/macm-checks.html", segment=get_segment(request), table=table)
 
 # Helper - Extract current page name from request
 def get_segment(request):

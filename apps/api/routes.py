@@ -13,6 +13,7 @@ from flask import current_app as app
 from flask import jsonify
 from apps.authentication.models import Tasks
 from apps.celery_module.tasks import retrieve_wiki_pages
+from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
