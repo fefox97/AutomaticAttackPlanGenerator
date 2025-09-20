@@ -39,7 +39,8 @@ $(document).ready(function() {
             contentType: false,
             cache: false,
         }).done(function(response) {
-            showDC2MModal(response.app_name + " MACM", response.cypher, response.app_name);
+            $('.upload_docker_compose').removeClass('btn-loading');
+            showDC2MModal(response.app_name + " MACM", response.cypher, response.app_name, response.services, response.service_types);
         }).fail(function(response) {
             $('.upload_docker_compose').removeClass('btn-loading');
             showModal("Upload failed", JSON.parse(response.responseText));
@@ -108,7 +109,7 @@ function deleteMacm(AppID) {
     });
 }
 
-function showDC2MModal(title, cypher, app_name) {
+function showDC2MModal(title, cypher, app_name, services, service_types) {
     $('#modalDC2MLabel').text(title);
     if (cypher) {
         $('#modalDC2MOutput').text(cypher);
@@ -118,13 +119,61 @@ function showDC2MModal(title, cypher, app_name) {
         $('#uploadDC2MOutput').show();
         $('#copyDC2MOutput').show();
         $('#copyDC2MOutput').attr('data-clipboard-text', cypher);
+
+        // Populate services customization
+        let servicesList = $('#modalDC2MServicesList');
+        servicesList.empty();
+        services.forEach(service => {
+            let serviceTypeOptions = service_types.map(service_type => {
+                return `<option value="${service_type.name}" ${service_type.name === 'Service' ? 'selected' : ''}>PL: ${service_type.primary_label}, SL: ${service_type.secondary_label}, Asset Type: ${service_type.name}</option>`;
+            }).join('');
+            let serviceItem = `
+                <div class="mb-3">
+                    <label for="service_${service}" class="form-label">${service}</label>
+                    <select class="form-select" id="service_${service}">
+                        ${serviceTypeOptions}
+                    </select>
+                </div>
+            `;
+            servicesList.append(serviceItem);
+        });
     } else {
         $('#modalDC2MOutputPre').hide();
         $('#modalDC2MAlert').show();
         $('#uploadDC2MOutput').hide();
         $('#copyDC2MOutput').hide();
     }
+
+    $('#modalDC2MServicesList').on('change', 'select', function() {
+        updateDC2MOutput(services, service_types);
+    });
+
     $('#modalDC2M').modal('show');
     Prism.highlightAll();
     $('.upload_macm').removeClass('btn-loading');
+}
+
+function updateDC2MOutput(services, service_types) {
+    let cypher = $('#modalDC2MOutput').text();
+    services.forEach(service => {
+        let selectedType = $(`#service_${service}`).val();
+        let primaryLabel = service_types.find(st => st.name === selectedType)?.primary_label || 'Service';
+        let secondaryLabel = service_types.find(st => st.name === selectedType)?.secondary_label || '';
+        
+        let regex = new RegExp(`(:[A-Za-z0-9_]+(?::[A-Za-z0-9_]+)?)\\s*\\{([^}]*name:\\s*['"]${service}['"][^}]*)\\}`, 'g');
+        let newLabel = secondaryLabel ? `:${primaryLabel}:${secondaryLabel}` : `:${primaryLabel}`;
+
+        cypher = cypher.replace(regex, function(match, labelPart, props) {
+            let newProps;
+            if (/type:\s*'[^']*'/.test(props)) {
+                newProps = props.replace(/type:\s*'[^']*'/, `type: '${selectedType}'`);
+            } else {
+                newProps = props.replace(/(name:\s*['"][^'"]+['"])/, `$1, type: '${selectedType}'`);
+            }
+            return `${newLabel} {${newProps}}`;
+        });
+    });
+    $('#modalDC2MOutput').text(cypher);
+    $('#copyDC2MOutput').attr('data-clipboard-text', cypher);
+    Prism.highlightAll();
 }

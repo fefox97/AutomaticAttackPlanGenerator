@@ -98,11 +98,11 @@ class Converter:
     def escape_script(self, html: str):
         html = bleach.clean(html, tags=['table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'b', 'i', 'u', 'br', 'a'], attributes=['style', 'class', 'id', 'href'], strip=True)
         return html
-    
-    def dockerCompose2MACM(self, dockerComposeContent):
+
+    def docker_compose_2_MACM(self, dockerComposeContent):
         dockerComposeContent = yaml.safe_load(dockerComposeContent)
         if 'services' not in dockerComposeContent:
-            raise ValueError("Il file docker-compose non contiene la sezione 'services'.")
+            raise ValueError("The docker-compose file does not contain the 'services' section.")
         
         services = dockerComposeContent['services'].keys()
         networks = dockerComposeContent.get('networks', {}).keys()
@@ -173,4 +173,4 @@ class Converter:
 
         macm[-1] = macm[-1].rstrip(",\n") # Rimuovi l'ultima virgola
 
-        return "".join(macm)
+        return "".join(macm), list(services)

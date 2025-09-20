@@ -90,12 +90,12 @@ class AssetTypes(db.Model):
     
     __tablename__ = 'AssetTypes'
 
-    AssetTypeID            = db.Column(db.Integer, primary_key=True, nullable=False)
-    Name          = db.Column(db.Text, nullable=False)
-    Description   = db.Column(db.Text)
-    PrimaryLabel  = db.Column(db.Text)
-    SecondaryLabel = db.Column(db.Text)
-    Color         = db.Column(db.Text)
+    AssetTypeID     = db.Column(db.Integer, primary_key=True, nullable=False)
+    Name            = db.Column(db.Text, nullable=False)
+    Description     = db.Column(db.Text)
+    PrimaryLabel    = db.Column(db.Text)
+    SecondaryLabel  = db.Column(db.Text)
+    Color           = db.Column(db.Text)
 
     @staticmethod
     def get_colors():
