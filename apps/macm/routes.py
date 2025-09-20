@@ -19,6 +19,7 @@ from apps.my_modules import converter
 def macm():
     try:
         upload_macm_form = UploadMacmForm(request.form)
+        upload_docker_compose_form = UploadMacmForm(request.form)
         users = Users.query.with_entities(Users.id, Users.username).where(Users.id != current_user.id).all()
         users_dict = converter.tuple_list_to_dict(users)
         usersPerApp = MacmUser.usersPerApp()
@@ -29,7 +30,7 @@ def macm():
     except Exception as error:
         macms = None
         raise error
-    return render_template('macm/macm-manager.html', segment=get_segment(request), macms=macms, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict, upload_macm_form=upload_macm_form)
+    return render_template('macm/macm-manager.html', segment=get_segment(request), macms=macms, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict, upload_macm_form=upload_macm_form, upload_docker_compose_form=upload_docker_compose_form)
 
 @blueprint.route('/macm-viewer', methods=['GET'])
 @auth_required()

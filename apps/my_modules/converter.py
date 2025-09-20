@@ -2,6 +2,7 @@ import re
 import pandas as pd
 from html2text import html2text as h2t
 import bleach
+import yaml
 
 class Converter:
 
@@ -97,3 +98,79 @@ class Converter:
     def escape_script(self, html: str):
         html = bleach.clean(html, tags=['table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'b', 'i', 'u', 'br', 'a'], attributes=['style', 'class', 'id', 'href'], strip=True)
         return html
+    
+    def dockerCompose2MACM(self, dockerComposeContent):
+        dockerComposeContent = yaml.safe_load(dockerComposeContent)
+        if 'services' not in dockerComposeContent:
+            raise ValueError("Il file docker-compose non contiene la sezione 'services'.")
+        
+        services = dockerComposeContent['services'].keys()
+        networks = dockerComposeContent.get('networks', {}).keys()
+
+        networks_connects_services = {}
+        port_service_map = {}
+        for service, config in dockerComposeContent['services'].items():
+            if 'networks' in config: # Se il servizio specifica reti
+                for network in config['networks']:
+                    if network not in networks_connects_services:
+                        networks_connects_services[network] = []
+                    networks_connects_services[network].append(service)
+            else: # Se il servizio non specifica reti, connettilo alla rete di default
+                if 'default' not in networks_connects_services:
+                    networks_connects_services['default'] = []
+                networks_connects_services['default'].append(service)
+            if 'ports' in config: # Mappa le porte ai servizi
+                port_service_map[service] = []
+                for port in config['ports']:
+                    host_port = port.split(":")[0] if ":" in port else port.split("/")[0]
+                    port_service_map[service].append(host_port)
+
+        service_uses_services = {}
+        for service, config in dockerComposeContent['services'].items():
+            if 'depends_on' in config:
+                service_uses_services[service] = config['depends_on']
+
+        component_id = 0
+        macm = []
+        hosts = []
+        connects = []
+        macm.append("CREATE\n")
+        macm.append(f"\t(VM:Virtual:VM {{name:'VM', type:'Virtual.VM', component_id:'{component_id}'}}),\n")
+        component_id += 1
+        macm.append(f"\t(VM_OS:SystemLayer:OS {{name:'VM_OS', type:'SystemLayer.OS', component_id:'{component_id}'}}),\n")
+        component_id += 1
+        hosts.append("\t(VM)-[:hosts]->(VM_OS),\n")
+        macm.append(f"\t(Docker:SystemLayer:ContainerRuntime {{name:'Docker', type:'SystemLayer.ContainerRuntime', component_id:'{component_id}'}}),\n")
+        component_id += 1
+        hosts.append("\t(VM_OS)-[:hosts]->(Docker),\n")
+        for service in services:
+            macm.append(f"\t({service}_container:Virtual:Container {{name:'{service}_container', type:'Virtual.Container', component_id:'{component_id}'}}),\n")
+            component_id += 1
+            hosts.append(f"\t(Docker)-[:hosts]->({service}_container),\n")
+            macm.append(f"\t({service}_OS:SystemLayer:OS {{name:'{service}_OS', type:'SystemLayer.OS', component_id:'{component_id}'}}),\n")
+            component_id += 1
+            hosts.append(f"\t({service}_container)-[:hosts]->({service}_OS),\n")
+            macm.append(f"\t({service}:Service {{name:'{service}', type:'Service', component_id:'{component_id}', parameters:'{{\"ports\": \"{', '.join(port_service_map.get(service, []))}\"}}'}}),\n")
+            component_id += 1
+            hosts.append(f"\t({service}_OS)-[:hosts]->({service}),\n")
+        
+        for network, connected_services in networks_connects_services.items():
+            macm.append(f"\t({network}:Network:LAN {{name:'{network}', type:'Network.LAN', component_id:'{component_id}'}}),\n")
+            component_id += 1
+            hosts.append(f"\t(VM_OS)-[:hosts]->({network}),\n")
+            for service in connected_services:
+                connects.append(f"\t({network})-[:connects]->({service}_container),\n")
+
+        macm.append("\n")
+
+        for host in hosts:
+            macm.append(host)
+        for connect in connects:
+            macm.append(connect)
+        for service, used_services in service_uses_services.items():
+            for used_service in used_services:
+                macm.append(f"\t({service})-[:uses]->({used_service}),\n")
+
+        macm[-1] = macm[-1].rstrip(",\n") # Rimuovi l'ultima virgola
+
+        return "".join(macm)
