@@ -138,6 +138,32 @@ def upload_macm():
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
+@blueprint.route('/upload_docker_compose', methods=['POST'])
+@auth_required()
+def upload_docker_compose():
+    app_name = request.form.get('macmAppName')
+    if app_name in [None, '']:
+        return make_response(jsonify({'message': 'No App Name provided'}), 400)
+    if 'composeFile' in request.files and request.files['composeFile'].filename != '':
+        file = request.files['composeFile']
+        app.logger.info(f"Uploading Docker Compose from file {request.files['composeFile']}")
+        if not APIUtils().allowed_file(file.filename, ['yaml', 'yml']):
+            return make_response(jsonify({'message': 'File type not allowed'}), 400)
+        yaml_str = file.read().decode('utf-8')
+    elif 'dockerYaml' in request.form and request.form.get('dockerYaml') != '':
+        yaml_str = request.form.get('dockerYaml')
+    else:
+        return make_response(jsonify({'message': 'No file or YAML content provided'}), 400)
+    try:
+        cypher = macm.upload_docker_compose(yaml_str)
+        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'app_name': app_name}), 200)
+    except MACMCheckException as mce:
+        app.logger.error(f"MACM Check Error uploading Docker Compose: {mce.args}", exc_info=True)
+        return make_response(jsonify({'message': mce.args}), 400)
+    except Exception as error:
+        app.logger.error(f"Error uploading Docker Compose: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+
 @blueprint.route('/update_macm', methods=['POST'])
 @auth_required()
 def update_macm():

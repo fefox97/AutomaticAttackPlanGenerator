@@ -57,6 +57,36 @@
                 </div>
             </div>
 
+            <div class="card border-0 shadow mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingLoadDockerCompose" data-bs-toggle="collapse" data-bs-target="#collapseLoadDockerCompose" aria-expanded="true" aria-controls="collapseLoadDockerCompose">
+                    <h2 class="h4 mb-0">
+                        Load Docker Compose
+                        <i class="fas fa-chevron-down mr-auto"></i>
+                    </h2>
+                </div>
+                
+                <div id="collapseLoadDockerCompose" class="card-body collapse show" aria-labelledby="headingLoadDockerCompose">
+                    <form id="uploadDockerComposeForm" method="post" enctype="multipart/form-data" action="/api/upload_docker_compose">
+                        <div class="form-group mb-3">
+                            <label for="macmAppName" class="form-label">App Name</label>
+                            {{ upload_docker_compose_form.macmAppName(size=100, class="form-control", id="macmAppName") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="composeFile" class="form-label">Insert YAML File</label>
+                            <input class="form-control" type="file" id="composeFile" name="composeFile">
+                        </div>
+                        <p class="text-center">OR</p>
+                        <div class="form-group mb-3">
+                            <label for="dockerYaml" class="form-label">Insert Docker Compose content</label>
+                            <textarea class="form-control" id="dockerYaml" name="dockerYaml" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary upload_docker_compose">
+                            <span>Upload</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
             <div class="card border-0 shadow">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h4 mb-0">MACM</h2>
@@ -121,11 +151,12 @@
         </div>
     </div>
 
-    {% include 'penetration_tests/modals/rename_macm_modal.html' %}
-    {% include 'penetration_tests/modals/edit_macm_modal.html' %}
-    {% include 'penetration_tests/modals/delete_modal.html' %}
-    {% include 'penetration_tests/modals/share_macm_modal.html' %}
-    {% include 'penetration_tests/modals/unshare_macm_modal.html' %}
+    {% include 'macm/modals/edit_macm_modal.html' %}
+    {% include 'macm/modals/rename_macm_modal.html' %}
+    {% include 'macm/modals/delete_modal.html' %}
+    {% include 'macm/modals/share_macm_modal.html' %}
+    {% include 'macm/modals/unshare_macm_modal.html' %}
+    {% include 'macm/modals/docker_compose_to_MACM.html' %}
 
 {% endblock content %}
 

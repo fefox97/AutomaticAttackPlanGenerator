@@ -9,7 +9,6 @@ import re
 
 import urllib
 from apps.exception.MACMCheckException import MACMCheckException
-from apps.my_modules import converter
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
@@ -325,8 +324,11 @@ class MacmUtils:
 		except Exception as error:
 			print(f"Error uploading MACM: {error}")
 			self.delete_database(database)
-			raise MACMCheckException(f"Error uploading MACM: {error}")
+			raise MACMCheckException(f"{error}")
 		Utils().upload_databases('Macm', neo4j_db=database, app_name=app_name)
+
+	def upload_docker_compose(self, dockerComposeContent):
+		return self.converter.dockerCompose2MACM(dockerComposeContent)
 
 	def load_macm_constraints(self, database='macm'):
 		try:
@@ -958,7 +960,7 @@ class RiskAnalysisCatalogUtils:
 			# Calcola le minacce per ciascun componente
 			threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
 				ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
-			threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+			threat_for_each_component = self.converter.tuple_list_to_dict(threat_for_each_component)
 
 			# Calcola il numero totale di minacce
 			threat_number = ThreatModel.query.filter_by(AppID=appId).count()
