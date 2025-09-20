@@ -328,7 +328,7 @@ class MacmUtils:
 		Utils().upload_databases('Macm', neo4j_db=database, app_name=app_name)
 
 	def upload_docker_compose(self, dockerComposeContent):
-		return self.converter.dockerCompose2MACM(dockerComposeContent)
+		return self.converter.docker_compose_2_MACM(dockerComposeContent)
 
 	def load_macm_constraints(self, database='macm'):
 		try:

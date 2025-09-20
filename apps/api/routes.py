@@ -17,7 +17,7 @@ from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import App, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
+from apps.databases.models import App, AssetTypes, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 from celery.result import AsyncResult
@@ -155,8 +155,10 @@ def upload_docker_compose():
     else:
         return make_response(jsonify({'message': 'No file or YAML content provided'}), 400)
     try:
-        cypher = macm.upload_docker_compose(yaml_str)
-        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'app_name': app_name}), 200)
+        cypher, services = macm.upload_docker_compose(yaml_str)
+        service_types = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.PrimaryLabel, AssetTypes.SecondaryLabel).filter(AssetTypes.PrimaryLabel == 'Service').all()
+        service_types = [{'name': st.Name, 'primary_label': st.PrimaryLabel, 'secondary_label': st.SecondaryLabel} for st in service_types]
+        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'services':services, 'app_name': app_name, 'service_types':service_types}), 200)
     except MACMCheckException as mce:
         app.logger.error(f"MACM Check Error uploading Docker Compose: {mce.args}", exc_info=True)
         return make_response(jsonify({'message': mce.args}), 400)
