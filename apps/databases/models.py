@@ -1,10 +1,12 @@
 import json
 from datetime import datetime
+import re
 from sqlalchemy.sql.expression import case
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy import ForeignKey, select, func, and_, or_, UniqueConstraint
 from sqlalchemy_utils import create_view
+
 from .types import ExternalReferencesType
 
 from apps import db
@@ -96,11 +98,38 @@ class AssetTypes(db.Model):
     PrimaryLabel    = db.Column(db.Text)
     SecondaryLabel  = db.Column(db.Text)
     Color           = db.Column(db.Text)
+    Ports           = db.Column(db.Text)
 
     @staticmethod
     def get_colors():
         asset_types_colors = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.Color).all()
         return {asset_type.Name: asset_type.Color for asset_type in asset_types_colors}
+
+    @hybrid_property
+    def get_ports(self):
+        if self.Ports is None:
+            return []
+        if isinstance(self.Ports, int):
+            return [self.Ports]
+        ports_str = str(self.Ports).strip()
+        if not ports_str:
+            return []
+        if ports_str.isdigit():
+            return [int(ports_str)]
+        return [int(p.strip()) for p in re.split(r',\s*', ports_str) if p.strip().isdigit()]
+
+    @staticmethod
+    def get_asset_type_by_port(port):
+        port = int(port)
+        asset_types = AssetTypes.query.all()
+        return [at for at in asset_types if port in at.get_ports]
+
+    @staticmethod
+    def get_asset_type_by_ports(ports):
+        asset_types = []
+        for port in ports:
+            asset_types.extend(AssetTypes.get_asset_type_by_port(port))
+        return list({at.Name for at in asset_types})
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -121,6 +150,7 @@ class Protocols(db.Model):
     Description = db.Column(db.Text)
     ISOLayer = db.Column(db.Text)
     Relationship = db.Column(db.Text)
+    Ports = db.Column(db.Text)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():

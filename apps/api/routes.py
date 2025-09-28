@@ -155,10 +155,17 @@ def upload_docker_compose():
     else:
         return make_response(jsonify({'message': 'No file or YAML content provided'}), 400)
     try:
-        cypher, services = macm.upload_docker_compose(yaml_str)
+        cypher, services, port_service_map = macm.upload_docker_compose(yaml_str)
         service_types = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.PrimaryLabel, AssetTypes.SecondaryLabel).filter(AssetTypes.PrimaryLabel == 'Service').all()
+        suggested_asset_types = {}
+        for service in port_service_map.items():
+            service_name = service[0]
+            ports = service[1]
+            asset_types = AssetTypes.get_asset_type_by_ports(ports)
+            app.logger.info(f"Asset types for service {service_name} with ports {ports}: {asset_types}")
+            suggested_asset_types[service_name] = asset_types if asset_types else ['Service']
         service_types = [{'name': st.Name, 'primary_label': st.PrimaryLabel, 'secondary_label': st.SecondaryLabel} for st in service_types]
-        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'services':services, 'app_name': app_name, 'service_types':service_types}), 200)
+        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'services': services, 'app_name': app_name, 'service_types': service_types, 'suggested_asset_types':suggested_asset_types}), 200)
     except MACMCheckException as mce:
         app.logger.error(f"MACM Check Error uploading Docker Compose: {mce.args}", exc_info=True)
         return make_response(jsonify({'message': mce.args}), 400)
@@ -266,6 +273,7 @@ def reload_databases():
         else:
             return make_response(jsonify({'message': 'No database provided'}), 400)
     except Exception as error:
+        app.logger.error(f"Error reloading database {database}: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
 @blueprint.route('/test', methods=['GET', 'POST'])

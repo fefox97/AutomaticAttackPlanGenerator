@@ -40,7 +40,7 @@ $(document).ready(function() {
             cache: false,
         }).done(function(response) {
             $('.upload_docker_compose').removeClass('btn-loading');
-            showDC2MModal(response.app_name + " MACM", response.cypher, response.app_name, response.services, response.service_types);
+            showDC2MModal(response.app_name + " MACM", response.cypher, response.app_name, response.services, response.service_types, response.suggested_asset_types);
         }).fail(function(response) {
             $('.upload_docker_compose').removeClass('btn-loading');
             showModal("Upload failed", JSON.parse(response.responseText));
@@ -109,7 +109,7 @@ function deleteMacm(AppID) {
     });
 }
 
-function showDC2MModal(title, cypher, app_name, services, service_types) {
+function showDC2MModal(title, cypher, app_name, services, service_types, suggested_asset_types) {
     $('#modalDC2MLabel').text(title);
     if (cypher) {
         $('#modalDC2MOutput').text(cypher);
@@ -125,7 +125,7 @@ function showDC2MModal(title, cypher, app_name, services, service_types) {
         servicesList.empty();
         services.forEach(service => {
             let serviceTypeOptions = service_types.map(service_type => {
-                return `<option value="${service_type.name}" ${service_type.name === 'Service' ? 'selected' : ''}>PL: ${service_type.primary_label}, SL: ${service_type.secondary_label}, Asset Type: ${service_type.name}</option>`;
+                return `<option value="${service_type.name}" ${service_type.name === suggested_asset_types[service][0] ? 'selected' : ''}>PL: ${service_type.primary_label}, SL: ${service_type.secondary_label}, Asset Type: ${service_type.name} ${suggested_asset_types[service].includes(service_type.name ) ? '⭐️' : ''}</option>`;
             }).join('');
             let serviceItem = `
                 <div class="mb-3">
@@ -137,6 +137,7 @@ function showDC2MModal(title, cypher, app_name, services, service_types) {
             `;
             servicesList.append(serviceItem);
         });
+        updateDC2MOutput(services, service_types);
     } else {
         $('#modalDC2MOutputPre').hide();
         $('#modalDC2MAlert').show();

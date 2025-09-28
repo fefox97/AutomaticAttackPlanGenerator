@@ -51,6 +51,7 @@
                                 <th>Description</th>
                                 <th>ISO/OSI Layer</th>
                                 <th>Relationship</th>
+                                <th>Ports</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,6 +63,7 @@
                                     <td>{{ row.Description }}</td>
                                     <td>{{ row.ISOLayer }}</td>
                                     <td>{{ row.Relationship }}</td>
+                                    <td>{{ row.Ports if row.Ports is not none else '' }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -73,6 +75,7 @@
                                 <th>Description</th>
                                 <th>ISO/OSI Layer</th>
                                 <th>Relationship</th>
+                                <th>Ports</th>
                             </tr>
                         </tfoot>
                     </table> 

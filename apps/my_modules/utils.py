@@ -196,6 +196,7 @@ class ProtocolsCatalogUtils:
 		print("\nLoading Protocols catalog...\n")
 		df = pd.read_excel(file_path, sheet_name="Protocols", header=0)
 		df.rename(columns={'Extended Name': 'ExtendedName', 'Layer': 'ISOLayer'}, inplace=True)
+		# df['Ports'] = df['Ports'].apply(lambda x: self.converter.string_to_int_list(x))
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
 	
