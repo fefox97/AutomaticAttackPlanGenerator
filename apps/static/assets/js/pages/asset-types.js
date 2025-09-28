@@ -5,7 +5,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('asset_types_catalog_columns') === null) {    
-        default_shown_columns = ['Asset Type ID', 'Name', 'Primary Label', 'Secondary Label', 'Description'];
+        default_shown_columns = ['Asset Type ID', 'Name', 'Primary Label', 'Secondary Label', 'Description', 'Ports'];
         localStorage.setItem('asset_types_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('asset_types_catalog_columns'));

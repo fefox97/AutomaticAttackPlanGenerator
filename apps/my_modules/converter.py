@@ -20,7 +20,7 @@ class Converter:
 
     def string_to_int_list(self, string: str, sepator=r'[ ,]+'):
         string = f"{string}"
-        if string in [None, '', 'None']:
+        if string in [None, '', 'None', 'nan']:
             return None
         else:
             return [int(x) for x in re.split(sepator, string)]
@@ -110,6 +110,7 @@ class Converter:
         networks_connects_services = {}
         port_service_map = {}
         for service, config in dockerComposeContent['services'].items():
+            print(f"Processing service: {service} with config: {config}")
             if 'networks' in config: # Se il servizio specifica reti
                 for network in config['networks']:
                     if network not in networks_connects_services:
@@ -119,8 +120,8 @@ class Converter:
                 if 'default' not in networks_connects_services:
                     networks_connects_services['default'] = []
                 networks_connects_services['default'].append(service)
+            port_service_map[service] = []
             if 'ports' in config: # Mappa le porte ai servizi
-                port_service_map[service] = []
                 for port in config['ports']:
                     host_port = port.split(":")[0] if ":" in port else port.split("/")[0]
                     port_service_map[service].append(host_port)
@@ -173,4 +174,4 @@ class Converter:
 
         macm[-1] = macm[-1].rstrip(",\n") # Rimuovi l'ultima virgola
 
-        return "".join(macm), list(services)
+        return "".join(macm), list(services), port_service_map

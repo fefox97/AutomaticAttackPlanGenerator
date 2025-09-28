@@ -5,7 +5,7 @@ $(window).on('load', function() {
 
     // Set default shown columns
     if (localStorage.getItem('protocols_catalog_columns') === null) {    
-        default_shown_columns = ['Protocol ID', 'Name', 'Description', 'ISO/OSI Layer'];
+        default_shown_columns = ['Protocol ID', 'Name', 'Description', 'ISO/OSI Layer', 'Ports'];
         localStorage.setItem('protocols_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
         default_shown_columns = JSON.parse(localStorage.getItem('protocols_catalog_columns'));
