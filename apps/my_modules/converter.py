@@ -131,7 +131,7 @@ class Converter:
             if 'depends_on' in config:
                 service_uses_services[service] = config['depends_on']
 
-        component_id = 0
+        component_id = 1
         macm = []
         hosts = []
         connects = []
