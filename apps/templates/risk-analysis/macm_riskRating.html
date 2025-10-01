@@ -403,7 +403,7 @@
         </div>
     </div>
     
-    {% include 'penetration_tests/modals/edit_macm_modal.html' %}
+    {% include 'macm/modals/edit_macm_modal.html' %}
 
 {% endblock %}
 
@@ -413,6 +413,6 @@
         var app_name = "{{table[0].Application if table is not none | tojson }}";
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/risk_analysis/macm_riskRating.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/reports.js"></script>
 {% endblock javascripts %}
