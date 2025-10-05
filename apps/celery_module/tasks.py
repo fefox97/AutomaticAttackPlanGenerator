@@ -47,7 +47,7 @@ def query_llm(app_id, max_tries=10, sleep_time=1):
             raise Exception("Error making the request to LLM")
 
 @celery.task
-def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
+def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None, wiki_images_folder=None):
     def get_all_md_files(repo, path=""):
         md_files = []
         contents = repo.get_contents(path)
@@ -58,6 +58,16 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
                 md_files.append(content.path)
         return md_files
 
+    def get_image_files(repo, path=""):
+        image_files = []
+        contents = repo.get_contents(path)
+        for content in contents:
+            if content.type == "dir":
+                image_files.extend(get_image_files(repo, content.path))
+            elif content.type == "file" and re.search(r'\.(png|jpg|jpeg|gif|bmp|svg)$', content.path, re.IGNORECASE):
+                image_files.append(content.path)
+        return image_files
+
     with app.app_context():
         try:
             if not wiki_repo_url:
@@ -66,6 +76,8 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
             g = Github(auth=auth)
             repo = g.get_repo(wiki_repo_url)
             pages = get_all_md_files(repo)
+            images = get_image_files(repo)
+            app.logger.info(f"Found {images} images in the wiki repository {wiki_repo_url}")
 
             if not os.path.exists(wiki_folder):
                 os.makedirs(wiki_folder)
@@ -92,6 +104,17 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None):
                         os.makedirs(dest_dir, exist_ok=True)
                     with open(dest_path, 'w') as f:
                         f.write(file_content_decoded)
+
+            for image in images:
+                image_content = repo.get_contents(image)
+                image_data = image_content.decoded_content
+                dest_path = os.path.join(wiki_images_folder, image.split('/')[-1])
+                dest_dir = os.path.dirname(dest_path)
+                if not os.path.exists(dest_dir):
+                    os.makedirs(dest_dir, exist_ok=True)
+                with open(dest_path, 'wb') as img_file:
+                    img_file.write(image_data)
             return pages
+
         except Exception as e:
             app.logger.error(f"Error retrieving wiki pages: {e}", exc_info=True)

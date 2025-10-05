@@ -97,6 +97,7 @@ class Config(object):
 
     # Setup for FlatPages
     FLATPAGES_ROOT = os.getenv('FLATPAGES_ROOT', None)
+    FLATPAGES_ROOT_IMAGES = os.getenv('FLATPAGES_ROOT_IMAGES', None)
     FLATPAGES_EXTENSION = os.getenv('FLATPAGES_EXTENSION', '.md')
     FLATPAGES_MARKDOWN_EXTENSIONS = [
         'fenced_code',

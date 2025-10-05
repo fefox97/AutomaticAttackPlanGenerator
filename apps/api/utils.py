@@ -158,9 +158,9 @@ class APIUtils:
             app.logger.error(f"Error making the request to LLM: {e}", exc_info=True)
             return None
         
-    def retrieve_wiki_pages(self, wiki_repo_url=None, wiki_folder=None):
+    def retrieve_wiki_pages(self, wiki_repo_url=None, wiki_folder=None, wiki_images_folder=None):
         try:
-            pages = retrieve_wiki_pages.delay(wiki_repo_url=wiki_repo_url, wiki_folder=wiki_folder)
+            pages = retrieve_wiki_pages.delay(wiki_repo_url=wiki_repo_url, wiki_folder=wiki_folder, wiki_images_folder=wiki_images_folder)
             task = Tasks(
                 id=pages.id,
                 name="Wiki pages retrieval",
