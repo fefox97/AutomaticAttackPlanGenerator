@@ -608,8 +608,9 @@ def edit_setting():
 def get_wiki():
     repo_url = app.config['WIKI_REPO']
     wiki_folder = app.config['FLATPAGES_ROOT']
+    wiki_images_folder = app.config['FLATPAGES_ROOT_IMAGES']
     try:
-        pages = APIUtils().retrieve_wiki_pages(wiki_repo_url=repo_url, wiki_folder=wiki_folder)
+        pages = APIUtils().retrieve_wiki_pages(wiki_repo_url=repo_url, wiki_folder=wiki_folder, wiki_images_folder=wiki_images_folder)
         return jsonify({'message': "Wiki pages retrieve started successfully"})
     except Exception as error:
         app.logger.error(f"Error retrieving wiki: {error.args}", exc_info=True)
