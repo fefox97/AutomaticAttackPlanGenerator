@@ -131,6 +131,16 @@ class AssetTypes(db.Model):
             asset_types.extend(AssetTypes.get_asset_type_by_port(port))
         return list({at.Name for at in asset_types})
 
+    @staticmethod
+    def get_suggested_asset_types(port_service_map):
+        suggested_asset_types = {}
+        for service in port_service_map.items():
+            service_name = service[0]
+            ports = service[1]
+            asset_types = AssetTypes.get_asset_type_by_ports(ports)
+            suggested_asset_types[service_name] = asset_types if asset_types else ['Service.App']
+        return suggested_asset_types
+
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
             if hasattr(value, '__iter__') and not isinstance(value, str):
