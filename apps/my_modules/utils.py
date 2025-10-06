@@ -266,7 +266,7 @@ class MacmUtils:
 		self.PASS_NEO4J = os.getenv('PASS_NEO4J'    , None)
 
 		self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J), initial_retry_delay=10)
-		self.driver.verify_connectivity()
+		# self.driver.verify_connectivity()
 
 	def clear_database(self, database):
 		self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
