@@ -78,6 +78,29 @@ class Users(db.Model, UserMixin):
 #     user = Users.query.filter_by(username=username).first()
 #     return user if user else None
 
+class ApiToken(db.Model):
+    __tablename__ = 'ApiTokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'), nullable=False)
+    token = db.Column(db.String(128), unique=True, nullable=False)
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    expires_on = db.Column(db.DateTime, nullable=True)
+    revoked = db.Column(db.Boolean, default=False, nullable=False)
+    last_used = db.Column(db.DateTime, nullable=True)
+    usage_count = db.Column(db.Integer, default=0, nullable=False)
+    description = db.Column(db.String(255), nullable=False, default='')
+
+    user = db.relationship('Users', backref=db.backref('api_tokens', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<ApiToken {self.token}>'
+
+    def token_used(self):
+        self.last_used = db.func.now()
+        self.usage_count += 1
+        db.session.commit()
+
 class OAuth(OAuthConsumerMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("Users.id", ondelete="cascade"), nullable=False)
     user = db.relationship(Users)
