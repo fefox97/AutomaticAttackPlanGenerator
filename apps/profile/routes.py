@@ -2,6 +2,7 @@
 
 from flask import flash, redirect, request, url_for
 from flask_security import auth_required, current_user, verify_password
+from apps.authentication.models import ApiToken
 from apps.profile import blueprint
 from apps.profile.forms import DeleteAccountForm
 from apps import db, render_template

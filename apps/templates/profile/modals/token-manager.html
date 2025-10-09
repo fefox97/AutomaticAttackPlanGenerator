@@ -1,0 +1,49 @@
+<!-- Token Manager Modal -->
+<div class="modal fade" id="tokenManagerModal" tabindex="-1" aria-labelledby="tokenManagerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tokenManagerModalLabel">API Token Management</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="generateTokenForm" class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="tokenDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="tokenDescription" name="description" placeholder="Where will this token be used?" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="expiresDays" class="form-label">Expiration (days, optional)</label>
+                        <input type="number" min="1" class="form-control" id="expiresDays" name="expires_days" placeholder="e.g. 30">
+                    </div>
+                    <div class="col-auto align-self-end">
+                        <button type="submit" class="btn btn-success">Generate new token</button>
+                    </div>
+                </form>
+                <table class="table table-striped" id="tokenTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Token</th>
+                            <th>Created at</th>
+                            <th>Expires at</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated dynamically by JS -->
+                    </tbody>
+                </table>
+                <div class="alert alert-info" id="noTokensAlert" role="alert" style="display:none;">
+                    No API tokens generated.
+                </div>
+                <div class="alert alert-success" id="tokenCreatedAlert" role="alert" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

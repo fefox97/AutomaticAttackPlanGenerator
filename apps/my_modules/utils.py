@@ -18,7 +18,7 @@ from apps.databases.models import App, AssetTypes, MacmChecks, MethodologyCatalo
 from flask_login import current_user
 from apps.config import Config
 from apps import db
-from flask import current_app as app
+from flask import current_app as app, g
 
 class AttackPatternUtils:
 	
@@ -655,39 +655,38 @@ class Utils:
 	#     response = {'message': 'ER diagram generated successfully'}
 	#     return response
 
-	def test_function(self):
-		row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
-		query = select(
-					ToolCatalogue.ToolID.label("Tool_ID"), 
-					ToolCatalogue.Name.label("Tool_Name"), 
-					ToolCatalogue.Command,
-					ToolCatalogue.Description.label("Tool_Description"),
-					Capec.Capec_ID,
-					Capec.Name.label("Attack_Pattern"), 
-					Capec.Execution_Flow, 
-					Capec.Description.label("Capec_Description"), 
-					ThreatCatalogue.TID.label("Threat_ID"), 
-					ThreatCatalogue.Asset.label("Asset_Type"), 
-					ThreatCatalogue.Threat, 
-					ThreatCatalogue.Description.label("Threat_Description"), 
-					Macm.Component_ID, 
-					Macm.Name.label("Asset"), 
-					Macm.Parameters,
-					Macm.App_ID.label("AppID"),
-					PentestPhases.PhaseID.label("PhaseID"),
-					PentestPhases.PhaseName.label("PhaseName")
-				).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
-		compiled = query.compile(compile_kwargs={"literal_binds": True})
-		response = {'query': str(compiled)}
+	# def test_function(self):
+	# 	row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
+	# 	query = select(
+	# 				ToolCatalogue.ToolID.label("Tool_ID"), 
+	# 				ToolCatalogue.Name.label("Tool_Name"), 
+	# 				ToolCatalogue.Command,
+	# 				ToolCatalogue.Description.label("Tool_Description"),
+	# 				Capec.Capec_ID,
+	# 				Capec.Name.label("Attack_Pattern"), 
+	# 				Capec.Execution_Flow, 
+	# 				Capec.Description.label("Capec_Description"), 
+	# 				ThreatCatalogue.TID.label("Threat_ID"), 
+	# 				ThreatCatalogue.Asset.label("Asset_Type"), 
+	# 				ThreatCatalogue.Threat, 
+	# 				ThreatCatalogue.Description.label("Threat_Description"), 
+	# 				Macm.Component_ID, 
+	# 				Macm.Name.label("Asset"), 
+	# 				Macm.Parameters,
+	# 				Macm.App_ID.label("AppID"),
+	# 				PentestPhases.PhaseID.label("PhaseID"),
+	# 				PentestPhases.PhaseName.label("PhaseName")
+	# 			).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
+	# 	compiled = query.compile(compile_kwargs={"literal_binds": True})
+	# 	response = {'query': str(compiled)}
 		
-		return response
+	# 	return response
 			
 
-	# def test_function(self):
-	#     response = {}
-	#     attack_data = AttackView.query.all()
-	#     response['output'] = str(attack_data)
-	#     return response
+	def test_function(self):
+		response = {}
+		response['output'] = g.api_user.username
+		return response
 
 class RiskAnalysisCatalogUtils:
 	converter = Converter()

@@ -135,6 +135,7 @@ def configure_roles(app):
         app.user_datastore.find_or_create_role(name='admin', description='Administrator')
         app.user_datastore.find_or_create_role(name='end-user', description='User')
         app.user_datastore.find_or_create_role(name='editor', description='Editor')
+        app.user_datastore.find_or_create_role(name='api-user', description='API User')
         db.session.commit()
         user_registered.connect_via(app)(user_registered_sighandler)
     
