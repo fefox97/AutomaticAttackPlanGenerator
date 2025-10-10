@@ -7,6 +7,7 @@ services:
       - "7474:7474"
       - "7687:7687"
     environment:
+      TZ: Europe/Rome
       NEO4J_AUTH: ${USER_NEO4J}/${PASS_NEO4J}
       NEO4J_ACCEPT_LICENSE_AGREEMENT: ${NEO4J_ACCEPT_LICENSE_AGREEMENT}
       NEO4J_PLUGINS: ${NEO4J_PLUGINS}
@@ -30,6 +31,7 @@ services:
     volumes:
       - my-db:/var/lib/mysql
     environment:
+      TZ: Europe/Rome
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -44,6 +46,7 @@ services:
       - ./apps:/apps
       - uploads_volume:/uploads
     environment:
+      - TZ=Europe/Rome
       - URL=${URL}
       - SITE_NAME=${SITE_NAME}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -81,6 +84,7 @@ services:
       - USER_REGISTERABLE=${USER_REGISTERABLE}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
       - FLATPAGES_ROOT=${FLATPAGES_ROOT}
       - FLATPAGES_ROOT_IMAGES=${FLATPAGES_ROOT_IMAGES}
       - FLATPAGES_EXTENSION=${FLATPAGES_EXTENSION}
@@ -99,15 +103,17 @@ services:
     container_name: celery_worker
     restart: always
     build: .
-    command: celery -A run.celery worker --loglevel=info --include=apps.celery_module.tasks
+    command: celery -A run.celery worker --pool=eventlet --loglevel=info --include=apps.celery_module.tasks
     volumes:
       - ./apps:/apps
     environment:
+      - TZ=Europe/Rome
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
       - pennet
+      - db
     networks:
       - celery_network
       - db_network
@@ -116,15 +122,18 @@ services:
     container_name: flower
     restart: always
     build: .
-    command: celery -A run.celery --broker=redis://redis:6379/0 flower
+    command: celery -A run.celery --broker=redis://redis:6379/0 flower --pool=eventlet
     ports:
       - "5555:5555"
     depends_on:
       - redis
       - pennet
+      - db
     networks:
       - celery_network
       - db_network
+    environment:
+      - TZ=Europe/Rome
 
   redis:
     image: redis:alpine
@@ -134,6 +143,8 @@ services:
       - redis_volume:/data
     networks:
       - celery_network
+    environment:
+      - TZ=Europe/Rome
 
   nginx:
     container_name: nginx
@@ -161,6 +172,8 @@ services:
       - web_network
     depends_on: 
       - pennet
+    environment:
+      - TZ=Europe/Rome
   # cloudflare:
   #   container_name: cloudflare
   #   restart: always

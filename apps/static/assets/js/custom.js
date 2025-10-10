@@ -69,7 +69,7 @@ function addToast(id, container, title, message, icon, autohide, delay) {
     wrapper.setAttribute('data-bs-delay', delay)
     wrapper.innerHTML =
         `<div class="toast-header">
-            <strong class="text-body me-auto"> ${icon} ${title}</strong>
+            <strong class="text-body me-auto"> <i class="${icon}"></i> ${title}</strong>
             <small class="text-body-secondary">${time}</small>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
@@ -213,7 +213,7 @@ function getTaskStatus(task, toast=false) {
                     buttons.push('<button class="btn btn-sm btn-primary ms-2" onclick="downloadReport(\'' + task.app_id + '\', \'' + task.task_id + '\', this)"><span>Download Report</span></button>');
                     icon = '<i class="fas fa-check"></i>';
                 }
-                buttons.push('<button class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span><i class="fas fa-trash"></i></span></button>');
+                buttons.push('<button type="button" class="btn btn-sm btn-danger ms-2" onclick="deleteTask(\'' + task.task_id + '\')"><span><i class="fas fa-trash"></i></span></button>');
                 if (task.type === 'wiki_pages_retrieval') {
                     message = "Wiki pages retrieval task is " + response.task_status + ". You can now navigate to the Wiki section to view the retrieved pages.";
                 } else if (task.type === 'pentest_report') {
@@ -230,23 +230,6 @@ function getTaskStatus(task, toast=false) {
     });
 }
 
-function deleteTask(task_id) {
-    $.ajax({
-        url: '/api/delete_task',
-        type: 'POST',
-        data: {
-            task_id: task_id
-        },
-        success: function(response) {
-            console.log(response);
-            removeNotification(task_id);
-        },
-        error: function(response) {
-            console.log(response);
-        }
-    });
-}
-
 function downloadReport(app_id, task_id, button) {
     let formData = new FormData();
     formData.append('AppID', app_id);
@@ -254,19 +237,83 @@ function downloadReport(app_id, task_id, button) {
     downloadFiles(formData, '/api/download_ai_report', button);
 }
 
-function addNotification(id, title, message, buttons, time, toast, icon='<i class="fas fa-info"></i>') {
+function getNotifications() {
+    $.ajax({
+        url: '/api/get_notifications',
+        type: 'GET',
+        data: {
+            
+        },
+        success: function(response) {
+            notifications = response.notifications;
+            for (let i = 0; i < notifications.length; i++) {
+                let notification = notifications[i];
+                buttons = [];
+                if (notification.buttons) {
+                    buttons = JSON.parse(notification.buttons);
+                }
+                addNotification(notification.id, notification.title, notification.message, buttons, notification.created_on, false, notification.icon);
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+
+function deleteNotification(notification_id, event) {
+    if (event) event.stopPropagation();
+    $.ajax({
+        url: '/api/delete_notification',
+        type: 'POST',
+        data: {
+            notification_id: notification_id
+        },
+        success: function(response) {
+            document.getElementById(notification_id + '_notification').remove();
+            $('#notification_counter').text(parseInt($('#notification_counter').text()) - 1);
+            if ($('#notification_counter').text() === '0') {
+                $('#notification_counter').addClass('d-none');
+                $('#no_notification_alert').removeClass('d-none');
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+function clearNotifications() {
+    $.ajax({
+        url: '/api/delete_all_notifications',
+        type: 'GET',
+        success: function(response) {
+            console.log(response);
+            $('#notification_container').empty();
+            $('#notification_counter').text('0');
+            $('#notification_counter').addClass('d-none');
+            $('#no_notification_alert').removeClass('d-none');
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+function addNotification(id, title, message, buttons, date, toast, icon='fas fa-info') {
     if ($('#no_notification_alert').length) {
         $('#no_notification_alert').addClass('d-none');
     }
     let notification = document.createElement('div');
     notification.className = "dropdown-item d-flex align-items-center justify-content-between";
     notification.id = id + '_notification';
-    let formattedTime = new Date(time).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    let formattedTime = new Date(date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     notification.innerHTML = `
         <div class="d-flex align-items-center notification-item">
             <div class="me-3">
                 <div class="icon icon-shape bg-primary text-white rounded-circle">
-                    ${icon}
+                    <i class="${icon}"></i>
                 </div>
             </div>
             <div>
@@ -274,36 +321,27 @@ function addNotification(id, title, message, buttons, time, toast, icon='<i clas
                 <span class="text-sm text-muted ms-2">${formattedTime}</span>
                 <p class="text-sm text-muted text-wrap mb-0">${message}</p>
             </div>`;
+    notification.innerHTML += `<div class="ms-auto">
+    <button type="button" class="btn btn-sm btn-danger" onclick="deleteNotification('${id}', event)"> <span class="fas fa-times"></span> </button>`;
     if (buttons) {
-        notification.innerHTML += '<div class="ms-auto">';
         for (let i = 0; i < buttons.length; i++) {
             notification.innerHTML += buttons[i];
         }
-        notification.innerHTML += '</div>';
     }
     notification.innerHTML += '</div>';
-    $('#notification_container').append(notification);
+    notification.innerHTML += '</div>';
+    let container = document.getElementById('notification_container');
+    if (container.firstChild) {
+        container.insertBefore(notification, container.firstChild);
+    } else {
+        container.appendChild(notification);
+    }
     if ($('#notification_counter').hasClass('d-none')) {
         $('#notification_counter').removeClass('d-none');
     }
     $('#notification_counter').text(parseInt($('#notification_counter').text()) + 1);
     if (toast)
         showToast(title, message, autohide = true, 5000, icon);
-}
-
-function removeNotification(id) {
-    document.getElementById(id + '_notification').remove();
-    $('#notification_counter').text(parseInt($('#notification_counter').text()) - 1);
-    if ($('#notification_counter').text() === '0') {
-        $('#notification_counter').addClass('d-none');
-        $('no_notification_alert').removeClass('d-none');
-    }
-}
-
-function clearNotifications() {
-    for (let i = 0; i < old_tasks.length; i++) {
-        deleteTask(old_tasks[i]);
-    }
 }
 
 function downloadFiles(formData, api, button) {
@@ -359,4 +397,7 @@ $(window).on('load', function() {
         searchInPage(text);
     });
 
+    socket.on('receive_notification', function(data) {
+        addNotification(data.id, data.title, data.message, data.buttons, data.date, true, data.icon);
+    });
 });

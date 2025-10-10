@@ -7,18 +7,21 @@ import numpy as np
 from neo4j import Result
 import re
 
-import urllib
+from apps.celery_module.tasks import test_celery
 from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import inspect, select, func, and_, text
+from sqlalchemy import inspect, func, text
 from sqlalchemy.orm import sessionmaker
 from apps.databases.models import App, AssetTypes, MacmChecks, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
 from flask_login import current_user
 from apps.config import Config
 from apps import db
-from flask import current_app as app, g
+from flask import g
+
+from apps.notifications.notify import create_notification, send_notification
+
 
 class AttackPatternUtils:
 	
@@ -630,62 +633,10 @@ class Utils:
 			ThreatModel.metadata.create_all(self.engine)
 			MethodologyView.metadata.create_all(self.engine)
 
-	# def test_function(self):
-	#     response = {}
-	#     # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-	#     # Session = sessionmaker(bind=engine)
-	#     # session = Session()
-	#     search_keys = ['SQL', 'SQL Injection']
-	#     search_cols = [Capec.Name, Capec.Description]
-	#     search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
-	#     query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
-	#     compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
-	#     response['query'] = str(compiled)
-	#     output = query.all()
-	#     response['output'] = str(output)
-	#     # session.close()
-	#     return response
-	
-	# def test_function(self):
-		
-	#     er_diagram_filename = 'er_diagram.png'
-	#     er_diagram_path = f'{Config.DBS_PATH}/images/{er_diagram_filename}'
-	#     graph = create_schema_graph(metadata=db.metadata, show_datatypes=True, show_indexes=True, rankdir='LR', font='Helvetica', concentrate=False)
-	#     graph.write_png(er_diagram_path)
-	#     response = {'message': 'ER diagram generated successfully'}
-	#     return response
-
-	# def test_function(self):
-	# 	row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
-	# 	query = select(
-	# 				ToolCatalogue.ToolID.label("Tool_ID"), 
-	# 				ToolCatalogue.Name.label("Tool_Name"), 
-	# 				ToolCatalogue.Command,
-	# 				ToolCatalogue.Description.label("Tool_Description"),
-	# 				Capec.Capec_ID,
-	# 				Capec.Name.label("Attack_Pattern"), 
-	# 				Capec.Execution_Flow, 
-	# 				Capec.Description.label("Capec_Description"), 
-	# 				ThreatCatalogue.TID.label("Threat_ID"), 
-	# 				ThreatCatalogue.Asset.label("Asset_Type"), 
-	# 				ThreatCatalogue.Threat, 
-	# 				ThreatCatalogue.Description.label("Threat_Description"), 
-	# 				Macm.Component_ID, 
-	# 				Macm.Name.label("Asset"), 
-	# 				Macm.Parameters,
-	# 				Macm.App_ID.label("AppID"),
-	# 				PentestPhases.PhaseID.label("PhaseID"),
-	# 				PentestPhases.PhaseName.label("PhaseName")
-	# 			).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
-	# 	compiled = query.compile(compile_kwargs={"literal_binds": True})
-	# 	response = {'query': str(compiled)}
-		
-	# 	return response
-			
-
 	def test_function(self):
 		response = {}
-		response['output'] = g.api_user.username
+		test_celery.delay(current_user.id)
+		response['output'] = 'Celery task test_celery invoked'
 		return response
 
 class RiskAnalysisCatalogUtils:

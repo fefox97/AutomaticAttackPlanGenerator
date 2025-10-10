@@ -103,11 +103,15 @@
 <!-- CountUp.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.9.0/countUp.umd.min.js"></script>
 
+<!-- Socket.IO -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
 <!-- Custom JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/custom.js"></script>
 
 <script type="text/javascript">
+    const socket = io('{{ request.host_url[:-1] }}');
     if ('{{ current_user.is_authenticated }}' == 'True') {
-        getPendingTasks();
+        getNotifications();
     }
 </script>

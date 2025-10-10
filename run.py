@@ -1,4 +1,5 @@
-
+import eventlet
+eventlet.monkey_patch()
 
 import os
 from   flask_migrate import Migrate
@@ -15,7 +16,6 @@ DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 get_config_mode = 'Debug' if DEBUG else 'Production'
 
 try:
-
     # Load the configuration using the default values
     app_config = config_dict[get_config_mode.capitalize()]
 
@@ -25,6 +25,7 @@ except KeyError:
 app = create_app(app_config)
 migrate = Migrate(app, db)
 celery = app.extensions['celery']
+socketio = app.extensions['socketio']
 
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)
@@ -41,4 +42,4 @@ if DEBUG:
     app.logger.info('DBS_PATH           = ' + app_config.DBS_PATH)
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app, debug=DEBUG)
