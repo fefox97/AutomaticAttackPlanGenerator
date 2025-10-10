@@ -26,6 +26,7 @@ class Users(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(100), nullable=True)
     login_count = db.Column(db.Integer, nullable=True)
     roles         = db.relationship('Roles', secondary='roles_users', backref=db.backref('users'))
+    notification_session_id = db.Column(db.String(255), nullable=True)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -143,3 +144,21 @@ class Tasks(db.Model):
 
     def __repr__(self):
         return str(self.name)
+    
+class Notifications(db.Model):
+
+    __tablename__ = 'Notifications'
+
+    id            = db.Column(db.Integer, primary_key=True)
+    title         = db.Column(db.String(255), nullable=False)
+    message       = db.Column(db.Text, nullable=False)
+    icon          = db.Column(db.String(100), nullable=True)
+    buttons       = db.Column(db.Text, nullable=True)  # JSON string
+    user_id       = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'), nullable=True)
+    created_on    = db.Column(db.DateTime, default=db.func.now())
+    read          = db.Column(db.Boolean, default=False, nullable=False)
+
+    user          = db.relationship(Users, backref=db.backref('notifications', lazy='dynamic'))
+
+    def __repr__(self):
+        return str(self.title)

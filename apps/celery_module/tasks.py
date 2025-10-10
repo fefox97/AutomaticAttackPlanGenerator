@@ -1,13 +1,28 @@
+from datetime import datetime
 import os
 import time
 from flask import current_app as app
+from flask_socketio import SocketIO
 import requests
 import json
 from apps import celery
-from apps.databases.models import Settings
 from github import Github, Auth
 import re
 import shutil
+from apps.authentication.models import Users
+
+def create_celery_notification(title, message, icon="fa fa-info", buttons=None, user_id=None, date=None):
+    from apps.notifications.notify import create_notification
+    socketio = SocketIO(message_queue="redis://redis:6379/0")
+    data = {
+            "title": title,
+            "message": message,
+            "icon": icon,
+            "buttons": buttons,
+            "date": date if date else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+    socketio.emit('receive_notification', data, to=Users.query.get(user_id).notification_session_id)
+    create_notification(title=title, message=message, icon=icon, buttons=buttons, user_id=user_id, date=date)
 
 @celery.task
 def query_llm(app_id, max_tries=10, sleep_time=1):
@@ -47,7 +62,7 @@ def query_llm(app_id, max_tries=10, sleep_time=1):
             raise Exception("Error making the request to LLM")
 
 @celery.task
-def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None, wiki_images_folder=None):
+def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None, wiki_images_folder=None, user_id=None):
     def get_all_md_files(repo, path=""):
         md_files = []
         contents = repo.get_contents(path)
@@ -114,7 +129,25 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None, wiki_images_folder
                     os.makedirs(dest_dir, exist_ok=True)
                 with open(dest_path, 'wb') as img_file:
                     img_file.write(image_data)
+            create_celery_notification(title="Wiki retrieved successfully", 
+                                message=f"The wiki has been retrieved successfully from the repository {wiki_repo_url}.",
+                                icon="fa fa-check",
+                                buttons=None,
+                                user_id=user_id)
             return pages
-
         except Exception as e:
             app.logger.error(f"Error retrieving wiki pages: {e}", exc_info=True)
+
+@celery.task
+def test_celery(user_id=None):
+    with app.app_context():
+        try:
+            create_celery_notification(title="Test notification", 
+                                message="This is a test notification from Celery task",
+                                icon="fa fa-info",
+                                buttons=None,
+                                user_id=user_id)
+            return "Celery is working fine!"
+        except Exception as e:
+            app.logger.error(f"Error in test_celery task: {e}", exc_info=True)
+            raise Exception("Error in test_celery task")

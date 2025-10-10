@@ -160,7 +160,7 @@ class APIUtils:
         
     def retrieve_wiki_pages(self, wiki_repo_url=None, wiki_folder=None, wiki_images_folder=None):
         try:
-            pages = retrieve_wiki_pages.delay(wiki_repo_url=wiki_repo_url, wiki_folder=wiki_folder, wiki_images_folder=wiki_images_folder)
+            pages = retrieve_wiki_pages.delay(wiki_repo_url=wiki_repo_url, wiki_folder=wiki_folder, wiki_images_folder=wiki_images_folder, user_id=current_user.id)
             task = Tasks(
                 id=pages.id,
                 name="Wiki pages retrieval",

@@ -14,7 +14,7 @@ from flask import render_template_string, request, send_file, make_response
 from flask_security import auth_required, current_user, roles_required
 from flask import current_app as app
 from flask import jsonify
-from apps.authentication.models import Tasks, ApiToken
+from apps.authentication.models import Notifications, Tasks, ApiToken
 from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
@@ -125,6 +125,38 @@ def delete_task():
         return jsonify({'message': 'Task deleted'})
     else:
         return jsonify({'message': 'Task not found'}), 404
+
+@blueprint.route('/get_notifications', methods=['GET'])
+@auth_required()
+def get_notifications():
+    notifications = Notifications.query.filter_by(user_id=current_user.id).order_by(Notifications.created_on.asc()).all()
+    notifications_list = []
+    for notification in notifications:
+        notifications_list.append({
+            'id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'icon': notification.icon,
+            'created_on': notification.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'read': notification.read,
+            'buttons': json.loads(notification.buttons) if notification.buttons else None
+        })
+    return jsonify({'notifications': notifications_list})
+
+@blueprint.route('/delete_notification', methods=['POST'])
+@auth_required()
+def delete_notification():
+    notification_id = request.form.get("notification_id")
+    Notifications.query.filter_by(user_id=current_user.id, id=notification_id).delete()
+    db.session.commit()
+    return jsonify({'message': 'Notification deleted'})
+
+@blueprint.route('/delete_all_notifications', methods=['GET'])
+@auth_required()
+def delete_all_notifications():
+    Notifications.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return jsonify({'message': 'All notifications deleted'})
 
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
