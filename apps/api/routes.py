@@ -8,7 +8,7 @@ from functools import wraps
 from flask import request, jsonify, g
 
 from atlassian import Jira
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from apps.api import blueprint
 from flask import render_template_string, request, send_file, make_response
 from flask_security import auth_required, current_user, roles_required
@@ -24,6 +24,7 @@ from apps import db, mail
 from sqlalchemy.sql.expression import null
 from celery.result import AsyncResult
 
+from apps.notifications.notify import create_send_notification_broadcast
 from apps.templates.security.email.report_issue import report_issue_html_content
 
 import os
@@ -139,7 +140,7 @@ def get_notifications():
             'icon': notification.icon,
             'created_on': notification.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'read': notification.read,
-            'buttons': notification.buttons
+            'links': notification.links
         })
     return jsonify({'notifications': notifications_list})
 
@@ -157,6 +158,26 @@ def delete_all_notifications():
     Notifications.query.filter_by(user_id=current_user.id).delete()
     db.session.commit()
     return jsonify({'message': 'All notifications deleted'})
+
+@blueprint.route('/broadcast_message', methods=['POST'])
+@auth_required()
+@roles_required('admin')
+def broadcast_message():
+    title = request.form.get("title")
+    message = request.form.get("content")
+    link_name = request.form.get("link_name")
+    link_url = request.form.get("link_url")
+    links = None
+    if link_name and link_url:
+        links = {link_name: link_url}
+    if not title or not message:
+        return jsonify({'message': 'Title and message are required'}), 400
+    try:
+        create_send_notification_broadcast(title=title, message=message, icon="fa fa-bullhorn", links=links)
+        return jsonify({'message': 'Broadcast message sent'})
+    except Exception as e:
+        app.logger.error(f"Error broadcasting message: {e}", exc_info=True)
+        return jsonify({'message': 'Error broadcasting message'}), 500
 
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
