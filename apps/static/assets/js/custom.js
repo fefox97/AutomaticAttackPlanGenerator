@@ -248,11 +248,11 @@ function getNotifications() {
             notifications = response.notifications;
             for (let i = 0; i < notifications.length; i++) {
                 let notification = notifications[i];
-                buttons = [];
-                if (notification.buttons) {
-                    buttons = JSON.parse(notification.buttons);
+                links = {};
+                if (notification.links) {
+                    links = JSON.parse(notification.links);
                 }
-                addNotification(notification.id, notification.title, notification.message, buttons, notification.created_on, false, notification.icon);
+                addNotification(notification.id, notification.title, notification.message, links, notification.created_on, false, notification.icon);
             }
         },
         error: function(response) {
@@ -301,7 +301,7 @@ function clearNotifications() {
     });
 }
 
-function addNotification(id, title, message, buttons, date, toast, icon='fas fa-info') {
+function addNotification(id, title, message, links, date, toast, icon='fas fa-info') {
     if ($('#no_notification_alert').length) {
         $('#no_notification_alert').addClass('d-none');
     }
@@ -310,21 +310,21 @@ function addNotification(id, title, message, buttons, date, toast, icon='fas fa-
     notification.id = id + '_notification';
     let formattedTime = new Date(date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     notification.innerHTML = `
-        <div class="d-flex align-items-center notification-item">
-            <div class="me-3">
-                <div class="icon icon-shape bg-primary text-white rounded-circle">
-                    <i class="${icon}"></i>
-                </div>
+        <div class="me-3">
+            <div class="icon icon-shape bg-primary text-white rounded-circle">
+                <i class="${icon}"></i>
             </div>
+        </div>
+        <div class="d-flex align-items-center notification-item me-3">
             <div>
                 <span class="h6">${title}</span>
                 <span class="text-sm text-muted ms-2">${formattedTime}</span>
                 <p class="text-sm text-muted text-wrap mb-0">${message}</p>
             </div>`;
     notification.innerHTML += '<div class="ms-auto">';
-    if (buttons) {
-        for (let i = 0; i < buttons.length; i++) {
-            notification.innerHTML += buttons[i];
+    if (links && Object.keys(links).length > 0) {
+        for (const [key, value] of Object.entries(links)) {
+            notification.innerHTML += `<button class="btn btn-sm btn-primary me-2" onclick="location.href='${value}'"> ${key} </button>`;
         }
     }
     notification.innerHTML += `<button type="button" class="btn btn-sm btn-danger" onclick="deleteNotification('${id}', event)"> <span class="fas fa-times"></span> </button>`;

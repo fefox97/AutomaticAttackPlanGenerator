@@ -29,6 +29,22 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">Broadcast Message</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                        <div>
+                            <h3 class="h6 mb-1">Send Broadcast Notification</h3>
+                            <p class="small pe-4">Send a broadcast message to all users</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary btn-sm reload_databases" id="BroadcastMessage" data-bs-toggle="modal" data-bs-target="#broadcastMessageModal">
+                                <span><i class="fas fa-bullhorn"></i> Send</span>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card card-body border-0 shadow mb-4">
                 <h2 class="h5 mb-4">Wiki Settings</h2>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0">
@@ -202,6 +218,7 @@
 
 {% endblock content %}
 
+{% include 'admin/modals/broadcast_message.html' %}
 {% include 'admin/modals/edit_setting_modal.html' %}
 {% include 'admin/modals/delete_wiki_modal.html' %}
 

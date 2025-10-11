@@ -20,6 +20,11 @@ $(document).ready(function() {
     }
     );
 
+    $('#broadcastMessageForm').on('submit', function(e) {
+        e.preventDefault();
+        sendBroadcastMessage();
+    });
+
     $('#deleteWikiSubmit').click(function() {
         $('#deleteWikiModal').modal('hide');
         deleteWiki();
@@ -148,5 +153,29 @@ function deleteWiki() {
     }).fail(function(response) {
         showError(response.status, autohide = true);
         $(button).removeClass('btn-loading');
+    });
+}
+
+function sendBroadcastMessage() {
+    console.log("Invio del messaggio di broadcast...");
+    let title = $('#broadcastMessageTitle').val();
+    let content = $('#broadcastMessageContent').val();
+    let link_name = $('#broadcastMessageLinkName').val();
+    let link_url = $('#broadcastMessageLinkURL').val();
+    $.ajax({
+        url: '/api/broadcast_message',
+        type: 'POST',
+        data: {
+            title: title,
+            content: content,
+            link_name: link_name,
+            link_url: link_url,
+        }
+    }).done(function(response) {
+        $('#broadcastMessageModal').modal('hide');
+        showModal("Broadcast Message", response.message, '<i class="fa fa-info"</i>', autohide=true);
+    }).fail(function(response) {
+        $('#broadcastMessageModal').modal('hide');
+        showModal("Broadcast Message", JSON.parse(response.responseText), '<i class="fa fa-info"</i>', autohide=true);
     });
 }
