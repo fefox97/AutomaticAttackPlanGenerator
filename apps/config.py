@@ -1,5 +1,3 @@
-
-
 import os, random, string
 from dotenv import load_dotenv
 
@@ -7,6 +5,8 @@ from apps.markdown_extensions.card_extension import CardExtension
 from apps.markdown_extensions.table_extension import TableClassExtension
 
 class Config(object):
+
+    VERSION = "2.0.0"
 
     basedir = os.path.abspath(os.path.dirname(__file__))
     # Load .env file

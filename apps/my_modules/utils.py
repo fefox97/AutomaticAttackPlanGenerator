@@ -422,7 +422,7 @@ class MacmUtils:
 			db.session.commit()
 			for user in users:
 				if user != current_user.id:
-					create_send_notification(f"MACM '{app_name}' shared with you", f"User '{current_user.username}' has shared the MACM '{app_name}' with you.", buttons="""["<a class='btn btn-primary me-2' href='/macm'>Go to MACM</a>"]""", user_id=user)
+					create_send_notification(f"MACM '{app_name}' shared with you", f"User '{current_user.username}' has shared the MACM '{app_name}' with you.", links={"Go to MACM":"/macm"}, user_id=user)
 			return True
 		except Exception as error:
 			raise error
