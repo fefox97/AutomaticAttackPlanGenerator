@@ -321,13 +321,13 @@ function addNotification(id, title, message, buttons, date, toast, icon='fas fa-
                 <span class="text-sm text-muted ms-2">${formattedTime}</span>
                 <p class="text-sm text-muted text-wrap mb-0">${message}</p>
             </div>`;
-    notification.innerHTML += `<div class="ms-auto">
-    <button type="button" class="btn btn-sm btn-danger" onclick="deleteNotification('${id}', event)"> <span class="fas fa-times"></span> </button>`;
+    notification.innerHTML += '<div class="ms-auto">';
     if (buttons) {
         for (let i = 0; i < buttons.length; i++) {
             notification.innerHTML += buttons[i];
         }
     }
+    notification.innerHTML += `<button type="button" class="btn btn-sm btn-danger" onclick="deleteNotification('${id}', event)"> <span class="fas fa-times"></span> </button>`;
     notification.innerHTML += '</div>';
     notification.innerHTML += '</div>';
     let container = document.getElementById('notification_container');
