@@ -1,4 +1,4 @@
-name: Deploy Web Server
+name: Deploy Web Server (VPN + SSH)
 
 on:
   push:
@@ -8,15 +8,25 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+      WEBAPP_PATH: ${{ secrets.WEBAPP_PATH }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Check TUN device (required by OpenVPN)
+        run: |
+          if [ ! -c /dev/net/tun ]; then
+            echo "TUN device is not available on this runner. OpenVPN cannot start." >&2
+            exit 1
+          fi
 
       - name: Install OpenVPN
         run: |
@@ -25,14 +35,36 @@ jobs:
           
       - name: Connect to VPN
         run: |
+          set -euo pipefail
           echo "${{ secrets.OPENVPN_CONFIG }}" > client.ovpn
-          sudo openvpn --config client.ovpn --daemon
-          sleep 10  # Aspetta che la connessione venga stabilita
+          sudo openvpn --config client.ovpn --daemon --writepid /tmp/openvpn.pid
+          # Wait up to 60s for interface to come up
+          for i in $(seq 1 60); do
+            if ip addr show | grep -qE '\btun[0-9]'; then
+              echo "OpenVPN is up"
+              break
+            fi
+            sleep 1
+          done
+          if ! ip addr show | grep -qE '\btun[0-9]'; then
+            echo "OpenVPN did not come up within 60s" >&2
+            sudo cat /tmp/openvpn.pid 2>/dev/null || true
+            exit 1
+          fi
 
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} << 'EOF'
-            cd ${{ secrets.WEBAPP_PATH }}
+          set -euo pipefail
+          SSH_TARGET="root@${{ secrets.SERVER_IP }}"
+          # Optional: ensure host key is known to avoid MITM (kept StrictHostKeyChecking=no for now)
+          ssh -vvv -o StrictHostKeyChecking=no "$SSH_TARGET" << 'EOF'
+            set -euo pipefail
+            cd "${{ secrets.WEBAPP_PATH }}"
+            echo "Current directory: $(pwd)"
+            echo "Git remote(s):"; git remote -v || true
+            echo "Git status before pull:"; git status -sb || true
             git pull origin main
-            docker compose restart
+            docker compose down || true
+            docker compose up -d --build
+            echo "Deployed OK"
           EOF
