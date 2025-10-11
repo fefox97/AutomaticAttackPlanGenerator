@@ -137,6 +137,8 @@ class Config(object):
     URI_NEO4J_WSS               = os.getenv('URI_NEO4J_WSS'    , None)
     USER_NEO4J                  = os.getenv('USER_NEO4J'    , None)
     PASS_NEO4J                  = os.getenv('PASS_NEO4J'    , None)
+    RO_USER_NEO4J               = os.getenv('RO_USER_NEO4J'    , None)
+    RO_PASS_NEO4J               = os.getenv('RO_PASS_NEO4J'    , None)
     TLS_NEO4J                   = os.getenv('TLS_NEO4J'    , None)
 
     # try to set up a Relational DBMS
