@@ -56,8 +56,5 @@ nginx/dhparam.pem
 docker-compose.yml
 
 apps/templates/wiki/pages/
-<<<<<<< HEAD
-apps/static/assets/wiki/
-=======
 apps/templates/wiki/pages/
 apps/static/assets/wiki/
