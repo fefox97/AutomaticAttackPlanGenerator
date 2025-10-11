@@ -107,8 +107,8 @@ services:
       - redis
       - pennet
     networks:
-      - celery_network
       - db_network
+      - celery_network
 
   flower:
     container_name: flower
@@ -121,8 +121,8 @@ services:
       - redis
       - pennet
     networks:
-      - celery_network
       - db_network
+      - celery_network
 
   redis:
     image: redis:alpine

@@ -10,7 +10,7 @@ RUN mkdir /uploads
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y nmap wkhtmltopdf fonts-noto-color-emoji
+RUN apt install -y nmap fonts-noto-color-emoji
 
 COPY . .
 
