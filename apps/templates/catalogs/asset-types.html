@@ -50,6 +50,7 @@
                                 <th>Primary Label</th>
                                 <th>Secondary Label</th>
                                 <th>Description</th>
+                                <th>Ports</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,6 +61,7 @@
                                     <td>{{ row.PrimaryLabel }}</td>
                                     <td>{{ row.SecondaryLabel }}</td>
                                     <td>{{ row.Description if row.Description }}</td>
+                                    <td>{{ row.Ports if row.Ports }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -70,6 +72,7 @@
                                 <th>Primary Label</th>
                                 <th>Secondary Label</th>
                                 <th>Description</th>
+                                <th>Ports</th>
                             </tr>
                         </tfoot>
                     </table> 

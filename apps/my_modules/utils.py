@@ -7,18 +7,21 @@ import numpy as np
 from neo4j import Result
 import re
 
-import urllib
-from apps.my_modules import converter
+from apps.celery_module.tasks import test_celery
+from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules.converter import Converter
 from neo4j import GraphDatabase
 import sqlalchemy
-from sqlalchemy import inspect, select, func, and_, text
+from sqlalchemy import inspect, func, text
 from sqlalchemy.orm import sessionmaker
-from apps.databases.models import App, AssetTypes, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
+from apps.databases.models import App, AssetTypes, MacmChecks, MethodologyCatalogue, MethodologyView, PentestPhases, Protocols, Settings, ThreatAgentAttribute, ThreatAgentAttributesCategory, ThreatAgentCategory, ThreatAgentQuestion, ThreatAgentQuestionReplies, ThreatAgentReply, ThreatAgentReplyCategory, ThreatCatalogue, Capec, CapecThreatRel, ThreatModel, ToolCatalogue, CapecToolRel, Macm, AttackView, Attack, MacmUser, ToolPhaseRel, ThreatAgentRiskScores, StrideImpactRecord, RiskRecord
 from flask_login import current_user
 from apps.config import Config
 from apps import db
-from flask import current_app as app
+from flask import g
+
+from apps.notifications.notify import create_notification, create_send_notification, send_notification
+
 
 class AttackPatternUtils:
 	
@@ -196,6 +199,7 @@ class ProtocolsCatalogUtils:
 		print("\nLoading Protocols catalog...\n")
 		df = pd.read_excel(file_path, sheet_name="Protocols", header=0)
 		df.rename(columns={'Extended Name': 'ExtendedName', 'Layer': 'ISOLayer'}, inplace=True)
+		# df['Ports'] = df['Ports'].apply(lambda x: self.converter.string_to_int_list(x))
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
 	
@@ -227,6 +231,34 @@ class MethodologyCatalogUtils:
 		df.replace(np.nan, None, inplace=True) # replace NaN with None
 		return df
 
+class MACMCheckCatalogUtils:
+
+	converter = Converter()
+
+	def __init__(self):
+		self.base_path = Config.DBS_PATH
+
+	@staticmethod
+	def get_catalog_filename():
+		from flask import current_app as app
+		with app.app_context():
+			setting = Settings.query.filter_by(key='catalogs_filename').first()
+			return setting.value if setting else None
+
+	@property
+	def file_path(self):
+		filename = self.get_catalog_filename()
+		return f"{self.base_path}/{filename}" if filename else None
+
+	def load_macm_checks_catalog(self):
+		file_path = self.file_path
+		if not file_path or not os.path.exists(file_path):
+			raise FileNotFoundError("Catalog file not found")
+		print("\nLoading MACM Checks catalog...\n")
+		df = pd.read_excel(file_path, sheet_name="MACMChecks", header=0)
+		df.replace(np.nan, None, inplace=True) # replace NaN with None
+		return df
+
 class MacmUtils:
 
 	converter = Converter()
@@ -237,7 +269,7 @@ class MacmUtils:
 		self.PASS_NEO4J = os.getenv('PASS_NEO4J'    , None)
 
 		self.driver = GraphDatabase.driver(self.URI_NEO4J, auth=(self.USER_NEO4J, self.PASS_NEO4J), initial_retry_delay=10)
-		self.driver.verify_connectivity()
+		# self.driver.verify_connectivity()
 
 	def clear_database(self, database):
 		self.driver.execute_query("MATCH (n) DETACH DELETE n", database_=database)
@@ -289,9 +321,26 @@ class MacmUtils:
 		except:
 			print(f"Database {database} does not exist: creating it...")
 			self.create_database(database)
-		self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
-		self.driver.execute_query(query, database_=database)
+		# self.driver.execute_query("CREATE CONSTRAINT key IF NOT EXISTS FOR (asset:service) REQUIRE asset.component_id IS UNIQUE", database_=database)
+		self.load_macm_constraints(database)
+		try:
+			self.driver.execute_query(query, database_=database)
+		except Exception as error:
+			print(f"Error uploading MACM: {error}")
+			self.delete_database(database)
+			raise MACMCheckException(f"{error}")
 		Utils().upload_databases('Macm', neo4j_db=database, app_name=app_name)
+
+	def upload_docker_compose(self, dockerComposeContent):
+		return self.converter.docker_compose_2_MACM(dockerComposeContent)
+
+	def load_macm_constraints(self, database='macm'):
+		try:
+			for constraint in MacmChecks.query.with_entities(MacmChecks.Query).all():
+				self.driver.execute_query(constraint.Query, database_=database)
+		except Exception as error:
+			print(f"Error loading MACM constraints: {error}")
+			raise error
 
 	def update_macm(self, query, database='macm'):
 		try:
@@ -371,9 +420,11 @@ class MacmUtils:
 					macm_user = MacmUser(AppID=app_id, AppName=app_name, UserID=user, IsOwner=False)
 					db.session.add(macm_user)
 			db.session.commit()
+			for user in users:
+				if user != current_user.id:
+					create_send_notification(f"MACM '{app_name}' shared with you", f"User '{current_user.username}' has shared the MACM '{app_name}' with you.", buttons="""["<a class='btn btn-primary me-2' href='/macm'>Go to MACM</a>"]""", user_id=user)
 			return True
 		except Exception as error:
-			print(f"Error sharing MACM {app_id} with users {users}:\n {error}")
 			raise error
 
 	def unshare_macm(self, app_id, user_id):
@@ -423,6 +474,7 @@ class Utils:
 		self.tool_catalog_utils = ToolCatalogUtils()
 		self.macm_utils = MacmUtils()
 		self.methodology_catalog_utils = MethodologyCatalogUtils()
+		self.macm_check_catalog_utils = MACMCheckCatalogUtils()
 		self.risk_analysis_catalog_utils = RiskAnalysisCatalogUtils()
 		self.asset_types_catalog_utils = AssetTypesCatalogUtils()
 		self.protocols_catalog_utils = ProtocolsCatalogUtils()
@@ -534,6 +586,9 @@ class Utils:
 		elif database == 'MethodologyCatalog':
 			methodology_catalog_df = self.methodology_catalog_utils.load_methodology_catalog()
 			self.save_dataframe_to_database(methodology_catalog_df, MethodologyCatalogue)
+		elif database == 'MACMChecksCatalog':
+			macm_checks_catalog_df = self.macm_check_catalog_utils.load_macm_checks_catalog()
+			self.save_dataframe_to_database(macm_checks_catalog_df, MacmChecks)
 		elif database == 'AssetTypesCatalog':
 			asset_types_catalog_df = self.asset_types_catalog_utils.load_asset_types_catalog()
 			self.save_dataframe_to_database(asset_types_catalog_df, AssetTypes)
@@ -580,64 +635,11 @@ class Utils:
 			ThreatModel.metadata.create_all(self.engine)
 			MethodologyView.metadata.create_all(self.engine)
 
-	# def test_function(self):
-	#     response = {}
-	#     # engine = sqlalchemy.create_engine('sqlite:///apps/db.sqlite3')
-	#     # Session = sessionmaker(bind=engine)
-	#     # session = Session()
-	#     search_keys = ['SQL', 'SQL Injection']
-	#     search_cols = [Capec.Name, Capec.Description]
-	#     search_args = [or_(and_(col.ilike(f"%{key}%") for key in search_keys) for col in search_cols)]
-	#     query = Capec.query.filter(*search_args).with_entities(Capec.Name, Capec.Description)
-	#     compiled = query.statement.compile(compile_kwargs={"literal_binds": True})
-	#     response['query'] = str(compiled)
-	#     output = query.all()
-	#     response['output'] = str(output)
-	#     # session.close()
-	#     return response
-	
-	# def test_function(self):
-		
-	#     er_diagram_filename = 'er_diagram.png'
-	#     er_diagram_path = f'{Config.DBS_PATH}/images/{er_diagram_filename}'
-	#     graph = create_schema_graph(metadata=db.metadata, show_datatypes=True, show_indexes=True, rankdir='LR', font='Helvetica', concentrate=False)
-	#     graph.write_png(er_diagram_path)
-	#     response = {'message': 'ER diagram generated successfully'}
-	#     return response
-
 	def test_function(self):
-		row_number_column = func.row_number().over(order_by=Macm.Component_ID).label('Attack_Number')
-		query = select(
-					ToolCatalogue.ToolID.label("Tool_ID"), 
-					ToolCatalogue.Name.label("Tool_Name"), 
-					ToolCatalogue.Command,
-					ToolCatalogue.Description.label("Tool_Description"),
-					Capec.Capec_ID,
-					Capec.Name.label("Attack_Pattern"), 
-					Capec.Execution_Flow, 
-					Capec.Description.label("Capec_Description"), 
-					ThreatCatalogue.TID.label("Threat_ID"), 
-					ThreatCatalogue.Asset.label("Asset_Type"), 
-					ThreatCatalogue.Threat, 
-					ThreatCatalogue.Description.label("Threat_Description"), 
-					Macm.Component_ID, 
-					Macm.Name.label("Asset"), 
-					Macm.Parameters,
-					Macm.App_ID.label("AppID"),
-					PentestPhases.PhaseID.label("PhaseID"),
-					PentestPhases.PhaseName.label("PhaseName")
-				).select_from(Macm).join(ThreatCatalogue, Macm.Type==ThreatCatalogue.Asset).join(CapecThreatRel).join(Capec).join(CapecToolRel).join(ToolCatalogue).join(Attack, and_(Macm.Component_ID==Attack.ComponentID, Attack.ToolID==ToolCatalogue.ToolID, Macm.App_ID==Attack.AppID)).join(ToolPhaseRel, ToolCatalogue.ToolID==ToolPhaseRel.ToolID).join(PentestPhases, ToolPhaseRel.PhaseID==PentestPhases.PhaseID).add_columns(row_number_column)
-		compiled = query.compile(compile_kwargs={"literal_binds": True})
-		response = {'query': str(compiled)}
-		
+		response = {}
+		test_celery.delay(current_user.id)
+		response['output'] = 'Celery task test_celery invoked'
 		return response
-			
-
-	# def test_function(self):
-	#     response = {}
-	#     attack_data = AttackView.query.all()
-	#     response['output'] = str(attack_data)
-	#     return response
 
 class RiskAnalysisCatalogUtils:
 	converter = Converter()
@@ -911,7 +913,7 @@ class RiskAnalysisCatalogUtils:
 			# Calcola le minacce per ciascun componente
 			threat_for_each_component = ThreatModel.query.filter_by(AppID=appId).with_entities(
 				ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
-			threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
+			threat_for_each_component = self.converter.tuple_list_to_dict(threat_for_each_component)
 
 			# Calcola il numero totale di minacce
 			threat_number = ThreatModel.query.filter_by(AppID=appId).count()

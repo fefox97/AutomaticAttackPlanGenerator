@@ -1,0 +1,28 @@
+<!-- Parser Modal -->
+<div class="modal fade" id="modalDC2M" tabindex="-1" aria-labelledby="modalDC2MLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDC2MLabel">DockerCompose2MACM Output</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <pre class="line-numbers" id="modalDC2MOutputPre"><code class="language-cypher" id="modalDC2MOutput"></code></pre>
+                <div class="alert alert-info" id="modalDC2MAlert" role="alert" style="display: none;">
+                    <h5 class="alert-heading">Nothing to do</h5>
+                    <p>There is no MACM data.</p>
+                </div>
+                <div class="row" id="modalDC2MServices">
+                    <div class="col-12">
+                        <h5>Customize service types</h5>
+                        <div id="modalDC2MServicesList"></div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="uploadDC2MOutput">Upload</button>
+                <button type="button" class="btn btn-secondary" id="copyDC2MOutput" onclick="navigator.clipboard.writeText($(this).attr('data-clipboard-text'))">Copy</button>
+                <button type="button" class="btn btn-tertiary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

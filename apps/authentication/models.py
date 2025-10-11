@@ -26,6 +26,7 @@ class Users(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(100), nullable=True)
     login_count = db.Column(db.Integer, nullable=True)
     roles         = db.relationship('Roles', secondary='roles_users', backref=db.backref('users'))
+    notification_session_id = db.Column(db.String(255), nullable=True)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -78,6 +79,29 @@ class Users(db.Model, UserMixin):
 #     user = Users.query.filter_by(username=username).first()
 #     return user if user else None
 
+class ApiToken(db.Model):
+    __tablename__ = 'ApiTokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'), nullable=False)
+    token = db.Column(db.String(128), unique=True, nullable=False)
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    expires_on = db.Column(db.DateTime, nullable=True)
+    revoked = db.Column(db.Boolean, default=False, nullable=False)
+    last_used = db.Column(db.DateTime, nullable=True)
+    usage_count = db.Column(db.Integer, default=0, nullable=False)
+    description = db.Column(db.String(255), nullable=False, default='')
+
+    user = db.relationship('Users', backref=db.backref('api_tokens', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<ApiToken {self.token}>'
+
+    def token_used(self):
+        self.last_used = db.func.now()
+        self.usage_count += 1
+        db.session.commit()
+
 class OAuth(OAuthConsumerMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("Users.id", ondelete="cascade"), nullable=False)
     user = db.relationship(Users)
@@ -120,3 +144,21 @@ class Tasks(db.Model):
 
     def __repr__(self):
         return str(self.name)
+    
+class Notifications(db.Model):
+
+    __tablename__ = 'Notifications'
+
+    id            = db.Column(db.Integer, primary_key=True)
+    title         = db.Column(db.String(255), nullable=False)
+    message       = db.Column(db.Text, nullable=False)
+    icon          = db.Column(db.String(100), nullable=True)
+    buttons       = db.Column(db.Text, nullable=True)  # JSON string
+    user_id       = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'), nullable=True)
+    created_on    = db.Column(db.DateTime, default=db.func.now())
+    read          = db.Column(db.Boolean, default=False, nullable=False)
+
+    user          = db.relationship(Users, backref=db.backref('notifications', lazy='dynamic'))
+
+    def __repr__(self):
+        return str(self.title)

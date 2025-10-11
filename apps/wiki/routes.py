@@ -31,6 +31,7 @@ def macm_examples():
 def wiki_page(path):
     app.logger.info('Wiki page requested: {}'.format(path))
     page = pages.get_or_404(path)
+    page.html = page.html.replace('src="./images/', 'src="/static/assets/wiki/images/')
     template = page.meta.get('template', 'wiki/flatpage.html')
     return render_template(template, page=page, segment=get_segment(request))
 

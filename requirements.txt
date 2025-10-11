@@ -71,3 +71,6 @@ PyGithub
 Flask-FlatPages
 markdown
 Pygments
+
+flask-socketio
+eventlet

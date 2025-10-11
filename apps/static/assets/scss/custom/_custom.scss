@@ -170,6 +170,9 @@ div.dataTables_scrollBody {
 .bg-macm-label{
     background-color: $bg-macm-label-background !important;
 }
+.bg-macm-check{
+    background-color: $bg-macm-check-background !important;
+}
 
 .text-capec{
     color: $capec-color !important;
@@ -299,6 +302,9 @@ pre[class*=language-]{
 .sidebar {
     .sidebar-inner {
         height: 100vh;
+    }
+    .nav {
+        white-space: normal !important;
     }
 
     .multi-level{

@@ -3,6 +3,9 @@ import datetime
 import json
 import traceback
 import uuid
+import secrets
+from functools import wraps
+from flask import request, jsonify, g
 
 from atlassian import Jira
 from sqlalchemy import select
@@ -11,20 +14,50 @@ from flask import render_template_string, request, send_file, make_response
 from flask_security import auth_required, current_user, roles_required
 from flask import current_app as app
 from flask import jsonify
-from apps.authentication.models import Tasks
-from apps.celery_module.tasks import retrieve_wiki_pages
+from apps.authentication.models import Notifications, Tasks, ApiToken
+from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import App, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
+from apps.databases.models import App, AssetTypes, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 from celery.result import AsyncResult
 
 from apps.templates.security.email.report_issue import report_issue_html_content
 
-from github import Github
 import os
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        # If the user is already normally authenticated, accept the request
+        if current_user and hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
+            g.api_user = current_user
+            return f(*args, **kwargs)
+        token = None
+        # Try to get token from Authorization header (Bearer <token>)
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1]
+        # Fallback: try to get token from query string
+        if not token:
+            token = request.args.get('api_token')
+        # Fallback: try to get token from JSON body
+        if not token and request.is_json:
+            token = request.json.get('api_token')
+        if not token:
+            return jsonify({'error': 'API token is missing'}), 401
+        api_token = ApiToken.query.filter_by(token=token, revoked=False).first()
+        if not api_token:
+            return jsonify({'error': 'Invalid or revoked API token'}), 401
+        if api_token.expires_on and api_token.expires_on < datetime.datetime.utcnow():
+            return jsonify({'error': 'API token expired'}), 401
+        # Optionally set user in Flask global context
+        g.api_user = api_token.user
+        api_token.token_used()
+        return f(*args, **kwargs)
+    return decorated
 
 @blueprint.route('/get_pending_tasks', methods=['GET'])
 @auth_required()
@@ -93,9 +126,40 @@ def delete_task():
     else:
         return jsonify({'message': 'Task not found'}), 404
 
+@blueprint.route('/get_notifications', methods=['GET'])
+@auth_required()
+def get_notifications():
+    notifications = Notifications.query.filter_by(user_id=current_user.id).order_by(Notifications.created_on.asc()).all()
+    notifications_list = []
+    for notification in notifications:
+        notifications_list.append({
+            'id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'icon': notification.icon,
+            'created_on': notification.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'read': notification.read,
+            'buttons': notification.buttons
+        })
+    return jsonify({'notifications': notifications_list})
+
+@blueprint.route('/delete_notification', methods=['POST'])
+@auth_required()
+def delete_notification():
+    notification_id = request.form.get("notification_id")
+    Notifications.query.filter_by(user_id=current_user.id, id=notification_id).delete()
+    db.session.commit()
+    return jsonify({'message': 'Notification deleted'})
+
+@blueprint.route('/delete_all_notifications', methods=['GET'])
+@auth_required()
+def delete_all_notifications():
+    Notifications.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return jsonify({'message': 'All notifications deleted'})
+
 @blueprint.route('/search_capec_by_id', methods=['POST'])
 def search_capec_by_id():
-    app.logger.info(f"Current user: {current_user}")
     search_id = request.form.get("SearchID") or ''
     showTree = True if request.form.get("ShowTree") == 'true' else False
     search_id_conv = converter.string_to_int_list(search_id)
@@ -135,6 +199,35 @@ def upload_macm():
         return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
     except Exception as error:
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
+        return make_response(jsonify({'message': error.args}), 400)
+
+@blueprint.route('/upload_docker_compose', methods=['POST'])
+@auth_required()
+def upload_docker_compose():
+    app_name = request.form.get('macmAppName')
+    if app_name in [None, '']:
+        return make_response(jsonify({'message': 'No App Name provided'}), 400)
+    if 'composeFile' in request.files and request.files['composeFile'].filename != '':
+        file = request.files['composeFile']
+        app.logger.info(f"Uploading Docker Compose from file {request.files['composeFile']}")
+        if not APIUtils().allowed_file(file.filename, ['yaml', 'yml']):
+            return make_response(jsonify({'message': 'File type not allowed'}), 400)
+        yaml_str = file.read().decode('utf-8')
+    elif 'dockerYaml' in request.form and request.form.get('dockerYaml') != '':
+        yaml_str = request.form.get('dockerYaml')
+    else:
+        return make_response(jsonify({'message': 'No file or YAML content provided'}), 400)
+    try:
+        cypher, services, port_service_map = macm.upload_docker_compose(yaml_str)
+        service_types = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.PrimaryLabel, AssetTypes.SecondaryLabel).filter(AssetTypes.PrimaryLabel == 'Service').all()
+        suggested_asset_types = AssetTypes.get_suggested_asset_types(port_service_map)
+        service_types = [{'name': st.Name, 'primary_label': st.PrimaryLabel, 'secondary_label': st.SecondaryLabel} for st in service_types]
+        return make_response(jsonify({'message': 'Docker Compose uploaded successfully', 'cypher': cypher, 'services': services, 'app_name': app_name, 'service_types': service_types, 'suggested_asset_types':suggested_asset_types}), 200)
+    except MACMCheckException as mce:
+        app.logger.error(f"MACM Check Error uploading Docker Compose: {mce.args}", exc_info=True)
+        return make_response(jsonify({'message': mce.args}), 400)
+    except Exception as error:
+        app.logger.error(f"Error uploading Docker Compose: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
 @blueprint.route('/update_macm', methods=['POST'])
@@ -206,6 +299,7 @@ def share_macm():
             macm.share_macm(app_id, users)
             return make_response(jsonify({'message': 'MACM shared successfully'}), 200)
         except Exception as error:
+            app.logger.error(f"Error sharing MACM {app_id} with users {users}:\n {error}", exc_info=True)
             return make_response(jsonify({'message': error.args}), 400)
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
@@ -237,10 +331,12 @@ def reload_databases():
         else:
             return make_response(jsonify({'message': 'No database provided'}), 400)
     except Exception as error:
+        app.logger.error(f"Error reloading database {database}: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
 
 @blueprint.route('/test', methods=['GET', 'POST'])
-@auth_required()
+@token_required
+# @auth_required()
 def test():
     response = utils.test_function()
     return make_response(jsonify(response), 200)
@@ -571,8 +667,9 @@ def edit_setting():
 def get_wiki():
     repo_url = app.config['WIKI_REPO']
     wiki_folder = app.config['FLATPAGES_ROOT']
+    wiki_images_folder = app.config['FLATPAGES_ROOT_IMAGES']
     try:
-        pages = APIUtils().retrieve_wiki_pages(wiki_repo_url=repo_url, wiki_folder=wiki_folder)
+        pages = APIUtils().retrieve_wiki_pages(wiki_repo_url=repo_url, wiki_folder=wiki_folder, wiki_images_folder=wiki_images_folder)
         return jsonify({'message': "Wiki pages retrieve started successfully"})
     except Exception as error:
         app.logger.error(f"Error retrieving wiki: {error.args}", exc_info=True)
@@ -589,3 +686,56 @@ def delete_wiki():
     except Exception as error:
         app.logger.error(f"Error deleting wiki: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
+
+@blueprint.route('/api_tokens', methods=['POST'])
+@auth_required()
+@roles_required('api-user')
+def create_api_token():
+    expires_days = request.json.get('expires_days')
+    description = request.json.get('description')
+    token_value = secrets.token_urlsafe(32)
+    expires_on = None
+    if expires_days:
+        expires_on = datetime.datetime.utcnow() + datetime.timedelta(days=int(expires_days))
+    token = ApiToken(user_id=current_user.id, token=token_value, expires_on=expires_on, description=description)
+    db.session.add(token)
+    db.session.commit()
+    return jsonify({'token': token.token, 'expires_on': token.expires_on}), 201
+
+@blueprint.route('/api_tokens', methods=['GET'])
+@auth_required()
+@roles_required('api-user')
+def list_api_tokens():
+    tokens = ApiToken.query.filter_by(user_id=current_user.id).all()
+    return jsonify([
+        {
+            'id': t.id,
+            'token': t.token,
+            'created_on': t.created_on.strftime('%d/%m/%Y %H:%M') if t.created_on else '-',
+            'expires_on': t.expires_on.strftime('%d/%m/%Y %H:%M') if t.expires_on else 'Never',
+            'revoked': t.revoked,
+            'description': t.description
+        } for t in tokens
+    ])
+
+@blueprint.route('/api_tokens/<int:token_id>/revoke', methods=['POST'])
+@auth_required()
+@roles_required('api-user')
+def revoke_api_token(token_id):
+    token = ApiToken.query.filter_by(id=token_id, user_id=current_user.id).first()
+    if not token:
+        return jsonify({'error': 'Token not found'}), 404
+    token.revoked = True
+    db.session.commit()
+    return jsonify({'message': 'Token revoked'})
+
+@blueprint.route('/api_tokens/<int:token_id>/delete', methods=['POST'])
+@auth_required()
+@roles_required('api-user')
+def delete_api_token(token_id):
+    token = ApiToken.query.filter_by(id=token_id, user_id=current_user.id).first()
+    if not token:
+        return jsonify({'error': 'Token not found'}), 404
+    db.session.delete(token)
+    db.session.commit()
+    return jsonify({'message': 'Token deleted'})

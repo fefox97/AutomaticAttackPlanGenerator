@@ -10,7 +10,7 @@ RUN mkdir /uploads
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y nmap wkhtmltopdf fonts-noto-color-emoji
+RUN apt install -y nmap fonts-noto-color-emoji
 
 COPY . .
 
@@ -19,5 +19,5 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install -e ./sqlalchemy-utils
 
-# gunicorn
-CMD ["gunicorn", "--config", "gunicorn-cfg.py", "run:app"]
+# gunicorn con worker eventlet
+CMD ["gunicorn", "--config", "gunicorn-cfg.py", "--worker-class", "eventlet", "run:app"]

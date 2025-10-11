@@ -126,12 +126,12 @@
     </div>
 
     {% include 'penetration_tests/modals/parser_modal.html' %}
-    {% include 'penetration_tests/modals/delete_modal.html' %}
+    {% include 'macm/modals/delete_modal.html' %}
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm-detail.js"></script>
-    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/macm-detail.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/reports.js"></script>
 {% endblock javascripts %}
