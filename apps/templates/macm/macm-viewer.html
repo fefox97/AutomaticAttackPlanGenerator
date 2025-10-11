@@ -29,7 +29,10 @@
 
     <div class="card border-0 shadow mb-3" id="macmGraph">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h4 mb-0">The {{ app_info.Name }} MACM Graph</h2>
+            <div
+                <h2 class="h4 mb-0">The {{ app_info.Name }} MACM Graph</h2>
+                <p class="mb-0 text-muted">{{selected_macm}}</p>
+            </div>
             <div>
                 <label for="layoutSelector" class="me-2 fw-semibold">Layout:</label>
                 <select id="layoutSelector" class="form-select d-inline-block w-auto me-3 align-middle" style="min-width: 120px;">
