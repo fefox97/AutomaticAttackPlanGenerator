@@ -139,7 +139,7 @@ def get_notifications():
             'icon': notification.icon,
             'created_on': notification.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'read': notification.read,
-            'buttons': json.loads(notification.buttons) if notification.buttons else None
+            'buttons': notification.buttons
         })
     return jsonify({'notifications': notifications_list})
 
@@ -299,6 +299,7 @@ def share_macm():
             macm.share_macm(app_id, users)
             return make_response(jsonify({'message': 'MACM shared successfully'}), 200)
         except Exception as error:
+            app.logger.error(f"Error sharing MACM {app_id} with users {users}:\n {error}", exc_info=True)
             return make_response(jsonify({'message': error.args}), 400)
     else:
         return make_response(jsonify({'message': 'No MACM provided'}), 400)

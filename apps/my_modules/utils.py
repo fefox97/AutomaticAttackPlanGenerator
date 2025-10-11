@@ -20,7 +20,7 @@ from apps.config import Config
 from apps import db
 from flask import g
 
-from apps.notifications.notify import create_notification, send_notification
+from apps.notifications.notify import create_notification, create_send_notification, send_notification
 
 
 class AttackPatternUtils:
@@ -420,9 +420,11 @@ class MacmUtils:
 					macm_user = MacmUser(AppID=app_id, AppName=app_name, UserID=user, IsOwner=False)
 					db.session.add(macm_user)
 			db.session.commit()
+			for user in users:
+				if user != current_user.id:
+					create_send_notification(f"MACM '{app_name}' shared with you", f"User '{current_user.username}' has shared the MACM '{app_name}' with you.", buttons="""["<a class='btn btn-primary me-2' href='/macm'>Go to MACM</a>"]""", user_id=user)
 			return True
 		except Exception as error:
-			print(f"Error sharing MACM {app_id} with users {users}:\n {error}")
 			raise error
 
 	def unshare_macm(self, app_id, user_id):

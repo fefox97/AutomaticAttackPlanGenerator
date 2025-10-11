@@ -43,5 +43,6 @@ def create_notification(title, message, icon="fa fa-info", buttons=None, user_id
     db.session.commit()
 
 def create_send_notification(title, message, icon="fa fa-info", buttons=None, user_id=None, date=None):
+    app.logger.info(f"Creating and sending notification to user_id={user_id}: {title} - {message}")
     create_notification(title=title, message=message, icon=icon, buttons=buttons, user_id=user_id, date=date)
     send_notification(title=title, message=message, icon=icon, buttons=buttons, user_id=user_id, date=date)
