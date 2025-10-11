@@ -51,13 +51,9 @@ neo4j/ssl/*
 certs/*
 # nginx dhparam file to be generated
 nginx/dhparam.pem
-old.env
+.env.old
 
 docker-compose.yml
-<<<<<<< HEAD
-apps/templates/wiki/pages/
 
-=======
 apps/templates/wiki/pages/
->>>>>>> origin/main
 apps/static/assets/wiki/
