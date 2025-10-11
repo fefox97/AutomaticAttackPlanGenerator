@@ -63,7 +63,9 @@ jobs:
             echo "Current directory: $(pwd)"
             echo "Git remote(s):"; git remote -v || true
             echo "Git status before pull:"; git status -sb || true
+            git stash || true
             git pull origin main
+            git stash pop || true
             docker compose down || true
             docker compose up -d --build
             echo "Deployed OK"
