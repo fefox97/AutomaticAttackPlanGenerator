@@ -5,6 +5,7 @@ from io import BytesIO
 
 import pandas as pd
 
+from apps.api.utils import APIUtils
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
 from flask import request, send_file
@@ -12,8 +13,8 @@ from flask import request, send_file
 from flask_security import auth_required, current_user
 
 from flask import current_app as app
-from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
-from sqlalchemy import func
+from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatCatalogue, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
+from sqlalchemy import func, and_
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
 from apps import db, render_template
 
@@ -882,54 +883,39 @@ def final_step():
     selected_macm = request.args.get('app_id')
 
     # Recupera i record di rischio associati all'AppID selezionato
-    risk_records = RiskRecord.query.filter_by(AppID=selected_macm).all()
-
-    # Organizza i dati per esportarli
-    data = []
-    for record in risk_records:
-        # Ottieni asset dal modello 'Macm' (presumendo che esista una relazione in RiskRecord -> Macm)
-        asset = Macm.query.filter_by(Component_ID=record.ComponentID).first()
-        asset_name = asset.Name if asset else "Unknown"  # Recupera il nome dell'asset o "Unknown" se non trovato
-
-        # Ottieni tutte le minacce associate al component_id dal modello 'ThreatModel'
-        threat_models = (ThreatModel.query.filter_by(Threat_ID=record.ThreatID).all())
-
-        for threat_model in threat_models:
-            # Recupera il nome della minaccia o "Unknown"
-            threat = threat_model.Threat if threat_model else "Unknown"
-
-            # Aggiungi i dati per ciascuna minaccia associata all'asset
-            data.append({
-                "Asset": asset_name,
-                "Threat": threat,
-                "ComponentID": record.ComponentID,
-                "FinancialDamage": record.Financialdamage,
-                "ReputationDamage": record.Reputationdamage,
-                "Noncompliance": record.Noncompliance,
-                "PrivacyViolation": record.Privacyviolation,
-                "Likelihood": record.Likelihood,
-                "TechnicalImpact": record.TechnicalImpact,
-                "BusinessImpact": record.BusinessImpact,
-                "OverallRisk": record.OverallRisk,
-                "EaseOfDiscovery": record.Easyofdiscovery,
-                "EaseOfExploit": record.Easyofexploit,
-                "Awareness": record.Awareness,
-                "IntrusionDetection": record.Intrusiondetection,
-                "LossOfConfidentiality": record.Lossconfidentiality,
-                "LossOfIntegrity": record.Lossintegrity,
-                "LossOfAvailability": record.Lossavailability,
-                "LossOfAccountability": record.Lossaccountability
-            })
+    risk_records = RiskRecord.query.filter_by(AppID=selected_macm).join(
+        ThreatCatalogue, RiskRecord.ThreatID == ThreatCatalogue.TID
+    ).join(
+        Macm, and_(RiskRecord.ComponentID == Macm.Component_ID, Macm.App_ID == RiskRecord.AppID)
+    ).with_entities(
+        Macm.Name.label('Asset'),
+        Macm.Type.label('Asset Type'),
+        ThreatCatalogue.TID,
+        ThreatCatalogue.Threat,
+        RiskRecord.Skill,
+        RiskRecord.Motive,
+        RiskRecord.Opportunity,
+        RiskRecord.Size,
+        RiskRecord.Easyofdiscovery.label('Ease of Discovery'),
+        RiskRecord.Easyofexploit.label('Ease of Exploit'),
+        RiskRecord.Awareness,
+        RiskRecord.Intrusiondetection.label('Intrusion Detection'),
+        RiskRecord.Lossconfidentiality.label('Loss of Confidentiality'),
+        RiskRecord.Lossintegrity.label('Loss of Integrity'),
+        RiskRecord.Lossavailability.label('Loss of Availability'),
+        RiskRecord.Lossaccountability.label('Loss of Accountability'),
+        RiskRecord.Financialdamage.label('Financial Damage'),
+        RiskRecord.Reputationdamage.label('Reputation Damage'),
+        RiskRecord.Noncompliance.label('Non Compliance'),
+        RiskRecord.Privacyviolation.label('Privacy Violation'),
+        RiskRecord.Likelihood,
+        RiskRecord.TechnicalImpact.label('Technical Impact'),
+        RiskRecord.BusinessImpact.label('Business Impact'),
+        RiskRecord.OverallRisk.label('Overall Risk')
+    ).all()
 
     # Crea un DataFrame pandas dai dati
-    df = pd.DataFrame(data)
-
-    # Salva il DataFrame in un file Excel in memoria
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='RiskAnalysis')
-    output.seek(0)
+    excel = APIUtils().query_to_excel(risk_records, 'Risk Analysis')
 
     # Restituisci il file Excel come risposta
-    return send_file(output, as_attachment=True, download_name=f'risk_analysis_{selected_macm}.xlsx',
-                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(excel, as_attachment=True, download_name=f'risk_analysis_{selected_macm}.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
