@@ -9,8 +9,9 @@ from apps.authentication.models import Notifications, Users
 
 @socketio.on('connect')
 def handle_connect():
-    Users.query.filter_by(id=current_user.id).update({'notification_session_id': request.sid})
-    db.session.commit()
+    if current_user.is_authenticated:
+        Users.query.filter_by(id=current_user.id).update({'notification_session_id': request.sid})
+        db.session.commit()
 
 @socketio.on('disconnect')
 def handle_disconnect():
