@@ -14,7 +14,7 @@ def handle_connect():
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    Users.query.filter_by(id=current_user.id).update({'notification_session_id': None})
+    Users.query.filter_by(notification_session_id=request.sid).update({'notification_session_id': None})
     db.session.commit()
 
 def send_notification(title, message, icon="fa fa-info", links=None, user_id=None, date=None):
