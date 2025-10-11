@@ -34,7 +34,7 @@ class Config(object):
     SECURITY_CHANGEABLE = os.getenv('SECURITY_CHANGEABLE', True)
     SECURITY_SEND_REGISTER_EMAIL = os.getenv('SECURITY_SEND_REGISTER_EMAIL', True)
     SECURITY_DEFAULT_REMEMBER_ME = os.getenv('SECURITY_DEFAULT_REMEMBER_ME', True)
-    SECURITY_POST_LOGIN_VIEW = os.getenv('SECURITY_POST_LOGIN_VIEW', 'index')
+    # SECURITY_POST_LOGIN_VIEW = os.getenv('SECURITY_POST_LOGIN_VIEW', 'index')
     SECURITY_POST_REGISTER_VIEW = os.getenv('SECURITY_POST_REGISTER_VIEW', 'login')
     SECURITY_POST_LOGOUT_VIEW = os.getenv('SECURITY_POST_LOGOUT_VIEW', 'home')
     SECURITY_USERNAME_ENABLE = os.getenv('SECURITY_USERNAME_ENABLE', True)
@@ -60,6 +60,9 @@ class Config(object):
     CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
     CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
     
+    # SocketIO
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', f'{basedir}/static/uploads')
@@ -97,6 +100,7 @@ class Config(object):
 
     # Setup for FlatPages
     FLATPAGES_ROOT = os.getenv('FLATPAGES_ROOT', None)
+    FLATPAGES_ROOT_IMAGES = os.getenv('FLATPAGES_ROOT_IMAGES', None)
     FLATPAGES_EXTENSION = os.getenv('FLATPAGES_EXTENSION', '.md')
     FLATPAGES_MARKDOWN_EXTENSIONS = [
         'fenced_code',

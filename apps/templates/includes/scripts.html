@@ -38,12 +38,15 @@
 <script>
     MathJax = {
         tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            inlineMath: [['$', '$']],
         },
+        svg: {
+            fontCache: 'global'
+        }
     };
 </script>
-<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+<script type="text/javascript" id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.0.0/tex-svg.min.js"></script>
+
 
 <!-- Github buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -100,11 +103,15 @@
 <!-- CountUp.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.9.0/countUp.umd.min.js"></script>
 
+<!-- Socket.IO -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
 <!-- Custom JS -->
 <script src="{{ config.ASSETS_ROOT }}/js/custom.js"></script>
 
 <script type="text/javascript">
+    const socket = io('{{ request.host_url[:-1] }}');
     if ('{{ current_user.is_authenticated }}' == 'True') {
-        getPendingTasks();
+        getNotifications();
     }
 </script>

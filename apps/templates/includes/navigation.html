@@ -30,17 +30,20 @@
 					</div>
 				</a>
 				<div class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
-					<a class="dropdown-item d-flex align-items-center" href="{{ url_for('profile_blueprint.profile') }}">
-					<i class="fas fa-user me-2"></i>            
-					My Profile
-					</a>
-					<div role="separator" class="dropdown-divider my-1"></div>
-					<a class="dropdown-item d-flex align-items-center" href="{{ url_for_security('logout') }}">
-					<svg class="dropdown-icon text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-					</svg>                
-					Logout
-					</a>
+					<div class="border-bottom">
+						<a class="dropdown-item d-flex align-items-center" href="{{ url_for('profile_blueprint.profile') }}">
+							<i class="fas fa-user me-2"></i>            
+							Profile
+						</a>
+					</div>
+					<div>
+						<a class="dropdown-item d-flex align-items-center" href="{{ url_for_security('logout') }}">
+						<svg class="dropdown-icon text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+						</svg>                
+						Logout
+						</a>
+					</div>
 				</div>
 				</li>
 				<!-- add notification dropdown -->
@@ -58,8 +61,8 @@
 						</button>
 					</div>
 					<div class="dropdown-divider"></div>
-					<div id="notification_container"></div>
-						<!-- sbow no notification alert -->
+					<div id="notification_container" class="overflow-scroll" style="max-height: 400px;">
+						<!-- show no notification alert -->
 						<div class="alert alert-info text-center mx-4" id="no_notification_alert">
 							<i class="fas fa-info-circle"></i>
 							<span>No notifications</span>

@@ -13,11 +13,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-body border-0 shadow mb-4 mb-xl-0">
-                <div class="mb-3">
+                <div class="mb-3 border-bottom">
                     <label for="username" class="form-label">Username</label>
                     <p id="username">{{ current_user.username }}</p>
                 </div>
-                <div class="mb-3 d-flex justify-content-between">
+                <div class="mb-3 d-flex justify-content-between border-bottom">
                     <div>
                         <label for="email" class="form-label">Email</label>
                         <p id="email">{{ current_user.email }}</p>
@@ -26,7 +26,7 @@
                         <a href="{{url_for_security('change_email')}}" class="btn btn-primary">Edit Email</a>
                     </div>
                 </div>
-                <div class="mb-3 d-flex justify-content-between">
+                <div class="mb-3 d-flex justify-content-between border-bottom">
                     <div>
                         <label for="password" class="form-label">Password</label>
                         <p>********</p>
@@ -35,6 +35,19 @@
                         <a href="{{url_for_security('change_password')}}" class="btn btn-primary">Change Password</a>
                     </div>
                 </div>
+                {% if 'api-user' in current_user.roles %}
+                <div class="mb-3 d-flex justify-content-between border-bottom">
+                    <div>
+                        <label for="token" class="form-label">Token</label>
+                        <p id="token">Manage your API tokens</p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tokenManagerModal">
+                            Manage API Tokens
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
                 <div class="mb-3 d-flex justify-content-between">
                     <div>
                         <label for="delete-account" class="form-label">Delete Account</label>
@@ -47,7 +60,10 @@
         </div>
     </div>
 
+    {% include 'profile/modals/token-manager.html' %}
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/profile.js"></script>
+{% endblock javascripts %}

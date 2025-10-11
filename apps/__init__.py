@@ -15,6 +15,7 @@ from flask import render_template as real_render_template
 from apps.celery_module.celery_utils import make_celery
 
 from flask_flatpages import FlatPages
+from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 security = Security()
@@ -23,6 +24,7 @@ mail = Mail()
 user_datastore = None
 celery = Celery()
 pages = FlatPages()
+socketio = SocketIO()
 
 def render_template(*args, **kwargs):
     tree = {}
@@ -63,7 +65,7 @@ def register_assets(app):
     scss.build()
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki'):
+    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki', 'macm'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
     app.register_blueprint(github_blueprint, url_prefix="/login")
@@ -135,6 +137,7 @@ def configure_roles(app):
         app.user_datastore.find_or_create_role(name='admin', description='Administrator')
         app.user_datastore.find_or_create_role(name='end-user', description='User')
         app.user_datastore.find_or_create_role(name='editor', description='Editor')
+        app.user_datastore.find_or_create_role(name='api-user', description='API User')
         db.session.commit()
         user_registered.connect_via(app)(user_registered_sighandler)
     
@@ -165,6 +168,7 @@ def configure_database(app):
         db.session.remove()
 
 from apps.authentication.oauth import github_blueprint
+from apps.notifications import notify
 
 def create_app(config):
     app = Flask(__name__)
@@ -172,23 +176,26 @@ def create_app(config):
 
     user_datastore = SQLAlchemyUserDatastore(db, Users, Roles)
     app.user_datastore = user_datastore
-    
+
     register_extensions(app, user_datastore)
     register_blueprints(app)
     register_assets(app)
     register_custom_filters(app)
-    
+
     with app.app_context():
         initialize_database(app)
     configure_database(app)
     configure_admin(app)
     configure_roles(app)
-    
+
     celery = make_celery(app)
     celery.conf.update(app.config, namespace='CELERY')
     app.extensions['celery'] = celery
-    
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)    
+
+    socketio.init_app(app, cors_allowed_origins="*", async_mode='eventlet', message_queue=app.config['REDIS_URL'])
+    app.extensions['socketio'] = socketio
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)
 
     clear_tmp(app.config['TMP_FOLDER'])
     # clean_tasks(app)

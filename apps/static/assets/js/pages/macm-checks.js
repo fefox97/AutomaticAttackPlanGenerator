@@ -1,17 +1,17 @@
-var protocols_catalog = undefined;
+var macm_check_catalog = undefined;
 var default_shown_columns = undefined;
 
 $(window).on('load', function() {
 
     // Set default shown columns
-    if (localStorage.getItem('protocols_catalog_columns') === null) {    
-        default_shown_columns = ['Protocol ID', 'Name', 'Description', 'ISO/OSI Layer', 'Ports'];
-        localStorage.setItem('protocols_catalog_columns', JSON.stringify(default_shown_columns));
+    if (localStorage.getItem('macm_check_catalog_columns') === null) {    
+        default_shown_columns = ['Check ID', 'Name', 'Description', 'Query'];
+        localStorage.setItem('macm_check_catalog_columns', JSON.stringify(default_shown_columns));
     } else {
-        default_shown_columns = JSON.parse(localStorage.getItem('protocols_catalog_columns'));
+        default_shown_columns = JSON.parse(localStorage.getItem('macm_check_catalog_columns'));
     }
     
-    protocols_catalog = $('#protocolsCatalogTable').DataTable({
+    macm_check_catalog = $('#macmCheckCatalogTable').DataTable({
         "paging": false,
         "ordering": true,
         "order": [[ 0, "asc" ]],
@@ -30,19 +30,7 @@ $(window).on('load', function() {
                 targets: 0,
                 className: 'noVis',
                 width: '120px',
-            },
-            {
-                targets: [0, 3],
-                searchPanes: {
-                    show: false,
-                },
-            },
-            {
-                targets: [1],
-                searchPanes: {
-                    show: true,
-                },
-            },
+            }
         ],
         buttons: [
             {
@@ -81,21 +69,22 @@ $(window).on('load', function() {
     });
 
     // Set column names for search
-    protocols_catalog.settings()[0].aoColumns.forEach(function(column) {
+    macm_check_catalog.settings()[0].aoColumns.forEach(function(column) {
         column.sName = column.sTitle;
     });
     
 
     // Save column visibility state
-    protocols_catalog.on('column-visibility.dt', function (e, settings, column, state) {
+    macm_check_catalog.on('column-visibility.dt', function (e, settings, column, state) {
         if (state) {
             default_shown_columns.push(settings.aoColumns[column].sTitle);
         } else {
             default_shown_columns = default_shown_columns.filter(function(value, index, arr){ return value != settings.aoColumns[column].sTitle;});
         }
-        localStorage.setItem('protocols_catalog_columns', JSON.stringify(default_shown_columns));
+        localStorage.setItem('macm_check_catalog_columns', JSON.stringify(default_shown_columns));
     });
 });
 
 $(document).ready(function() {
+    
 });

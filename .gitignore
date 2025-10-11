@@ -42,20 +42,22 @@ apps/static/uploads/
 apps/static/assets/dbs/*
 
 *.sql
-neo4j/*
+neo4j/data/*
+neo4j/logs/*
+neo4j/ssl/*
 .docker-env
 
 # nginx certificates to be generated
 certs/*
 # nginx dhparam file to be generated
 nginx/dhparam.pem
-old.env
+.env.old
 
 docker-compose.yml
-<<<<<<< HEAD
-apps/templates/wiki/pages/
 
+apps/templates/wiki/pages/
+<<<<<<< HEAD
+apps/static/assets/wiki/
 =======
 apps/templates/wiki/pages/
->>>>>>> origin/main
 apps/static/assets/wiki/

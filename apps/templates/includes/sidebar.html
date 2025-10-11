@@ -183,6 +183,16 @@
             <span class="sidebar-text">Home</span>
           </a>
         </li>
+        <li class="nav-item {% if 'macm' in segment %} active {% endif %}">
+          <a href="/macm" class="nav-link">
+            <span class="sidebar-icon">
+              <span class="material-symbols-outlined align-top">
+                graph_5
+              </span>
+            </span>
+            <span class="sidebar-text">MACM</span>
+          </a>
+        </li>
         <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
           <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
             <span>
@@ -278,6 +288,14 @@
                     <span class="material-symbols-outlined align-top">tactic</span>
                   </span> 
                   <span class="sidebar-text">Methodologies</span>
+                </a>
+              </li>
+              <li class="nav-item {% if 'macm-checks' in segment %} active {% endif %}">
+                <a href="/catalogs/macm-checks" class="nav-link">
+                  <span class="sidebar-icon">
+                    <span class="material-symbols-outlined align-top">list_alt_check</span>
+                  </span> 
+                  <span class="sidebar-text">MACM Checks</span>
                 </a>
               </li>
             </ul>

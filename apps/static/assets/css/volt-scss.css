@@ -20024,6 +20024,9 @@ div.dataTables_scrollBody {
 .bg-macm-label {
   background-color: #3968b2 !important; }
 
+.bg-macm-check {
+  background-color: #0c7f40 !important; }
+
 .text-capec {
   color: #6C969D !important; }
 
@@ -20134,6 +20137,9 @@ pre[class*=language-] {
 
 .sidebar .sidebar-inner {
   height: 100vh; }
+
+.sidebar .nav {
+  white-space: normal !important; }
 
 .sidebar .multi-level .nav-link {
   padding-left: 2rem !important; }
@@ -20637,7 +20643,7 @@ pre[class*=language-] {
   background-color: #4B5563 !important; }
 
 [data-bs-theme="dark"] .text-capec {
-  color: #6C969D !important; }
+  color: #7fafb7 !important; }
 
 [data-bs-theme="dark"] .text-threat {
   color: #A14A76 !important; }
