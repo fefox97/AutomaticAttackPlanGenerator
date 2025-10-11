@@ -11,18 +11,18 @@ import re
 import shutil
 from apps.authentication.models import Users
 
-def create_celery_notification(title, message, icon="fa fa-info", buttons=None, user_id=None, date=None):
+def create_celery_notification(title, message, icon="fa fa-info", links=None, user_id=None, date=None):
     from apps.notifications.notify import create_notification
     socketio = SocketIO(message_queue="redis://redis:6379/0")
     data = {
             "title": title,
             "message": message,
             "icon": icon,
-            "buttons": buttons,
+            "links": links,
             "date": date if date else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
     socketio.emit('receive_notification', data, to=Users.query.get(user_id).notification_session_id)
-    create_notification(title=title, message=message, icon=icon, buttons=buttons, user_id=user_id, date=date)
+    create_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
 
 @celery.task
 def query_llm(app_id, max_tries=10, sleep_time=1):
@@ -132,7 +132,7 @@ def retrieve_wiki_pages(wiki_repo_url=None, wiki_folder=None, wiki_images_folder
             create_celery_notification(title="Wiki retrieved successfully", 
                                 message=f"The wiki has been retrieved successfully from the repository {wiki_repo_url}.",
                                 icon="fa fa-check",
-                                buttons=None,
+                                links=None,
                                 user_id=user_id)
             return pages
         except Exception as e:
@@ -145,7 +145,7 @@ def test_celery(user_id=None):
             create_celery_notification(title="Test notification", 
                                 message="This is a test notification from Celery task",
                                 icon="fa fa-info",
-                                buttons=None,
+                                links={"prova": "/home"},
                                 user_id=user_id)
             return "Celery is working fine!"
         except Exception as e:

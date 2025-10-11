@@ -153,7 +153,7 @@ class Notifications(db.Model):
     title         = db.Column(db.String(255), nullable=False)
     message       = db.Column(db.Text, nullable=False)
     icon          = db.Column(db.String(100), nullable=True)
-    buttons       = db.Column(db.Text, nullable=True)  # JSON string
+    links         = db.Column(db.JSON, nullable=True)
     user_id       = db.Column(db.Integer, db.ForeignKey('Users.id', ondelete='CASCADE'), nullable=True)
     created_on    = db.Column(db.DateTime, default=db.func.now())
     read          = db.Column(db.Boolean, default=False, nullable=False)
