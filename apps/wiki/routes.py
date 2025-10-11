@@ -14,8 +14,8 @@ def macm_examples():
     database = 'wordpress'
     neo4j_params = {
         "uri": app.config['URI_NEO4J_WSS'],
-        "user": app.config['USER_NEO4J'],
-        "password": app.config['PASS_NEO4J'],
+        "user": app.config['RO_USER_NEO4J'],
+        "password": app.config['RO_PASS_NEO4J'],
         "encrypted": app.config['TLS_NEO4J']
     }
     asset_types_colors = AssetTypes.get_colors()
