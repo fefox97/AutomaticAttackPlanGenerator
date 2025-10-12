@@ -145,7 +145,7 @@
                                                 value="{{ form_data[threat.Threat][param] or 5 }}"
                                                 min="1" max="9"
                                                 class="form-control business-impact-input"
-                                                onchange="calculateBusinessImpact('{{ threat.Threat_ID }}')">
+                                                onchange="calculateImpact('{{ threat.Threat_ID }}')">
                                         </row>
                                     </div>
                                 {% endfor %}
