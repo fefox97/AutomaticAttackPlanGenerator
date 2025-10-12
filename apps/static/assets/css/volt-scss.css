@@ -20251,7 +20251,7 @@ pre[class*=language-] {
   width: 50vw;
   max-width: 800px; }
 
-#notifications .notification-item {
+#notifications .notification-content {
   overflow-x: scroll; }
 
 #notifications_icon:hover {
