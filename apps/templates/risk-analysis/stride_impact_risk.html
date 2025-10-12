@@ -1,245 +1,85 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} MACM {% endblock %}
+{% block title %} STRIDE Impact Evaluation {% endblock title %}
 
-<!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/css/custom_stride.css">
-{% endblock %}
-
-{% block content %}
-
-
-    <form id="questionnaire-form" method="POST" action="/risk_analysis/stride_impact_evaluation">
-    <div class="container">
-        <input type="hidden" name="appId" value="{{ appId }}">
-        <!-- IMPACT DEFAULT EVALUATION-->
-        <div class="panel panel-default">
-            <div>{{ stride_impact_previous_results_list }}
-                <table border="1" style="width: 100%">
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>SPOOFING</p>
-                                <b>Description: </b>
-                                <p>Threats related to the interception of data in transit</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does a Spoofing threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.spoofing[0] }}  name="spoofing_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.spoofing[1] }} name="spoofing_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.spoofing[2] }} name="spoofing_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.spoofing[3] }} name="spoofing_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>TAMPERING</p>
-                                <b>Description: </b>
-                                <p>Threats related to data manipulation</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does a Tampering threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.tampering[0] }} name="tampering_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.tampering[1] }}  name="tampering_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.tampering[2] }}  name="tampering_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.tampering[3]}}  name="tampering_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                    Evaluation already performed at: {{ stride_impact_previous_results.Updated_at }}
-                    <br><br>
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>REPUTATION</p>
-                                <b>Description: </b>
-                                <p>Threats that impact reputation</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does a Reputation threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.reputation[0]}} name="reputation_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.reputation[1]}} name="reputation_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.reputation[2]}} name="reputation_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.reputation[3]}} name="reputation_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>INFORMATION DISCLOSURE</p>
-                                <b>Description: </b>
-                                <p>Threats related to exposure of confidential information</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does an Information Disclosure threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td>
-
-                                            <input type="number" min="1" max="9" value={{ stride_impact_previous_results.information_disclosure[0]}} name="information_disclosure_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.information_disclosure[1]}} name="information_disclosure_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.information_disclosure[2]}} name="information_disclosure_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.information_disclosure[3]}} name="information_disclosure_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>Denial Of Service</p>
-                                <b>Description: </b>
-                                <p>Threats related that compromise the availability of the asset</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does an Denial of Services threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.dos[0]}} name="dos_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.dos[1]}} name="dos_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.dos[2]}} name="dos_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.dos[3]}} name="dos_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-
-                    </tr>
-                    <tr style="border-bottom: 1px solid #ddd">
-                        <td style="padding: 10px;" width="25%">
-                            <div style="padding: 3px;">
-                                <b>Stride: </b>
-                                <p>Elevation of Privileges</p>
-                                <b>Description: </b>
-                                <p>Threats related that compromise the privileges the user has</p>
-                            </div>
-                        </td>
-                        <td style="padding: 10px;" width="75%">
-                            <div style="padding: 3px; font-size: 120%;">
-                                <p>How much impact does an Elevation of Privileges threat have on application?</p>
-                                <br>
-                                <table border="1" style="width: 100%">
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Financial damage<span>How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.elevationofprivileges[0]}} name="elevationofprivileges_financialdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Reputation damage<span>Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.elevationofprivileges[1]}} name="elevationofprivileges_reputationdamage"></td>
-                                    </tr>
-                                    <tr style="border-bottom: 1px solid #ddd">
-                                        <td><a class="tip">Non-compliance<span>How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.elevationofprivileges[2]}} name="elevationofprivileges_noncompliance"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><a class="tip">Privacy violation<span>How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)</span></a></td>
-                                        <td><input type="number" min="1" max="9" value={{ stride_impact_previous_results.elevationofprivileges[3]}} name="elevationofprivileges_privacyviolation"></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                </tr>
-                </table>
-            </div>
+{% macro risk_factors(factor, label, stride_impact_previous_factor_results, description) %}
+<div class="row border-bottom">
+    <div class="col my-3 align-self-center">
+        <strong>STRIDE:</strong> <span class="fw-bold">{{factor}}</span><br>
+        <strong>Description:</strong>
+        <span>{{description}}</span>
+    </div>
+    <div class="col my-3 align-self-center">
+        <div class="mb-2 fs-5">How much impact does a {{factor}} threat have on application?</div>
+        <div class="input-group mb-3">
+            <div class="input-group-text">Financial damage</div>
+            <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true" data-bs-toggle="tooltip" title="How much financial damage will result from an exploit? Less than the cost to fix the vulnerability (1), minor effect on annual profit (3), significant effect on annual profit (7), bankruptcy (9)"></i></div>
+            <input type="number" min="1" max="9" value="{{ stride_impact_previous_factor_results[0] }}" name="{{label}}_financialdamage" class="form-control">
         </div>
-        <div style="text-align: center;">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="input-group mb-3">
+            <div class="input-group-text">Reputation damage</div>
+            <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true" data-bs-toggle="tooltip" title="Would an exploit result in reputation damage that would harm the business? Minimal damage (1), Loss of major accounts (4), loss of goodwill (5), brand damage (9)"></i></div>
+            <input type="number" min="1" max="9" value="{{ stride_impact_previous_factor_results[1]}}" name="{{label}}_reputationdamage" class="form-control">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-text">Non-compliance</div>
+            <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true" data-bs-toggle="tooltip" title="How much exposure does non-compliance introduce? Minor violation (2), clear violation (5), high profile violation (7)"></i></div>
+            <input type="number" min="1" max="9" value="{{ stride_impact_previous_factor_results[2]}}" name="{{label}}_noncompliance" class="form-control">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-text">Privacy violation</div>
+            <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true" data-bs-toggle="tooltip" title="How much personally identifiable information could be disclosed? One individual (3), hundreds of people (5), thousands of people (7), millions of people (9)"></i></div>
+            <input type="number" min="1" max="9" value="{{ stride_impact_previous_factor_results[3]}}" name="{{label}}_privacyviolation" class="form-control">
         </div>
     </div>
-</form>
+</div>
+{% endmacro %}
+
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+        <div class="d-block mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/apps/static">
+                            <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/risk_analysis">Risk Analysis</a></li>
+                    <li class="breadcrumb-item"><a href="/risk_analysis/macm_riskRating?app_id={{ appId }}">Risk Rating</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">STRIDE Impact Evaluation</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form id="questionnaire-form" method="POST" action="/risk_analysis/stride_impact_evaluation">
+        <input type="hidden" name="appId" value="{{ appId }}">
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ app_info.Name }} Stride Impact Evaluation</h4>
+                {% if stride_impact_previous_results.Updated_at %}
+                <p class="mb-0 text-muted">Evaluation already performed at: {{ stride_impact_previous_results.Updated_at }}</p>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {{ stride_impact_previous_results_list }}
+                <div class="">
+                    {{ risk_factors("Spoofing", "spoofing", stride_impact_previous_results.spoofing, "Threats related to the interception of data in transit.") }}
+                    {{ risk_factors("Tampering", "tampering", stride_impact_previous_results.tampering, "Threats related to data manipulation.") }}
+                    {{ risk_factors("Repudiation", "reputation", stride_impact_previous_results.reputation, "Threats related to the denial of actions.") }}
+                    {{ risk_factors("Information Disclosure", "information_disclosure", stride_impact_previous_results.information_disclosure, "Threats related to the exposure of information to unauthorized parties.") }}
+                    {{ risk_factors("Denial of Service", "dos", stride_impact_previous_results.dos, "Threats related to the interruption of service to authorized users.") }}
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
 {% endblock %}
 
 <!-- Specific Page JS goes HERE -->
 {% block javascripts %}
-<script src="{{ config.ASSETS_ROOT }}/js/pages/macm.js"></script>
-<script src="{{ config.ASSETS_ROOT }}/js/pages/edit-macm.js"></script>
-<script src="{{ config.ASSETS_ROOT }}/js/pages/reports.js"></script>
+<script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/risk_analysis/stride-impact-risk.js"></script>
 {% endblock javascripts %}
