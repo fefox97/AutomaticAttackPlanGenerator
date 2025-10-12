@@ -2,19 +2,7 @@
 
 {% block title %} MACM-{{ macm_data.Component_ID }} {% endblock %}
 
-{% block stylesheets %}
-<style>
-    table {
-        /* Mantiene larghezze uniformi */
-    }
-    td {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        white-space: normal;
-    }
-
-</style>
-{% endblock stylesheets %}
+{% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
@@ -110,7 +98,7 @@
                                         value="{{ form_data[param] or 5 }}"
                                         min="1" max="9"
                                         class="form-control likelihood-input"
-                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
+                                        onchange="calculateImpact('{{ threat.Threat_ID }}')">
                                 </row>
                             </div>
                         {% endfor %}
@@ -134,7 +122,7 @@
                                                 value="{{ form_data[threat.Threat][param] or 5 }}"
                                                 min="1" max="9"
                                                 class="form-control technical-impact-input"
-                                                onchange="calculateTechnicalImpact('{{ threat.Threat_ID }}')">
+                                                onchange="calculateImpact('{{ threat.Threat_ID }}')">
                                         </row>
                                     </div>
                                 {% endfor %}
@@ -157,7 +145,7 @@
                                                 value="{{ form_data[threat.Threat][param] or 5 }}"
                                                 min="1" max="9"
                                                 class="form-control business-impact-input"
-                                                onchange="calculateBusinessImpact('{{ threat.Threat_ID }}')">
+                                                onchange="calculateImpact('{{ threat.Threat_ID }}')">
                                         </row>
                                     </div>
                                 {% endfor %}
