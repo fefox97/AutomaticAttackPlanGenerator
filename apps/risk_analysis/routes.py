@@ -866,9 +866,9 @@ def save_risk_evaluation():
         app.logger.error(f"Error saving risk evaluation: {e}", exc_info=True)
         db.session.rollback()
         return jsonify({"status": "error", "message": "An error occurred while saving the risk evaluation."}), 500
-    # template = f"risk-analysis/macm_riskRating.html"
+
     # return render_template(
-    #     template,
+    #     "risk-analysis/macm_riskRating.html",
     #     segment=get_segment(request),
     #     table=table,
     #     threat_for_each_component=threat_for_each_component,
