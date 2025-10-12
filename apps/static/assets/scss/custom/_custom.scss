@@ -3,6 +3,19 @@
     --dark-drowpdown-link-active-bg: red !important;
 }
 
+.fill-primary{
+    color: $primary !important;
+}
+.fill-secondary{
+    color: $secondary !important;
+}
+.fill-tertiary{
+    color: $tertiary !important;
+}
+.fill-success{
+    color: $success !important;
+}
+
 .custom-background{
     position: absolute;
     top: 0;
@@ -432,7 +445,7 @@ pre[class*=language-]{
         width: 50vw;
         max-width: 800px;
     }
-    .notification-item{
+    .notification-content{
         overflow-x: scroll;
     }
 }

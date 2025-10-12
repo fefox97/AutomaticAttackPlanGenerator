@@ -18,12 +18,13 @@ def handle_disconnect():
     Users.query.filter_by(notification_session_id=request.sid).update({'notification_session_id': None})
     db.session.commit()
 
-def send_notification(title, message, icon="fa fa-info", links=None, user_id=None, date=None):
+def send_notification(id, title, message, icon="fa fa-info", links=None, user_id=None, date=None):
     data = {
+        "id": id,
         "title": title,
         "message": message,
         "icon": icon,
-        "buttons": links,
+        "links": links,
         "date": date if date else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
     if user_id:
@@ -44,10 +45,11 @@ def create_notification(title, message, icon="fa fa-info", links=None, user_id=N
                 )
     db.session.add(notification)
     db.session.commit()
+    return notification.id
 
 def create_send_notification(title, message, icon="fa fa-info", links=None, user_id=None, date=None):
-    create_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
-    send_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
+    notification_id = create_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
+    send_notification(id=notification_id,title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
 
 def create_send_notification_to_admins(title, message, icon="fa fa-info", links=None, date=None):
     admins = Users.query.join(Users.roles).filter_by(name='admin').all()

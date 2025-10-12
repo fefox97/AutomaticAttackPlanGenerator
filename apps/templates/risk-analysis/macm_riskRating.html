@@ -1,184 +1,9 @@
 {% extends "layouts/base.html" %}
 
-<style>
-    /* Enhanced progress bar design */
-    .progress-step-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-
-
-    .progress-step {
-        width: 33%;
-        text-align: center;
-    }
-
-    .progress-step .step-circle {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #ddd;
-        position: relative;
-    }
-
-    .progress-step .step-circle::before {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        background-color: transparent;
-        border: 2px solid #ddd;
-    }
-
-    .progress-step.completed .step-circle {
-        background-color: #28a745; /* Green for completed */
-    }
-
-    .progress-step.completed .step-circle::before {
-        border-color: #28a745;
-    }
-
-    .progress-step.active .step-circle {
-        background-color: #ffc107; /* Yellow for active */
-    }
-
-    .progress-step.active .step-circle::before {
-        border-color: #ffc107;
-    }
-
-    .progress-step .step-label {
-        font-size: 14px;
-        margin-top: 5px;
-        font-weight: 600;
-    }
-
-    /* Progress bar legend */
-    .progress-legend {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        margin: 0 15px;
-    }
-
-    .legend-circle {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        margin-right: 8px;
-    }
-
-    .legend-completed {
-        background-color: #28a745; /* Green for completed */
-    }
-
-    .legend-active {
-        background-color: #ffc107; /* Yellow for active */
-    }
-
-    .legend-text {
-        font-size: 14px;
-        color: #343a40;
-    }
-
-    .progress-step-container {
-    clear: both;
-}
-
-</style>
-
-
 {% block title %} MACM {% endblock %}
 
 <!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}
-<style>
-    /* Barra di progressione minimalista */
-    .progress-step-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .progress-step {
-        width: 33%;
-        text-align: center;
-    }
-
-    .progress-step .step-circle {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #ddd;
-        line-height: 30px;
-        color: #fff;
-        font-weight: bold;
-        margin: 0 auto;
-    }
-
-    .progress-step.completed .step-circle {
-        background-color: #28a745; /* Verde per completato */
-    }
-
-    .progress-step.active .step-circle {
-        background-color: #ffc107; /* Giallo per attivo */
-    }
-
-    .progress-step .step-label {
-        font-size: 12px;
-        margin-top: 5px;
-    }
-
-    /* Legenda per la barra di progressione */
-    .progress-legend {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        margin: 0 15px;
-    }
-
-    .legend-circle {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        margin-right: 8px;
-    }
-
-    .legend-completed {
-        background-color: #28a745; /* Verde per completato */
-    }
-
-    .legend-active {
-        background-color: #ffc107; /* Giallo per attivo */
-    }
-
-    .legend-text {
-        font-size: 14px;
-        opacity: 0.8;
-    }
-
-    /* Aggiunto uno stile per i pulsanti a sinistra e destra */
-    .step-buttons-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-</style>
-{% endblock %}
+{% block stylesheets %}{% endblock %}
 
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
@@ -194,7 +19,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Risk Rating</li>
                 </ol>
             </nav>
-            <h2 class="h4">{{ table[0].Application if table is not none }} Risk Rating</h2>
+            <h2 class="h4">{{ app_info.Name }} Risk Rating</h2>
             {% if table is not none %}
                 <p class="mb-0 text-danger fw-bold">{{threat_number}} threats found</p>
             {% endif %}
@@ -205,79 +30,65 @@
     <div class="col-12">
         <div class="card border-0 shadow mb-3">
             <div class="card-body">
-                <!-- Barra di progressione con le fasi -->
-                <div class="progress-step-container">
-                    <div class="progress-step {% if wizard_completed %}completed{% else %}active{% endif %}">
-                        <div class="step-circle"></div>
-                        <div class="step-label">Threat Agent Wizard</div>
-                    </div>
-                    <div class="progress-step {% if stride_impact_completed %}completed{% else %}active{% endif %}">
-                        <div class="step-circle"></div>
-                        <div class="step-label">StrideImpact Evaluation</div>
-                    </div>
-
-        <div class="progress-step {% if final_step_completed %}completed{% elif wizard_completed and stride_impact_completed %}active{% else %}inactive{% endif %}">
-            <div class="step-circle"></div>
-            <div class="step-label">
-                {% if wizard_completed and stride_impact_completed %}
-                    <a href="/risk_analysis/final-step?app_id={{ table[0].App_ID }}" class="text-decoration-none text-dark">
-                        Export Risk Analysis Report
-                    </a>
-                {% else %}
-                    Export Risk Analysis Report
-                {% endif %}
-            </div>
-    </div>
-</div>
-
-
-    </div>
-
                 <!-- Legenda della barra di progressione -->
-                <div class="progress-legend">
-                    <div class="legend-item">
-                        <div class="legend-circle legend-completed"></div>
-                        <div class="legend-text">Completed</div>
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="d-flex justify-content-center me-5">
+                        <span class="material-icons fill-success me-1">circle</span>
+                        <div>Completed</div>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-circle legend-active"></div>
-                        <div class="legend-text">In Progress</div>
+                    <div class="d-flex justify-content-center">
+                        <span class="material-icons fill-secondary me-1">circle</span>
+                        <div>In Progress</div>
                     </div>
                 </div>
 
-                <!-- Contenuto combinato con i pulsanti per ogni fase -->
-                <div class="step-buttons-container">
-                    <!-- Start the Threat Agent Wizard -->
-                    <div class="mb-4 text-center flex-fill">
-                        <h5 class="mb-3">Start the Threat Agent Wizard</h5>
-                        <p class="text-muted mb-4">Complete this important step to proceed with the risk analysis.</p>
-                        <div class="d-flex justify-content-center">
-                            {% if wizard_completed %}
-                                <a href="/risk_analysis/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-success">
-                                    <i class="fas fa-check-circle"></i> Threat Agent Wizard Completed
+                <!-- Barra di progressione con le fasi -->
+                <div class="d-flex justify-content-between align-items-center mb-4 mx-7">
+                    <div class="d-flex flex-column text-center">
+                        <span class="material-icons fs-2 {% if wizard_completed %}fill-success{% else %}fill-secondary{% endif %}">circle</span>
+                        <div class="fw-bold">Threat Agent Wizard</div>
+                    </div>
+                    <div class="d-flex flex-column text-center">
+                        <span class="material-icons fs-2 {% if stride_impact_completed %}fill-success{% else %}fill-secondary{% endif %}">circle</span>
+                        <div class="fw-bold">StrideImpact Evaluation</div>
+                    </div>
+                    <div class="d-flex flex-column text-center">
+                        <span class="material-icons fs-2 {% if final_step_completed %}fill-success{% elif wizard_completed and stride_impact_completed %}fill-secondary{% else %}fill-secondary{% endif %}">circle</span>
+                        <div class="fw-bold">
+                            {% if wizard_completed and stride_impact_completed %}
+                                <a href="/risk_analysis/final-step?app_id={{ app_info.App_ID }}" class="text-decoration-none text-dark">
+                                    Export Risk Analysis Report
                                 </a>
                             {% else %}
-                                <a href="/risk_analysis/threat-agent-wizard?app_id={{ table[0].App_ID }}" class="btn btn-danger">
-                                    <i class="fas fa-exclamation-circle"></i> Start Threat Agent Wizard
-                                </a>
+                                Export Risk Analysis Report
                             {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contenuto combinato con i pulsanti per ogni fase -->
+                <div class="d-flex justify-content-around">
+                    <!-- Start the Threat Agent Wizard -->
+                    <div class="mb-4 text-center flex-fill">
+                        <h5 class="mb-2">Threat Agent Wizard</h5>
+                        <p class="text-muted mb-4">Complete this step to proceed with the risk analysis.</p>
+                        <div class="d-flex justify-content-center">
+                            <a href="/risk_analysis/threat-agent-wizard?app_id={{ app_info.App_ID }}" class="btn {% if wizard_completed %}btn-success{% else %}btn-danger{% endif %}">
+                                <i class="fas {% if wizard_completed %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                                {% if wizard_completed %} Threat Agent Wizard Completed {% else %} Start Threat Agent Wizard {% endif %}
+                            </a>
                         </div>
                     </div>
 
                     <!-- StrideImpact Evaluation -->
                     <div class="mb-4 text-center flex-fill">
-                        <h5 class="mb-3">StrideImpact Evaluation</h5>
+                        <h5 class="mb-3">STRIDE Impact Evaluation</h5>
                         <p class="text-muted mb-4">Evaluate the STRIDE impact on your application and components.</p>
                         <div class="d-flex justify-content-center">
-                            {% if stride_impact_completed %}
-                                <a href="/risk_analysis/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-success">
-                                    <i class="fas fa-check-circle"></i> StrideImpact Evaluation Completed
-                                </a>
-                            {% else %}
-                                <a href="/risk_analysis/stride-impact-rating?app_id={{ table[0].App_ID }}" class="btn btn-warning">
-                                    <i class="fas fa-exclamation-circle"></i> Start StrideImpact Evaluation
-                                </a>
-                            {% endif %}
+                            <a href="/risk_analysis/stride-impact-rating?app_id={{ app_info.App_ID }}" class="btn {% if stride_impact_completed %}btn-success{% elif wizard_completed %}btn-secondary{% else %}disabled{% endif %}">
+                                <i class="fas {% if stride_impact_completed %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                                {% if stride_impact_completed %} StrideImpact Evaluation Completed {% else %} Start StrideImpact Evaluation {% endif %}
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -332,13 +143,7 @@
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge position-relative
-                                                               {% if row['Component_ID'] in analyzed_component_ids %}
-                                                                   bg-success
-                                                               {% else %}
-                                                                   bg-macm
-                                                               {% endif %}"
-                                                       href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
+                                                    <a class="badge position-relative {% if row['Component_ID'] in analyzed_component_ids %} bg-success {% else %} bg-macm {% endif %}" href="/risk_analysis/macm-detailRisk?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
                                                         {% if row['Component_ID'] in analyzed_component_ids %}
                                                             <i class="fas fa-check-circle text-white ms-1"></i>
@@ -409,8 +214,8 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-        var app_id = "{{table[0].App_ID if table is not none | tojson }}";
-        var app_name = "{{table[0].Application if table is not none | tojson }}";
+        var app_id = "{{app_info.App_ID if table is not none | tojson }}";
+        var app_name = "{{app_info.Application if table is not none | tojson }}";
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/risk_analysis/macm_riskRating.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>
