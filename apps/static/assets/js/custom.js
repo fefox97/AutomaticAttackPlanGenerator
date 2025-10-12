@@ -277,6 +277,10 @@ function deleteNotification(notification_id, event) {
                 $('#notification_counter').addClass('d-none');
                 $('#no_notification_alert').removeClass('d-none');
             }
+            let notifications = $('#notification_container').find('.notification');
+            if (notifications.length > 0) {
+                $(notifications[notifications.length - 1]).removeClass('border-bottom');
+            }
         },
         error: function(response) {
             console.log(response);
@@ -302,11 +306,13 @@ function clearNotifications() {
 }
 
 function addNotification(id, title, message, links, date, toast, icon='fas fa-info') {
-    if ($('#no_notification_alert').length) {
-        $('#no_notification_alert').addClass('d-none');
-    }
     let notification = document.createElement('div');
-    notification.className = "dropdown-item d-flex align-items-center justify-content-between";
+    notification.className = "dropdown-item d-flex align-items-center justify-content-between notification";
+    if (!$('#no_notification_alert').hasClass('d-none')) {
+        $('#no_notification_alert').addClass('d-none');
+    }else{
+        notification.className += " border-bottom";
+    }
     notification.id = id + '_notification';
     let formattedTime = new Date(date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     notification.innerHTML = `
@@ -398,6 +404,6 @@ $(window).on('load', function() {
     });
 
     socket.on('receive_notification', function(data) {
-        addNotification(data.id, data.title, data.message, data.buttons, data.date, true, data.icon);
+        addNotification(data.id, data.title, data.message, data.links, data.date, true, data.icon);
     });
 });
