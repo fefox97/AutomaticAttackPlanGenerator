@@ -277,7 +277,7 @@ function deleteNotification(notification_id, event) {
                 $('#notification_counter').addClass('d-none');
                 $('#no_notification_alert').removeClass('d-none');
             }
-            let notifications = $('#notification_container').find('.notification');
+            let notifications = $('#notification_container').find('.notification-item');
             if (notifications.length > 0) {
                 $(notifications[notifications.length - 1]).removeClass('border-bottom');
             }
@@ -307,7 +307,7 @@ function clearNotifications() {
 
 function addNotification(id, title, message, links, date, toast, icon='fas fa-info') {
     let notification = document.createElement('div');
-    notification.className = "dropdown-item d-flex align-items-center justify-content-between notification";
+    notification.className = "dropdown-item d-flex align-items-center justify-content-between notification-item";
     if (!$('#no_notification_alert').hasClass('d-none')) {
         $('#no_notification_alert').addClass('d-none');
     }else{
@@ -321,7 +321,7 @@ function addNotification(id, title, message, links, date, toast, icon='fas fa-in
                 <i class="${icon}"></i>
             </div>
         </div>
-        <div class="d-flex align-items-center notification-item me-3">
+        <div class="d-flex align-items-center notification-content me-3">
             <div>
                 <span class="h6">${title}</span>
                 <span class="text-sm text-muted ms-2">${formattedTime}</span>
