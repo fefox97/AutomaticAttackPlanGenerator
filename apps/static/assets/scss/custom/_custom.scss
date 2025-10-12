@@ -3,6 +3,19 @@
     --dark-drowpdown-link-active-bg: red !important;
 }
 
+.fill-primary{
+    color: $primary !important;
+}
+.fill-secondary{
+    color: $secondary !important;
+}
+.fill-tertiary{
+    color: $tertiary !important;
+}
+.fill-success{
+    color: $success !important;
+}
+
 .custom-background{
     position: absolute;
     top: 0;

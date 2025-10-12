@@ -1,24 +1,23 @@
 
-import json
 from datetime import datetime
-from io import BytesIO
 
-import pandas as pd
 
 from apps.api.utils import APIUtils
 from apps.authentication.models import Users
 from apps.risk_analysis import blueprint
-from flask import request, send_file
+from flask import jsonify, redirect, request, send_file, url_for
 
 from flask_security import auth_required, current_user
 
 from flask import current_app as app
-from apps.databases.models import App, AttackView, Capec, MacmUser, MethodologyCatalogue, MethodologyView, Macm, ThreatCatalogue, ThreatModel, ToolCatalogue, PentestPhases, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
+from apps.databases.models import App, AttackView, MacmUser, Macm, ThreatCatalogue, ThreatModel, ThreatAgentQuestionReplies, ThreatAgentQuestion, ThreatAgentReply, ThreatAgentReplyCategory, ThreatAgentCategory, ThreatAgentAttributesCategory, ThreatAgentAttribute, ThreatAgentRiskScores, StrideImpactRecord, ThreatAgentQuestionReplies, RiskRecord
 from sqlalchemy import func, and_
 from apps.my_modules import converter, RiskAnalysisCatalogUtils
 from apps import db, render_template
 
 from flask_security import auth_required
+
+from fastapi.encoders import jsonable_encoder
 
 # Helper - Extract current page name from request
 def get_segment(request):
@@ -123,6 +122,7 @@ def threat_agent_wizard():
     usersPerApp = request.args.get('usersPerApp')
     owners = request.args.get('owners')
     users_dict = request.args.get('users_dict')
+    app_info = App.query.filter_by(AppID=appId).first()
 
     try:
         # Fetch all questions
@@ -175,6 +175,7 @@ def threat_agent_wizard():
         owners=owners,
         users_dict=users_dict,
         questions_replies=questions_replies_list,
+        app_info=app_info,
         appId=appId
     )
 
@@ -480,7 +481,7 @@ def stride_impact_rating():
     """
     # Extract `appId` and `objective` from the form
     appId = request.args.get('app_id')
-
+    app_info = App.query.filter_by(AppID=appId).first()
     stride_impact_evaluation_list=StrideImpactRecord.query.filter_by(AppID=appId).all()
 
     stride_impact_previous_results={}
@@ -513,13 +514,12 @@ def stride_impact_rating():
         else:
             stride_impact_previous_results["Updated_at"] = None
 
-
-
-
     template = "risk-analysis/stride_impact_risk.html"
     return render_template(
         template,
-        segment=get_segment(request),appId=appId,
+        segment=get_segment(request),
+        appId=appId,
+        app_info=app_info,
         stride_impact_previous_results=stride_impact_previous_results
     )
 
@@ -750,11 +750,14 @@ def macm_riskDetailed():
     riskAnalysisCatalogUtils = RiskAnalysisCatalogUtils()
     analyzed_component_ids, final_step_completed = riskAnalysisCatalogUtils.completed_risk_analysis(selected_macm)
 
-
-    return render_template(f"risk-analysis/macm-detailRisk.html", segment=get_segment(request),
+    return render_template(f"risk-analysis/macm-detailRisk.html",
+                            segment=get_segment(request),
                             selected_macm=selected_macm, component_id=selected_id,
-                            macm_data=macm_data, threat_data=threat_data,
-                            ThreatAgentParameters=ThreatAgentParameters, form_data=form_data,
+                            macm_data=macm_data,
+                            threat_data=threat_data,
+                            threat_data_json=jsonable_encoder(threat_data),
+                            ThreatAgentParameters=ThreatAgentParameters,
+                            form_data=form_data,
                             analyzed_component_ids=analyzed_component_ids,
                             final_step_completed=final_step_completed)
 
@@ -762,118 +765,122 @@ def macm_riskDetailed():
 @blueprint.route('/save_risk_evaluation', methods=['POST'])
 @auth_required()
 def save_risk_evaluation():
-    threatAgentUtils = RiskAnalysisCatalogUtils()
-
-    selected_macm = request.form.get('selected_macm')
-    component_id = request.form.get('component_id')
-    form = request.form
-
     try:
-        table = Macm.query.filter_by(App_ID=selected_macm).all()
-        app_info = App.query.filter_by(AppID=selected_macm).first()
-        if not table:
+        threatAgentUtils = RiskAnalysisCatalogUtils()
+        selected_macm = request.form.get('selected_macm')
+        component_id = request.form.get('component_id')
+        form = request.form
+
+        try:
+            table = Macm.query.filter_by(App_ID=selected_macm).all()
+            app_info = App.query.filter_by(AppID=selected_macm).first()
+            if not table:
+                table = None
+        except Exception:
             table = None
-    except Exception:
-        table = None
 
-    try:
-        threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm)\
-            .with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID))\
-            .group_by(ThreatModel.Component_ID).all()
-        threat_for_each_component = threatAgentUtils.converter.tuple_list_to_dict(threat_for_each_component)
-        threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
-    except Exception:
-        app.logger.error('Exception while fetching threat data', exc_info=True)
-        threat_for_each_component = {}
-        threat_number = 0
+        try:
+            threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm)\
+                .with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID))\
+                .group_by(ThreatModel.Component_ID).all()
+            threat_for_each_component = threatAgentUtils.converter.tuple_list_to_dict(threat_for_each_component)
+            threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
+        except Exception:
+            app.logger.error('Exception while fetching threat data', exc_info=True)
+            threat_for_each_component = {}
+            threat_number = 0
 
-    threat_ids = threatAgentUtils.get_all_threat_ids(form)
+        threat_ids = threatAgentUtils.get_all_threat_ids(form)
 
-    for threat_id in threat_ids:
-        threat_data = {
-            key.split('[')[1][:-1]: value
-            for key, value in form.items()
-            if key.startswith(f"{threat_id}[") and key.endswith("]")
-        }
+        for threat_id in threat_ids:
+            threat_data = {
+                key.split('[')[1][:-1]: value
+                for key, value in form.items()
+                if key.startswith(f"{threat_id}[") and key.endswith("]")
+            }
 
-        likelihood_value, likelihood_category = threatAgentUtils.calculate_likelihood(threat_data)
-        tech_impact_value, bus_impact_value, tech_category, bus_category = threatAgentUtils.calculate_impact(threat_data)
-        avg_impact = (tech_impact_value + bus_impact_value) / 2
-        impact_category = threatAgentUtils.get_category(avg_impact)
-        overall_risk = threatAgentUtils.calculate_overall_risk(likelihood_category, impact_category)
+            likelihood_value, likelihood_category = threatAgentUtils.calculate_likelihood(threat_data)
+            tech_impact_value, bus_impact_value, tech_category, bus_category = threatAgentUtils.calculate_impact(threat_data)
+            avg_impact = (tech_impact_value + bus_impact_value) / 2
+            impact_category = threatAgentUtils.get_category(avg_impact)
+            overall_risk = threatAgentUtils.calculate_overall_risk(likelihood_category, impact_category)
 
-        risk_record = RiskRecord.query.filter_by(
-            AppID=selected_macm,
-            ComponentID=component_id,
-            ThreatID=threat_id
-        ).first()
-
-        if risk_record:
-            risk_record.Likelihood = int(round(likelihood_value))
-            risk_record.TechnicalImpact = int(round(tech_impact_value))
-            risk_record.BusinessImpact = int(round(bus_impact_value))
-            risk_record.OverallRisk = overall_risk
-            risk_record.updated_at = datetime.utcnow()
-        else:
-            new_risk_record = RiskRecord(
+            risk_record = RiskRecord.query.filter_by(
                 AppID=selected_macm,
                 ComponentID=component_id,
-                ThreatID=threat_id,
-                Skill=int(threat_data.get('skill', 5)),
-                Size=int(threat_data.get('size', 5)),
-                Motive=int(threat_data.get('motive', 5)),
-                Opportunity=int(threat_data.get('opportunity', 5)),
-                Easyofdiscovery=int(threat_data.get('ease_of_discovery', 5)),
-                Easyofexploit=int(threat_data.get('ease_of_exploit', 5)),
-                Awareness=int(threat_data.get('awareness', 5)),
-                Intrusiondetection=int(threat_data.get('intrusion_detection', 5)),
-                Lossconfidentiality=int(threat_data.get('loss_of_confidentiality', 5)),
-                Lossintegrity=int(threat_data.get('loss_of_integrity', 5)),
-                Lossavailability=int(threat_data.get('loss_of_availability', 5)),
-                Lossaccountability=int(threat_data.get('loss_of_accountability', 5)),
-                Financialdamage=int(threat_data.get('financialdamage', 5)),
-                Reputationdamage=int(threat_data.get('reputationdamage', 5)),
-                Noncompliance=int(threat_data.get('noncompliance', 5)),
-                Privacyviolation=int(threat_data.get('privacyviolation', 5)),
-                Likelihood=int(round(likelihood_value)),
-                TechnicalImpact=int(round(tech_impact_value)),
-                BusinessImpact=int(round(bus_impact_value)),
-                TechnicalRisk=tech_category,
-                OverallRisk=overall_risk
-            )
-            db.session.add(new_risk_record)
-        db.session.commit()
-    # Dopo db.session.commit()
-    analyzed_components = (
-        db.session.query(RiskRecord.ComponentID)
-        .filter_by(AppID=selected_macm)
-        .distinct()
-        .all()
-    )
-    analyzed_component_ids = [c[0] for c in analyzed_components]
+                ThreatID=threat_id
+            ).first()
 
-    # Componenti che hanno almeno un threat
-    components_with_threats = {t.Component_ID for t in ThreatModel.query.filter_by(AppID=selected_macm).all()}
+            if risk_record:
+                risk_record.Likelihood = int(round(likelihood_value))
+                risk_record.TechnicalImpact = int(round(tech_impact_value))
+                risk_record.BusinessImpact = int(round(bus_impact_value))
+                risk_record.OverallRisk = overall_risk
+                risk_record.updated_at = datetime.utcnow()
+            else:
+                new_risk_record = RiskRecord(
+                    AppID=selected_macm,
+                    ComponentID=component_id,
+                    ThreatID=threat_id,
+                    Skill=int(threat_data.get('skill', 5)),
+                    Size=int(threat_data.get('size', 5)),
+                    Motive=int(threat_data.get('motive', 5)),
+                    Opportunity=int(threat_data.get('opportunity', 5)),
+                    Easyofdiscovery=int(threat_data.get('ease_of_discovery', 5)),
+                    Easyofexploit=int(threat_data.get('ease_of_exploit', 5)),
+                    Awareness=int(threat_data.get('awareness', 5)),
+                    Intrusiondetection=int(threat_data.get('intrusion_detection', 5)),
+                    Lossconfidentiality=int(threat_data.get('loss_of_confidentiality', 5)),
+                    Lossintegrity=int(threat_data.get('loss_of_integrity', 5)),
+                    Lossavailability=int(threat_data.get('loss_of_availability', 5)),
+                    Lossaccountability=int(threat_data.get('loss_of_accountability', 5)),
+                    Financialdamage=int(threat_data.get('financialdamage', 5)),
+                    Reputationdamage=int(threat_data.get('reputationdamage', 5)),
+                    Noncompliance=int(threat_data.get('noncompliance', 5)),
+                    Privacyviolation=int(threat_data.get('privacyviolation', 5)),
+                    Likelihood=int(round(likelihood_value)),
+                    TechnicalImpact=int(round(tech_impact_value)),
+                    BusinessImpact=int(round(bus_impact_value)),
+                    TechnicalRisk=tech_category,
+                    OverallRisk=overall_risk
+                )
+                db.session.add(new_risk_record)
+            db.session.commit()
+        # Dopo db.session.commit()
+        analyzed_components = (
+            db.session.query(RiskRecord.ComponentID)
+            .filter_by(AppID=selected_macm)
+            .distinct()
+            .all()
+        )
+        analyzed_component_ids = [c[0] for c in analyzed_components]
 
-    # Componenti che hanno almeno un RiskRecord
-    components_with_risk = {r.ComponentID for r in RiskRecord.query.filter_by(AppID=selected_macm).all()}
+        # Componenti che hanno almeno un threat
+        components_with_threats = {t.Component_ID for t in ThreatModel.query.filter_by(AppID=selected_macm).all()}
 
-    final_step_completed=components_with_threats.issubset(components_with_risk)
+        # Componenti che hanno almeno un RiskRecord
+        components_with_risk = {r.ComponentID for r in RiskRecord.query.filter_by(AppID=selected_macm).all()}
 
-    template = f"risk-analysis/macm_riskRating.html"
-    return render_template(
-        template,
-        segment=get_segment(request),
-        table=table,
-        threat_for_each_component=threat_for_each_component,
-        threat_number=threat_number,
-        selected_macm=selected_macm,
-        wizard_completed=threatAgentUtils.wizard_completed(selected_macm),
-        stride_impact_completed=threatAgentUtils.stride_impact_completed(selected_macm),
-        analyzed_component_ids=analyzed_component_ids,
-        final_step_completed=final_step_completed,
-        app_info=app_info,
-    )
+        final_step_completed=components_with_threats.issubset(components_with_risk)
+    except Exception as e:
+        app.logger.error(f"Error saving risk evaluation: {e}", exc_info=True)
+        db.session.rollback()
+        return jsonify({"status": "error", "message": "An error occurred while saving the risk evaluation."}), 500
+    # template = f"risk-analysis/macm_riskRating.html"
+    # return render_template(
+    #     template,
+    #     segment=get_segment(request),
+    #     table=table,
+    #     threat_for_each_component=threat_for_each_component,
+    #     threat_number=threat_number,
+    #     selected_macm=selected_macm,
+    #     wizard_completed=threatAgentUtils.wizard_completed(selected_macm),
+    #     stride_impact_completed=threatAgentUtils.stride_impact_completed(selected_macm),
+    #     analyzed_component_ids=analyzed_component_ids,
+    #     final_step_completed=final_step_completed,
+    #     app_info=app_info,
+    # )
+    return jsonify({"status": "success", "message": "Risk evaluation saved successfully."}), 200
 
 
 

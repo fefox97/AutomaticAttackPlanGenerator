@@ -19904,6 +19904,18 @@ article .h1, article .h2, article .h3, article .h4, article .h5, article .h6 {
   --my-navbar-height: 5rem;
   --dark-drowpdown-link-active-bg: red !important; }
 
+.fill-primary {
+  color: #1F2937 !important; }
+
+.fill-secondary {
+  color: #f0bc74 !important; }
+
+.fill-tertiary {
+  color: #31316A !important; }
+
+.fill-success {
+  color: #10B981 !important; }
+
 .custom-background {
   position: absolute;
   top: 0;
