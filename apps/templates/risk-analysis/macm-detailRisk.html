@@ -98,7 +98,7 @@
                                         value="{{ form_data[param] or 5 }}"
                                         min="1" max="9"
                                         class="form-control likelihood-input"
-                                        onchange="calculateImpact('{{ threat.Threat_ID }}')">
+                                        onchange="calculateLikelihood('{{ threat.Threat_ID }}')">
                                 </row>
                             </div>
                         {% endfor %}
