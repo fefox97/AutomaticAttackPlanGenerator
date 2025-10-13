@@ -53,7 +53,7 @@ def get_segment(request):
     try:
         segment = request.path.split('/')[-1]
         if segment == '':
-            segment = 'macm'
+            segment = 'macms'
         return segment
     except:
         return None

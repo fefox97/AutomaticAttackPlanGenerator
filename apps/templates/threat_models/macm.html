@@ -18,24 +18,34 @@
                             Home
                         </a>
                     </li>
-                    <li class="breadcrumb-item"><a href="/penetration_tests/">Penetration Tests</a></li>
+                    <li class="breadcrumb-item"><a href="/threat_models/">Threat Models</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ app_info.Name }}</li>
                 </ol>
             </nav>
             <h2 class="h4">MACM</h2>
             {% if table is not none %}
-                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats affecting {{ threat_for_each_component|length }} components and {{ attack_number }} attacks affecting {{ attack_for_each_component|length }} components.</p>
+                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats affecting {{ threat_for_each_component|length }} components.</p>
             {% endif %}
             <p class="mb-0"></p>
         </div>
     </div>
     
     <div class="col-12">
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Statistics</h4>
+            </div>
+            <div class="card-body">
+                <div id="threat_per_stride_chart" class="plot_container"></div>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-12">
         <div class="card border-0 shadow mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h4 class="mb-0">{{ app_info.Name if table is not none }} Penetration Test Plan</h2>
+                    <h4 class="mb-0">{{ app_info.Name if table is not none }} Threat Model</h4>
                     <span class="display-10 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
                 </div>
                 <div>
@@ -51,23 +61,9 @@
                             Export Threat Model
                         </span>
                     </button>
-                    <button type="button" class="btn btn-primary" id="exportAttackPlan">
-                        <span>
-                            <i class="fas fa-file-export me-2"></i>
-                            Export Attack Plan
-                        </span>
-                    </button>
-                    <button type="button" class="btn btn-primary btn-ai" id="generateAIReport">
-                        <i class="bi bi-stars me-2"></i>
-                        Generate AI Report
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">Beta</span>
-                    </button>
                 </div>
             </div>
             <div class="card-body">
-                <!-- {% for _, extra_component in extra_components.iterrows() %}
-                    {{ extra_component.component_id }}
-                {% endfor %} -->
                 {% if table is not none %}
                     <div class="d-block align-items-center">
                         <!-- [ stiped-table ] start -->
@@ -85,23 +81,14 @@
                             <tbody>
                                 {% for row in table %}
                                     <tr>
-                                        {% if attack_for_each_component is not none%}
-                                            {% set attack_for_this_component = attack_for_each_component[row['Component_ID']] %}
-                                        {% endif %}
                                         {% if threat_for_each_component is not none%}
                                             {% set threat_for_this_component = threat_for_each_component[row['Component_ID']] %}
                                         {% endif %}
                                         <td>
                                             <div class="id-badge">
                                                 <h2>
-                                                    <a class="badge bg-macm position-relative" href="/penetration_tests/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
+                                                    <a class="badge bg-macm position-relative" href="/threat_models/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
                                                         {{ row['Component_ID'] }}
-                                                        {% if attack_for_this_component %}
-                                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-capec badge-macm-detail">
-                                                                {{attack_for_each_component[row['Component_ID']]}}
-                                                                <span class="visually-hidden">Attacks available</span>
-                                                            </span>
-                                                        {% endif %}
                                                         {% if threat_for_this_component %}
                                                             <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-threat badge-macm-detail">
                                                                 {{threat_for_each_component[row['Component_ID']]}}
@@ -160,39 +147,6 @@
         </div>
         
         {% if table is not none %}
-        <!-- <div class="card border-0 shadow mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2 class="h4 mb-0">MACM Graph</h2>
-                <ul class="nav nav-pills mb-3" id="graph-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="graph-tab" data-bs-toggle="pill" data-bs-target="#pills-graph" type="button" role="tab" aria-controls="pills-graph" aria-selected="true">Graph</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="schema-tab" data-bs-toggle="pill" data-bs-target="#pills-schema" type="button" role="tab" aria-controls="pills-schema" aria-selected="false">Schema</button>
-                    </li>
-                </ul>
-                <div>
-                    <button type="button" class="btn btn-primary" id="centerNetwork" disabled>Center</button>
-                    <button type="button" class="btn btn-primary" id="saveImage" disabled>Save Image</button>
-                </div>
-            </div>
-            
-            <div class="card-body">
-                <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-graph" role="tabpanel" aria-labelledby="graph-tab" tabindex="0">
-                        <div class="d-block align-items-center pt-5">
-                            <div id="graph" class="neovis"></div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade " id="pills-schema" role="tabpanel" aria-labelledby="schema-tab" tabindex="0">
-                        <div class="d-block align-items-center pt-5">
-                            <div id="schema" class="neovis"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        
         <div class="card border-0 shadow mb-3" id="macmGraph">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">MACM Graph</h2>
@@ -231,13 +185,10 @@
         </div>
         {% endif %}
 
-        {% include 'penetration_tests/macm/reports.html' %}
-
     </div>
 
     {% include 'macm/modals/edit_macm_modal.html' %}
     {% include 'macm/modals/delete_modal.html' %}
-    {% include 'penetration_tests/modals/parser_modal.html' %}
 
 {% endblock content %}
 
@@ -246,10 +197,12 @@
     <script type="text/javascript">
         var app_id = "{{app_info.AppID if app_info is not none | tojson }}";
         var app_name = "{{app_info.Name if app_info is not none | tojson }}";
+        var threat_per_stride = JSON.parse('{{ threat_per_stride | tojson | safe }}');
         var neo4j_params = JSON.parse('{{neo4j_params |tojson|safe }}');
         var asset_types_colors = JSON.parse('{{asset_types_colors |tojson|safe }}');
     </script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/threat_model/tm-charts.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/graph.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>

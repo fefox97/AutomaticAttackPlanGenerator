@@ -183,8 +183,8 @@
             <span class="sidebar-text">Home</span>
           </a>
         </li>
-        <li class="nav-item {% if 'macm' in segment %} active {% endif %}">
-          <a href="/macm" class="nav-link">
+        <li class="nav-item {% if 'macms' in segment %} active {% endif %}">
+          <a href="/macms" class="nav-link">
             <span class="sidebar-icon">
               <span class="material-symbols-outlined align-top">
                 graph_5
@@ -193,7 +193,7 @@
             <span class="sidebar-text">MACM</span>
           </a>
         </li>
-        <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment %} active {% endif %}">
+        <li class="nav-item {% if 'penetration_tests' in segment or 'risk_analysis' in segment or 'threat_models' in segment %} active {% endif %}">
           <span class="nav-link d-flex justify-content-between align-items-center collapsed" data-bs-toggle="collapse" data-bs-target="#submenu-app">
             <span>
               <span class="sidebar-icon">
@@ -208,6 +208,14 @@
               <div class="multi-level collapse"
                 role="list" id="submenu-app" aria-expanded="false">
                 <ul class="flex-column nav">
+                  <li class="nav-item {% if 'threat_models' in segment %} active {% endif %}">
+                    <a href="/threat_models" class="nav-link">
+                      <span class="sidebar-icon">
+                        <span class="material-symbols-outlined align-top">gpp_maybe</span>
+                      </span>
+                      <span class="sidebar-text">Threat Models</span>
+                    </a>
+                  </li>
                   <li class="nav-item {% if 'penetration_tests' in segment %} active {% endif %}">
                     <a href="/penetration_tests" class="nav-link">
                       <span class="sidebar-icon">

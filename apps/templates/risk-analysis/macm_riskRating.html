@@ -21,7 +21,7 @@
             </nav>
             <h2 class="h4">{{ app_info.Name }} Risk Rating</h2>
             {% if table is not none %}
-                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats found</p>
+                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats affecting {{ threat_for_each_component|length }} components.</p>
             {% endif %}
         </div>
     </div>

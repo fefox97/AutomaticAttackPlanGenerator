@@ -20487,6 +20487,9 @@ pre[class*=language-] {
   flex: 0 0 16.5%;
   width: 16%; }
 
+[data-bs-theme="dark"] .plot_container {
+  filter: invert(100%) hue-rotate(180deg); }
+
 [data-bs-theme="dark"] .inverted {
   filter: invert(1) hue-rotate(180deg); }
 
