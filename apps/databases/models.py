@@ -491,7 +491,7 @@ class ThreatModel(db.Model):
                 "ThreatModel",
                 select(
                     ThreatCatalogue.TID.label("Threat_ID"), 
-                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    Macm.Type.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
                     ThreatCatalogue.Description.label("Threat_Description"),
                     ThreatCatalogue.Compromised,
