@@ -1,6 +1,6 @@
 
 
-from flask import redirect, request, url_for
+from flask import redirect, request, session, url_for
 from flask_security import current_user
 
 from flask_dance.contrib.github import github
@@ -9,18 +9,17 @@ from apps.authentication import blueprint
 from apps.authentication.forms import GithubForm
 from apps.authentication.models import Users
 from apps import db, render_template
-
-# @blueprint.route('/')
-# def route_default():
-#     return redirect(url_for_security('login'))
+from flask import current_app as app
 
 @blueprint.route("/github")
 def login_github():
     """ Github login """
+    next_url = request.args.get("next")
+    if next_url:
+        app.logger.info(f'Next URL: {next_url}')
+        session['next_url'] = next_url
     if not github.authorized:
         return redirect(url_for("github.login"))
-
-    res = github.get("/user")
     return redirect(url_for('home_blueprint.index'))
 
 @blueprint.route("/register-github", methods=['GET', 'POST'])
