@@ -1,0 +1,20 @@
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">TID</th>
+                <th scope="col">Threat</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for threat in threat_data %}
+            <tr>
+                <th scope="row"><span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{threat.Threat_ID}} </span></th>
+                <td class="align-middle">{{ threat.Threat }}</td>
+                <td class="align-middle">{{ threat.Threat_Description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
