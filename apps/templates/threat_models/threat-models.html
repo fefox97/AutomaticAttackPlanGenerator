@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Risk Analysis {% endblock %} 
+{% block title %} Threat Models {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,7 +19,7 @@
                             Home
                         </a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Risk Analysis</li>
+                    <li class="breadcrumb-item active" aria-current="page">Threat Models</li>
                 </ol>
             </nav>
         </div>
@@ -27,30 +27,29 @@
     
     <div class="row">
         <div class="col-12">
-
-            <div class="card border-0 shadow mb-3">
+            <div class="card border-0 shadow">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h4 mb-0">Risk Analysis</h2>
+                    <h2 class="h4 mb-0">Threat Models</h2>
                 </div>
 
                 <div class="card card-body border-0 shadow mb-4 mb-xl-0">
-                    {% if risk_analyses is not none %}
+                    {% if threat_models is not none %}
                         <ul class="list-group list-group-flush">
-                            {% for risk_analysis in risk_analyses %}
+                            {% for threat_model in threat_models %}
                                 <li class="list-group-item d-flex align-items-center justify-content-between px-0">
                                     <div class="d-flex align-items-center">
-                                        <h1 class="display-9 mb-1">{{ risk_analysis.AppName }}</h1>
-                                        <h6><span class="badge bg-time bg-small rounded-pill ms-3">{{ risk_analysis.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span></h6>
+                                        <h1 class="display-9 mb-1">{{ threat_model.AppName }}</h1>
+                                        <span class="badge bg-time bg-small rounded-pill ms-3 fs-10">{{ threat_model.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span>
                                     </div>
                                     <div>
-                                        {% if usersPerApp[risk_analysis.AppID] | length > 1 and current_user.id == owners[risk_analysis.AppID] %}
+                                        {% if usersPerApp[threat_model.AppID] | length > 1 and current_user.id == owners[threat_model.AppID] %}
                                             <span class="badge bg-shared rounded-pill me-2">Shared</span>
-                                        {% elif current_user.id != owners[risk_analysis.AppID] %}
+                                        {% elif current_user.id != owners[threat_model.AppID] %}
                                             <span class="badge bg-shared rounded-pill me-2">
-                                                Shared by {{ users_dict[owners[risk_analysis.AppID]] }}
+                                                Shared by {{ users_dict[owners[threat_model.AppID]] }}
                                             </span>
                                         {% endif %}
-                                        <a class="btn btn-secondary btn-sm" href="/risk_analysis/macm_riskRating?app_id={{risk_analysis.AppID}}"  role="button">
+                                        <a class="btn btn-secondary btn-sm" href="/threat_models/macm?app_id={{threat_model.AppID}}"  role="button">
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
@@ -64,7 +63,7 @@
                         </ul>
                     {% else %}
                         <div class="alert alert-warning" role="alert">
-                            <h5 class="alert-heading">No Risk analysis</h5>
+                            <h5 class="alert-heading">No Penetration Tests</h5>
                             <p>No data available, please upload a MACM</p>
                         </div>
                     {% endif %}
@@ -74,6 +73,7 @@
     </div>
 
     {% include 'macm/modals/edit_macm_modal.html' %}
+    {% include 'macm/modals/rename_macm_modal.html' %}
     {% include 'macm/modals/delete_modal.html' %}
     {% include 'macm/modals/share_macm_modal.html' %}
     {% include 'macm/modals/unshare_macm_modal.html' %}
@@ -85,4 +85,5 @@
     <script type="text/javascript">
         var usersPerApp = JSON.parse('{{ usersPerApp | tojson }}');
     </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/penetration-tests.js"></script>
 {% endblock javascripts %}

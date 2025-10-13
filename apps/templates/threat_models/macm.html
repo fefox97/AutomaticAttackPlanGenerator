@@ -1,0 +1,198 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} MACM {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="/">
+                            <span class="material-symbols-outlined align-top breadcrumb-icon">
+                                home
+                            </span>
+                            Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/threat_models/">Threat Models</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ app_info.Name }}</li>
+                </ol>
+            </nav>
+            <h2 class="h4">MACM</h2>
+            {% if table is not none %}
+                <p class="mb-0 text-danger fw-bold">{{threat_number}} threats</p>
+            {% endif %}
+            <p class="mb-0"></p>
+        </div>
+    </div>
+    
+    <div class="col-12">
+
+        <div class="card border-0 shadow mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{{ app_info.Name if table is not none }} Threat Model</h4>
+                    <span class="display-10 text-body-tertiary mb-0">{{ app_info.AppID if table is not none }}</span>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editMacmModal">
+                        <span>
+                            <i class="fas fa-edit me-2"></i>
+                            Edit MACM
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-primary" id="exportThreatModel">
+                        <span>
+                            <i class="fas fa-file-export me-2"></i>
+                            Export Threat Model
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if table is not none %}
+                    <div class="d-block align-items-center">
+                        <!-- [ stiped-table ] start -->
+                        <table id="macmTable" class="table table-striped table-hover table-dataframe">
+                            <thead>
+                                <tr>
+                                    <th>Component ID</th>
+                                    <th>Name</th>
+                                    <th>Labels</th>
+                                    <th>Type</th>
+                                    <th>Parameters</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in table %}
+                                    <tr>
+                                        {% if threat_for_each_component is not none%}
+                                            {% set threat_for_this_component = threat_for_each_component[row['Component_ID']] %}
+                                        {% endif %}
+                                        <td>
+                                            <div class="id-badge">
+                                                <h2>
+                                                    <a class="badge bg-macm position-relative" href="/threat_models/macm-detail?app_id={{ row['App_ID'] }}&id={{ row['Component_ID'] }}" id="{{ row['Component_ID'] }}">
+                                                        {{ row['Component_ID'] }}
+                                                        {% if threat_for_this_component %}
+                                                            <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-threat badge-macm-detail">
+                                                                {{threat_for_each_component[row['Component_ID']]}}
+                                                                <span class="visually-hidden">Threats available</span>
+                                                            </span>
+                                                        {% endif %}
+                                                    </a>
+                                                </h2>
+                                            </div>
+                                        </td>
+                                        <td>{{ row['Name'] }}</td>
+                                        <td>
+                                            {% for label in row['Labels'] %}
+                                                <span class="badge bg-macm-label me-1 mb-1">{{ label }}</span>
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ row['Type'] }}</td>
+                                        <td class="text-nowrap">
+                                            {% if row['Parameters'] is not none %}
+                                                {% for key, parameter in row['Parameters'].items() %}
+                                                    {{ key }}: {{ parameter }}<br>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm align-items-center" onclick="deleteComponent('{{row.App_ID}}', '{{row.Component_ID}}', '{{row.Name}}')">
+                                                <i class="fas fa-trash mr-auto"></i>
+                                                Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Component ID</th>
+                                    <th>Name</th>
+                                    <th>Labels</th>
+                                    <th>Type</th>
+                                    <th>Parameters</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tfoot>
+                        </table> 
+                        <!-- [ stiped-table ] end -->
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">No MACM Data</h4>
+                        <p>No data available, please select or upload a MACM in the <a class="warning" href="/penetration_tests">dedicated page</a>.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if table is not none %}
+        <div class="card border-0 shadow mb-3" id="macmGraph">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">MACM Graph</h2>
+                <div>
+                    <label for="layoutSelector" class="me-2 fw-semibold">Layout:</label>
+                    <select id="layoutSelector" class="form-select d-inline-block w-auto me-3 align-middle" style="min-width: 120px;">
+                        <option value="euler">Euler</option>
+                        <option value="elk">ELK</option>
+                        <option value="cola">Cola</option>
+                        <option value="spread">Spread</option>
+                    </select>
+                    <button type="button" class="btn btn-primary" id="center"><i class="fas fa-crosshairs me-2"></i>Center</button>
+                    <button type="button" class="btn btn-primary" id="showAll"><i class="fas fa-eye me-2"></i>Show All</button>
+                    
+                    <button type="button" class="btn btn-primary" id="rearrange"><i class="fas fa-random me-2"></i>Rearrange</button>
+                    <button type="button" class="btn btn-primary" id="fullscreen"> <i class="fas fa-expand me-2"></i>Fullscreen</button>
+                    <button type="button" class="btn btn-primary" id="exportImage"> <i class="fas fa-download me-2"></i>Export Image</button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="d-block align-items-center" id="cytoscape-container">
+                    <div id="cytoscape-navigator-overlay">
+                        <div id="cytoscape-navigator-overlay-buttons" class="position-absolute bottom-0 end-0 mb-5 me-5 d-flex flex-column z-3">
+                            <button id="zoom-in" class="btn btn-primary"">+</button>
+                            <button id="zoom-out" class="btn btn-primary">-</button>
+                        </div>
+                        <div id="cytoscape-suggestion-overlay" class="position-absolute z-3 start-0 end-0 d-flex justify-content-center" style="opacity: 0;">
+                            <span class="bg-body px-2 rounded-3">Click on a node to hide/show its connections</span>
+                        </div>
+                    </div>
+                    <div id="cy" class="cytoscape position-relative">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {% include 'macm/modals/edit_macm_modal.html' %}
+    {% include 'macm/modals/delete_modal.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script type="text/javascript">
+        var app_id = "{{app_info.AppID if app_info is not none | tojson }}";
+        var app_name = "{{app_info.Name if app_info is not none | tojson }}";
+        var neo4j_params = JSON.parse('{{neo4j_params |tojson|safe }}');
+        var asset_types_colors = JSON.parse('{{asset_types_colors |tojson|safe }}');
+    </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/graphs/graph.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/pentest/reports.js"></script>
+{% endblock javascripts %}
