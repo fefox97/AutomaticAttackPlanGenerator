@@ -5,6 +5,7 @@
                 <th scope="col">TID</th>
                 <th scope="col">Threat</th>
                 <th scope="col">Description</th>
+                <th scope="col">STRIDE</th>
             </tr>
         </thead>
         <tbody>
@@ -13,6 +14,7 @@
                 <th scope="row"><span class="badge bg-threat"> <span class="material-symbols-outlined">destruction</span> {{threat.Threat_ID}} </span></th>
                 <td class="align-middle">{{ threat.Threat }}</td>
                 <td class="align-middle">{{ threat.Threat_Description }}</td>
+                <td class="align-middle">{{ threat.STRIDE }}</td>
             </tr>
             {% endfor %}
         </tbody>

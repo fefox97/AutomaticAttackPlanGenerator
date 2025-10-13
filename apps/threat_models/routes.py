@@ -4,15 +4,14 @@ from apps.authentication.models import Users
 from apps.threat_models import blueprint
 from flask import request
 from flask import current_app as app
-from apps.databases.models import App, AssetTypes, AttackView, MacmUser, Macm, MethodologyView, PentestPhases, ThreatModel
+from apps.databases.models import App, AssetTypes, MacmUser, Macm, ThreatCatalogue, ThreatModel
 from sqlalchemy import func
 from apps.my_modules import converter
 from werkzeug.exceptions import NotFound
 from apps import render_template
-
 from flask_security import auth_required, current_user
-
 from apps.my_modules.utils import MacmUtils
+from fastapi.encoders import jsonable_encoder
 
 @blueprint.route('/', methods=['GET'])
 @auth_required()
@@ -45,6 +44,14 @@ def macm():
         threat_for_each_component = ThreatModel.query.filter_by(AppID=selected_macm).with_entities(ThreatModel.Component_ID, func.count(ThreatModel.Component_ID)).group_by(ThreatModel.Component_ID).all()
         threat_for_each_component = converter.tuple_list_to_dict(threat_for_each_component)
         threat_number = ThreatModel.query.filter_by(AppID=selected_macm).count()
+        threat_per_stride = [
+            ['Spoofing', ThreatModel.query.filter_by(AppID=selected_macm, Spoofing=True).count()],
+            ['Tampering', ThreatModel.query.filter_by(AppID=selected_macm, Tampering=True).count()],
+            ['Repudiation', ThreatModel.query.filter_by(AppID=selected_macm, Repudiation=True).count()],
+            ['Information Disclosure', ThreatModel.query.filter_by(AppID=selected_macm, InformationDisclosure=True).count()],
+            ['Denial of Service', ThreatModel.query.filter_by(AppID=selected_macm, DenialOfService=True).count()],
+            ['Elevation of Privilege', ThreatModel.query.filter_by(AppID=selected_macm, ElevationOfPrivilege=True).count()]
+        ]
         neo4j_params = {
             "uri": app.config['URI_NEO4J_WSS'],
             "user": app.config['RO_USER_NEO4J'],
@@ -57,7 +64,7 @@ def macm():
     except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         raise Exception('Exception occurred while trying to serve ' + request.path)
-    return render_template(f"threat_models/macm.html", segment=get_segment(request), table=table, threat_for_each_component=threat_for_each_component, threat_number=threat_number, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info, asset_types_colors=asset_types_colors)
+    return render_template(f"threat_models/macm.html", segment=get_segment(request), table=table, threat_for_each_component=threat_for_each_component, threat_number=threat_number, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info, asset_types_colors=asset_types_colors, threat_per_stride=threat_per_stride)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @auth_required()
