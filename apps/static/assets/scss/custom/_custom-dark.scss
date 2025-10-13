@@ -1,6 +1,12 @@
 $color-mode-type: data;
 
+
+
 @include color-mode(dark) {
+
+    .plot_container{
+        filter: invert(100%) hue-rotate(180deg);
+    }
 
     .inverted {
         filter: invert(1) hue-rotate(180deg);
