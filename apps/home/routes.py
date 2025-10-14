@@ -16,7 +16,6 @@ def index():
     """
     Redirect to the home page.
     """
-    app.logger.info(f'Session: {session}')
     if session.get('next_url'):
         next_url = session.get('next_url')
         session.pop('next_url', None)
