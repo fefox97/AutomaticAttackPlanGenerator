@@ -98,7 +98,7 @@ def register_custom_filters(app):
         return injections
 
 from apps.authentication.models import Roles, Users, Tasks
-from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Protocols, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
+from apps.databases.models import App, Bibliography, Macm, Capec, MacmChecks, MacmUser, Attack, Protocols, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
 from apps.admin.views import MyAdminIndexView, MyModelView, ThreatCatalogueView
 from flask_admin.menu import MenuLink
 
@@ -122,6 +122,7 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases', category='Catalogs'))
     myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))
     myAdmin.add_view(MyModelView(Bibliography, db.session, name='Bibliography'))
+    myAdmin.add_view(MyModelView(MacmChecks, db.session, name='MACM Checks', category='App'))
 
 def clean_tasks(app):
     @app.before_request
