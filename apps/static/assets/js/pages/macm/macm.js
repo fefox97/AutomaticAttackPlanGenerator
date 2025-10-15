@@ -48,7 +48,8 @@ $(document).ready(function() {
     });
 
     $('#uploadDC2MOutput').click(function() {
-        $(this).addClass('btn-loading');
+        let uploadButton = $(this);
+        uploadButton.addClass('btn-loading');
         let cypher = $('#modalDC2MOutput').text();
         if (cypher) {
             let formData = new FormData();
@@ -63,9 +64,9 @@ $(document).ready(function() {
             }).done(function(response) {
                 location.reload();
             }).fail(function(response) {
-                $(this).removeClass('btn-loading');
+                uploadButton.removeClass('btn-loading');
                 $('#modalDC2M').modal('hide');
-                showModal("Upload failed", JSON.parse(response.responseText), null, autohide = true);
+                showModal("Upload failed", JSON.parse(response.responseText));
             });
         }
     });

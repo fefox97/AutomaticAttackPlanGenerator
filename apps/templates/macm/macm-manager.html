@@ -96,7 +96,7 @@
                     {% if macms is not none %}
                         <ul class="list-group list-group-flush">
                             {% for macm in macms %}
-                                <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                <li class="list-group-item d-flex align-items-center justify-content-between px-0 {% if not loop.last %}border-bottom{% endif %} py-3">
                                     <div class="d-flex align-items-center">
                                         <h1 class="display-9 mb-1">{{ macm.AppName }}</h1>
                                         <span class="badge bg-time bg-small rounded-pill ms-3 fs-10">{{ macm.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span>
