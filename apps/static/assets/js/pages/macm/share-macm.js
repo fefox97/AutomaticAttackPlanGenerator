@@ -32,7 +32,7 @@ function shareMacm(AppID) {
         location.reload();
     }).fail(function(response) {
         $('#shareMacmModal').modal('hide');
-        showModal("Share failed", JSON.parse(response.responseText), autohide = true);
+        showModal("Share failed", JSON.parse(response.responseText), null, autohide = true);
     });
 }
 
@@ -50,6 +50,6 @@ function unshareMacm(AppID, UserID) {
         location.reload();
     }).fail(function(response) {
         $('#unshareMacmModal').modal('hide');
-        showModal("Unshare failed", JSON.parse(response.responseText), autohide = true);
+        showModal("Unshare failed", JSON.parse(response.responseText), null, autohide = true);
     });
 }
