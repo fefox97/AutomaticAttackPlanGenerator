@@ -1,13 +1,16 @@
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
 
 function showModal(title, response, icon=null, autohide = false, large = false, badge = null) {
-    $("#modal-title").text(title);
+    let modal = $("#MainModal");
+    let modalTitle = modal.find(".modal-title");
+    let modalBodyText = modal.find(".modal-body-text");
+    modalTitle.text(title);
     if (icon) {
-        $("#modal-title").prepend(icon);
-        $("#modal-title").find("i").addClass("me-2");
+        modalTitle.prepend(icon);
+        modalTitle.find("i").addClass("me-2");
     }
     if (badge) {
-        $("#modal-title").append(badge);
+        modalTitle.append(badge);
     }
     let messages = "";
     if (typeof response === "string") {
@@ -17,14 +20,14 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
             messages += response[key] + "\n";
         }
     }
-    $("#modal-body-text").text(messages);
+    modalBodyText.text(messages);
     if (large) {
-        $("#modal-upload").addClass("modal-lg");
+        modal.addClass("modal-lg");
     }
-    $("#modal-upload").modal("show");
+    modal.modal("show");
     if (autohide) {
         setTimeout(function() {
-            $("#modal-upload").modal("hide");
+            modal.modal("hide");
         }, 5000);
     }
 }

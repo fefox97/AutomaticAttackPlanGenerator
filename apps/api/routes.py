@@ -19,7 +19,7 @@ from apps.exception.MACMCheckException import MACMCheckException
 from apps.my_modules import converter, macm, utils
 from apps.api.utils import AttackPatternAPIUtils, APIUtils
 from apps.api.parser import NmapParser
-from apps.databases.models import App, AssetTypes, Attack, AttackView, Settings, ThreatModel, ToolCatalogue
+from apps.databases.models import App, AssetTypes, Attack, AttackView, MacmChecks, Settings, ThreatModel, ToolCatalogue
 from apps import db, mail
 from sqlalchemy.sql.expression import null
 from celery.result import AsyncResult
@@ -760,3 +760,31 @@ def delete_api_token(token_id):
     db.session.delete(token)
     db.session.commit()
     return jsonify({'message': 'Token deleted'})
+
+@blueprint.route('/get_macm_check_status', methods=['GET'])
+@auth_required()
+def get_macm_check_status():
+    try:
+        check_status = MacmChecks.query.with_entities(MacmChecks.Id, MacmChecks.Name, MacmChecks.Activated).all()
+        check_status = converter.tuple_list_to_list_of_tuples(check_status)
+        return jsonify({'status': check_status})
+    except Exception as error:
+        app.logger.error(f"Error getting MACM integrity check status: {error.args}", exc_info=True)
+        return jsonify({'message': "Error getting MACM integrity check status"}), 400
+
+@blueprint.route('/update_macm_check_status', methods=['POST'])
+@auth_required()
+@roles_required('admin')
+def update_macm_check_status():
+    try:
+        check_status = request.form.get('check_status')
+        check_status = json.loads(check_status)
+        for check in check_status:
+            macm_check = MacmChecks.query.filter_by(Id=check['id']).first()
+            if macm_check:
+                macm_check.Activated = check['activated']
+        db.session.commit()
+        return jsonify({'message': 'MACM integrity check status updated successfully'})
+    except Exception as error:
+        app.logger.error(f"Error updating MACM integrity check status: {error.args}", exc_info=True)
+        return jsonify({'message': "Error updating MACM integrity check status"}), 400

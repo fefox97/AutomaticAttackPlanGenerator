@@ -441,6 +441,7 @@ class MacmChecks(db.Model):
     Name = db.Column(db.Text)
     Description = db.Column(db.Text)
     Query = db.Column(db.Text)
+    Activated = db.Column(db.Boolean)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -451,6 +452,8 @@ class MacmChecks(db.Model):
 
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.CheckName}')
+
+
 
 class App(db.Model):
     

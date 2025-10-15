@@ -65,7 +65,7 @@ $(document).ready(function() {
             }).fail(function(response) {
                 $(this).removeClass('btn-loading');
                 $('#modalDC2M').modal('hide');
-                showModal("Upload failed", JSON.parse(response.responseText), autohide = true);
+                showModal("Upload failed", JSON.parse(response.responseText), null, autohide = true);
             });
         }
     });
@@ -105,7 +105,7 @@ function deleteMacm(AppID) {
         location.reload();
     }).fail(function(response) {
         $('#deleteModal').modal('hide');
-        showModal("Delete failed", JSON.parse(response.responseText), autohide = true);
+        showModal("Delete failed", JSON.parse(response.responseText), null, autohide = true);
     });
 }
 
