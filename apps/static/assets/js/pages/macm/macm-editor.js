@@ -1,3 +1,8 @@
+var inspector;
+// Chiave usata per il salvataggio locale del diagramma
+const MACM_LOCAL_STORAGE_KEY = 'macmDiagramCurrent';
+let autoSaveTimeout = null;
+
 function init() {
     myDiagram = new go.Diagram('macmDiagramDiv', {
         'undoManager.isEnabled': true, // enable undo & redo
@@ -25,6 +30,17 @@ function init() {
             if (idx < 0) document.title += '*';
         } else {
             if (idx >= 0) document.title = document.title.slice(0, idx);
+        }
+        // Auto-save con debounce quando ci sono modifiche
+        scheduleAutoSave();
+    });
+
+    myDiagram.addDiagramListener("ChangedSelection", function(diagramEvent) {
+        var hh = myDiagram.selection.first();
+        if (hh == null) {
+            hideInspector();
+        } else {
+            showInspector();
         }
     });
 
@@ -72,10 +88,9 @@ function init() {
         }
     });
 
-    const inspector =
-        new Inspector('macmInspectorDiv', myDiagram, {
+    inspector = new Inspector('macmInspectorDiv', myDiagram, {
             // allows for multiple nodes to be inspected at once
-            multipleSelection: false,
+            multipleSelection: true,
             // max number of node properties will be shown when multiple selection is true
             showSize: 4,
             // when multipleSelection is true, when showUnionProperties is true it takes the union of properties
@@ -93,6 +108,7 @@ function init() {
                 from: { name:'From', readOnly: true, show: Inspector.showIfPresent },
                 to: { name:'To', readOnly: true, show: Inspector.showIfPresent},
                 background_color: { show: false, type: 'color'},
+                description: { show: false },
                 primary_label: { name: "Primary Label", readOnly: true, show: Inspector.showIfPresent },
                 secondary_label: { name: "Secondary Label", readOnly: true, show: Inspector.showIfPresent }
             }
@@ -206,7 +222,13 @@ function init() {
                 fromLinkable: true,
                 toLinkable: true,
                 fromSpot: go.Spot.AllSides,
-                toSpot: go.Spot.AllSides
+                toSpot: go.Spot.AllSides,
+                toolTip:
+                    go.GraphObject.build('ToolTip')
+                        .add(
+                        new go.TextBlock({ margin: 4 })
+                        .bind('text', '', paletteNodeInfo)
+                    ),
             })
             .apply(shapeStyle)
             // Se presente data.color usa quello, altrimenti fallback al tema
@@ -245,7 +267,7 @@ function init() {
             mouseEnter: (e, link) => (link.findObject('HIGHLIGHT').stroke = link.diagram.themeManager.findValue('linkOver', 'colors')),
             mouseLeave: (e, link) => (link.findObject('HIGHLIGHT').stroke = 'transparent'),
             // context-click creates an editable link label
-            doubleClick: (e, link) => {
+            click: (e, link) => {
                 e.diagram.model.commit(m => {
                     if (!link.data.type)
                         m.set(link.data, 'type', 'No Type');
@@ -279,7 +301,7 @@ function init() {
                     margin: 3,
                     editable: true,
                     textEditor: window.TextEditorSelectBox,
-                    choices: ['uses', 'connects', 'hosts', 'interacts', 'provides']
+                    choices: ['No Type', 'uses', 'connects', 'hosts', 'interacts', 'provides']
                     })
                     .apply(linkTextStyle)
                     .bindTwoWay('text', 'type')
@@ -289,6 +311,12 @@ function init() {
     // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
     myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Routing.Orthogonal;
     myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Routing.Orthogonal;
+    // Imposta il dato archetipo dei nuovi link: avranno "No Type" di default
+    myDiagram.toolManager.linkingTool.archetypeLinkData = { type: 'No Type' };
+    // Uniforma eventuali link esistenti privi di type
+    myDiagram.model.commit(m => {
+        m.linkDataArray.forEach(ld => { if (!ld.type) m.set(ld, 'type', 'No Type'); });
+    }, 'Set default link type');
 
 
     // initialize the Palette that is on the left side of the page
@@ -299,6 +327,7 @@ function init() {
         type: at.name,
         primary_label: at.primary_label,
         secondary_label: at.secondary_label,
+        description: at.description,
         background_color: at.color,
         color: getTextColor(at.color)
     }));
@@ -309,6 +338,9 @@ function init() {
         allowZoom: false,
         model: new go.GraphLinksModel(paletteNodes)
     });
+
+    // Carica automaticamente il diagramma se presente in localStorage
+    load();
 }
 
 function nodeInfo(d) {
@@ -317,6 +349,14 @@ function nodeInfo(d) {
         if (d.type) str += 'Asset Type: ' + d.type;
         return str;
     }
+
+function paletteNodeInfo(d) {
+    var str = 'Asset Type: ' + d.type + '\n';
+    if (d.primary_label) str += 'Primary Label: ' + d.primary_label + '\n';
+    if (d.secondary_label) str += 'Secondary Label: ' + d.secondary_label + '\n';
+    if (d.description) str += 'Description: ' + d.description + '\n';
+    return str;
+}
 
 function linkInfo(d) {
     var str = 'Relationship:\n';
@@ -374,6 +414,85 @@ function makeButton(text, action, visiblePredicate) {
     return button;
 }
 
+function confirmClearDiagram() {
+    $('#deleteName').text("the entire diagram");
+    $('#deleteConfirm').click(clearDiagram);
+    $('#deleteModal').modal('show');
+}
+
+function clearDiagram() {
+    myDiagram.startTransaction('clear diagram');
+    myDiagram.clear();
+    hideInspector();
+    save();
+    myDiagram.commitTransaction('clear diagram');
+    $('#deleteModal').modal('hide');
+}
+
+// Debounce per auto-save
+function scheduleAutoSave() {
+    if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(() => {
+        if (myDiagram && myDiagram.isModified) {
+            save();
+        }
+    }, 800); // 800ms di inattività prima del salvataggio
+}
+
+// Salva lo stato corrente del diagramma in localStorage
+function save() {
+    if (!myDiagram) return;
+    try {
+        const json = myDiagram.model.toJson();
+        localStorage.setItem(MACM_LOCAL_STORAGE_KEY, json);
+        // Reset stato modificato
+        myDiagram.isModified = false;
+        const button = document.getElementById('SaveButton');
+        if (button) button.disabled = true;
+        console.log('[MACM] Diagramma salvato in localStorage');
+    } catch (err) {
+        console.error('[MACM] Errore salvataggio diagramma:', err);
+    }
+}
+
+// Carica lo stato del diagramma da localStorage (se presente)
+function load() {
+    if (!myDiagram) return;
+    try {
+        const json = localStorage.getItem(MACM_LOCAL_STORAGE_KEY);
+        if (!json) {
+            console.log('[MACM] Nessun diagramma salvato trovato');
+            return;
+        }
+        const model = go.Model.fromJson(json);
+        // Reinserisce la funzione di key unica (persa nel fromJson)
+        if (model instanceof go.GraphLinksModel) {
+            model.makeUniqueKeyFunction = function() {
+                let k = 1;
+                while (model.findNodeDataForKey(k)) k++;
+                return k;
+            };
+        }
+        myDiagram.model = model;
+        // Assicura che ogni link abbia almeno il type di default
+        myDiagram.model.commit(m => {
+            m.linkDataArray.forEach(ld => { if (!ld.type) m.set(ld, 'type', 'No Type'); });
+        }, 'Normalize link types after load');
+        myDiagram.isModified = false;
+        const button = document.getElementById('SaveButton');
+        if (button) button.disabled = true;
+        console.log('[MACM] Diagramma caricato da localStorage');
+    } catch (err) {
+        console.error('[MACM] Errore caricamento diagramma:', err);
+    }
+}
+
+// Rimuove il diagramma salvato (utility opzionale)
+function removeSavedDiagram() {
+    localStorage.removeItem(MACM_LOCAL_STORAGE_KEY);
+    console.log('[MACM] Diagramma salvato rimosso');
+}
+
   // print the diagram by opening a new window holding SVG images of the diagram contents for each page
 function printDiagram() {
     const svgWindow = window.open();
@@ -409,6 +528,28 @@ function changeTheme() {
     }
 }
 
+function showInspector() {
+    const el = document.getElementById('macmInspectorDiv');
+    if (el && el.classList.contains('is-visible')) return;
+    el.classList.remove('is-hidden', 'exit-right', 'is-visible');
+    void el.offsetWidth;
+    requestAnimationFrame(() => {
+        el.classList.add('is-visible');
+    });
+}
+
+function hideInspector() {
+    const el = document.getElementById('macmInspectorDiv');
+    if (el && el.classList.contains('is-hidden')) return;
+    el.classList.add('exit-right');
+    el.addEventListener('transitionend', function onEnd() {
+        console.log("Hiding inspector");
+        el.classList.remove('is-visible');
+        el.classList.add('is-hidden');
+        el.removeEventListener('transitionend', onEnd);
+    });
+}
+
 function getCypher() {
     var jsonDiagram = myDiagram.model.toJson();
     jsonDiagram = JSON.parse(jsonDiagram);
@@ -426,7 +567,7 @@ function getCypher() {
             cypherQuery += ` {name:"${node.name}", component_id:"${node.key}", type:"${node.type}"}),\n`;
         }
         for (const link of linkArray) {
-            if (!link.type){
+            if (!link.type || link.type === 'No Type'){
                 throw new Error(`Link from Node ${nodeArray[link.from-1].name} to Node ${nodeArray[link.to-1].name} has no type defined.`);
             }
             cypherQuery += `(Node${link.from})-[:${link.type}]->(Node${link.to}),\n`;

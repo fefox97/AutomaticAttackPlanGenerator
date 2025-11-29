@@ -753,7 +753,7 @@ pre[class*=language-]{
     flex-grow: 1;
     border: 1px solid #333;
     border-radius: 6px;
-    height: 450px;
+    height: 550px;
     width: 100%;
 }
 
@@ -804,4 +804,36 @@ pre[class*=language-]{
     flex-direction: column;
     gap: 8px;
     width: 100%;
+}
+
+#macmInspectorDiv {
+    background: $gray-100;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    will-change: transform, opacity;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#macmInspectorDiv.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+#macmInspectorDiv.is-hidden {
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#macmInspectorDiv.exit-right {
+    transform: translateX(100%);
+    opacity: 0;
 }
