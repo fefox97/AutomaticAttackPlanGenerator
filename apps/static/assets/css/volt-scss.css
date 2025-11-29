@@ -20487,6 +20487,57 @@ pre[class*=language-] {
   flex: 0 0 16.5%;
   width: 16%; }
 
+#macmDiagramDiv {
+  flex-grow: 1;
+  border: 1px solid #333;
+  border-radius: 6px;
+  height: 450px;
+  width: 100%; }
+
+#macmPaletteGroupDiv {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  height: 150px;
+  margin-top: 8px; }
+
+#macmPaletteDiv {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #333;
+  border-radius: 6px; }
+  #macmPaletteDiv canvas {
+    padding: 10px 10px 10px 10px !important; }
+
+#macmPaletteLabelDiv {
+  display: flex;
+  position: absolute;
+  /* overlay sopra la palette */
+  top: 10px;
+  left: 12px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  z-index: 2;
+  padding: 6px 8px;
+  background-color: rgba(var(--bs-body-bg-rgb), 0.8);
+  border: 1px solid #333;
+  border-radius: 6px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  backdrop-filter: blur(2px);
+  height: 130px; }
+
+#macmEditorGroupDiv {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%; }
+
 [data-bs-theme="dark"] .plot_container {
   filter: invert(100%) hue-rotate(180deg); }
 
