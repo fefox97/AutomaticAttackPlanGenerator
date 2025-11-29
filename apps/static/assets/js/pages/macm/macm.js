@@ -83,14 +83,6 @@ $(document).ready(function() {
         const QueryCypher = $('#editQueryCypher').val();
         editMacm(AppID, QueryCypher);
     });
-
-    $('#deleteModal').on('show.bs.modal', function(event) {
-        const AppID = event.relatedTarget.dataset.bsAppid;
-        const AppName = event.relatedTarget.dataset.bsAppname;
-        $('#deleteName').text(AppName);
-        $('#deleteConfirm').click(function() { deleteMacm(AppID); });
-        this.querySelector('#deleteID').value = AppID;
-    });
 });
 
 function deleteMacm(AppID) {
@@ -108,6 +100,15 @@ function deleteMacm(AppID) {
         $('#deleteModal').modal('hide');
         showModal("Delete failed", JSON.parse(response.responseText), null, autohide = true);
     });
+}
+
+function confirmDeleteMacm(caller){
+    const AppID = caller.dataset.bsAppid;
+    const AppName = caller.dataset.bsAppname;
+    $('#deleteName').text(AppName);
+    $('#deleteConfirm').click(function() { deleteMacm(AppID); });
+    $('#deleteModal').children('#deleteID').val(AppID);
+    $('#deleteModal').modal('show');
 }
 
 function showDC2MModal(title, cypher, app_name, services, service_types, suggested_asset_types) {

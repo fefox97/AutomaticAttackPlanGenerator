@@ -258,4 +258,16 @@ $color-mode-type: data;
     .text-protocols{
         color: $protocols-color-dark !important;
     }
+
+    #macmDiagramDiv{
+        select {
+            background: $form-control-bg-dark !important;
+            color: $form-control-color-dark !important;
+        }
+    }
+    #macmInspectorDiv {
+        background: $gray-800;
+        border: 1px solid #333;
+        border-radius: 6px;
+    }
 }

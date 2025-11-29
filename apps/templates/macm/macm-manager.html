@@ -79,13 +79,19 @@
                         <div id="macmInspectorDiv"></div>
                     </div>
                     <div class="card-footer justify-content-between d-flex">
-                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#macmEditorInfoModal">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#macmEditorInfoModal">
                             <i class="fas fa-info mr-auto"></i>
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="showC2MModal()">
-                            <i class="fas fa-code mr-auto"></i>
-                            Get Cypher
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-danger" onclick="confirmClearDiagram()">
+                                <i class="fas fa-trash mr-auto"></i>
+                                Clear Diagram
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="showC2MModal()">
+                                <i class="fas fa-code mr-auto"></i>
+                                Get Cypher
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,10 +165,14 @@
                                                 <i class="fas fa-share mr-auto"></i>
                                                 Share
                                             </button>
-                                            <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}">
+                                            <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}" onclick="confirmDeleteMacm(this)">
                                                 <i class="fas fa-trash mr-auto"></i>
                                                 Delete
                                             </button>
+                                            <!-- <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}">
+                                                <i class="fas fa-trash mr-auto"></i>
+                                                Delete
+                                            </button> -->
                                         {% else %}
                                             <button type="button" class="btn btn-primary btn-sm align-items-center" data-bs-target="#unshareMacmModal" data-bs-toggle="modal" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}" data-bs-UserID="{{current_user.id}}">
                                                 <i class="fas fa-share mr-auto"></i>
