@@ -1,5 +1,4 @@
 var inspector;
-// Chiave usata per il salvataggio locale del diagramma
 const MACM_LOCAL_STORAGE_KEY = 'macmDiagramCurrent';
 let autoSaveTimeout = null;
 
@@ -8,7 +7,18 @@ function init() {
         'undoManager.isEnabled': true, // enable undo & redo
         'themeManager.changesDivBackground': true,
         'themeManager.currentTheme': document.documentElement.getAttribute('data-bs-theme', 'dark'),
+        layout: new ContinuousForceDirectedLayout({ // automatically spread nodes apart while dragging
+            defaultSpringLength: 200
+        }),
+        SelectionMoved: e => e.diagram.layout.invalidateLayout()
     });
+
+    // dragging a node invalidates the Diagram.layout, causing a layout during the drag
+    myDiagram.toolManager.draggingTool.doMouseMove = function () {
+      // method override must be function, not =>
+        go.DraggingTool.prototype.doMouseMove.call(this);
+        if (this.isActive) this.diagram.layout.doLayout(this.diagram);
+    };
 
     // A custom function to generate unique positive keys
     myDiagram.model = new go.GraphLinksModel({
@@ -543,7 +553,6 @@ function hideInspector() {
     if (el && el.classList.contains('is-hidden')) return;
     el.classList.add('exit-right');
     el.addEventListener('transitionend', function onEnd() {
-        console.log("Hiding inspector");
         el.classList.remove('is-visible');
         el.classList.add('is-hidden');
         el.removeEventListener('transitionend', onEnd);
