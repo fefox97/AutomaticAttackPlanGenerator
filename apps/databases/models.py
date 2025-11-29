@@ -105,6 +105,18 @@ class AssetTypes(db.Model):
         asset_types_colors = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.Color).all()
         return {asset_type.Name: asset_type.Color for asset_type in asset_types_colors}
 
+    @staticmethod
+    def get_all_asset_types():
+        asset_types = AssetTypes.query.all()
+        return {asset_type.AssetTypeID: {
+                'name': asset_type.Name,
+                'description': asset_type.Description,
+                'primary_label': asset_type.PrimaryLabel,
+                'secondary_label': asset_type.SecondaryLabel,
+                'color': asset_type.Color,
+            } for asset_type in asset_types
+        }
+
     @hybrid_property
     def get_ports(self):
         if self.Ports is None:
