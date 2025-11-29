@@ -1,0 +1,505 @@
+function init() {
+    myDiagram = new go.Diagram('macmDiagramDiv', {
+        'undoManager.isEnabled': true, // enable undo & redo
+        'themeManager.changesDivBackground': true,
+        'themeManager.currentTheme': document.documentElement.getAttribute('data-bs-theme', 'dark'),
+    });
+
+    // A custom function to generate unique positive keys
+    myDiagram.model = new go.GraphLinksModel({
+        makeUniqueKeyFunction: function() {
+            let k = 1; 
+            while (myDiagram.model.findNodeDataForKey(k)) {
+            k++;
+            }
+            return k;
+        },
+    });
+
+    // when the document is modified, add a "*" to the title and enable the "Save" button
+    myDiagram.addDiagramListener('Modified', e => {
+        const button = document.getElementById('SaveButton');
+        if (button) button.disabled = !myDiagram.isModified;
+        const idx = document.title.indexOf('*');
+        if (myDiagram.isModified) {
+            if (idx < 0) document.title += '*';
+        } else {
+            if (idx >= 0) document.title = document.title.slice(0, idx);
+        }
+    });
+
+    myDiagram.contextMenu =
+        go.GraphObject.build('ContextMenu')
+            .add(
+            makeButton('Paste',
+                (e, obj) =>
+                e.diagram.commandHandler.pasteSelection(
+                    e.diagram.toolManager.contextMenuTool.mouseDownPoint
+                ),
+                o =>
+                o.diagram.commandHandler.canPasteSelection(
+                    o.diagram.toolManager.contextMenuTool.mouseDownPoint
+                )
+            ),
+            makeButton('Undo',
+                (e, obj) => e.diagram.commandHandler.undo(),
+                o => o.diagram.commandHandler.canUndo()
+            ),
+            makeButton('Redo',
+                (e, obj) => e.diagram.commandHandler.redo(),
+                o => o.diagram.commandHandler.canRedo()
+            )
+        );
+
+    // set up some colors/fonts for the default ('light') and dark Themes
+    myDiagram.themeManager.set('light', {
+        colors: {
+            text: '#fff',
+            bgText: '#000',
+            link: '#dcb263',
+            linkOver: '#cbd5e1',
+            div: '#F2F4F6',
+        }
+    });
+
+    myDiagram.themeManager.set('dark', {
+        colors: {
+            text: '#fff',
+            bgText: '#fff',
+            link: '#fdb71c',
+            linkOver: '#475569',
+            div: '#1F2937'
+        }
+    });
+
+    const inspector =
+        new Inspector('macmInspectorDiv', myDiagram, {
+            // allows for multiple nodes to be inspected at once
+            multipleSelection: false,
+            // max number of node properties will be shown when multiple selection is true
+            showSize: 4,
+            // when multipleSelection is true, when showUnionProperties is true it takes the union of properties
+            // otherwise it takes the intersection of properties
+            showUnionProperties: true,
+            // uncomment this line to only inspect the named properties below instead of all properties on each object:
+            // includesOwnProperties: false,
+            properties: {
+                name: { name: "Name", show: Inspector.showIfPresent },
+                // key would be automatically added for nodes, but we want to declare it read-only also:
+                key: { name:"ID", readOnly: true, show: Inspector.showIfPresent },
+                // color would be automatically added for nodes, but we want to declare it a color also:
+                color: { show: false, type: 'color' },
+                type: { name:'Type', show: Inspector.showIfPresent, readOnly: true },
+                from: { name:'From', readOnly: true, show: Inspector.showIfPresent },
+                to: { name:'To', readOnly: true, show: Inspector.showIfPresent},
+                background_color: { show: false, type: 'color'},
+                primary_label: { name: "Primary Label", readOnly: true, show: Inspector.showIfPresent },
+                secondary_label: { name: "Secondary Label", readOnly: true, show: Inspector.showIfPresent }
+            }
+        });
+
+    var partContextMenu =
+        go.GraphObject.build('ContextMenu')
+            .add(
+            makeButton('Properties',
+                (e, obj) => {
+                // OBJ is this Button
+                var contextmenu = obj.part; // the Button is in the context menu Adornment
+                var part = contextmenu.adornedPart; // the adornedPart is the Part that the context menu adorns
+                // now can do something with PART, or with its data, or with the Adornment (the context menu)
+                if (part instanceof go.Link) alert(linkInfo(part.data));
+                else alert(nodeInfo(part.data));
+                }),
+            makeButton('Cut',
+                (e, obj) => e.diagram.commandHandler.cutSelection(),
+                o => o.diagram.commandHandler.canCutSelection()
+            ),
+            makeButton('Copy',
+                (e, obj) => e.diagram.commandHandler.copySelection(),
+                o => o.diagram.commandHandler.canCopySelection()
+            ),
+            makeButton('Paste',
+                (e, obj) =>
+                e.diagram.commandHandler.pasteSelection(
+                    e.diagram.toolManager.contextMenuTool.mouseDownPoint
+                ),
+                o =>
+                o.diagram.commandHandler.canPasteSelection(
+                    o.diagram.toolManager.contextMenuTool.mouseDownPoint
+                )
+            ),
+            makeButton('Delete',
+                (e, obj) => e.diagram.commandHandler.deleteSelection(),
+                o => o.diagram.commandHandler.canDeleteSelection()
+            ),
+            makeButton('Undo',
+                (e, obj) => e.diagram.commandHandler.undo(),
+                o => o.diagram.commandHandler.canUndo()
+            ),
+            makeButton('Redo',
+                (e, obj) => e.diagram.commandHandler.redo(),
+                o => o.diagram.commandHandler.canRedo()
+            ),
+            makeButton('Group',
+                (e, obj) => e.diagram.commandHandler.groupSelection(),
+                o => o.diagram.commandHandler.canGroupSelection()
+            ),
+            makeButton('Ungroup',
+                (e, obj) => e.diagram.commandHandler.ungroupSelection(),
+                o => o.diagram.commandHandler.canUngroupSelection()
+            )
+        );
+
+    // define the Node templates for regular nodes
+    myDiagram.nodeTemplateMap.add('', // the default category
+        new go.Node('Auto',
+            {
+                contextMenu: partContextMenu,
+                toolTip:
+                    go.GraphObject.build('ToolTip')
+                        .add(
+                        new go.TextBlock({ margin: 4 })
+                        .bind('text', '', nodeInfo)
+                    ),
+            })
+            .apply(nodeStyle)
+            .add(
+            new go.Shape('RoundedRectangle', {
+                name: 'BODY',
+                fromLinkable: true,
+                toLinkable: true,
+                fromSpot: go.Spot.AllSides,
+                toSpot: go.Spot.AllSides
+            })
+            .apply(shapeStyle)
+            .bind('fill', 'background_color', c => c || myDiagram.themeManager.findValue('background', 'colors')),
+            new go.Panel('Vertical').add(
+                new go.TextBlock({
+                    margin: new go.Margin(12, 12, 4, 12),
+                    maxSize: new go.Size(160, NaN),
+                    wrap: go.Wrap.Fit,
+                    editable: true,
+                    isMultiline: false
+                    })
+                    .apply(nodeTextStyle)
+                    .bind('stroke', 'color')
+                    .bindTwoWay('text', 'name'),
+                new go.TextBlock({
+                    font: '6pt Figtree, sans-serif',
+                    editable: false,
+                    isMultiline: false
+                    })
+                    .apply(nodeAssetTypeStyle)
+                    .bind('stroke', 'color')
+                    .bindTwoWay('text', 'type')
+                )
+            )
+    );
+    
+    const paletteTemplate = new go.Map();
+    paletteTemplate.add('',
+        new go.Node('Auto')
+            .apply(nodeStyle)
+            .add(
+            new go.Shape('RoundedRectangle', {
+                name: 'BODY',
+                fromLinkable: true,
+                toLinkable: true,
+                fromSpot: go.Spot.AllSides,
+                toSpot: go.Spot.AllSides
+            })
+            .apply(shapeStyle)
+            // Se presente data.color usa quello, altrimenti fallback al tema
+            .bind('fill', 'background_color', c => c || myDiagram.themeManager.findValue('background', 'colors')),
+            new go.Panel('Vertical').add(
+                new go.TextBlock({
+                    margin: 5,
+                    editable: false,
+                    isMultiline: false
+                    })
+                    .apply(paletteAssetTypeStyle)
+                    .bind('stroke', 'color')
+                    .bindTwoWay('text', 'type')
+                )
+            )
+        );
+    // replace the default Link template in the linkTemplateMap
+    myDiagram.linkTemplate =
+        new go.Link({
+            routing: go.Routing.AvoidsNodes,
+            curve: go.Curve.JumpOver,
+            corner: 5,
+            toShortLength: 4,
+            relinkableFrom: true,
+            relinkableTo: true,
+            reshapable: true,
+            resegmentable: true,
+            contextMenu: partContextMenu,
+            toolTip:
+                go.GraphObject.build('ToolTip')
+                    .add(
+                    new go.TextBlock({ margin: 4 }) // the tooltip shows the result of calling linkInfo(data)
+                        .bind('text', '', linkInfo)
+                ),
+            // mouse-overs subtly highlight links:
+            mouseEnter: (e, link) => (link.findObject('HIGHLIGHT').stroke = link.diagram.themeManager.findValue('linkOver', 'colors')),
+            mouseLeave: (e, link) => (link.findObject('HIGHLIGHT').stroke = 'transparent'),
+            // context-click creates an editable link label
+            doubleClick: (e, link) => {
+                e.diagram.model.commit(m => {
+                    if (!link.data.type)
+                        m.set(link.data, 'type', 'No Type');
+                });
+            }
+            })
+            // .bindTwoWay('points')
+            .add(
+            // the highlight shape, normally transparent
+            new go.Shape({
+                isPanelMain: true,
+                strokeWidth: 8,
+                stroke: 'transparent',
+                name: 'HIGHLIGHT'
+            }),
+            // the link path shape
+            new go.Shape({ isPanelMain: true, strokeWidth: 2 })
+                .theme('stroke', 'link'),
+            // the arrowhead
+            new go.Shape({ toArrow: 'standard', strokeWidth: 0, scale: 1.5 })
+                .theme('fill', 'link'),
+            // the link label
+            new go.Panel('Auto', { visible: false })
+                .bind('visible', 'type', t => typeof t === 'string' && t.length > 0) // only shown if there is text
+                .add(
+                // a gradient that fades into the background
+                new go.Shape('Ellipse', { strokeWidth: 0 })
+                    .theme('fill', 'div', null, null, c => new go.Brush("Radial", { 0: c, 0.5: `${c}00` })),
+                new go.TextBlock({
+                    name: 'LABEL',
+                    margin: 3,
+                    editable: true,
+                    textEditor: window.TextEditorSelectBox,
+                    choices: ['uses', 'connects', 'hosts', 'interacts', 'provides']
+                    })
+                    .apply(linkTextStyle)
+                    .bindTwoWay('text', 'type')
+                )
+        );
+
+    // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
+    myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Routing.Orthogonal;
+    myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Routing.Orthogonal;
+
+
+    // initialize the Palette that is on the left side of the page
+    // asset_types è un oggetto { id: { name, description, primary_label, secondary_label, color } }
+    // Genera un nodo per ogni tipo di asset con nome e colore corretti
+    const paletteNodes = Object.values(asset_types).map(at => ({
+        name: at.name,
+        type: at.name,
+        primary_label: at.primary_label,
+        secondary_label: at.secondary_label,
+        background_color: at.color,
+        color: getTextColor(at.color)
+    }));
+
+    myPalette = new go.Palette('macmPaletteDiv', {
+        nodeTemplateMap: paletteTemplate,
+        themeManager: myDiagram.themeManager, // share the ThemeManager used by myDiagram
+        allowZoom: false,
+        model: new go.GraphLinksModel(paletteNodes)
+    });
+}
+
+function nodeInfo(d) {
+        var str = 'Asset ' + d.key + '\n'
+        str += 'Name: ' + d.name + '\n';
+        if (d.type) str += 'Asset Type: ' + d.type;
+        return str;
+    }
+
+function linkInfo(d) {
+    var str = 'Relationship:\n';
+    if (d.type)
+        str += 'Type: ' + d.type + '\n';
+    str += 'from ' + d.from + ' to ' + d.to;;
+    return str;
+}
+
+// helper definitions for node templates
+function nodeStyle(node) {
+    node
+        // the Node.location is at the center of each node
+        .set({ locationSpot: go.Spot.Center })
+        // The Node.location comes from the "loc" property of the node data,
+        // converted by the Point.parse static method.
+        // If the Node.location is changed, it updates the "loc" property of the node data,
+        // converting back using the Point.stringify static method.
+        // .bindTwoWay('location', 'loc', go.Point.parse, go.Point.stringify);
+}
+
+function shapeStyle(shape) {
+    shape.set({ strokeWidth: 0, portId: '', cursor: 'pointer' });
+}
+
+function nodeTextStyle(textblock) {
+    textblock
+        .set({ font: 'bold 11pt Figtree, sans-serif' })
+}
+
+function nodeAssetTypeStyle(textblock) {
+    textblock
+    .set({ font: '8pt Figtree, sans-serif' })
+}
+
+function paletteAssetTypeStyle(textblock) {
+    textblock
+    .set({ font: '11pt Figtree, sans-serif' })
+}
+
+function linkTextStyle(textblock) {
+    textblock
+        .set({ font: 'italic 9pt Figtree, sans-serif'})
+        .theme('stroke', 'bgText');
+}
+
+function makeButton(text, action, visiblePredicate) {
+    const button =
+        go.GraphObject.build('ContextMenuButton')
+        .add(new go.TextBlock(text, { click: action }));
+    // don't bother with binding GraphObject.visible if there's no predicate
+    if (visiblePredicate) {
+        button.bindObject('visible', '', (o, e) => o.diagram ? visiblePredicate(o, e) : false);
+    }
+    return button;
+}
+
+  // print the diagram by opening a new window holding SVG images of the diagram contents for each page
+function printDiagram() {
+    const svgWindow = window.open();
+    if (!svgWindow) return; // failure to open a new Window
+    svgWindow.document.title = "GoJS Flowchart";
+    svgWindow.document.body.style.margin = "0px";
+    const printSize = new go.Size(700, 960);
+    const bnds = myDiagram.documentBounds;
+    let x = bnds.x;
+    let y = bnds.y;
+    while (y < bnds.bottom) {
+    while (x < bnds.right) {
+        const svg = myDiagram.makeSvg({
+        scale: 1.0,
+        position: new go.Point(x, y),
+        size: printSize,
+        background: myDiagram.themeManager.findValue('div', 'colors')
+        });
+        svgWindow.document.body.appendChild(svg);
+        x += printSize.width;
+    }
+    x = bnds.x;
+    y += printSize.height;
+    }
+    setTimeout(() => { svgWindow.print(); svgWindow.close(); }, 1);
+}
+
+function changeTheme() {
+    const myDiagram = go.Diagram.fromDiv('macmDiagramDiv');
+    console.log("Changing theme");
+    if (myDiagram) {
+        myDiagram.themeManager.currentTheme = document.documentElement.getAttribute('data-bs-theme', 'dark')
+    }
+}
+
+function getCypher() {
+    var jsonDiagram = myDiagram.model.toJson();
+    jsonDiagram = JSON.parse(jsonDiagram);
+    console.log(jsonDiagram);
+    nodeArray = jsonDiagram.nodeDataArray;
+    linkArray = jsonDiagram.linkDataArray;
+    if (nodeArray.length === 0 && linkArray.length === 0)
+        return null;
+    cypherQuery = "CREATE \n";
+    try {
+        for (const node of nodeArray) {
+            cypherQuery += `(Node${node.key}:${node.primary_label}`
+            if (node.secondary_label)
+                cypherQuery += `:${node.secondary_label}`
+            cypherQuery += ` {name:"${node.name}", component_id:"${node.key}", type:"${node.type}"}),\n`;
+        }
+        for (const link of linkArray) {
+            if (!link.type){
+                throw new Error(`Link from Node ${nodeArray[link.from-1].name} to Node ${nodeArray[link.to-1].name} has no type defined.`);
+            }
+            cypherQuery += `(Node${link.from})-[:${link.type}]->(Node${link.to}),\n`;
+        }
+        // remove the last comma and add a semicolon
+        cypherQuery = cypherQuery.slice(0, -2);
+    }
+    catch (error) {
+        alert(error);
+        return null;
+    }
+    return cypherQuery;
+}
+
+function showC2MModal() {
+    let cypher = getCypher();
+    if (cypher) {
+        $('#modalC2MOutput').text(cypher);
+        $('#modalC2MOutputPre').show();
+        $('#modalC2MAlert').hide();
+        $('#copyC2MOutput').show();
+        $('#copyC2MOutput').attr('data-clipboard-text', cypher);
+        $('#uploadC2MOutput').show();
+        $('#modalC2MacmAppNameGroup').show();
+    }
+    else {
+        $('#modalC2MOutputPre').hide();
+        $('#modalC2MAlert').show();
+        $('#uploadC2MOutput').hide();
+        $('#copyC2MOutput').hide();
+        $('#modalC2MacmAppNameGroup').hide();
+    }
+    $('#modalC2M').modal('show');
+    Prism.highlightAll();
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+    init();
+    }, 300);
+    document.getElementById('DarkMode').addEventListener('click', () => {
+        changeTheme();
+    });
+    $('#saveModelBtn').on('click', () => {
+        save();
+    });
+    $('#loadModelBtn').on('click', () => {
+        load();
+    });
+
+    $('#uploadC2MOutput').click(function() {
+        let uploadButton = $(this);
+        uploadButton.addClass('btn-loading');
+        let cypher = $('#modalC2MOutput').text();
+        let appName = $('#modalC2MacmAppName').val().trim();
+        if (cypher) {
+            let formData = new FormData();
+            formData.append('macmAppName', appName);
+            formData.append('macmCypher', cypher);
+            $.ajax({
+                url: '/api/upload_macm',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false
+            }).done(function(response) {
+                location.reload();
+            }).fail(function(response) {
+                uploadButton.removeClass('btn-loading');
+                $('#modalC2M').modal('hide');
+                showModal("Upload failed", JSON.parse(response.responseText));
+            });
+        }
+    });
+});

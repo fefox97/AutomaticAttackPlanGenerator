@@ -58,6 +58,39 @@
             </div>
 
             <div class="card border-0 shadow mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingMACMEditor" data-bs-toggle="collapse" data-bs-target="#collapseMACMEditor" aria-expanded="true" aria-controls="collapseMACMEditor">
+                    <h2 class="h4 mb-0">
+                        MACM Editor
+                        <i class="fas fa-chevron-down mr-auto"></i>
+                    </h2>
+                </div>
+                <div id="collapseMACMEditor" class="card-body collapse show" aria-labelledby="headingMACMEditor">
+                    <p>
+                        The MACM Editor allows you to create and modify your MACM graphs directly within the application. You can add nodes, define relationships, and customize properties to accurately represent your system architecture.
+                    </p>
+                    <div style="width: 100%; display: flex; gap: 8px">
+                        <div id="macmEditorGroupDiv">
+                            <div id="macmDiagramDiv"></div>
+                            <div id="macmPaletteGroupDiv">
+                                <div id="macmPaletteLabelDiv"><span>Asset Type Palette</span></div>
+                                <div id="macmPaletteDiv"></div>
+                            </div>
+                        </div>
+                        <div id="macmInspectorDiv"></div>
+                    </div>
+                    <div class="card-footer justify-content-between d-flex">
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#macmEditorInfoModal">
+                            <i class="fas fa-info mr-auto"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="showC2MModal()">
+                            <i class="fas fa-code mr-auto"></i>
+                            Get Cypher
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingLoadDockerCompose" data-bs-toggle="collapse" data-bs-target="#collapseLoadDockerCompose" aria-expanded="true" aria-controls="collapseLoadDockerCompose">
                     <h2 class="h4 mb-0">
                         Load Docker Compose
@@ -156,17 +189,22 @@
     {% include 'macm/modals/delete_modal.html' %}
     {% include 'macm/modals/share_macm_modal.html' %}
     {% include 'macm/modals/unshare_macm_modal.html' %}
+    {% include 'macm/modals/canvas_to_MACM.html' %}
+    {% include 'macm/modals/macm_editor_info.html' %}
     {% include 'macm/modals/docker_compose_to_MACM.html' %}
-
+    
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script type="text/javascript">
         var usersPerApp = JSON.parse('{{ usersPerApp | tojson }}');
+        var asset_types = JSON.parse('{{ asset_types | tojson }}');
     </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/rename-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/share-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/macm-editor.js"></script>
 {% endblock javascripts %}
