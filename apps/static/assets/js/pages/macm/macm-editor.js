@@ -54,6 +54,28 @@ function init() {
         }
     });
 
+    myDiagram.addDiagramListener('ExternalObjectsDropped', e => {
+        const droppedNode = e.subject.first();
+        if (droppedNode && droppedNode instanceof go.Node) {
+            let nameTextBlock = null;
+            droppedNode.elements.each(elem => {
+                if (elem instanceof go.Panel) {
+                    elem.elements.each(subElem => {
+                        if (subElem instanceof go.TextBlock && subElem.editable) {
+                            nameTextBlock = subElem;
+                        }
+                    });
+                }
+            });
+            
+            if (nameTextBlock) {
+                setTimeout(() => {
+                    myDiagram.commandHandler.editTextBlock(nameTextBlock);
+                }, 100);
+            }
+        }
+    });
+
     myDiagram.contextMenu =
         go.GraphObject.build('ContextMenu')
             .add(
