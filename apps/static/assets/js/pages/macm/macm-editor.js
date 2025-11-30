@@ -120,6 +120,8 @@ function init() {
         }
     });
 
+    const zoomSlider = new ZoomSlider(myDiagram, {alignment: 0});
+
     inspector = new Inspector('macmInspectorDiv', myDiagram, {
             // allows for multiple nodes to be inspected at once
             multipleSelection: true,

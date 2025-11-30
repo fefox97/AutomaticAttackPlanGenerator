@@ -750,12 +750,105 @@ pre[class*=language-]{
     width: 16%;
 }
 
+#macmDiagramGroupDiv{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
 #macmDiagramDiv{
     flex-grow: 1;
     border: 1px solid #333;
     border-radius: 6px;
     height: 550px;
     width: 100%;
+}
+
+.zoomSlider {
+    position: absolute;
+    right: 20px !important;
+    bottom: 20px !important;
+    z-index: 99;
+}
+
+.zoomButton {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    transition: opacity 0.2s;
+    border-radius: 6px;
+    border: unset;
+    background: $tertiary;
+    color: $white;
+}
+// .zoomRangeContainer {
+//     display: inline-block;
+//     vertical-align: top;
+//     padding: 0;
+// }
+.zoomRangeInput {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    transition: opacity 0.2s;
+    background: transparent;
+    appearance: none;
+}
+.zoomRangeInput::-webkit-slider-runnable-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+}
+.zoomRangeInput::-moz-range-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+}
+.zoomRangeInput::-ms-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+    color: transparent;
+}
+.zoomRangeInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -3.33px;
+    box-sizing: border-box;
+    border: 1px solid $white;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-moz-range-thumb {
+    box-sizing: border-box;
+    border: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-ms-thumb {
+    margin-top: 0;
+    box-sizing: border-box;
+    border: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-ms-tooltip,
+.zoomRangeInput::-ms-fill-lower,
+.zoomRangeInput::-ms-fill-upper {
+    display: none;
 }
 
 #macmPaletteGroupDiv{
