@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="card border-0 shadow mb-3">
+            <div id="macmEditorCard" class="card border-0 shadow mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingMACMEditor" data-bs-toggle="collapse" data-bs-target="#collapseMACMEditor" aria-expanded="true" aria-controls="collapseMACMEditor">
                     <h2 class="h4 mb-0">
                         MACM Editor
@@ -68,9 +68,11 @@
                     <p>
                         The MACM Editor allows you to create and modify your MACM graphs directly within the application. You can add nodes, define relationships, and customize properties to accurately represent your system architecture.
                     </p>
-                    <div style="width: 100%; display: flex; gap: 8px">
-                        <div id="macmEditorGroupDiv">
-                            <div id="macmDiagramDiv"></div>
+                    <div id="macmEditor">
+                        <div id="macmCanvasPaletteDiv">
+                            <div id="macmDiagramGroupDiv">
+                                <div id="macmDiagramDiv"></div>
+                            </div>
                             <div id="macmPaletteGroupDiv">
                                 <div id="macmPaletteLabelDiv">Asset Type Palette</div>
                                 <div id="macmPaletteDiv"></div>

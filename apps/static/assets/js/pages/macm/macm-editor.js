@@ -120,6 +120,23 @@ function init() {
         }
     });
 
+    const zoomSlider = new ZoomSlider(myDiagram, {alignment: 0});
+    const fullscreenBtn = document.createElement('button');
+    fullscreenBtn.id = 'macmFullscreenBtn';
+    fullscreenBtn.className = 'zoomButton mb-1';
+    fullscreenBtn.type = 'button';
+    fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+    fullscreenBtn.addEventListener('click', () => {
+        if ($('#macmEditorCard').hasClass('fullscreen')) {
+            disableFullScreen();
+        }
+        else {
+            enableFullScreen();
+        }
+    });
+    zoomSlider._sliderDiv.style = '';
+    zoomSlider._sliderDiv.prepend(fullscreenBtn);
+
     inspector = new Inspector('macmInspectorDiv', myDiagram, {
             // allows for multiple nodes to be inspected at once
             multipleSelection: true,
@@ -443,6 +460,27 @@ function init() {
     load();
 }
 
+function disableFullScreen() {
+    $('#macmFullscreenBtn').children('i').removeClass('fa-compress');
+    $('#macmFullscreenBtn').children('i').addClass('fa-expand');
+    $('#macmEditorCard').removeClass('fullscreen');
+    $('#macmEditorCard').addClass('fullscreen-hide');
+    $('#headingMACMEditor').attr('data-bs-toggle', 'collapse');
+}
+
+function enableFullScreen() {
+    $('#macmFullscreenBtn').children('i').removeClass('fa-expand');
+    $('#macmFullscreenBtn').children('i').addClass('fa-compress');
+    $('#macmEditorCard').removeClass('fullscreen-hide');
+    $('#macmEditorCard').addClass('fullscreen');
+    $('#headingMACMEditor').removeAttr('data-bs-toggle');
+    $(document).keypress(function(event) {
+        if (event.keyCode === 27) {
+            disableFullScreen();
+        }
+    });
+}
+
 function nodeInfo(d) {
         var str = 'Asset ' + d.key + '\n'
         str += 'Name: ' + d.name + '\n';
@@ -750,7 +788,7 @@ function showC2MModal() {
 
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-    init();
+        init();
     }, 300);
     document.getElementById('DarkMode').addEventListener('click', () => {
         changeTheme();
