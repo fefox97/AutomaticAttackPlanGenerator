@@ -8,7 +8,7 @@ function init() {
         'themeManager.changesDivBackground': true,
         'themeManager.currentTheme': document.documentElement.getAttribute('data-bs-theme', 'dark'),
         layout: new ContinuousForceDirectedLayout({ // automatically spread nodes apart while dragging
-            defaultSpringLength: 200
+            defaultSpringLength: 300
         }),
         SelectionMoved: e => e.diagram.layout.invalidateLayout()
     });
@@ -223,8 +223,8 @@ function init() {
                     name: 'BODY',
                     fromLinkable: true,
                     toLinkable: true,
-                    // fromSpot: go.Spot.AllSides,
-                    // toSpot: go.Spot.AllSides,
+                    fromSpot: go.Spot.AllSides,
+                    toSpot: go.Spot.AllSides,
                 })
                 .apply(shapeStyle)
                 .bind('fill', 'background_color', c => c || myDiagram.themeManager.findValue('background', 'colors')),
@@ -446,7 +446,9 @@ function init() {
 function nodeInfo(d) {
         var str = 'Asset ' + d.key + '\n'
         str += 'Name: ' + d.name + '\n';
-        if (d.type) str += 'Asset Type: ' + d.type;
+        if (d.type) str += 'Asset Type: ' + d.type + '\n';
+        if (d.primary_label) str += 'Primary Label: ' + d.primary_label + '\n';
+        if (d.secondary_label) str += 'Secondary Label: ' + d.secondary_label;
         return str;
     }
 
@@ -680,34 +682,7 @@ function hideInspector() {
 
 function getCypher() {
     var jsonDiagram = myDiagram.model.toJson();
-    jsonDiagram = JSON.parse(jsonDiagram);
-    console.log(jsonDiagram);
-    nodeArray = jsonDiagram.nodeDataArray;
-    linkArray = jsonDiagram.linkDataArray;
-    if (nodeArray.length === 0 && linkArray.length === 0)
-        return null;
-    cypherQuery = "CREATE \n";
-    try {
-        for (const node of nodeArray) {
-            cypherQuery += `(Node${node.key}:${node.primary_label}`
-            if (node.secondary_label)
-                cypherQuery += `:${node.secondary_label}`
-            cypherQuery += ` {name:"${node.name}", component_id:"${node.key}", type:"${node.type}"}),\n`;
-        }
-        for (const link of linkArray) {
-            if (!link.type || link.type === 'No Type'){
-                throw new Error(`Link from Node ${nodeArray[link.from-1].name} to Node ${nodeArray[link.to-1].name} has no type defined.`);
-            }
-            cypherQuery += `(Node${link.from})-[:${link.type}]->(Node${link.to}),\n`;
-        }
-        // remove the last comma and add a semicolon
-        cypherQuery = cypherQuery.slice(0, -2);
-    }
-    catch (error) {
-        alert(error);
-        return null;
-    }
-    return cypherQuery;
+    return jsonToCypher(jsonDiagram);
 }
 
 function switchPaletteTab(selectedLabel) {
@@ -729,6 +704,25 @@ function switchPaletteTab(selectedLabel) {
             }, 320); // Aspetta la fine della transizione (0.3s + buffer)
         }
     });
+}
+
+function uploadCypher() {
+    var cypherQuery = $('#modalCypher2CanvasInput').val().trim();
+    var cypher2Json = cypherToJson(cypherQuery);
+    if (cypher2Json) {
+        myDiagram.model = go.Model.fromJson(cypher2Json);
+        // Assicura che ogni link abbia almeno il type di default
+        myDiagram.model.commit(m => {
+            m.linkDataArray.forEach(ld => { if (!ld.type) m.set(ld, 'type', 'No Type'); });
+        }, 'Normalize link types after cypher upload');
+        myDiagram.isModified = true;
+        const button = document.getElementById('SaveButton');
+        if (button) button.disabled = false;
+        $('#modalCypher2Canvas').modal('hide');
+    }
+    else {
+        showModal("Cypher Import Error", "The provided Cypher query could not be parsed. Please check the syntax and try again.");
+    }
 }
 
 function showC2MModal() {
