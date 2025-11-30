@@ -124,6 +124,11 @@ function init() {
             }
         });
 
+    const myOverview = new go.Overview('macmOverviewDiv', {
+        observed: myDiagram,
+        contentAlignment: go.Spot.Center
+    });
+
     var partContextMenu =
         go.GraphObject.build('ContextMenu')
             .add(
@@ -184,42 +189,48 @@ function init() {
                 toolTip:
                     go.GraphObject.build('ToolTip')
                         .add(
-                        new go.TextBlock({ margin: 4 })
-                        .bind('text', '', nodeInfo)
-                    ),
+                            new go.TextBlock({ margin: 4 })
+                            .bind('text', '', nodeInfo)
+                        ),
+                mouseEnter: (e, node) => showSmallPorts(node, true),
+                mouseLeave: (e, node) => showSmallPorts(node, false)
             })
             .apply(nodeStyle)
             .add(
-            new go.Shape('RoundedRectangle', {
-                name: 'BODY',
-                fromLinkable: true,
-                toLinkable: true,
-                fromSpot: go.Spot.AllSides,
-                toSpot: go.Spot.AllSides
-            })
-            .apply(shapeStyle)
-            .bind('fill', 'background_color', c => c || myDiagram.themeManager.findValue('background', 'colors')),
-            new go.Panel('Vertical').add(
-                new go.TextBlock({
-                    margin: new go.Margin(12, 12, 4, 12),
-                    maxSize: new go.Size(160, NaN),
-                    wrap: go.Wrap.Fit,
-                    editable: true,
-                    isMultiline: false
-                    })
-                    .apply(nodeTextStyle)
-                    .bind('stroke', 'color')
-                    .bindTwoWay('text', 'name'),
-                new go.TextBlock({
-                    font: '6pt Figtree, sans-serif',
-                    editable: false,
-                    isMultiline: false
-                    })
-                    .apply(nodeAssetTypeStyle)
-                    .bind('stroke', 'color')
-                    .bindTwoWay('text', 'type')
-                )
-            )
+                new go.Shape('RoundedRectangle', {
+                    name: 'BODY',
+                    fromLinkable: true,
+                    toLinkable: true,
+                    // fromSpot: go.Spot.AllSides,
+                    // toSpot: go.Spot.AllSides,
+                })
+                .apply(shapeStyle)
+                .bind('fill', 'background_color', c => c || myDiagram.themeManager.findValue('background', 'colors')),
+                new go.Panel('Vertical').add(
+                    new go.TextBlock({
+                        margin: new go.Margin(12, 12, 4, 12),
+                        maxSize: new go.Size(160, NaN),
+                        wrap: go.Wrap.Fit,
+                        editable: true,
+                        isMultiline: false
+                        })
+                        .apply(nodeTextStyle)
+                        .bind('stroke', 'color')
+                        .bindTwoWay('text', 'name'),
+                    new go.TextBlock({
+                        font: '6pt Figtree, sans-serif',
+                        editable: false,
+                        isMultiline: false
+                        })
+                        .apply(nodeAssetTypeStyle)
+                        .bind('stroke', 'color')
+                        .bindTwoWay('text', 'type')
+                ),
+                makePort('T', go.Spot.Top, false, true),
+                makePort('L', go.Spot.Left, true, true),
+                makePort('R', go.Spot.Right, true, true),
+                makePort('B', go.Spot.Bottom, true, false)
+            ),
     );
     
     const paletteTemplate = new go.Map();
@@ -341,13 +352,70 @@ function init() {
         background_color: at.color,
         color: getTextColor(at.color)
     }));
-
-    myPalette = new go.Palette('macmPaletteDiv', {
-        nodeTemplateMap: paletteTemplate,
-        themeManager: myDiagram.themeManager, // share the ThemeManager used by myDiagram
-        allowZoom: false,
-        model: new go.GraphLinksModel(paletteNodes)
+    
+    // Raggruppa gli asset types per primary_label
+    const groupedByLabel = {};
+    paletteNodes.forEach(node => {
+        const label = node.primary_label || 'Other';
+        if (!groupedByLabel[label]) {
+            groupedByLabel[label] = [];
+        }
+        groupedByLabel[label].push(node);
     });
+
+    // Crea le palette per ogni primary_label
+    window.palettes = {};
+    const labels = Object.keys(groupedByLabel).sort();
+    const paletteDiv = document.getElementById('macmPaletteDiv');
+    
+    labels.forEach((label, index) => {
+        // Crea l'item dell'accordion
+        const accordionItem = document.createElement('div');
+        accordionItem.className = 'macm-accordion-item' + (index === 0 ? ' active' : '');
+        
+        // Crea la tab (sempre visibile)
+        const tab = document.createElement('div');
+        tab.className = 'macm-palette-tab';
+        tab.textContent = label;
+        tab.onclick = () => switchPaletteTab(label);
+        
+        // Crea il contenuto della palette
+        const paletteId = `macmPaletteDiv_${label.replace(/\s+/g, '_')}`;
+        const paletteContent = document.createElement('div');
+        paletteContent.className = 'macm-palette-content';
+        paletteContent.id = paletteId;
+        
+        accordionItem.appendChild(tab);
+        accordionItem.appendChild(paletteContent);
+        paletteDiv.appendChild(accordionItem);
+    });
+    
+    // Inizializza le palette GoJS
+    setTimeout(() => {
+        labels.forEach((label, index) => {
+            const paletteId = `macmPaletteDiv_${label.replace(/\s+/g, '_')}`;
+            const paletteDiv = document.getElementById(paletteId);
+            
+            if (!paletteDiv) {
+                console.error(`Palette div not found: ${paletteId}`);
+                return;
+            }
+            
+            const rect = paletteDiv.getBoundingClientRect();
+            
+            try {
+                window.palettes[label] = new go.Palette(paletteId, {
+                    nodeTemplateMap: paletteTemplate,
+                    themeManager: myDiagram.themeManager,
+                    padding: 20,
+                    allowZoom: false,
+                    model: new go.GraphLinksModel(groupedByLabel[label])
+                });
+            } catch (error) {
+                console.error(`Error initializing palette ${label}:`, error);
+            }
+        });
+    }, 100);
 
     // Carica automaticamente il diagramma se presente in localStorage
     load();
@@ -393,18 +461,15 @@ function shapeStyle(shape) {
 }
 
 function nodeTextStyle(textblock) {
-    textblock
-        .set({ font: 'bold 11pt Figtree, sans-serif' })
+    textblock.set({ font: 'bold 11pt Figtree, sans-serif' })
 }
 
 function nodeAssetTypeStyle(textblock) {
-    textblock
-    .set({ font: '8pt Figtree, sans-serif' })
+    textblock.set({ font: '8pt Figtree, sans-serif' })
 }
 
 function paletteAssetTypeStyle(textblock) {
-    textblock
-    .set({ font: '11pt Figtree, sans-serif' })
+    textblock.set({ font: '11pt Figtree, sans-serif' })
 }
 
 function linkTextStyle(textblock) {
@@ -422,6 +487,31 @@ function makeButton(text, action, visiblePredicate) {
         button.bindObject('visible', '', (o, e) => o.diagram ? visiblePredicate(o, e) : false);
     }
     return button;
+}
+
+function makePort(name, spot, output, input) {
+      // the port is basically just a small transparent circle
+    return new go.Shape('Circle', {
+        fill: null, // not seen, by default; set to a translucent gray by showSmallPorts, defined below
+        stroke: null,
+        desiredSize: new go.Size(7, 7),
+        alignment: spot, // align the port on the main Shape
+        alignmentFocus: spot, // just inside the Shape
+        portId: name, // declare this object to be a "port"
+        fromSpot: spot,
+        toSpot: spot, // declare where links may connect at this port
+        fromLinkable: output,
+        toLinkable: input, // declare whether the user may draw links to/from here
+        cursor: 'pointer', // show a different cursor to indicate potential link point
+    });
+}
+
+function showSmallPorts(node, show) {
+    node.ports.each(port => {
+        if (port.portId !== '') {
+            port.fill = show ? 'rgba(0,0,0,.3)' : null;
+        }
+    });
 }
 
 function confirmClearDiagram() {
@@ -545,18 +635,25 @@ function showInspector() {
     void el.offsetWidth;
     requestAnimationFrame(() => {
         el.classList.add('is-visible');
+        el.addEventListener('transitionend', function onTransitionEnd() {
+            const inspectorWidth = el.offsetWidth;
+            document.documentElement.style.setProperty('--macm-inspector-width', `${inspectorWidth}px`);
+            el.removeEventListener('transitionend', onTransitionEnd);
+        }, { once: true });
     });
 }
 
 function hideInspector() {
     const el = document.getElementById('macmInspectorDiv');
     if (el && el.classList.contains('is-hidden')) return;
+    // Resetta subito la larghezza a 0 per far ricalcolare la palette
+    document.documentElement.style.setProperty('--macm-inspector-width', '0px');
     el.classList.add('exit-right');
     el.addEventListener('transitionend', function onEnd() {
         el.classList.remove('is-visible');
         el.classList.add('is-hidden');
         el.removeEventListener('transitionend', onEnd);
-    });
+    }, { once: true });
 }
 
 function getCypher() {
@@ -589,6 +686,27 @@ function getCypher() {
         return null;
     }
     return cypherQuery;
+}
+
+function switchPaletteTab(selectedLabel) {
+    // Rimuovi active da tutti gli accordion items
+    const allItems = document.querySelectorAll('.macm-accordion-item');
+    allItems.forEach(item => item.classList.remove('active'));
+    
+    // Trova e attiva l'accordion item selezionato
+    allItems.forEach(item => {
+        const tab = item.querySelector('.macm-palette-tab');
+        if (tab && tab.textContent === selectedLabel) {
+            item.classList.add('active');
+            
+            // Forza il ridimensionamento della palette attiva dopo la transizione
+            setTimeout(() => {
+                if (window.palettes && window.palettes[selectedLabel]) {
+                    window.palettes[selectedLabel].requestUpdate();
+                }
+            }, 320); // Aspetta la fine della transizione (0.3s + buffer)
+        }
+    });
 }
 
 function showC2MModal() {

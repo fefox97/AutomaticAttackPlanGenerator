@@ -1,6 +1,7 @@
 :root{
     --my-navbar-height: 5rem;
     --dark-drowpdown-link-active-bg: red !important;
+    --macm-inspector-width: 0px;
 }
 
 .fill-primary{
@@ -763,30 +764,87 @@ pre[class*=language-]{
     flex-direction: row;
     align-items: stretch;
     gap: 8px;
-    height: 150px;
     margin-top: 8px;
-    // margin-left: 8px;
+    justify-content: space-between;
 }
 
 #macmPaletteDiv{
-    width: 100%;
-    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    height: 150px;
     border: 1px solid #333;
     border-radius: 6px;
-    canvas{
-        padding: 10px 10px 10px 10px !important;
+    overflow: hidden;
+
+    .macm-accordion-item {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        transition: flex 0.3s ease;
+        position: relative;
+        border-right: 1px solid #333;
+        overflow: hidden;
+        
+        &:last-child {
+            border-right: none;
+        }
+        
+        // Tab compressa
+        flex: 0 0 50px;
+        
+        // Tab espansa
+        &.active {
+            flex: 1;
+        }
+    }
+
+    .macm-palette-tab {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        padding: 15px 10px;
+        background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.8);;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: center;
+        transition: all 0.2s ease;
+        border: none;
+        width: 50px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+            background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.6);;
+        }
+        
+        .active & {
+            background-color: $primary;
+            color: white;
+        }
+    }
+
+    .macm-palette-content {
+        flex: 1;
+        width: calc(65vw - var(--macm-inspector-width));
+        overflow: hidden;
+        background-color: var(--#{$prefix}body-bg);
     }
 }
 
 #macmPaletteLabelDiv{
     display: flex;
-    position: absolute; /* overlay sopra la palette */
     top: 10px;
     left: 12px;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     z-index: 2;
     padding: 6px 8px;
     background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.8);
@@ -796,7 +854,7 @@ pre[class*=language-]{
     transform: rotate(180deg);
     white-space: nowrap;
     backdrop-filter: blur(2px);
-    height: 130px;
+    height: 150px;
 }
 
 #macmEditorGroupDiv{
@@ -804,6 +862,14 @@ pre[class*=language-]{
     flex-direction: column;
     gap: 8px;
     width: 100%;
+}
+
+#macmOverviewDiv{
+    width: 150px;
+    height: 150px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: $gray-100;
 }
 
 #macmInspectorDiv {
