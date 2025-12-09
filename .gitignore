@@ -58,3 +58,6 @@ docker-compose.yml
 apps/templates/wiki/pages/
 apps/templates/wiki/pages/
 apps/static/assets/wiki/
+
+._*
+apps/static/assets/custom_modules/gojs/go-debug.js
