@@ -41,7 +41,7 @@ function reloadDatabases(database) {
             'database': database,
         }
     }).done(function(response) {
-        showModal("Success", response, true);
+        showModal("Success", response, null, true);
         $(button).removeClass('btn-loading');
     }).fail(function(response) {
         console.error(response.status);
@@ -61,7 +61,7 @@ function uploadExcel() {
         processData: false,
         contentType: false,
     }).done(function(response) {
-        showModal("Success", response, true);
+        showModal("Success", response, null, true);
     }).fail(function(response) {
         showError(response.status, autohide = true);
     });
@@ -90,10 +90,10 @@ function downloadExcel() {
         link.parentNode.removeChild(link);
     })
     .then(_ => {
-        showModal("Excel Download", filename + " downloaded successfully", autohide = true)
+        showModal("Excel Download", filename + " downloaded successfully", null, autohide = true)
     })
     .catch(error => {
-        showModal("Excel Download", "Error downloading the file!", autohide = true)
+        showModal("Excel Download", "Error downloading the file!", null, autohide = true)
     });
 }
 

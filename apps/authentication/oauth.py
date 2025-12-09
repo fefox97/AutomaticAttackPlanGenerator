@@ -29,7 +29,7 @@ def github_logged_in(blueprint, token):
     info = github.get("/user")
     email_info = github.get("/user/emails")
     account_info = info.json()
-
+    
     if info.ok:
 
         username = account_info["login"]

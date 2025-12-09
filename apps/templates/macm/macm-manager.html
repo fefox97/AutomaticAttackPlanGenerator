@@ -57,6 +57,52 @@
                 </div>
             </div>
 
+            <div id="macmEditorCard" class="card border-0 shadow mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingMACMEditor" data-bs-toggle="collapse" data-bs-target="#collapseMACMEditor" aria-expanded="true" aria-controls="collapseMACMEditor">
+                    <h2 class="h4 mb-0">
+                        MACM Editor
+                        <i class="fas fa-chevron-down mr-auto"></i>
+                    </h2>
+                </div>
+                <div id="collapseMACMEditor" class="card-body collapse show" aria-labelledby="headingMACMEditor">
+                    <p>
+                        The MACM Editor allows you to create and modify your MACM graphs directly within the application. You can add nodes, define relationships, and customize properties to accurately represent your system architecture.
+                    </p>
+                    <div id="macmEditor">
+                        <div id="macmCanvasPaletteDiv">
+                            <div id="macmDiagramGroupDiv">
+                                <div id="macmDiagramDiv"></div>
+                            </div>
+                            <div id="macmPaletteGroupDiv">
+                                <div id="macmPaletteLabelDiv">Asset Type Palette</div>
+                                <div id="macmPaletteDiv"></div>
+                                <div id="macmOverviewDiv"></div>
+                            </div>
+                        </div>
+                        <div id="macmInspectorDiv"></div>
+                    </div>
+                    <div class="card-footer justify-content-between d-flex">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#macmEditorInfoModal">
+                            <i class="fas fa-info mr-auto"></i>
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-danger" onclick="confirmClearDiagram()">
+                                <i class="fas fa-trash mr-auto"></i>
+                                Clear Diagram
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCypher2Canvas">
+                                <i class="fas fa-upload mr-auto"></i>
+                                Upload Cypher
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="showC2MModal()">
+                                <i class="fas fa-code mr-auto"></i>
+                                Get Cypher
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card border-0 shadow mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center {{'collapsed' if macms is not none }}" id="headingLoadDockerCompose" data-bs-toggle="collapse" data-bs-target="#collapseLoadDockerCompose" aria-expanded="true" aria-controls="collapseLoadDockerCompose">
                     <h2 class="h4 mb-0">
@@ -96,7 +142,7 @@
                     {% if macms is not none %}
                         <ul class="list-group list-group-flush">
                             {% for macm in macms %}
-                                <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+                                <li class="list-group-item d-flex align-items-center justify-content-between px-0 {% if not loop.last %}border-bottom{% endif %} py-3">
                                     <div class="d-flex align-items-center">
                                         <h1 class="display-9 mb-1">{{ macm.AppName }}</h1>
                                         <span class="badge bg-time bg-small rounded-pill ms-3 fs-10">{{ macm.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</span>
@@ -109,7 +155,7 @@
                                                 Shared by {{ users_dict[owners[macm.AppID]] }}
                                             </span>
                                         {% endif %}
-                                        <a class="btn btn-secondary btn-sm" href="/macm/macm-viewer?app_id={{macm.AppID}}"  role="button">
+                                        <a class="btn btn-secondary btn-sm" href="/macms/macm-viewer?app_id={{macm.AppID}}"  role="button">
                                             <i class="fas fa-eye mr-auto"></i>
                                             View
                                         </a>
@@ -126,7 +172,7 @@
                                                 <i class="fas fa-share mr-auto"></i>
                                                 Share
                                             </button>
-                                            <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}">
+                                            <button type="button" class="btn btn-danger btn-sm align-items-center" data-bs-AppID="{{macm.AppID}}" data-bs-AppName="{{macm.AppName}}" onclick="confirmDeleteMacm(this)">
                                                 <i class="fas fa-trash mr-auto"></i>
                                                 Delete
                                             </button>
@@ -156,17 +202,26 @@
     {% include 'macm/modals/delete_modal.html' %}
     {% include 'macm/modals/share_macm_modal.html' %}
     {% include 'macm/modals/unshare_macm_modal.html' %}
+    {% include 'macm/modals/canvas_to_MACM.html' %}
+    {% include 'macm/modals/cypher_to_canvas.html' %}
+    {% include 'macm/modals/macm_editor_info.html' %}
     {% include 'macm/modals/docker_compose_to_MACM.html' %}
-
+    
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script type="text/javascript">
         var usersPerApp = JSON.parse('{{ usersPerApp | tojson }}');
+        var asset_types_colors = JSON.parse('{{asset_types_colors |tojson|safe }}');
+        var asset_types = JSON.parse('{{ asset_types | tojson }}');
     </script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/theme/color-manager.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/gojs-layouts.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/edit-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/rename-macm.js"></script>
     <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/share-macm.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/parser.js"></script>
+    <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/macm-editor.js"></script>
 {% endblock javascripts %}

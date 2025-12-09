@@ -1,0 +1,27 @@
+<!-- Canvas to MACM Modal -->
+<div class="modal fade" id="modalC2M" tabindex="-1" aria-labelledby="modalC2MLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalC2MLabel">Cypher Query</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group mb-3" id="modalC2MacmAppNameGroup">
+                    <label for="modalC2MacmAppName" class="form-label">App Name</label>
+                    <input type="text" class="form-control" id="modalC2MacmAppName" placeholder="Enter the application name">
+                </div>
+                <pre class="line-numbers" id="modalC2MOutputPre"><code class="language-cypher" id="modalC2MOutput"></code></pre>
+                <div class="alert alert-info" id="modalC2MAlert" role="alert" style="display: none;">
+                    <h5 class="alert-heading">Nothing to do</h5>
+                    <p>There is no MACM data.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="uploadC2MOutput">Upload</button>
+                <button type="button" class="btn btn-secondary" id="copyC2MOutput" onclick="navigator.clipboard.writeText($(this).attr('data-clipboard-text'))">Copy</button>
+                <button type="button" class="btn btn-tertiary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

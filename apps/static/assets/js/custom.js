@@ -1,13 +1,16 @@
 codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, []));
 
 function showModal(title, response, icon=null, autohide = false, large = false, badge = null) {
-    $("#modal-title").text(title);
+    let modal = $("#MainModal");
+    let modalTitle = modal.find(".modal-title");
+    let modalBodyText = modal.find(".modal-body-text");
+    modalTitle.text(title);
     if (icon) {
-        $("#modal-title").prepend(icon);
-        $("#modal-title").find("i").addClass("me-2");
+        modalTitle.prepend(icon);
+        modalTitle.find("i").addClass("me-2");
     }
     if (badge) {
-        $("#modal-title").append(badge);
+        modalTitle.append(badge);
     }
     let messages = "";
     if (typeof response === "string") {
@@ -17,14 +20,14 @@ function showModal(title, response, icon=null, autohide = false, large = false, 
             messages += response[key] + "\n";
         }
     }
-    $("#modal-body-text").text(messages);
+    modalBodyText.text(messages);
     if (large) {
-        $("#modal-upload").addClass("modal-lg");
+        modal.addClass("modal-lg");
     }
-    $("#modal-upload").modal("show");
+    modal.modal("show");
     if (autohide) {
         setTimeout(function() {
-            $("#modal-upload").modal("hide");
+            modal.modal("hide");
         }, 5000);
     }
 }
@@ -277,6 +280,10 @@ function deleteNotification(notification_id, event) {
                 $('#notification_counter').addClass('d-none');
                 $('#no_notification_alert').removeClass('d-none');
             }
+            let notifications = $('#notification_container').find('.notification-item');
+            if (notifications.length > 0) {
+                $(notifications[notifications.length - 1]).removeClass('border-bottom');
+            }
         },
         error: function(response) {
             console.log(response);
@@ -302,11 +309,13 @@ function clearNotifications() {
 }
 
 function addNotification(id, title, message, links, date, toast, icon='fas fa-info') {
-    if ($('#no_notification_alert').length) {
-        $('#no_notification_alert').addClass('d-none');
-    }
     let notification = document.createElement('div');
-    notification.className = "dropdown-item d-flex align-items-center justify-content-between";
+    notification.className = "dropdown-item d-flex align-items-center justify-content-between notification-item";
+    if (!$('#no_notification_alert').hasClass('d-none')) {
+        $('#no_notification_alert').addClass('d-none');
+    }else{
+        notification.className += " border-bottom";
+    }
     notification.id = id + '_notification';
     let formattedTime = new Date(date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     notification.innerHTML = `
@@ -315,7 +324,7 @@ function addNotification(id, title, message, links, date, toast, icon='fas fa-in
                 <i class="${icon}"></i>
             </div>
         </div>
-        <div class="d-flex align-items-center notification-item me-3">
+        <div class="d-flex align-items-center notification-content me-3">
             <div>
                 <span class="h6">${title}</span>
                 <span class="text-sm text-muted ms-2">${formattedTime}</span>
@@ -398,6 +407,6 @@ $(window).on('load', function() {
     });
 
     socket.on('receive_notification', function(data) {
-        addNotification(data.id, data.title, data.message, data.buttons, data.date, true, data.icon);
+        addNotification(data.id, data.title, data.message, data.links, data.date, true, data.icon);
     });
 });

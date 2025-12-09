@@ -336,7 +336,7 @@ class MacmUtils:
 
 	def load_macm_constraints(self, database='macm'):
 		try:
-			for constraint in MacmChecks.query.with_entities(MacmChecks.Query).all():
+			for constraint in MacmChecks.query.where(MacmChecks.Activated==True).with_entities(MacmChecks.Query).all():
 				self.driver.execute_query(constraint.Query, database_=database)
 		except Exception as error:
 			print(f"Error loading MACM constraints: {error}")

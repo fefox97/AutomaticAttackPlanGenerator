@@ -65,7 +65,7 @@ def register_assets(app):
     scss.build()
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'errors', 'wiki', 'macm'):
+    for module_name in ('authentication', 'home', 'api', 'profile', 'risk_analysis', 'catalogs', 'penetration_tests', 'threat_models', 'errors', 'wiki', 'macm'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
     app.register_blueprint(github_blueprint, url_prefix="/login")
@@ -98,7 +98,7 @@ def register_custom_filters(app):
         return injections
 
 from apps.authentication.models import Roles, Users, Tasks
-from apps.databases.models import App, Bibliography, Macm, Capec, MacmUser, Attack, Protocols, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
+from apps.databases.models import App, Bibliography, Macm, Capec, MacmChecks, MacmUser, Attack, Protocols, Settings, ToolCatalogue, MethodologyCatalogue, ThreatCatalogue, PentestPhases, AssetTypes
 from apps.admin.views import MyAdminIndexView, MyModelView, ThreatCatalogueView
 from flask_admin.menu import MenuLink
 
@@ -122,6 +122,7 @@ def configure_admin(app):
     myAdmin.add_view(MyModelView(PentestPhases, db.session, name='Pentest Phases', category='Catalogs'))
     myAdmin.add_view(MyModelView(Settings, db.session, name='Settings'))
     myAdmin.add_view(MyModelView(Bibliography, db.session, name='Bibliography'))
+    myAdmin.add_view(MyModelView(MacmChecks, db.session, name='MACM Checks', category='App'))
 
 def clean_tasks(app):
     @app.before_request

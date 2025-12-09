@@ -1,16 +1,14 @@
 
 
-from datetime import time
+import time
 import os
 from apps import render_template
 from apps.home import blueprint
-from flask import redirect, request, url_for
+from flask import redirect, request, session, url_for
 from flask import current_app as app
 from apps.databases.models import AssetTypes, Attack, App, Bibliography, Capec, Macm, MethodologyCatalogue, Protocols, Settings, ThreatCatalogue, ThreatModel, ToolCatalogue
 from flask_security import auth_required, roles_required
 
-
-from sqlalchemy import func
 
 @blueprint.route('/')
 @blueprint.route('/index')
@@ -18,6 +16,10 @@ def index():
     """
     Redirect to the home page.
     """
+    if session.get('next_url'):
+        next_url = session.get('next_url')
+        session.pop('next_url', None)
+        return redirect(next_url)
     return redirect(url_for('home_blueprint.home'))
 
 @blueprint.route('/home')
@@ -62,7 +64,10 @@ def settings():
     if not os.path.exists(f'{path}/{excel_file}'):
         excel_file = None
     try:
-        last_modified = time.ctime(os.path.getmtime(f'{path}/{excel_file}'))
+        last_modified = None
+        file_path = f'{path}/{excel_file}'
+        if os.path.exists(file_path):
+            last_modified = time.strftime('%d %B %Y - %H:%M', time.localtime(os.path.getmtime(file_path)))
     except:
         last_modified = None
     return render_template(f"admin/settings.html", segment=get_segment(request), excel_file=excel_file, last_modified=last_modified, settings=settings)

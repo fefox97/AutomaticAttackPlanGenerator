@@ -10,11 +10,13 @@ from github import Github, Auth
 import re
 import shutil
 from apps.authentication.models import Users
+from apps.notifications.notify import create_notification
 
 def create_celery_notification(title, message, icon="fa fa-info", links=None, user_id=None, date=None):
-    from apps.notifications.notify import create_notification
     socketio = SocketIO(message_queue="redis://redis:6379/0")
+    notification_id = create_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
     data = {
+            "id": notification_id,
             "title": title,
             "message": message,
             "icon": icon,
@@ -22,7 +24,6 @@ def create_celery_notification(title, message, icon="fa fa-info", links=None, us
             "date": date if date else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
     socketio.emit('receive_notification', data, to=Users.query.get(user_id).notification_session_id)
-    create_notification(title=title, message=message, icon=icon, links=links, user_id=user_id, date=date)
 
 @celery.task
 def query_llm(app_id, max_tries=10, sleep_time=1):

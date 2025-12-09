@@ -105,6 +105,18 @@ class AssetTypes(db.Model):
         asset_types_colors = AssetTypes.query.with_entities(AssetTypes.Name, AssetTypes.Color).all()
         return {asset_type.Name: asset_type.Color for asset_type in asset_types_colors}
 
+    @staticmethod
+    def get_all_asset_types():
+        asset_types = AssetTypes.query.all()
+        return {asset_type.AssetTypeID: {
+                'name': asset_type.Name,
+                'description': asset_type.Description,
+                'primary_label': asset_type.PrimaryLabel,
+                'secondary_label': asset_type.SecondaryLabel,
+                'color': asset_type.Color,
+            } for asset_type in asset_types
+        }
+
     @hybrid_property
     def get_ports(self):
         if self.Ports is None:
@@ -271,6 +283,61 @@ class ThreatCatalogue(db.Model):
             Capec.Abstraction == 'Detailed').all()
         return [id[0] for id in ids]
 
+    @staticmethod
+    def hasSTRIDE(self):
+        if self.STRIDE is None:
+            return []
+        else:
+            return [x.strip() for x in self.STRIDE.split(',')]
+        
+    @hybrid_property
+    def hasSpoofing(self):
+        return 'S' in self.hasSTRIDE()
+
+    @hasSpoofing.expression
+    def hasSpoofing(cls):
+        return func.instr(cls.STRIDE, 'S') > 0
+
+    @hybrid_property
+    def hasTampering(self):
+        return 'T' in self.hasSTRIDE()
+
+    @hasTampering.expression
+    def hasTampering(cls):
+        return func.instr(cls.STRIDE, 'T') > 0
+
+    @hybrid_property
+    def hasRepudiation(self):
+        return 'R' in self.hasSTRIDE()
+
+    @hasRepudiation.expression
+    def hasRepudiation(cls):
+        return func.instr(cls.STRIDE, 'R') > 0
+
+    @hybrid_property
+    def hasInformationDisclosure(self):
+        return 'I' in self.hasSTRIDE()
+
+    @hasInformationDisclosure.expression
+    def hasInformationDisclosure(cls):
+        return func.instr(cls.STRIDE, 'I') > 0
+
+    @hybrid_property
+    def hasDenialOfService(self):
+        return 'D' in self.hasSTRIDE()
+
+    @hasDenialOfService.expression
+    def hasDenialOfService(cls):
+        return func.instr(cls.STRIDE, 'D') > 0
+
+    @hybrid_property
+    def hasElevationOfPrivilege(self):
+        return 'E' in self.hasSTRIDE()
+
+    @hasElevationOfPrivilege.expression
+    def hasElevationOfPrivilege(cls):
+        return func.instr(cls.STRIDE, 'E') > 0
+
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
             if hasattr(value, '__iter__') and not isinstance(value, str):
@@ -386,6 +453,7 @@ class MacmChecks(db.Model):
     Name = db.Column(db.Text)
     Description = db.Column(db.Text)
     Query = db.Column(db.Text)
+    Activated = db.Column(db.Boolean)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -396,6 +464,8 @@ class MacmChecks(db.Model):
 
     def __repr__(self):
         return str(f'{self.Component_ID}-{self.CheckName}')
+
+
 
 class App(db.Model):
     
@@ -491,7 +561,7 @@ class ThreatModel(db.Model):
                 "ThreatModel",
                 select(
                     ThreatCatalogue.TID.label("Threat_ID"), 
-                    ThreatCatalogue.Asset.label("Asset_Type"), 
+                    Macm.Type.label("Asset_Type"), 
                     ThreatCatalogue.Threat, 
                     ThreatCatalogue.Description.label("Threat_Description"),
                     ThreatCatalogue.Compromised,
@@ -502,6 +572,12 @@ class ThreatModel(db.Model):
                     ThreatCatalogue.PostI,
                     ThreatCatalogue.PostA,
                     ThreatCatalogue.STRIDE.label("STRIDE"),
+                    ThreatCatalogue.hasSpoofing.label("Spoofing"),
+                    ThreatCatalogue.hasTampering.label("Tampering"),
+                    ThreatCatalogue.hasRepudiation.label("Repudiation"),
+                    ThreatCatalogue.hasInformationDisclosure.label("InformationDisclosure"),
+                    ThreatCatalogue.hasDenialOfService.label("DenialOfService"),
+                    ThreatCatalogue.hasElevationOfPrivilege.label("ElevationOfPrivilege"),
                     ThreatCatalogue.EasyOfDiscovery,
                     ThreatCatalogue.EasyOfExploit,
                     ThreatCatalogue.Awareness,

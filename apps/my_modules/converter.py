@@ -11,6 +11,12 @@ class Converter:
             return None
         else:
             return {k: v for k, v in tuple_list}
+    
+    def tuple_list_to_list_of_tuples(self, tuple_list: list):
+        if tuple_list is None:
+            return None
+        else:
+            return [list(t) for t in tuple_list]
 
     def string_to_list(self, string: str, sepator=r'[ ,]+'):
         if string is None:

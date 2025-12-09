@@ -1,6 +1,20 @@
 :root{
     --my-navbar-height: 5rem;
     --dark-drowpdown-link-active-bg: red !important;
+    --macm-inspector-width: 0px;
+}
+
+.fill-primary{
+    color: $primary !important;
+}
+.fill-secondary{
+    color: $secondary !important;
+}
+.fill-tertiary{
+    color: $tertiary !important;
+}
+.fill-success{
+    color: $success !important;
 }
 
 .custom-background{
@@ -432,7 +446,7 @@ pre[class*=language-]{
         width: 50vw;
         max-width: 800px;
     }
-    .notification-item{
+    .notification-content{
         overflow-x: scroll;
     }
 }
@@ -734,4 +748,283 @@ pre[class*=language-]{
 .knowledge-base-col-statistics {
     flex: 0 0 16.5%;
     width: 16%;
+}
+
+#macmEditorCard{
+    max-height: 100vh;
+    &.fullscreen{
+        top: 0;
+        left: 0;
+        z-index: 100;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        animation: unfoldIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    &.fullscreen-hide{
+        animation: foldOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+}
+
+#macmEditor{
+    width: 100%;
+    height: 90%;
+    display: flex;
+}
+
+#macmDiagramGroupDiv{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#macmDiagramDiv{
+    flex-grow: 1;
+    border: 1px solid #333;
+    border-radius: 6px;
+    min-height: 550px;
+    height: 100%;
+    width: 100%;
+}
+
+.zoomSlider {
+    position: absolute;
+    right: 20px !important;
+    bottom: 20px !important;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+}
+
+.zoomButton {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    transition: opacity 0.2s;
+    border-radius: 6px;
+    border: unset;
+    background: $tertiary;
+    color: $white;
+}
+// .zoomRangeContainer {
+//     display: inline-block;
+//     vertical-align: top;
+//     padding: 0;
+// }
+.zoomRangeInput {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    transition: opacity 0.2s;
+    background: transparent;
+    appearance: none;
+}
+.zoomRangeInput::-webkit-slider-runnable-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+}
+.zoomRangeInput::-moz-range-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+}
+.zoomRangeInput::-ms-track {
+    box-sizing: border-box;
+    border: none;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+    color: transparent;
+}
+.zoomRangeInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -3.33px;
+    box-sizing: border-box;
+    border: 1px solid $white;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-moz-range-thumb {
+    box-sizing: border-box;
+    border: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-ms-thumb {
+    margin-top: 0;
+    box-sizing: border-box;
+    border: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $tertiary;
+}
+.zoomRangeInput::-ms-tooltip,
+.zoomRangeInput::-ms-fill-lower,
+.zoomRangeInput::-ms-fill-upper {
+    display: none;
+}
+
+#macmPaletteGroupDiv{
+    height: 150px;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: space-between;
+}
+
+#macmPaletteDiv{
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid #333;
+    border-radius: 6px;
+    overflow: hidden;
+
+    .macm-accordion-item {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        transition: flex 0.3s ease;
+        position: relative;
+        border-right: 1px solid #333;
+        overflow: hidden;
+        
+        &:last-child {
+            border-right: none;
+        }
+        
+        // Tab compressa
+        flex: 0 0 50px;
+        
+        // Tab espansa
+        &.active {
+            flex: 1;
+        }
+    }
+
+    .macm-palette-tab {
+        height: 100%;
+        width: 50px;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        padding: 15px 10px;
+        background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.8);;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: center;
+        transition: all 0.2s ease;
+        border: none;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+            background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.6);
+        }
+        
+        .active & {
+            background-color: $primary;
+            color: white;
+        }
+    }
+
+    .macm-palette-content {
+        height: 100%;
+        width: 100%;
+        flex: 1;
+        overflow: hidden;
+        background-color: var(--#{$prefix}body-bg);
+    }
+}
+
+#macmPaletteLabelDiv{
+    display: flex;
+    top: 10px;
+    left: 12px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 2;
+    padding: 6px 8px;
+    background-color: rgba(var(--#{$prefix}body-bg-rgb), 0.8);
+    border: 1px solid #333;
+    border-radius: 6px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    backdrop-filter: blur(2px);
+    height: 150px;
+}
+
+#macmCanvasPaletteDiv{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+#macmOverviewDiv{
+    width: 150px;
+    height: 150px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: $gray-100;
+}
+
+#macmInspectorDiv {
+    background: $gray-100;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    will-change: transform, opacity;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#macmInspectorDiv.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+#macmInspectorDiv.is-hidden {
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#macmInspectorDiv.exit-right {
+    transform: translateX(100%);
+    opacity: 0;
 }

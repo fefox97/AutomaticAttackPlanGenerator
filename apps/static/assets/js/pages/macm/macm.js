@@ -48,7 +48,8 @@ $(document).ready(function() {
     });
 
     $('#uploadDC2MOutput').click(function() {
-        $(this).addClass('btn-loading');
+        let uploadButton = $(this);
+        uploadButton.addClass('btn-loading');
         let cypher = $('#modalDC2MOutput').text();
         if (cypher) {
             let formData = new FormData();
@@ -63,9 +64,9 @@ $(document).ready(function() {
             }).done(function(response) {
                 location.reload();
             }).fail(function(response) {
-                $(this).removeClass('btn-loading');
+                uploadButton.removeClass('btn-loading');
                 $('#modalDC2M').modal('hide');
-                showModal("Upload failed", JSON.parse(response.responseText), autohide = true);
+                showModal("Upload failed", JSON.parse(response.responseText));
             });
         }
     });
@@ -82,14 +83,6 @@ $(document).ready(function() {
         const QueryCypher = $('#editQueryCypher').val();
         editMacm(AppID, QueryCypher);
     });
-
-    $('#deleteModal').on('show.bs.modal', function(event) {
-        const AppID = event.relatedTarget.dataset.bsAppid;
-        const AppName = event.relatedTarget.dataset.bsAppname;
-        $('#deleteName').text(AppName);
-        $('#deleteConfirm').click(function() { deleteMacm(AppID); });
-        this.querySelector('#deleteID').value = AppID;
-    });
 });
 
 function deleteMacm(AppID) {
@@ -105,8 +98,17 @@ function deleteMacm(AppID) {
         location.reload();
     }).fail(function(response) {
         $('#deleteModal').modal('hide');
-        showModal("Delete failed", JSON.parse(response.responseText), autohide = true);
+        showModal("Delete failed", JSON.parse(response.responseText), null, autohide = true);
     });
+}
+
+function confirmDeleteMacm(caller){
+    const AppID = caller.dataset.bsAppid;
+    const AppName = caller.dataset.bsAppname;
+    $('#deleteName').text(AppName);
+    $('#deleteConfirm').click(function() { deleteMacm(AppID); });
+    $('#deleteModal').children('#deleteID').val(AppID);
+    $('#deleteModal').modal('show');
 }
 
 function showDC2MModal(title, cypher, app_name, services, service_types, suggested_asset_types) {

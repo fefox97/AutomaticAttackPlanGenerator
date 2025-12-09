@@ -30,6 +30,10 @@ $(window).on('load', function() {
                 targets: 0,
                 className: 'noVis',
                 width: '120px',
+            },
+            {
+                targets: 3,
+                width: '120px',
             }
         ],
         buttons: [

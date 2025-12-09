@@ -202,6 +202,17 @@
                             </button>
                         </div>
                     </li>
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom">
+                        <div>
+                            <h3 class="h6 mb-1">Edit MACM Checks Status</h3>
+                            <p class="small pe-4">Edit the status of the MACM integrity checks</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary btn-sm" id="EditMacmChecksStatus" data-bs-toggle="modal" data-bs-target="#EditoMacmChecksStatusModal">
+                                <span><i class="fas fa-edit"></i> Edit</span>
+                            </button>
+                        </div>
+                    </li>
                     <li class="list-group-item d-flex align-items-center justify-content-between px-0">
                         <div>
                             <h3 class="h6 mb-1">Test</h3>
@@ -221,8 +232,10 @@
 {% include 'admin/modals/broadcast_message.html' %}
 {% include 'admin/modals/edit_setting_modal.html' %}
 {% include 'admin/modals/delete_wiki_modal.html' %}
+{% include 'home/modals/macm_check_status.html' %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/settings.js"></script> 
+<script type="text/javascript" src="{{ config.ASSETS_ROOT }}/js/pages/macm/manage-macm-checks.js"></script> 
 {% endblock javascripts %}

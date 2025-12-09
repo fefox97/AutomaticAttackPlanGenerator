@@ -25,12 +25,14 @@ def macm():
         usersPerApp = MacmUser.usersPerApp()
         owners = MacmUser.ownerPerApp()
         macms = MacmUser.query.join(App).filter(MacmUser.UserID==current_user.id).with_entities(App.AppID, App.Name.label('AppName'), App.Created_at.label('CreatedAt'), MacmUser.IsOwner).all()
+        asset_types = AssetTypes.get_all_asset_types()
+        asset_types_colors = AssetTypes.get_colors()
         if len(macms) == 0:
             macms = None
     except Exception as error:
         macms = None
         raise error
-    return render_template('macm/macm-manager.html', segment=get_segment(request), macms=macms, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict, upload_macm_form=upload_macm_form, upload_docker_compose_form=upload_docker_compose_form)
+    return render_template('macm/macm-manager.html', segment=get_segment(request), macms=macms, users=users, usersPerApp=usersPerApp, owners=owners, users_dict=users_dict, upload_macm_form=upload_macm_form, upload_docker_compose_form=upload_docker_compose_form, asset_types=asset_types, asset_types_colors=asset_types_colors)
 
 @blueprint.route('/macm-viewer', methods=['GET'])
 @auth_required()
@@ -41,8 +43,8 @@ def macm_viewer():
         raise NotFound('MACM not found')
     neo4j_params = {
             "uri": app.config['URI_NEO4J_WSS'],
-            "user": app.config['USER_NEO4J'],
-            "password": app.config['PASS_NEO4J'],
+            "user": app.config['RO_USER_NEO4J'],
+            "password": app.config['RO_PASS_NEO4J'],
             "encrypted": app.config['TLS_NEO4J']
         }
     asset_types_colors = AssetTypes.get_colors()
@@ -53,7 +55,7 @@ def get_segment(request):
     try:
         segment = request.path.split('/')[-1]
         if segment == '':
-            segment = 'macm'
+            segment = 'macms'
         return segment
     except:
         return None
