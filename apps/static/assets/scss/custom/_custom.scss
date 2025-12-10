@@ -750,8 +750,15 @@ pre[class*=language-]{
     width: 16%;
 }
 
+@media (max-width: 768px) {
+    .knowledge-base-col-statistics {
+        flex: 0 0 100%;
+        width: 100%;
+    }
+}
+
 #macmEditorCard{
-    max-height: 100vh;
+    // max-height: 100vh;
     &.fullscreen{
         top: 0;
         left: 0;

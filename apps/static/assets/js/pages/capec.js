@@ -4,14 +4,6 @@ let capec_table = undefined;
 let default_shown_columns = undefined;
 
 $(window).on('load', function() {
-
-    // Set default shown columns
-    if (localStorage.getItem('capec_table_columns') === null) {    
-        default_shown_columns = ['Capec ID', 'Name', 'Capec Parents ID', 'Capec Children ID', 'Abstraction', 'Description', 'Extended Description'];
-        localStorage.setItem('capec_table_columns', JSON.stringify(default_shown_columns));
-    } else {
-        default_shown_columns = JSON.parse(localStorage.getItem('capec_table_columns'));
-    }
     
     capec_table = $('#capec_table').DataTable({
         "paging": true,
@@ -24,6 +16,9 @@ $(window).on('load', function() {
         "scrollY": "50vh",
         "scrollCollapse": true,
         searchPane: true,
+        autoWidth: false,
+        responsive: true,
+        stateSave: true,
         fixedColumns: {
             left: 1
         },
@@ -87,30 +82,10 @@ $(window).on('load', function() {
                     }
                 });
             });
-            // Hide columns that are not in default_shown_columns
-            this.api().columns().every(function () {
-                if (!default_shown_columns.includes(this.header().innerHTML)) {
-                    this.visible(false);
-                }
-            });
             this.api().draw();
         }
     });
 
-    // Set column names for search
-    capec_table.settings()[0].aoColumns.forEach(function(column) {
-        column.sName = column.sTitle;
-    });
-
-    // Save column visibility state
-    capec_table.on('column-visibility.dt', function (e, settings, column, state) {
-        if (state) {
-            default_shown_columns.push(settings.aoColumns[column].sTitle);
-        } else {
-            default_shown_columns = default_shown_columns.filter(function(value, index, arr){ return value != settings.aoColumns[column].sTitle;});
-        }
-        localStorage.setItem('capec_table_columns', JSON.stringify(default_shown_columns));
-    });
 });
 
 $(document).ready(function() {
