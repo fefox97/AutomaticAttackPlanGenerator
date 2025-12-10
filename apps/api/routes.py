@@ -342,7 +342,7 @@ def unshare_macm():
 
 @blueprint.route('/reload_databases', methods=['POST'])
 @auth_required()
-@roles_required('admin')
+@roles_required('editor')
 def reload_databases():
     database = request.form.get('database')
     try:
