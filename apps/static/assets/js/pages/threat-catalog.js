@@ -2,14 +2,6 @@ var threat_catalog = undefined;
 var default_shown_columns = undefined;
 
 $(window).on('load', function() {
-
-    // Set default shown columns
-    if (localStorage.getItem('threat_catalog_columns') === null) {    
-        default_shown_columns = ['TID', 'Asset', 'Threat', 'Description', 'Capec Meta', 'Capec Standard', 'Capec Detailed'];
-        localStorage.setItem('threat_catalog_columns', JSON.stringify(default_shown_columns));
-    } else {
-        default_shown_columns = JSON.parse(localStorage.getItem('threat_catalog_columns'));
-    }
     
     threat_catalog = $('#threatCatalogTable').DataTable({
         "paging": false,
@@ -21,7 +13,9 @@ $(window).on('load', function() {
         "scrollX": true,
         "scrollY": "50vh",
         "scrollCollapse": true,
-        autoWidth: false,
+        autoWidth: true,
+        responsive: true,
+        stateSave: true,
         fixedColumns: {
             left: 1
         },
@@ -84,24 +78,11 @@ $(window).on('load', function() {
                     this.visible(false);
                 }
             });
+
             this.api().draw();
         }
     });
 
-    // Set column names for search
-    threat_catalog.settings()[0].aoColumns.forEach(function(column) {
-        column.sName = column.sTitle;
-    });
-
-    // Save column visibility state
-    threat_catalog.on('column-visibility.dt', function (e, settings, column, state) {
-        if (state) {
-            default_shown_columns.push(settings.aoColumns[column].sTitle);
-        } else {
-            default_shown_columns = default_shown_columns.filter(function(value, index, arr){ return value != settings.aoColumns[column].sTitle;});
-        }
-        localStorage.setItem('threat_catalog_columns', JSON.stringify(default_shown_columns));
-    });
 });
 
 function replaceIDWithButton(table) {

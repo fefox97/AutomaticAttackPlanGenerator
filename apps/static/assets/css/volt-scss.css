@@ -20537,18 +20537,22 @@ pre[class*=language-] {
   flex: 0 0 16.5%;
   width: 16%; }
 
-#macmEditorCard {
-  max-height: 100vh; }
-  #macmEditorCard.fullscreen {
-    top: 0;
-    left: 0;
-    z-index: 100;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    animation: unfoldIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
-  #macmEditorCard.fullscreen-hide {
-    animation: foldOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+@media (max-width: 768px) {
+  .knowledge-base-col-statistics {
+    flex: 0 0 100%;
+    width: 100%; } }
+
+#macmEditorCard.fullscreen {
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  animation: unfoldIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+
+#macmEditorCard.fullscreen-hide {
+  animation: foldOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
 
 #macmEditor {
   width: 100%;
