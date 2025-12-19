@@ -6,6 +6,12 @@ import yaml
 
 class Converter:
 
+    def _sanitize_cypher_identifier(self, value: str) -> str:
+        sanitized = re.sub(r'[^A-Za-z0-9_]', '_', value)
+        if sanitized and sanitized[0].isdigit():
+            sanitized = f"_{sanitized}"
+        return sanitized
+
     def tuple_list_to_dict(self, tuple_list: list):
         if tuple_list is None:
             return None
@@ -110,8 +116,8 @@ class Converter:
         if 'services' not in dockerComposeContent:
             raise ValueError("The docker-compose file does not contain the 'services' section.")
         
-        services = dockerComposeContent['services'].keys()
-        networks = dockerComposeContent.get('networks', {}).keys()
+        services = list(dockerComposeContent['services'].keys())
+        service_identifiers = {service: self._sanitize_cypher_identifier(service) for service in services}
 
         networks_connects_services = {}
         port_service_map = {}
@@ -129,13 +135,32 @@ class Converter:
             port_service_map[service] = []
             if 'ports' in config: # Mappa le porte ai servizi
                 for port in config['ports']:
-                    host_port = port.split(":")[0] if ":" in port else port.split("/")[0]
-                    port_service_map[service].append(host_port)
+                    if isinstance(port, dict):
+                        # Docker long syntax exposes host port under the published key
+                        published = port.get('published')
+                        host_port = str(published) if published is not None else str(port.get('target', ''))
+                    else:
+                        port_entry = str(port).split("/")[0]
+                        segments = port_entry.split(":")
+                        if len(segments) == 3:
+                            # ip:host:container -> reuse host segment
+                            host_port = segments[1]
+                        elif len(segments) >= 2:
+                            host_port = segments[0]
+                        else:
+                            host_port = segments[0]
+                    if host_port:
+                        port_service_map[service].append(host_port)
 
         service_uses_services = {}
         for service, config in dockerComposeContent['services'].items():
             if 'depends_on' in config:
-                service_uses_services[service] = config['depends_on']
+                depends_on = config['depends_on']
+                if isinstance(depends_on, dict):
+                    depends_on = list(depends_on.keys())
+                service_uses_services[service] = depends_on
+
+        network_identifiers = {network: self._sanitize_cypher_identifier(network) for network in networks_connects_services.keys()}
 
         component_id = 1
         macm = []
@@ -154,22 +179,25 @@ class Converter:
         component_id += 1
         hosts.append("\t(VM_OS)-[:hosts]->(Docker),\n")
         for service in services:
-            macm.append(f"\t({service}_container:Virtual:Container {{name:'{service}_container', type:'Virtual.Container', component_id:'{component_id}'}}),\n")
+            service_id = service_identifiers[service]
+            macm.append(f"\t({service_id}_container:Virtual:Container {{name:'{service}_container', type:'Virtual.Container', component_id:'{component_id}'}}),\n")
             component_id += 1
-            hosts.append(f"\t(Docker)-[:hosts]->({service}_container),\n")
-            macm.append(f"\t({service}_OS:SystemLayer:OS {{name:'{service}_OS', type:'SystemLayer.OS', component_id:'{component_id}'}}),\n")
+            hosts.append(f"\t(Docker)-[:hosts]->({service_id}_container),\n")
+            macm.append(f"\t({service_id}_OS:SystemLayer:OS {{name:'{service}_OS', type:'SystemLayer.OS', component_id:'{component_id}'}}),\n")
             component_id += 1
-            hosts.append(f"\t({service}_container)-[:hosts]->({service}_OS),\n")
-            macm.append(f"\t({service}:Service {{name:'{service}', type:'Service', component_id:'{component_id}', parameters:'{{\"ports\": \"{', '.join(port_service_map.get(service, []))}\"}}'}}),\n")
+            hosts.append(f"\t({service_id}_container)-[:hosts]->({service_id}_OS),\n")
+            macm.append(f"\t({service_id}:Service {{name:'{service}', type:'Service', component_id:'{component_id}', parameters:'{{\"ports\": \"{', '.join(port_service_map.get(service, []))}\"}}'}}),\n")
             component_id += 1
-            hosts.append(f"\t({service}_OS)-[:hosts]->({service}),\n")
+            hosts.append(f"\t({service_id}_OS)-[:hosts]->({service_id}),\n")
         
         for network, connected_services in networks_connects_services.items():
-            macm.append(f"\t({network}:Network:LAN {{name:'{network}', type:'Network.LAN', component_id:'{component_id}'}}),\n")
+            network_id = network_identifiers[network]
+            macm.append(f"\t({network_id}:Network:LAN {{name:'{network}', type:'Network.LAN', component_id:'{component_id}'}}),\n")
             component_id += 1
-            hosts.append(f"\t(VM_OS)-[:hosts]->({network}),\n")
+            hosts.append(f"\t(VM_OS)-[:hosts]->({network_id}),\n")
             for service in connected_services:
-                connects.append(f"\t({network})-[:connects]->({service}_container),\n")
+                service_id = service_identifiers[service]
+                connects.append(f"\t({network_id})-[:connects]->({service_id}_container),\n")
 
         macm.append("\n")
 
@@ -178,9 +206,15 @@ class Converter:
         for connect in connects:
             macm.append(connect)
         for service, used_services in service_uses_services.items():
+            service_id = service_identifiers.get(service)
+            if service_id is None:
+                continue
             for used_service in used_services:
-                macm.append(f"\t({service})-[:uses]->({used_service}),\n")
+                used_service_id = service_identifiers.get(used_service)
+                if used_service_id is None:
+                    continue
+                macm.append(f"\t({service_id})-[:uses]->({used_service_id}),\n")
 
         macm[-1] = macm[-1].rstrip(",\n") # Rimuovi l'ultima virgola
 
-        return "".join(macm), list(services), port_service_map
+        return "".join(macm), services, port_service_map
