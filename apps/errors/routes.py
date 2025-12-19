@@ -1,5 +1,6 @@
 from apps.errors import blueprint
 from flask import render_template, request
+
 from flask import current_app as app
 
 # handle if template is not found

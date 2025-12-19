@@ -37,5 +37,4 @@ def register_github():
         db.session.commit()
         
         return redirect(url_for('home_blueprint.index'))
-
     return render_template('accounts/add-email.html', form=github_register_form)

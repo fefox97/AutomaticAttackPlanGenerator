@@ -42,6 +42,9 @@ class Config(object):
     SECURITY_TRACKABLE = os.getenv('SECURITY_TRACKABLE', True)
     SECURITY_CHANGE_EMAIL = os.getenv('SECURITY_CHANGE_EMAIL', True)
     SECURITY_POST_CHANGE_VIEW = os.getenv('SECURITY_POST_CHANGE_VIEW', 'change')
+    SECURITY_USE_REGISTER_V2 = os.getenv('SECURITY_USE_REGISTER_V2', False)
+    SECURITY_RETURN_GENERIC_RESPONSES = os.getenv('SECURITY_RETURN_GENERIC_RESPONSES', True)
+    
 
     # Site info
     URL = os.getenv('URL', 'https://localhost')
