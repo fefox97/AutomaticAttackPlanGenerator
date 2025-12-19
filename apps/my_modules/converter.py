@@ -142,6 +142,9 @@ class Converter:
         hosts = []
         connects = []
         macm.append("CREATE\n")
+        macm.append(f"\t(CSP:CSP {{name:'CSP', type:'CSP', component_id:'{component_id}'}}),\n")
+        component_id += 1
+        hosts.append(f"\t(CSP) -[:provides]->(VM),\n")
         macm.append(f"\t(VM:Virtual:VM {{name:'VM', type:'Virtual.VM', component_id:'{component_id}'}}),\n")
         component_id += 1
         macm.append(f"\t(VM_OS:SystemLayer:OS {{name:'VM_OS', type:'SystemLayer.OS', component_id:'{component_id}'}}),\n")
