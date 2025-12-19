@@ -3,7 +3,7 @@ import re
 import sys
 
 from celery import Celery
-from flask import Flask, request
+from flask import Flask, redirect, request
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
@@ -11,11 +11,15 @@ from flask_assets import Environment, Bundle
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mailman import Mail
 from flask_security import Security, SQLAlchemyUserDatastore, user_registered
+from flask_security.utils import do_flash, url_for_security
 from flask import render_template as real_render_template
+from apps.authentication.forms import ExtendedRegisterForm
 from apps.celery_module.celery_utils import make_celery
 
 from flask_flatpages import FlatPages
 from flask_socketio import SocketIO
+
+from smtplib import SMTPRecipientsRefused
 
 db = SQLAlchemy()
 security = Security()
@@ -42,7 +46,12 @@ def render_template(*args, **kwargs):
 
 def register_extensions(app, user_datastore):
     db.init_app(app)
-    security.init_app(app, datastore=user_datastore)
+    security.init_app(
+        app,
+        datastore=user_datastore,
+        register_form=ExtendedRegisterForm,
+        confirm_register_form=ExtendedRegisterForm,
+    )
     myAdmin.init_app(app)
     mail.init_app(app)
     pages.init_app(app)
@@ -167,6 +176,15 @@ def configure_database(app):
     @app.teardown_request
     def shutdown_session(exception=None):
         db.session.remove()
+        
+
+def configure_smtp(app):
+    @app.errorhandler(SMTPRecipientsRefused)
+    def handle_smtp_refused(error):
+        if request.blueprint == 'security' and request.endpoint and request.endpoint.endswith('register'):
+            do_flash('We could not deliver the confirmation email. Please verify the email address and try again.', 'error')
+            return redirect(url_for_security('register'))
+        raise error
 
 from apps.authentication.oauth import github_blueprint
 from apps.notifications import notify
@@ -177,6 +195,8 @@ def create_app(config):
 
     user_datastore = SQLAlchemyUserDatastore(db, Users, Roles)
     app.user_datastore = user_datastore
+
+    configure_smtp(app)
 
     register_extensions(app, user_datastore)
     register_blueprints(app)

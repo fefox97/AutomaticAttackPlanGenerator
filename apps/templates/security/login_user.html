@@ -1,4 +1,5 @@
 {% extends "layouts/base-fullscreen.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field, render_field_errors, render_form_errors, prop_next %}
 
 {% block title %} Sign in {% endblock %} 
 
@@ -26,23 +27,12 @@
                                 </h1>
                                 <br />
                                 <!-- print flask-security messages -->
-                                {% with messages = get_flashed_messages(with_categories=true) %}
-                                    {% if messages %}
-                                        {% for category, message in messages %}
-                                            <div class="alert alert-{{ category }}">
-                                                {{ message }}
-                                            </div>
-                                        {% endfor %}
-                                    {% else %}
-                                    <p>
-                                        Insert your credentials
-                                    </p>
-                                    {% endif %}                                     
-                                {% endwith %}
+                                {% include "security/_messages.html" %}
                             </div>
                             <form method="post" action="" class="mt-4">
                                 
                                 {{ login_user_form.hidden_tag() }}
+                                {{ render_form_errors(login_user_form) }}
 
                                 <!-- Form -->
                                 <div class="form-group mb-4">
@@ -70,7 +60,7 @@
                                         </div>
                                         {% for error in login_user_form.password.errors %}
                                             <li class="p-1 small font-weight-bold text-danger">{{ error }}</li>
-                                        {% endfor %}  
+                                        {% endfor %}
                                     </div>
                                     <!-- End of Form -->
                                     <div class="d-flex justify-content-between align-items-top mb-4">
