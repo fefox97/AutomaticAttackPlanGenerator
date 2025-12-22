@@ -133,7 +133,7 @@ function cypherToJson(cypherQuery) {
             }
             
             // Match relationship pattern: (VarFrom)-[:TYPE {properties}]->(VarTo)
-            const relPattern = /\((\w+)\)-\[:(\w+)(?:\s*\{([^}]+)\})?\]->\((\w+)\)/g;
+            const relPattern = /\((\w+)\)-\[:(\w+)(?:\s*\{([^}]*)\})?\]->\((\w+)\)/g;
             let relMatch;
             
             while ((relMatch = relPattern.exec(line)) !== null) {
@@ -144,7 +144,7 @@ function cypherToJson(cypherQuery) {
                 
                 // Parse relationship properties if they exist
                 const relProperties = {};
-                if (propertiesStr) {
+                if (propertiesStr && propertiesStr.trim()) {
                     const propPattern = /(\w+)\s*:\s*'([^']*)'/g;
                     let propMatch;
                     
@@ -160,9 +160,9 @@ function cypherToJson(cypherQuery) {
                     type: relType
                 };
                 
-                // Add additional properties if they exist
-                if (relProperties.application_protocol) {
-                    linkData.application_protocol = relProperties.application_protocol;
+                // Add all properties to the link, not just application_protocol
+                for (const [key, value] of Object.entries(relProperties)) {
+                    linkData[key] = value;
                 }
                 
                 linkDataArray.push(linkData);
