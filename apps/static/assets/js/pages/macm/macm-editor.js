@@ -217,6 +217,19 @@ function init() {
             makeButton('Ungroup',
                 (e, obj) => e.diagram.commandHandler.ungroupSelection(),
                 o => o.diagram.commandHandler.canUngroupSelection()
+            ),
+            makeButton('Change Type',
+                (e, obj) => {
+                    var contextmenu = obj.part;
+                    var part = contextmenu.adornedPart;
+                    if (part instanceof go.Node) {
+                        changeNodeType(part);
+                    }
+                },
+                o => {
+                    var part = o.part?.adornedPart;
+                    return part instanceof go.Node && !(part instanceof go.Group);
+                }
             )
         );
 
@@ -573,6 +586,79 @@ function showSmallPorts(node, show) {
         if (port.portId !== '') {
             port.fill = show ? 'rgba(0,0,0,.3)' : null;
         }
+    });
+}
+
+function changeNodeType(node) {
+    if (!node || !node.data) return;
+    
+    // Crea un array di opzioni dai tipi disponibili
+    const assetTypesList = Object.values(asset_types).map(at => at.name).sort();
+    
+    // Crea un select HTML per la scelta del tipo
+    const selectHtml = assetTypesList.map(typeName => 
+        `<option value="${typeName}" ${node.data.type === typeName ? 'selected' : ''}>${typeName}</option>`
+    ).join('');
+    
+    // Mostra un dialog con il select
+    const modalHtml = `
+        <div class="modal fade" id="changeTypeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Node Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="nodeTypeSelect" class="form-label">Select new type:</label>
+                        <select class="form-select" id="nodeTypeSelect">
+                            ${selectHtml}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmChangeType">Change</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Rimuovi modal precedente se esiste
+    $('#changeTypeModal').remove();
+    
+    // Aggiungi il modal al body
+    $('body').append(modalHtml);
+    
+    // Gestisci la conferma
+    $('#confirmChangeType').off('click').on('click', function() {
+        const newType = $('#nodeTypeSelect').val();
+        const assetType = Object.values(asset_types).find(at => at.name === newType);
+        
+        if (assetType) {
+            myDiagram.model.commit(m => {
+                m.set(node.data, 'type', assetType.name);
+                m.set(node.data, 'background_color', assetType.color);
+                m.set(node.data, 'color', getTextColor(assetType.color));
+                m.set(node.data, 'primary_label', assetType.primary_label);
+                m.set(node.data, 'secondary_label', assetType.secondary_label);
+            }, 'change node type');
+            
+            myDiagram.isModified = true;
+            const saveButton = document.getElementById('SaveButton');
+            if (saveButton) saveButton.disabled = false;
+        }
+        
+        $('#changeTypeModal').modal('hide');
+    });
+    
+    // Mostra il modal
+    const modal = new bootstrap.Modal(document.getElementById('changeTypeModal'));
+    modal.show();
+    
+    // Pulisci il modal dopo la chiusura
+    $('#changeTypeModal').on('hidden.bs.modal', function() {
+        $(this).remove();
     });
 }
 
