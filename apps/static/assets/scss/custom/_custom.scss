@@ -1035,3 +1035,11 @@ pre[class*=language-]{
     transform: translateX(100%);
     opacity: 0;
 }
+
+.auto-layout-active {
+    background-color: #5b5bcf; // o il colore che preferisci
+}
+
+.auto-layout-inactive {
+    background-color: $tertiary; // o il colore che preferisci
+}

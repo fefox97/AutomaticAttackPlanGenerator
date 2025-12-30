@@ -1,6 +1,7 @@
 var inspector;
 const MACM_LOCAL_STORAGE_KEY = 'macmDiagramCurrent';
 let autoSaveTimeout = null;
+let autoLayoutEnabled = true;
 
 function init() {
     myDiagram = new go.Diagram('macmDiagramDiv', {
@@ -10,14 +11,14 @@ function init() {
         layout: new ContinuousForceDirectedLayout({ // automatically spread nodes apart while dragging
             defaultSpringLength: 300
         }),
-        SelectionMoved: e => e.diagram.layout.invalidateLayout()
+        SelectionMoved: e => { if (autoLayoutEnabled) e.diagram.layout.invalidateLayout(); }
     });
 
     // dragging a node invalidates the Diagram.layout, causing a layout during the drag
     myDiagram.toolManager.draggingTool.doMouseMove = function () {
       // method override must be function, not =>
         go.DraggingTool.prototype.doMouseMove.call(this);
-        if (this.isActive) this.diagram.layout.doLayout(this.diagram);
+        if (this.isActive && autoLayoutEnabled) this.diagram.layout.doLayout(this.diagram);
     };
 
     // A custom function to generate unique positive keys
@@ -134,8 +135,36 @@ function init() {
             enableFullScreen();
         }
     });
+    
+    const autoLayoutBtn = document.createElement('button');
+    autoLayoutBtn.id = 'macmAutoLayoutBtn';
+    autoLayoutBtn.className = 'zoomButton mb-1' + (autoLayoutEnabled ? ' auto-layout-active' : ' auto-layout-inactive');
+    autoLayoutBtn.type = 'button';
+    autoLayoutBtn.title = 'Toggle Auto Layout';
+    autoLayoutBtn.innerHTML = '<i class="fas fa-project-diagram"></i>';
+    autoLayoutBtn.addEventListener('click', () => {
+        autoLayoutEnabled = !autoLayoutEnabled;
+        if (autoLayoutEnabled) {
+            autoLayoutBtn.classList.remove('auto-layout-inactive');
+            autoLayoutBtn.classList.add('auto-layout-active');
+        } else {
+            autoLayoutBtn.classList.remove('auto-layout-active');
+            autoLayoutBtn.classList.add('auto-layout-inactive');
+        }
+        if (!autoLayoutEnabled) {
+            // Disattiva il layout impostando un layout statico
+            myDiagram.layout = new go.Layout();
+        } else {
+            // Riattiva il layout force-directed
+            myDiagram.layout = new ContinuousForceDirectedLayout({
+                defaultSpringLength: 300
+            });
+        }
+    });
+    
     zoomSlider._sliderDiv.style = '';
     zoomSlider._sliderDiv.prepend(fullscreenBtn);
+    zoomSlider._sliderDiv.prepend(autoLayoutBtn);
 
     inspector = new Inspector('macmInspectorDiv', myDiagram, {
             // allows for multiple nodes to be inspected at once
