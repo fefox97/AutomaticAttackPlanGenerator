@@ -20780,6 +20780,12 @@ pre[class*=language-] {
   transform: translateX(100%);
   opacity: 0; }
 
+.auto-layout-active {
+  background-color: #5b5bcf; }
+
+.auto-layout-inactive {
+  background-color: #31316A; }
+
 [data-bs-theme="dark"] .plot_container {
   filter: invert(100%) hue-rotate(180deg); }
 
