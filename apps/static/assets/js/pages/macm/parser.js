@@ -60,18 +60,25 @@ function cypherToJson(cypherQuery) {
                 const labels = nodeMatch[2].trim().split(':').map(l => l.trim()); // e.g., ["Party", "Human"]
                 const propertiesStr = nodeMatch[3]; // e.g., "component_id:'1', name:'User', type:'Party.Human'"
                 
-                // Parse properties - improved to handle JSON strings with double quotes
+                // Parse properties - improved to handle both single and double quotes
                 const properties = {};
                 // Split by comma, but respect nested JSON structures
                 let currentProp = '';
                 let inString = false;
+                let stringChar = null;
                 let braceCount = 0;
                 
                 for (let i = 0; i < propertiesStr.length; i++) {
                     const char = propertiesStr[i];
                     
-                    if (char === "'" && propertiesStr[i-1] !== '\\') {
-                        inString = !inString;
+                    if ((char === "'" || char === '"') && propertiesStr[i-1] !== '\\') {
+                        if (!inString) {
+                            inString = true;
+                            stringChar = char;
+                        } else if (char === stringChar) {
+                            inString = false;
+                            stringChar = null;
+                        }
                         currentProp += char;
                     } else if (inString) {
                         currentProp += char;
@@ -79,7 +86,7 @@ function cypherToJson(cypherQuery) {
                         if (char === '}') braceCount--;
                     } else if (char === ',' && braceCount === 0) {
                         // End of property
-                        const propMatch = currentProp.trim().match(/(\w+)\s*:\s*'(.*)'/);
+                        const propMatch = currentProp.trim().match(/(\w+)\s*:\s*["'](.*)["']/);
                         if (propMatch) {
                             properties[propMatch[1]] = propMatch[2];
                         }
@@ -91,12 +98,12 @@ function cypherToJson(cypherQuery) {
                 
                 // Don't forget the last property
                 if (currentProp.trim()) {
-                    const propMatch = currentProp.trim().match(/(\w+)\s*:\s*'(.*)'/);
+                    const propMatch = currentProp.trim().match(/(\w+)\s*:\s*["'](.*)["']/);
                     if (propMatch) {
                         properties[propMatch[1]] = propMatch[2];
                     }
                 }
-                
+
                 // Parse parameters if present
                 let parsedParameters = null;
                 if (properties.parameters) {
@@ -118,7 +125,7 @@ function cypherToJson(cypherQuery) {
                     color:  getTextColor(asset_types_colors[properties.type] || "rgba(255, 255, 255, 1)"),
                     key: parseInt(properties.component_id) || nodeKey
                 };
-                
+
                 // Add parameters if they exist
                 if (parsedParameters) {
                     nodeData.parameters = parsedParameters;
