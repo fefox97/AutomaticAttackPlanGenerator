@@ -191,9 +191,10 @@ $(document).ready(function () {
             }
 
             for (let [key, value] of Object.entries(asset_types_colors)) {
+                console.log(key, value);
                 let color = pSBC(-0.5, value);
                 let textColor = getTextColor(value);
-                cy.style().selector(`node.${key.replace('.','_')}`).style({
+                cy.style().selector(`node.${key.replace(/\./g,'_')}`).style({
                     'background-color': value,
                     'border-color': color,
                     'color': textColor,
@@ -202,7 +203,7 @@ $(document).ready(function () {
 
             cy.nodes().forEach(node => {
                 if (node.data().type)
-                    node.addClass(node.data().type.replace('.', '_'));
+                    node.addClass(node.data().type.replace(/\./g, '_'));
             });
 
             // Event listener per cambiare layout e salvare la preferenza
