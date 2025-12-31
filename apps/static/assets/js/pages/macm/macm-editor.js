@@ -871,6 +871,7 @@ function uploadCypher() {
         myDiagram.isModified = true;
         const button = document.getElementById('SaveButton');
         if (button) button.disabled = false;
+        save();
         $('#modalCypher2Canvas').modal('hide');
     }
     else {
