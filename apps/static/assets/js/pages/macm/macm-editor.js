@@ -2,6 +2,7 @@ var inspector;
 const MACM_LOCAL_STORAGE_KEY = 'macmDiagramCurrent';
 let autoSaveTimeout = null;
 let autoLayoutEnabled = true;
+let springLength = 500; // default spring length for the force-directed layout
 
 function init() {
     myDiagram = new go.Diagram('macmDiagramDiv', {
@@ -9,7 +10,7 @@ function init() {
         'themeManager.changesDivBackground': true,
         'themeManager.currentTheme': document.documentElement.getAttribute('data-bs-theme', 'dark'),
         layout: new ContinuousForceDirectedLayout({ // automatically spread nodes apart while dragging
-            defaultSpringLength: 300
+            defaultSpringLength: springLength
         }),
         SelectionMoved: e => { if (autoLayoutEnabled) e.diagram.layout.invalidateLayout(); }
     });
@@ -157,7 +158,7 @@ function init() {
         } else {
             // Riattiva il layout force-directed
             myDiagram.layout = new ContinuousForceDirectedLayout({
-                defaultSpringLength: 300
+                defaultSpringLength: springLength
             });
         }
     });
