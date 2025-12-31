@@ -25,9 +25,17 @@ function init() {
     // A custom function to generate unique positive keys
     myDiagram.model = new go.GraphLinksModel({
         makeUniqueKeyFunction: function() {
-            let k = 1; 
+            // Trova il massimo ID esistente
+            let maxKey = 0;
+            myDiagram.model.nodeDataArray.forEach(node => {
+                if (typeof node.key === 'number' && node.key > maxKey) {
+                    maxKey = node.key;
+                }
+            });
+            // Parte da maxKey + 1 e trova il prossimo ID libero
+            let k = maxKey + 1;
             while (myDiagram.model.findNodeDataForKey(k)) {
-            k++;
+                k++;
             }
             return k;
         },
@@ -746,8 +754,18 @@ function load() {
         // Reinserisce la funzione di key unica (persa nel fromJson)
         if (model instanceof go.GraphLinksModel) {
             model.makeUniqueKeyFunction = function() {
-                let k = 1;
-                while (model.findNodeDataForKey(k)) k++;
+                // Trova il massimo ID esistente
+                let maxKey = 0;
+                myDiagram.model.nodeDataArray.forEach(node => {
+                    if (typeof node.key === 'number' && node.key > maxKey) {
+                        maxKey = node.key;
+                    }
+                });
+                // Parte da maxKey + 1 e trova il prossimo ID libero
+                let k = maxKey + 1;
+                while (myDiagram.model.findNodeDataForKey(k)) {
+                    k++;
+                }
                 return k;
             };
         }
@@ -864,7 +882,26 @@ function uploadCypher() {
     var cypherQuery = $('#modalCypher2CanvasInput').val().trim();
     var cypher2Json = cypherToJson(cypherQuery);
     if (cypher2Json) {
-        myDiagram.model = go.Model.fromJson(cypher2Json);
+        const model = go.Model.fromJson(cypher2Json);
+        // Ripristina la funzione di key unica (persa nel fromJson)
+        if (model instanceof go.GraphLinksModel) {
+            model.makeUniqueKeyFunction = function() {
+                // Trova il massimo ID esistente
+                let maxKey = 0;
+                myDiagram.model.nodeDataArray.forEach(node => {
+                    if (typeof node.key === 'number' && node.key > maxKey) {
+                        maxKey = node.key;
+                    }
+                });
+                // Parte da maxKey + 1 e trova il prossimo ID libero
+                let k = maxKey + 1;
+                while (myDiagram.model.findNodeDataForKey(k)) {
+                    k++;
+                }
+                return k;
+            };
+        }
+        myDiagram.model = model;
         // Assicura che ogni link abbia almeno il type di default
         myDiagram.model.commit(m => {
             m.linkDataArray.forEach(ld => { if (!ld.type) m.set(ld, 'type', 'No Type'); });
