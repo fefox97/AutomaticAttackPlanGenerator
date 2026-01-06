@@ -106,13 +106,22 @@ class Config(object):
     FLATPAGES_ROOT_IMAGES = os.getenv('FLATPAGES_ROOT_IMAGES', None)
     FLATPAGES_EXTENSION = os.getenv('FLATPAGES_EXTENSION', '.md')
     FLATPAGES_MARKDOWN_EXTENSIONS = [
-        'fenced_code',
-        'codehilite',
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.codehilite',
         'markdown.extensions.extra',
         'markdown.extensions.meta',
+        'markdown.extensions.tables',
+        'markdown.extensions.nl2br',
         CardExtension(),
         TableClassExtension(),
     ]
+    FLATPAGES_EXTENSION_CONFIGS = {
+        'markdown.extensions.codehilite': {
+            'css_class': 'codehilite',
+            'linenums': False,
+            'guess_lang': True,
+        }
+    }
     WIKI_REPO = os.getenv('WIKI_REPO', None)
     GITHUB_REPO_TOKEN = os.getenv('GITHUB_REPO_TOKEN', None)
 
