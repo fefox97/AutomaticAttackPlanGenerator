@@ -384,9 +384,10 @@ class MacmUtils:
 
 	def delete_macm(self, app_id, delete_neo4j=True):
 		try:
-			if MacmUser.query.filter_by(AppID=app_id, UserID=current_user.id, IsOwner=True).first() is None:
+			user = g.api_user if hasattr(g, 'api_user') else current_user
+			if MacmUser.query.filter_by(AppID=app_id, UserID=user.id, IsOwner=True).first() is None:
 				app_name = App.query.filter_by(AppID=app_id).with_entities(App.Name).first()[0]
-				raise Exception(f"User {current_user.username} is not the owner of MACM {app_name}")
+				raise Exception(f"User {user.username} is not the owner of MACM {app_name}")
 			App.query.filter_by(AppID=app_id).delete()
 			Macm.query.filter_by(App_ID=app_id).delete()
 			MacmUser.query.filter_by(AppID=app_id).delete()
@@ -611,9 +612,10 @@ class Utils:
 			self.save_dataframe_to_database(threat_agent_category_attributes, ThreatAgentAttributesCategory)
 			self.save_dataframe_to_database(threat_agent_reply_categories, ThreatAgentReplyCategory)
 		elif database == 'Macm':
+			user = g.api_user if hasattr(g, 'api_user') else current_user
 			macm_df = self.macm_utils.read_macm(database=neo4j_db)
 			tool_asset_type_df = self.macm_utils.tool_asset_type_rel(database=neo4j_db)
-			macm_user_df = pd.DataFrame({'UserID': current_user.id, 'AppID': neo4j_db, 'IsOwner': True}, index=[0])
+			macm_user_df = pd.DataFrame({'UserID': user.id, 'AppID': neo4j_db, 'IsOwner': True}, index=[0])
 			app_df = pd.DataFrame({'AppID': neo4j_db, 'Name': app_name}, index=[0])
 			macm_df['App_ID'] = neo4j_db
 			tool_asset_type_df['AppID'] = neo4j_db
