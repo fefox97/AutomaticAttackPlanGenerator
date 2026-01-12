@@ -104,10 +104,12 @@ $('#generateTokenForm').on('submit', function(e) {
         body: JSON.stringify({ expires_days: expiresDays, description: description })
     })
     .then(response => {
-        if (response.status === 403) {
-            throw new Error('You do not have permission to create API tokens.');
-        } else {
-            throw new Error('Error generating token. Please try again.');
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('You do not have permission to create API tokens.');
+            } else {
+                throw new Error('Error generating token. Please try again.');
+            }
         }
         return response.json();
     })
