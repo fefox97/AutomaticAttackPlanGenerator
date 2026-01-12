@@ -199,9 +199,11 @@ def search_capec_by_keyword():
     return jsonify({'ids': result})
 
 @blueprint.route('/upload_macm', methods=['POST'])
-@auth_required()
+# @auth_required()
+@token_required
 def upload_macm():
     app_name = request.form.get('macmAppName')
+    user = g.api_user if hasattr(g, 'api_user') else current_user
     if app_name in [None, '']:
         return make_response(jsonify({'message': 'No App Name provided'}), 400)
     if 'macmFile' in request.files and request.files['macmFile'].filename != '':
@@ -215,9 +217,9 @@ def upload_macm():
     else:
         return make_response(jsonify({'message': 'No file or Cypher query provided'}), 400)
     try:
-        macm_db = f'db.{current_user.id}.{uuid.uuid4()}'
+        macm_db = f'db.{user.id}.{uuid.uuid4()}'
         macm.upload_macm(query_str, app_name=app_name, database=macm_db)
-        return make_response(jsonify({'message': 'MACM uploaded successfully'}), 200)
+        return make_response(jsonify({'message': 'MACM uploaded successfully', 'id': macm_db}), 200)
     except Exception as error:
         app.logger.error(f"Error uploading MACM: {error.args}", exc_info=True)
         return make_response(jsonify({'message': error.args}), 400)
@@ -284,7 +286,8 @@ def rename_macm():
         return make_response(jsonify({'message': 'No MACM provided'}), 400)
 
 @blueprint.route('/delete_macm', methods=['POST'])
-@auth_required()
+# @auth_required()
+@token_required
 def clear_macm():
     selected_macm = request.form.get('AppID')
     app.logger.info(f"Deleting MACM {selected_macm}")
@@ -404,7 +407,8 @@ def download_excel():
     return send_file(f'{path}/{filename}', as_attachment=True, mimetype='application/octet-stream', download_name=filename)
 
 @blueprint.route('/download_threat_model', methods=['POST'])
-@auth_required()
+# @auth_required()
+@token_required
 def download_threat_model():
     app_id = request.form.get('AppID')
     try:
