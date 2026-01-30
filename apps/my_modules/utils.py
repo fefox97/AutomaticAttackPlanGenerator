@@ -304,6 +304,13 @@ class MacmUtils:
 		max_id = self.driver.execute_query(query, database_=database, result_transformer_=Result.to_df).iloc[0]['max_id']
 		return max_id if max_id is not None else 0
 	
+	def get_number_of_nodes_and_edges(self, database='macm'):
+		query_nodes = "MATCH (n) RETURN count(n) as number_of_nodes"
+		query_edges = "MATCH ()-[r]->() RETURN count(r) as number_of_edges"
+		number_of_nodes = self.driver.execute_query(query_nodes, database_=database, result_transformer_=Result.to_df).iloc[0]['number_of_nodes']
+		number_of_edges = self.driver.execute_query(query_edges, database_=database, result_transformer_=Result.to_df).iloc[0]['number_of_edges']
+		return number_of_nodes, number_of_edges
+
 	def get_macm_info(self, database='macm'):
 		app = App.query.filter_by(AppID=database).with_entities(App.AppID, App.Name).first()
 		maxID = self.get_greatest_component_id(database)
