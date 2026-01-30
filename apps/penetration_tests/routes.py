@@ -1,5 +1,6 @@
 
 
+from apps.my_modules import utils
 from apps.penetration_tests.forms import UploadMacmForm
 from apps.authentication.models import Users
 from apps.penetration_tests import blueprint
@@ -58,12 +59,13 @@ def macm():
             "encrypted": app.config['TLS_NEO4J']
         }
         asset_types_colors = AssetTypes.get_colors()
+        number_of_nodes, number_of_edges = utils.macm_utils.get_number_of_nodes_and_edges(database=selected_macm)
     except NotFound as error:
         raise error
     except Exception as error:
         app.logger.error('Exception occurred while trying to serve ' + request.path, exc_info=True)
         raise Exception('Exception occurred while trying to serve ' + request.path)
-    return render_template(f"penetration_tests/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info, asset_types_colors=asset_types_colors)
+    return render_template(f"penetration_tests/macm.html", segment=get_segment(request), table=table, attack_for_each_component=attack_for_each_component, attack_number=attack_number, threat_for_each_component=threat_for_each_component, threat_number=threat_number, reports=reports, selected_macm=selected_macm, extra_components=extra_components, neo4j_params=neo4j_params, app_info=app_info, asset_types_colors=asset_types_colors, number_of_nodes=number_of_nodes, number_of_edges=number_of_edges)
 
 @blueprint.route('/macm-detail', methods=['GET'])
 @auth_required()

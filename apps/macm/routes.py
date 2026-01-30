@@ -10,7 +10,7 @@ from flask_security import auth_required, current_user
 from werkzeug.exceptions import NotFound
 
 from apps.macm.forms import UploadMacmForm
-from apps.my_modules import converter
+from apps.my_modules import converter, utils
 
 
 
@@ -39,6 +39,7 @@ def macm():
 def macm_viewer():
     selected_macm = request.args.get('app_id')
     app_info = App.query.filter_by(AppID=selected_macm).first()
+    number_of_nodes, number_of_edges = utils.macm_utils.get_number_of_nodes_and_edges(database=selected_macm)
     if selected_macm is None or MacmUser.query.filter_by(AppID=selected_macm).count() == 0 or app_info is None:
         raise NotFound('MACM not found')
     neo4j_params = {
@@ -48,7 +49,7 @@ def macm_viewer():
             "encrypted": app.config['TLS_NEO4J']
         }
     asset_types_colors = AssetTypes.get_colors()
-    return render_template('macm/macm-viewer.html', segment=get_segment(request), selected_macm=selected_macm, neo4j_params=neo4j_params, asset_types_colors=asset_types_colors, app_info=app_info)
+    return render_template('macm/macm-viewer.html', segment=get_segment(request), selected_macm=selected_macm, neo4j_params=neo4j_params, asset_types_colors=asset_types_colors, app_info=app_info, number_of_nodes=number_of_nodes, number_of_edges=number_of_edges)
 
 # Helper - Extract current page name from request
 def get_segment(request):
