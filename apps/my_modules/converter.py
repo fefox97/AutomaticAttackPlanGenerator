@@ -81,6 +81,23 @@ class Converter:
             out_dict = {k.removeprefix("'").removesuffix("'"): v.removeprefix("'").removesuffix("'") for k, v in out_dict.items()}
             return out_dict
 
+    def json_to_dict(self, string):
+        if string is None or (not isinstance(string, (dict, list)) and pd.isna(string)):
+            return None
+        if isinstance(string, (dict, list)):
+            return string
+        if isinstance(string, (str, bytes, bytearray)):
+            str_val = string.decode() if isinstance(string, (bytes, bytearray)) else string
+            str_val = str_val.strip()
+            if not str_val or str_val in ('None', 'null', 'nan'):
+                return None
+            try:
+                import json
+                return json.loads(str_val)
+            except Exception:
+                return str_val
+        return None
+
     def convert_column_to_text(self, df: pd.DataFrame):
         # for column in ['Can Follow Refs', 'Domains', 'Object Marking Refs', 'Prerequisites', 'Alternate Terms', 'Can Precede Refs', 'Resources Required', 'Example Instances']:
         for column in ['Can_Follow_Refs', 'Domains', 'Object_Marking_Refs', 'Prerequisites', 'Alternate_Terms', 'Can_Precede_Refs', 'Resources_Required', 'Example_Instances']:

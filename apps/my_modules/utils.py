@@ -319,7 +319,7 @@ class MacmUtils:
 	def read_macm(self, database='macm'):
 		macm_df: pd.DataFrame = self.driver.execute_query("MATCH (asset) RETURN asset.component_id, asset.name, asset.type, asset.app_id, asset.parameters, labels(asset)", database_=database, result_transformer_=Result.to_df)
 		macm_df.rename(columns={'asset.component_id': 'Component_ID', 'asset.name': 'Name', 'asset.type': 'Type', 'asset.app_id': 'App_ID', 'asset.parameters': 'Parameters', 'labels(asset)': 'Labels'}, inplace=True)
-		macm_df['Parameters'] = macm_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
+		macm_df['Parameters'] = macm_df['Parameters'].apply(self.converter.json_to_dict)
 		return macm_df
 
 	def upload_macm(self, query, app_name, database='macm'):
@@ -462,7 +462,7 @@ class MacmUtils:
 					components_to_add = pd.DataFrame({'ToolID': query.ToolID, 'ComponentID': component['component_id'], 'Parameters': parameters}, index=[0])
 					tool_asset_type_df = pd.concat([tool_asset_type_df, components_to_add], ignore_index=True)
 		tool_asset_type_df.drop_duplicates(inplace=True)
-		tool_asset_type_df['Parameters'] = tool_asset_type_df['Parameters'].apply(lambda x: json.loads(x) if x is not None else None)
+		tool_asset_type_df['Parameters'] = tool_asset_type_df['Parameters'].apply(self.converter.json_to_dict)
 		return tool_asset_type_df
 
 	def add_extra_components(self, database='macm'):
