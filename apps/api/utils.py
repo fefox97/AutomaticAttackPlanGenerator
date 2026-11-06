@@ -90,7 +90,7 @@ class APIUtils:
 
             if html_columns is not None:
                 for col in html_columns:
-                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if x is not None else x)
+                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if pd.notna(x) and isinstance(x, str) else ("" if pd.isna(x) else x))
 
             file_bytes = io.BytesIO()
             with pd.ExcelWriter(file_bytes, engine='xlsxwriter') as writer:
@@ -122,7 +122,7 @@ class APIUtils:
 
             if html_columns is not None:
                 for col in html_columns:
-                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if x is not None else x)
+                    df[col] = df[col].apply(lambda x: BeautifulSoup(x, features="html.parser").get_text('\n') if pd.notna(x) and isinstance(x, str) else ("" if pd.isna(x) else x))
             return df.to_json(orient='index')
         
         except:
