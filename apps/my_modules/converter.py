@@ -25,12 +25,18 @@ class Converter:
             return [list(t) for t in tuple_list]
 
     def string_to_list(self, string: str, sepator=r'[ ,]+'):
-        if string is None:
+        if isinstance(string, list):
+            return string
+        if string is None or not isinstance(string, str) or pd.isna(string):
             return None
         else:
             return re.split(sepator, string)
 
     def string_to_int_list(self, string: str, sepator=r'[ ,]+'):
+        if isinstance(string, list):
+            return [int(x) for x in string]
+        if string is None or not isinstance(string, (str, int, float)) or (not isinstance(string, (list, tuple)) and pd.isna(string)):
+            return None
         string = f"{string}"
         if string in [None, '', 'None', 'nan']:
             return None

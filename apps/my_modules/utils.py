@@ -139,8 +139,8 @@ class ToolCatalogUtils:
 		print("\nLoading pentest phases...\n")
 		df = pd.read_excel(file_path, sheet_name="Pentest Phases", header=0)
 		df.replace(np.nan, None, inplace=True)
-		df['PhaseID'] = df['PhaseID'].apply(lambda x: int(x) if x is not None else None)
-		df['IsSubPhaseOf'] = df['IsSubPhaseOf'].apply(lambda x: int(x) if x is not None else None)
+		df['PhaseID'] = df['PhaseID'].apply(lambda x: int(x) if x is not None and not pd.isna(x) else None)
+		df['IsSubPhaseOf'] = df['IsSubPhaseOf'].apply(lambda x: int(x) if x is not None and not pd.isna(x) else None)
 		print(df)
 		return df
 
@@ -504,7 +504,14 @@ class Utils:
 					session.execute(text(f"SET FOREIGN_KEY_CHECKS=1"))
 					session.commit()
 		mapper.metadata.create_all(self.engine)
-		session.bulk_insert_mappings(mapper, df.to_dict(orient="records", index=True), render_nulls=False)
+		records = [
+			{
+				k: (None if (v is None or (not isinstance(v, (list, tuple, dict, set)) and pd.isna(v))) else v)
+				for k, v in row.items()
+			}
+			for row in df.to_dict(orient="records")
+		]
+		session.bulk_insert_mappings(mapper, records, render_nulls=False)
 		session.commit()
 		session.close()
 
@@ -512,7 +519,10 @@ class Utils:
 		print("\nExtracting Capec-ThreatCatalog relations to database...\n")
 		relations_df = pd.DataFrame(columns=['Capec_ID', 'TID'])
 		for _, threat in df.iterrows():
-			for capec in threat['CapecMeta'] + threat['CapecStandard'] + threat['CapecDetailed']:
+			capecs = (threat['CapecMeta'] if isinstance(threat.get('CapecMeta'), list) else []) + \
+			         (threat['CapecStandard'] if isinstance(threat.get('CapecStandard'), list) else []) + \
+			         (threat['CapecDetailed'] if isinstance(threat.get('CapecDetailed'), list) else [])
+			for capec in capecs:
 				if capec is not None and capec != 'None':
 					relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'TID': threat['TID']}
 		relations_df.drop_duplicates(inplace=True)
@@ -523,8 +533,9 @@ class Utils:
 		print("\nExtracting Capec-ToolCatalog relations to database...\n")
 		relations_df = pd.DataFrame(columns=['Capec_ID', 'ToolID'])
 		for _, tool in df.iterrows():
-			if tool['CapecID'] is not None:
-				for capec in tool['CapecID']:
+			capec_id = tool.get('CapecID') if hasattr(tool, 'get') else tool['CapecID']
+			if capec_id is not None and isinstance(capec_id, (list, tuple)):
+				for capec in capec_id:
 					if capec is not None and capec != 'None':
 						relations_df.loc[len(relations_df)] = {'Capec_ID': int(capec), 'ToolID': tool['ToolID']}
 		relations_df.drop_duplicates(inplace=True)
@@ -535,10 +546,11 @@ class Utils:
 		print("\nExtracting ToolCatalog-PentestPhases relations to database...\n")
 		relations_df = pd.DataFrame(columns=['ToolID', 'PhaseID'])
 		for _, tool in df.iterrows():
-			if tool['PhaseID'] is not None:
-				for phase in tool['PhaseID']:
+			phase_id = tool.get('PhaseID') if hasattr(tool, 'get') else tool['PhaseID']
+			if phase_id is not None and isinstance(phase_id, (list, tuple)):
+				for phase in phase_id:
 					if phase is not None:
-						relations_df.loc[len(relations_df)] = {'ToolID': tool['ToolID'], 'PhaseID': phase}
+						relations_df.loc[len(relations_df)] = {'ToolID': tool['ToolID'], 'PhaseID': int(phase)}
 		relations_df.drop_duplicates(inplace=True)
 		relations_df.index.name = 'Id'
 		return relations_df
