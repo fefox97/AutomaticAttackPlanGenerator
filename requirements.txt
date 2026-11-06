@@ -13,7 +13,7 @@ sqlalchemy_utils
 sqlalchemy_schemadisplay
 
 email_validator
-gunicorn
+gunicorn==21.2.0
 jinja2
 flask-restx
 Werkzeug

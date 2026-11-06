@@ -11,6 +11,9 @@ from .exceptions import ImproperlyConfigured
 from .functions import identity
 from .functions.orm import _get_class_registry
 
+if not hasattr(attributes, 'ScalarAttributeImpl') and hasattr(attributes, '_ScalarAttributeImpl'):
+    attributes.ScalarAttributeImpl = attributes._ScalarAttributeImpl
+
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
     def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
